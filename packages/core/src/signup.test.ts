@@ -20,16 +20,12 @@ describe("schoolDetailsSchema", () => {
 describe("ownerAccountSchema", () => {
   const owner = { fullName: "Amaka Obi", email: " Amaka@Surebloom.NG ", password: "longenough" };
 
-  it("tidies the email and allows no phone", () => {
-    const parsed = ownerAccountSchema.parse({ ...owner, phone: "" });
-    expect(parsed.email).toBe("amaka@surebloom.ng");
-    expect(parsed.phone).toBeUndefined();
+  it("tidies the email", () => {
+    expect(ownerAccountSchema.parse(owner).email).toBe("amaka@surebloom.ng");
   });
 
-  it("checks the password length and an optional phone", () => {
+  it("checks the password length", () => {
     expect(ownerAccountSchema.safeParse({ ...owner, password: "short" }).success).toBe(false);
-    expect(ownerAccountSchema.safeParse({ ...owner, phone: "12345" }).success).toBe(false);
-    expect(ownerAccountSchema.parse({ ...owner, phone: "+234 803 000 0001" }).phone).toBe("+2348030000001");
   });
 });
 

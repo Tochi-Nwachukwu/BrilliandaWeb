@@ -43,7 +43,7 @@ function publicDraft(draft: FakeSignupDraft): SignupDraft {
   return {
     step: stepOf(draft),
     school: draft.school ?? null,
-    owner: draft.owner ? { fullName: draft.owner.fullName, email: draft.owner.email, phone: draft.owner.phone } : null,
+    owner: draft.owner ? { fullName: draft.owner.fullName, email: draft.owner.email } : null,
     codeSentAt: draft.codeSentAt ?? null,
     emailVerified: draft.emailVerified,
   };
@@ -71,7 +71,7 @@ export async function saveOwnerAccount(input: OwnerAccount): Promise<ActionResul
   const draft = id ? store.signupDrafts.get(id) : undefined;
   if (!draft?.school) return { ok: false, error: "Start with your school’s details." };
   const emailChanged = draft.owner?.email !== input.email;
-  draft.owner = { fullName: input.fullName, email: input.email, password: input.password, phone: input.phone };
+  draft.owner = { fullName: input.fullName, email: input.email, password: input.password };
   // A new address needs a new code; the same one keeps its timer.
   if (emailChanged || !draft.codeSentAt) {
     draft.codeSentAt = Date.now();
@@ -136,7 +136,7 @@ export async function createSchool(subdomain: string): Promise<ActionResult<{ su
   store.schools.push({ subdomain: check.subdomain, name: draft.school.schoolName, status: "active", brandColor: "#4A3AA7", logoUrl: null });
   let user = store.users.find((u) => u.email === draft.owner!.email);
   if (!user) {
-    user = { id: crypto.randomUUID(), fullName: draft.owner.fullName, email: draft.owner.email, password: draft.owner.password, phone: draft.owner.phone, schools: [] };
+    user = { id: crypto.randomUUID(), fullName: draft.owner.fullName, email: draft.owner.email, password: draft.owner.password, schools: [] };
     store.users.push(user);
   }
   user.schools.push({ subdomain: check.subdomain, role: "owner" });

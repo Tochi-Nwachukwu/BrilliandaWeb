@@ -27,7 +27,7 @@ export type FakeLink = { kind: "reset" | "magic"; userId: string; subdomain: str
 /** A signup in progress. The password is only ever kept here, never sent back to a page. */
 export type FakeSignupDraft = {
   school?: SchoolDetails;
-  owner?: { fullName: string; email: string; password: string; phone?: string };
+  owner?: { fullName: string; email: string; password: string };
   codeSentAt?: number;
   emailVerified: boolean;
 };

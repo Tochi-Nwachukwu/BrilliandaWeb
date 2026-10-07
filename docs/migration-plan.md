@@ -273,3 +273,6 @@ Everything else should match the look book. These change because the plan change
 - **Forms:** gain the plan's extra fields (first and last names, address, guardians) in the same style.
 - **Sample-account buttons** give way to fake demo schools until the backend is ready.
 - **The name:** Brillanda becomes Brillianda everywhere.
+- **Signup step 2 has no phone** (decided 7 October 2026). The plan lists an optional owner
+  phone, but step 1 already asks for the school's phone and nothing in v1 uses a second one.
+  Owners can add theirs later in their profile.

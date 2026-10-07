@@ -30,12 +30,11 @@ export const schoolDetailsSchema = z.object({
 });
 export type SchoolDetails = z.infer<typeof schoolDetailsSchema>;
 
-/** Screen 2. This email becomes the school's primary email. */
+/** Screen 2. This email becomes the school's primary email. No phone here: the school's is on screen 1. */
 export const ownerAccountSchema = z.object({
   fullName: z.string().trim().min(2, "Enter your full name").max(120, "Use at most 120 characters"),
   email: z.preprocess(trimmedLower, z.email("Enter an email address like name@school.com")),
   password: z.string().min(8, "Use at least 8 characters").max(128, "Use at most 128 characters"),
-  phone: z.union([z.literal("").transform(() => undefined), phone("Enter a Nigerian number, or leave it empty")]).optional(),
 });
 export type OwnerAccount = z.infer<typeof ownerAccountSchema>;
 

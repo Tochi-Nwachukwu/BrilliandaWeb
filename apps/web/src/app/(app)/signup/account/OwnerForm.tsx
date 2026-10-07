@@ -11,14 +11,13 @@ import { saveOwnerAccount } from "@/data/actions/signup";
 import { errorsFor, firstErrors, type Errors } from "@/lib/form";
 
 /** Screen 2: the owner's account. The email becomes the school's primary email. */
-export function OwnerForm({ saved }: { saved: { fullName: string; email: string; phone?: string } | null }) {
+export function OwnerForm({ saved }: { saved: { fullName: string; email: string } | null }) {
   const router = useRouter();
   const formRef = useRef<HTMLFormElement>(null);
   const [values, setValues] = useState({
     fullName: saved?.fullName ?? "",
     email: saved?.email ?? "",
     password: "",
-    phone: saved?.phone ? `0${saved.phone.slice(4)}` : "",
   });
   const [errors, setErrors] = useState<Errors>({});
   const [failure, setFailure] = useState<string | null>(null);
@@ -73,17 +72,6 @@ export function OwnerForm({ saved }: { saved: { fullName: string; email: string;
           value={values.password}
           onChange={(e) => set("password")(e.target.value)}
           error={errors.password}
-        />
-        <TextField
-          label="Your phone (optional)"
-          name="phone"
-          type="tel"
-          inputMode="tel"
-          autoComplete="tel"
-          placeholder="0803 000 0001"
-          value={values.phone}
-          onChange={(e) => set("phone")(e.target.value)}
-          error={errors.phone}
         />
       </div>
       <div className="mt-8">

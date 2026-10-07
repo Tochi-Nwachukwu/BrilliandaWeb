@@ -21,7 +21,7 @@ export type SignupStep = "school" | "owner" | "verify" | "address";
 export type SignupDraft = {
   step: SignupStep;
   school: SchoolDetails | null;
-  owner: { fullName: string; email: string; phone?: string } | null;
+  owner: { fullName: string; email: string } | null;
   /** When the current code was sent (ms since 1970), for the expiry and resend timers. */
   codeSentAt: number | null;
   emailVerified: boolean;
