@@ -11,14 +11,16 @@ plan's stack batch by batch (docs/migration-plan.md), keeping its look and behav
 - `/dev` (development only) is the playground: the app shell, every shared component, and the
   list patterns on sample students. Check changes to `packages/ui` there.
 - `pnpm test` (Vitest in packages), `pnpm typecheck`, `pnpm lint`, `pnpm build`
-- `pnpm e2e` runs Playwright at 360 and 1280 px. Locally, set `PW_CHROMIUM` to a Chromium path to
-  skip the browser download.
+- `pnpm e2e` builds the app and runs Playwright against it on port 3100, at 360 and 1280 px.
+  Locally, set `PW_CHROMIUM` to a Chromium path to skip the browser download.
 - `legacy/`: the old app, its own npm install: `cd legacy && npm ci && npm run dev` (5173 app, 5174 site)
 
 ## What each package owns
 
-- `apps/web`: Next.js 16 App Router. `src/app/(marketing)` for brillianda.com, `src/app/s/[school]`
-  for every page on a school's subdomain, `src/data` for the data layer (below).
+- `apps/web`: Next.js 16 App Router with two root layouts. `src/app/(marketing)` is brillianda.com
+  (the old site, with its own CSS); `src/app/(app)` is everything in our app design: signup,
+  `/login`, `s/[school]` for every page on a school's subdomain, and the `/dev` playground.
+  `src/data` is the data layer (below).
 - `packages/core`: pure TypeScript shared by browser and server: Zod schemas, generators, rules. No React, no I/O.
 - `packages/ui`: our components (our look on shadcn/ui) and the four responsive patterns:
   DataList, ResponsiveDialog, FilterSheet, ActionBar.

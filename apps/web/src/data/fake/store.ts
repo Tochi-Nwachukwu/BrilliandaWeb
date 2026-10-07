@@ -2,9 +2,27 @@
 // replaces it (docs/data-contract.md). It resets when the dev server restarts. Kept on globalThis
 // so a hot reload in development doesn't wipe it.
 import "server-only";
+import type { SchoolDetails } from "@brillianda/core";
 import type { SchoolSummary } from "../types";
 
-type FakeStore = { schools: SchoolSummary[] };
+type FakeStore = {
+  schools: SchoolSummary[];
+  trialRequests: Record<string, unknown>[];
+  signupDrafts: Map<string, FakeSignupDraft>;
+  users: FakeUser[];
+  sessions: Map<string, { userId: string }>;
+};
+
+/** A signup in progress. The password is only ever kept here, never sent back to a page. */
+export type FakeSignupDraft = {
+  school?: SchoolDetails;
+  owner?: { fullName: string; email: string; password: string; phone?: string };
+  codeSentAt?: number;
+  emailVerified: boolean;
+};
+
+/** FAKE: plain-text passwords, because nothing here is real. Better Auth replaces all of this. */
+export type FakeUser = { id: string; fullName: string; email: string; password: string; phone?: string; schools: { subdomain: string; role: "owner" | "admin" }[] };
 
 function seed(): FakeStore {
   return {
@@ -12,7 +30,16 @@ function seed(): FakeStore {
       { subdomain: "greenfield", name: "Greenfield College", status: "active", brandColor: "#4A3AA7", logoUrl: null },
       { subdomain: "surebloom", name: "Surebloom School", status: "active", brandColor: "#1E6B45", logoUrl: null },
       { subdomain: "closedschool", name: "Closed School", status: "suspended", brandColor: "#4A3AA7", logoUrl: null },
+      { subdomain: "royalheights", name: "Royal Heights College", status: "active", brandColor: "#9A3B2E", logoUrl: null },
     ],
+    trialRequests: [],
+    signupDrafts: new Map(),
+    users: [
+      { id: "u1", fullName: "Amaka Obi", email: "owner@greenfield.ng", password: "brillianda", schools: [{ subdomain: "greenfield", role: "owner" }] },
+      { id: "u2", fullName: "Tunde Bello", email: "admin@greenfield.ng", password: "brillianda", schools: [{ subdomain: "greenfield", role: "admin" }, { subdomain: "surebloom", role: "admin" }] },
+      { id: "u3", fullName: "Ngozi Eze", email: "owner@surebloom.ng", password: "brillianda", schools: [{ subdomain: "surebloom", role: "owner" }] },
+    ],
+    sessions: new Map(),
   };
 }
 

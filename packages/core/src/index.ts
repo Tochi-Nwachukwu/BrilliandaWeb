@@ -4,3 +4,7 @@
 export * from "./grading";
 export * from "./admission";
 export * from "./importing";
+export * from "./trial";
+export * from "./nigeria";
+export * from "./subdomain";
+export * from "./signup";

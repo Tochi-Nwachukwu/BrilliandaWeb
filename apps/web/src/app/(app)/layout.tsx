@@ -1,7 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Outfit } from "next/font/google";
 import { LOOK_SCRIPT } from "@/lib/look-script";
-import "./globals.css";
+import "../globals.css";
 
 // Outfit, the app's one typeface. Served from our own domain, so no flash of the system face.
 const outfit = Outfit({ subsets: ["latin"], weight: ["400", "500", "600"], variable: "--font-outfit", display: "swap" });

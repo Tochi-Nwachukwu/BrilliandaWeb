@@ -3,7 +3,7 @@ import { AppShell, type NavItem } from "@/components/shell/AppShell";
 import { devSignOut } from "./actions";
 
 // A playground for the shell and the shared components. Not part of the product: it 404s in
-// production builds.
+// production builds, except the one the browser tests run against (BRILLIANDA_PLAYGROUND=1).
 const NAV: NavItem[] = [
   { href: "/dev", label: "Home", icon: "home", exact: true },
   { href: "/dev/students", label: "Students", icon: "students" },
@@ -13,7 +13,7 @@ const NAV: NavItem[] = [
 ];
 
 export default function DevLayout({ children }: LayoutProps<"/dev">) {
-  if (process.env.NODE_ENV === "production") notFound();
+  if (process.env.NODE_ENV === "production" && process.env.BRILLIANDA_PLAYGROUND !== "1") notFound();
   return (
     <AppShell
       nav={NAV}

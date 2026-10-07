@@ -139,6 +139,20 @@ production returns "not found"). Notes:
 
 **Done when:** the whole signup can be clicked through on a phone against fake data.
 
+**Done (7 October 2026).** Notes:
+
+- The site is its own root layout in `src/app/(marketing)` with its own CSS, so its warm-paper
+  design and the app's Pastel never mix. Its markup moved over unchanged (only the name changed),
+  so it looks exactly the same; its scripts (intro, reveals, the live mark sheet, the trial form)
+  run as before. The copy still describes results and report cards, which are after v1; it is
+  left as it is.
+- "Sign in" on the site goes to `/login`, which the plan makes the Find my school page (batch 4).
+- Signup lives at `/signup`, `/signup/account`, `/signup/verify` and `/signup/address`, in the
+  old sign-in screens' design. Step 1 asks when the first session on Brillianda starts (month
+  and year, September by default).
+- The address rules, suggestions and the signup schemas are in `packages/core` with tests.
+- Browser tests now run against a production build (port 3100), which made them fast and steady.
+
 ### Batch 4: Each school's look, and signing in (Phase 1)
 
 - The school layout: logo, name and **brand colour**. Proposal: the school's colour on buttons and

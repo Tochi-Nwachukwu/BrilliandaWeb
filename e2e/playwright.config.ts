@@ -10,12 +10,11 @@ const launchOptions = localChromium && existsSync(localChromium) ? { executableP
 export default defineConfig({
   testDir: "./tests",
   fullyParallel: true,
-  // The dev server compiles each page on its first visit, which can take a few seconds.
-  expect: { timeout: 15_000 },
+  expect: { timeout: 10_000 },
   retries: process.env.CI ? 1 : 0,
   reporter: process.env.CI ? "github" : "list",
   use: {
-    baseURL: "http://localhost:3000",
+    baseURL: "http://localhost:3100",
     launchOptions,
     trace: "retain-on-failure",
   },
@@ -23,10 +22,14 @@ export default defineConfig({
     { name: "phone", use: { browserName: "chromium", viewport: { width: 360, height: 800 }, isMobile: true, hasTouch: true } },
     { name: "laptop", use: { browserName: "chromium", viewport: { width: 1280, height: 800 } } },
   ],
+  // A production build, not the dev server: pages are ready at once, as they are for users, so
+  // the tests check the app rather than the compiler. Port 3100 keeps clear of `pnpm dev`, and
+  // BRILLIANDA_PLAYGROUND=1 keeps the /dev playground in this build only.
   webServer: {
-    command: "pnpm --filter web dev",
-    url: "http://localhost:3000",
-    reuseExistingServer: !process.env.CI,
-    timeout: 180_000,
+    command: "pnpm --filter web build && pnpm --filter web exec next start -p 3100",
+    url: "http://localhost:3100",
+    env: { BRILLIANDA_PLAYGROUND: "1" },
+    reuseExistingServer: false,
+    timeout: 300_000,
   },
 });
