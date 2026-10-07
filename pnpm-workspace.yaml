@@ -1,0 +1,14 @@
+packages:
+  - apps/*
+  - packages/*
+  - e2e
+
+# The Vite app kept for comparison lives in legacy/ with its own npm install; it is not part of
+# this workspace.
+
+ignoredBuiltDependencies:
+  - sharp
+  - unrs-resolver
+
+onlyBuiltDependencies:
+  - esbuild

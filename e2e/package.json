@@ -1,0 +1,13 @@
+{
+  "name": "e2e",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Playwright flows at 360 and 1280 px, as the plan asks.",
+  "scripts": {
+    "test": "playwright test"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.63.0",
+    "@types/node": "^20"
+  }
+}

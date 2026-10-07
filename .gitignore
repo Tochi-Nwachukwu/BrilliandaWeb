@@ -5,8 +5,16 @@ coverage/
 .env
 .env.*
 !.env.example
-apps/api/storage/
-playwright-report/
-test-results/
 .DS_Store
 .vercel
+
+# Next.js and Turborepo
+.next/
+out/
+.turbo/
+*.tsbuildinfo
+
+# Playwright
+playwright-report/
+test-results/
+blob-report/
