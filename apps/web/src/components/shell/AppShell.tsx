@@ -4,6 +4,7 @@ import { Badge, CommandPalette, Icon, Toaster, cx, openCommandPalette, type Comm
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState, type ReactNode } from "react";
+import { initials } from "@/lib/initials";
 import { setLook, useLook, type Look } from "@/lib/look";
 
 export type NavItem = {
@@ -20,14 +21,6 @@ export type NavItem = {
 
 export type ShellAccount = { fullName: string; roleLabel: string };
 
-export function initials(name: string): string {
-  return name
-    .split(/\s+/)
-    .filter((word) => /^[A-Za-z]/.test(word))
-    .map((word) => word[0]!.toUpperCase())
-    .slice(0, 2)
-    .join("");
-}
 
 function isActive(pathname: string, item: NavItem) {
   return item.exact ? pathname === item.href : pathname === item.href || pathname.startsWith(`${item.href}/`);

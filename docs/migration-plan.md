@@ -188,6 +188,19 @@ production returns "not found"). Notes:
 
 **Done when:** a fake new school can set its calendar from the checklist on a phone.
 
+**Done (7 October 2026).** Notes:
+
+- Home keeps today's design: the greeting (with the date and "First Term, week 4 of 14" once the
+  calendar is set) and photo card, then the plan's six-step checklist, the four counts and recent
+  changes. Results-only parts of the old Home (publishing, reopen requests, progress by class)
+  belong to later versions and stay in `legacy/`.
+- Admins don't see the "Invite an admin" step, since only the owner invites.
+- Sessions and terms (More › Sessions and terms): the old Session screen's term tiles, then the
+  form: session year, 2 or 3 terms, names (First/Second/Third or Autumn/Spring/Summer, or typed),
+  dates. Suggested dates follow Lagos: Monday 14 September 2026 to Friday 18 December, and so on.
+  `defaultTerms`, `sessionSchema` and `termPosition` are in `packages/core` with tests.
+- Dates and the greeting use Lagos time (`src/lib/time.ts`), whatever the server's time zone.
+
 ### Batch 6: Classes and arms (Phase 2)
 
 - The **class ladder generator** in `packages/core`, with tests: first and last class, naming

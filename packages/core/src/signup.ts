@@ -71,9 +71,18 @@ export function sessionName(startYear: number): string {
   return `${startYear}/${startYear + 1}`;
 }
 
-/** Errors under each field, from a failed parse, in the shape every write returns. */
+/**
+ * Errors under each field, from a failed parse, in the shape every write returns. Nested fields
+ * use their full path, e.g. "terms.1.startsOn", so a form can put each message in its place.
+ */
 export function fieldErrorsOf(error: z.ZodError): Record<string, string[]> {
-  return z.flattenError(error).fieldErrors as Record<string, string[]>;
+  const out: Record<string, string[]> = {};
+  for (const issue of error.issues) {
+    if (!issue.path.length) continue;
+    const key = issue.path.join(".");
+    (out[key] ??= []).push(issue.message);
+  }
+  return out;
 }
 
 /** Check values against a schema: the parsed data, or the errors under each field. */

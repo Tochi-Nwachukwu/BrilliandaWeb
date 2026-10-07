@@ -2,7 +2,7 @@
 
 import { ActionBar, Badge, Button, DataList, FilterSheet, PageHeader, SelectField, levelOfArm, levelStyle, toast, type ColumnDef } from "@brillianda/ui";
 import { useMemo, useState } from "react";
-import { initials } from "@/components/shell/AppShell";
+import { initials } from "@/lib/initials";
 
 type Row = { id: string; fullName: string; admissionNo: string; arm: string; gender: "Male" | "Female"; parent: boolean };
 

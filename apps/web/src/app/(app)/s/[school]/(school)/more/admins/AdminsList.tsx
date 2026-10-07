@@ -4,7 +4,7 @@ import { INVITE_LIFETIME_HOURS, inviteAdminSchema, ROLE_LABEL } from "@brilliand
 import { Badge, Button, Icon, PageHeader, ResponsiveDialog, TextField, levelStyle, toast } from "@brillianda/ui";
 import { useRouter } from "next/navigation";
 import { useState, useTransition, type FormEvent } from "react";
-import { initials } from "@/components/shell/AppShell";
+import { initials } from "@/lib/initials";
 import { SampleLinks } from "@/components/auth/forms";
 import { FormError } from "@/components/auth/FormError";
 import { errorsFor, firstErrors, type Errors } from "@/lib/form";

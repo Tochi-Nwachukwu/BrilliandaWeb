@@ -82,3 +82,20 @@ can be clicked through. The real functions return nothing there. `src/data/sampl
 (one-tap sample accounts on sign-in pages) is fake only too and goes when the fakes go.
 Sample accounts: `owner@greenfield.ng`, `admin@greenfield.ng` (also an admin at Surebloom),
 `owner@surebloom.ng`; password `brillianda`. Open invite: `/s/greenfield/invite/demo-invite`.
+
+### Home and the calendar (batch 5)
+
+| Function | Kind | Input / output | Used by | Status |
+|---|---|---|---|---|
+| `getSession` | read | `subdomain` → `SessionSetup \| null`: session year, 2 or 3 terms, and `confirmed` (false until saved; unsaved schools get suggested dates from `defaultTerms`) | Home, Sessions and terms | fake |
+| `getSetupProgress` | read | `subdomain` → `SetupProgress`: the plan's six steps (calendar, classes, arms, subjects, students, admins) done or not, and whether the checklist is hidden | Home | fake |
+| `getHomeSummary` | read | `subdomain` → `HomeSummary`: counts of students, classes, arms, subjects, admins, and the 6 latest changes (the audit log) | Home | fake |
+| `saveSession` | action | `school, sessionSchema` → `ActionResult<SessionSetup>`; owners and admins; writes a change entry | Sessions and terms | fake |
+| `hideChecklist` | action | `school, hidden` → `ActionResult<null>` | Home | fake |
+
+- Field errors use the full path for nested fields (`terms.1.startsOn`), via `fieldErrorsOf` in core.
+- At signup, `createSchool` stores suggested dates for the session year the owner chose; the calendar
+  step counts as done once someone saves it.
+- Fake: classes, arms, subjects and students are always 0 until batches 6 to 9 add their fakes.
+  Calendar-less sample schools for trying the checklist: `royalheights` (`owner@royalheights.ng`)
+  and `kingsway` (`owner@kingsway.ng`).

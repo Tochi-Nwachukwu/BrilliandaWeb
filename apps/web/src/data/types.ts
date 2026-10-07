@@ -1,5 +1,5 @@
 // Shapes shared by every data function (docs/data-contract.md).
-import type { SchoolDetails } from "@brillianda/core";
+import type { SchoolDetails, Term } from "@brillianda/core";
 
 /** What every write returns: the result, or a message for a person and errors under each field. */
 export type ActionResult<T> =
@@ -55,3 +55,16 @@ export type InviteDetails = { schoolName: string; fullName: string; email: strin
  * emails exist. The real functions never return this.
  */
 export type SampleEmail = { sampleLinks?: { label: string; href: string }[] };
+
+/** The school's current session and its terms. `confirmed` is false until someone saves it. */
+export type SessionSetup = { startYear: number; name: string; terms: Term[]; confirmed: boolean };
+
+/** The plan's setup checklist, in its order. */
+export type SetupItemId = "calendar" | "classes" | "arms" | "subjects" | "students" | "admins";
+export type SetupProgress = { items: { id: SetupItemId; done: boolean }[]; hidden: boolean };
+
+/** One line of the school's record of changes. */
+export type ChangeEntry = { id: string; at: number; who: string; what: string };
+
+/** The counts and recent changes on Home. */
+export type HomeSummary = { students: number; classes: number; arms: number; subjects: number; admins: number; recent: ChangeEntry[] };

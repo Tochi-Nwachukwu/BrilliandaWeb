@@ -64,3 +64,15 @@ describe("normaliseNigerianPhone", () => {
     expect(normaliseNigerianPhone("080300000")).toBeNull();
   });
 });
+
+describe("fieldErrorsOf", () => {
+  it("keys nested errors by their full path", async () => {
+    const { fieldErrorsOf } = await import("./signup");
+    const { sessionSchema, defaultTerms } = await import("./calendar");
+    const terms = defaultTerms(2026);
+    const parsed = sessionSchema.safeParse({ startYear: 2026, terms: [terms[0], { ...terms[1], startsOn: "2026-12-01" }, terms[2]] });
+    expect(fieldErrorsOf(parsed.error!)).toEqual({ "terms.1.startsOn": ["Starts after First Term ends"] });
+    const owner = ownerAccountSchema.safeParse({ fullName: "", email: "x", password: "p" });
+    expect(Object.keys(fieldErrorsOf(owner.error!)).sort()).toEqual(["email", "fullName", "password"]);
+  });
+});

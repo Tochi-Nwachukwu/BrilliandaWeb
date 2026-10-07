@@ -6,6 +6,7 @@ import "server-only";
 import {
   alternativeSubdomains,
   CODE_LIFETIME_SECONDS,
+  defaultTerms,
   normaliseSubdomain,
   RESEND_AFTER_SECONDS,
   subdomainProblem,
@@ -14,6 +15,7 @@ import {
 } from "@brillianda/core";
 import { cookies } from "next/headers";
 import type { ActionResult, SignupDraft, SubdomainCheck } from "../types";
+import { recordChange } from "./changes";
 import { store, type FakeSignupDraft } from "./store";
 
 const COOKIE = "brillianda_signup";
@@ -138,6 +140,9 @@ export async function createSchool(subdomain: string): Promise<ActionResult<{ su
     store.users.push(user);
   }
   user.schools.push({ subdomain: check.subdomain, role: "owner" });
+  // Suggested dates for the session they said they start in; confirmed from the checklist.
+  store.calendars.set(check.subdomain, { confirmed: false, startYear: draft.school.sessionStartYear, terms: defaultTerms(draft.school.sessionStartYear) });
+  recordChange(check.subdomain, user.fullName, "Created the school");
 
   // Signed straight in. For real this is a one-time token exchanged on the new subdomain.
   const token = crypto.randomUUID();

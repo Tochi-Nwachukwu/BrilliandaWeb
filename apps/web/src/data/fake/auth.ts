@@ -6,6 +6,7 @@ import "server-only";
 import { INVITE_LIFETIME_HOURS, LINK_LIFETIME_MINUTES } from "@brillianda/core";
 import { cookies } from "next/headers";
 import type { ActionResult, InviteDetails, SampleEmail, SchoolMember, SchoolRole, SchoolSummary, SignedInMember } from "../types";
+import { recordChange } from "./changes";
 import { store, type FakeUser } from "./store";
 
 const SESSION_COOKIE = "brillianda_session";
@@ -151,11 +152,13 @@ export async function acceptInvite(subdomain: string, token: string, password: s
   }
   if (!roleIn(user, subdomain)) user.schools.push({ subdomain, role: "admin" });
   invite.usedAt = Date.now();
+  recordChange(subdomain, user.fullName, "Joined as an admin");
   await startSession(user);
   return { ok: true, data: null };
 }
 
-async function requireMember(subdomain: string, role?: SchoolRole) {
+/** The signed-in person if they belong to this school (with this role, if given); else null. */
+export async function requireMember(subdomain: string, role?: SchoolRole) {
   const user = await currentUser();
   const has = user && roleIn(user, subdomain);
   if (!user || !has || (role && has !== role)) return null;
@@ -179,7 +182,8 @@ const OWNER_ONLY = "Only the school owner can do this.";
 
 export async function inviteAdmin(subdomain: string, fullName: string, email: string): Promise<ActionResult<SampleEmail & { resent: boolean }>> {
   await pause();
-  if (!(await requireMember(subdomain, "owner"))) return { ok: false, error: OWNER_ONLY };
+  const owner = await requireMember(subdomain, "owner");
+  if (!owner) return { ok: false, error: OWNER_ONLY };
   const existing = byEmail(email);
   if (existing && roleIn(existing, subdomain)) return { ok: false, error: "They’re already on the team.", fieldErrors: { email: ["Already on the team"] } };
   const pending = store.invites.find((i) => i.subdomain === subdomain && i.email === email && !i.usedAt);
@@ -191,6 +195,7 @@ export async function inviteAdmin(subdomain: string, fullName: string, email: st
   } else {
     store.invites.push({ id: crypto.randomUUID(), token, subdomain, fullName, email, createdAt: Date.now() });
   }
+  recordChange(subdomain, owner.fullName, pending ? `Sent ${fullName} a fresh invite` : `Invited ${fullName} as an admin`);
   return { ok: true, data: { resent: !!pending, sampleLinks: [{ label: "Open the invite link", href: `/s/${subdomain}/invite/${token}` }] } };
 }
 
@@ -208,5 +213,6 @@ export async function removeAdmin(subdomain: string, userId: string): Promise<Ac
   const user = store.users.find((u) => u.id === userId);
   if (!user || roleIn(user, subdomain) !== "admin") return { ok: false, error: "Only admins can be removed. Ownership moves in a later version." };
   user.schools = user.schools.filter((s) => s.subdomain !== subdomain);
+  recordChange(subdomain, owner.fullName, `Removed ${user.fullName} as an admin`);
   return { ok: true, data: null };
 }

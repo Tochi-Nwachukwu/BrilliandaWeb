@@ -48,7 +48,7 @@ test("signing in, out, and the wrong password", async ({ page }) => {
   await expect(page.getByText("That email and password don’t match.")).toBeVisible();
 
   await signIn(page, "greenfield", "owner@greenfield.ng");
-  await expect(page.getByRole("heading", { name: "Home" })).toBeVisible();
+  await expect(page.getByRole("heading", { level: 1 })).toContainText("Amaka");
   await page.getByRole("button", { name: "Your account" }).click();
   await page.getByRole("button", { name: "Sign out" }).click();
   await expect(page).toHaveURL(/\/s\/greenfield\/login$/);
