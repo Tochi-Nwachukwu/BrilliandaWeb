@@ -1,0 +1,523 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Friendlier display faces</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@300;400;500&family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500&family=Gabarito:wght@400;500;600&family=Plus+Jakarta+Sans:wght@300;400;500;600&family=Figtree:wght@300;400;500;600&family=Outfit:wght@300;400;500&family=Nunito:wght@300;400;500;600&family=Fraunces:opsz,wght@9..144,300;9..144,400&family=Instrument+Sans:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --bg: #faf9f7;
+        --surface: #ffffff;
+        --sunken: #f0eeea;
+        --rule: #e4e1dc;
+        --rule-2: #ccc8c1;
+        --ink: #16171a;
+        --ink-2: #5c5f66;
+        --ink-3: #95989e;
+        --accent: #c8913a;
+        --success: #3f7a57;
+        --success-bg: #edf4f0;
+        --success-border: #ccdfd4;
+        --warning: #a9760c;
+        --warning-bg: #faf3e3;
+        --warning-border: #ecdcb4;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--ink);
+        font-family: "Instrument Sans", sans-serif;
+        padding: 52px 40px 90px;
+      }
+      .head {
+        max-width: 64ch;
+        margin-bottom: 20px;
+      }
+      .head h1 {
+        font-family: "Inter Tight", sans-serif;
+        font-weight: 300;
+        font-size: 38px;
+        letter-spacing: -0.04em;
+        margin: 0 0 14px;
+      }
+      .head p {
+        margin: 0 0 10px;
+        color: var(--ink-2);
+        line-height: 1.65;
+      }
+      .swatches {
+        display: flex;
+        gap: 0;
+        margin: 26px 0 40px;
+        border: 1px solid var(--rule);
+        border-radius: 4px;
+        overflow: hidden;
+        width: fit-content;
+      }
+      .sw {
+        width: 132px;
+        padding: 12px 14px 14px;
+        font-size: 11px;
+        color: var(--ink-3);
+      }
+      .sw i {
+        display: block;
+        height: 34px;
+        border-radius: 3px;
+        margin-bottom: 9px;
+        border: 1px solid var(--rule);
+        font-style: normal;
+      }
+
+      .row {
+        padding: 38px 0;
+        border-top: 1px solid var(--rule);
+        display: grid;
+        grid-template-columns: 196px 1fr 300px;
+        gap: 36px;
+        align-items: start;
+      }
+      .meta b {
+        display: block;
+        font-size: 16px;
+        margin-bottom: 8px;
+      }
+      .meta span {
+        display: block;
+        font-size: 13px;
+        color: var(--ink-3);
+        line-height: 1.55;
+      }
+      .tag {
+        display: inline-block;
+        margin-top: 10px;
+        font-size: 10.5px;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        border: 1px solid var(--rule-2);
+        border-radius: 2px;
+        padding: 2px 7px;
+        color: var(--ink-3);
+      }
+      .tag.now {
+        border-color: var(--accent);
+        color: var(--accent);
+      }
+      .tag.warn {
+        border-color: var(--warning-border);
+        background: var(--warning-bg);
+        color: var(--warning);
+      }
+
+      .spec h2 {
+        margin: 0 0 16px;
+        font-weight: 400;
+        font-size: clamp(28px, 3.3vw, 46px);
+        letter-spacing: -0.035em;
+        line-height: 1;
+        max-width: 16ch;
+      }
+      .spec .lede {
+        margin: 0 0 20px;
+        color: var(--ink-2);
+        font-size: 15px;
+        max-width: 50ch;
+        line-height: 1.6;
+      }
+      .figs {
+        display: flex;
+        gap: 24px;
+        align-items: baseline;
+        flex-wrap: wrap;
+        font-variant-numeric: tabular-nums;
+      }
+      .fig b {
+        font-weight: 400;
+        font-size: 36px;
+        letter-spacing: -0.04em;
+      }
+      .fig span {
+        font-size: 11.5px;
+        color: var(--ink-3);
+        display: block;
+      }
+
+      /* a real slice of the product, so the face is judged on the grid too */
+      .card {
+        background: var(--surface);
+        border: 1px solid var(--rule);
+        border-radius: 4px;
+        overflow: hidden;
+        box-shadow: 0 16px 44px rgba(14, 15, 17, 0.06);
+      }
+      .card .top {
+        padding: 10px 14px;
+        border-bottom: 1px solid var(--rule);
+        background: var(--sunken);
+        font-size: 12px;
+        font-weight: 500;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        font-variant-numeric: tabular-nums;
+      }
+      th {
+        font-size: 10px;
+        color: var(--ink-3);
+        font-weight: 500;
+        padding: 7px 6px;
+        border-bottom: 1px solid var(--rule);
+        text-align: center;
+      }
+      th:first-child {
+        text-align: left;
+        padding-left: 14px;
+      }
+      td {
+        font-size: 12px;
+        padding: 7px 6px;
+        border-bottom: 1px solid var(--rule);
+        text-align: center;
+      }
+      td:first-child {
+        text-align: left;
+        padding-left: 14px;
+        font-weight: 500;
+      }
+      tr:last-child td {
+        border-bottom: 0;
+      }
+      .badge {
+        display: inline-block;
+        min-width: 22px;
+        padding: 1px 7px;
+        border-radius: 3px;
+        font-size: 11px;
+        font-weight: 500;
+        color: var(--success);
+        background: var(--success-bg);
+        border: 1px solid var(--success-border);
+      }
+      .naira-note {
+        margin-top: 12px;
+        font-size: 11.5px;
+        color: var(--ink-3);
+      }
+
+      /* ---- the candidates: display face only ---- */
+      .f-inter .spec h2,
+      .f-inter .fig b,
+      .f-inter .card {
+        font-family: "Inter Tight", sans-serif;
+      }
+      .f-bricolage .spec h2,
+      .f-bricolage .fig b,
+      .f-bricolage .card {
+        font-family: "Bricolage Grotesque", sans-serif;
+      }
+      .f-gabarito .spec h2,
+      .f-gabarito .fig b,
+      .f-gabarito .card {
+        font-family: "Gabarito", sans-serif;
+      }
+      .f-jakarta .spec h2,
+      .f-jakarta .fig b,
+      .f-jakarta .card {
+        font-family: "Plus Jakarta Sans", sans-serif;
+      }
+      .f-figtree .spec h2,
+      .f-figtree .fig b,
+      .f-figtree .card {
+        font-family: "Figtree", sans-serif;
+      }
+      .f-outfit .spec h2,
+      .f-outfit .fig b,
+      .f-outfit .card {
+        font-family: "Outfit", sans-serif;
+      }
+      .f-nunito .spec h2,
+      .f-nunito .fig b,
+      .f-nunito .card {
+        font-family: "Nunito", sans-serif;
+      }
+      .f-fraunces .spec h2,
+      .f-fraunces .fig b,
+      .f-fraunces .card {
+        font-family: "Fraunces", serif;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="head">
+      <h1>Friendlier display faces</h1>
+      <p>
+        Same headline, same lede, same figures, same mark sheet — only the display face changes. Body text stays
+        Instrument Sans throughout. Everything here is free under the SIL Open Font Licence.
+      </p>
+      <p>
+        The page background is also the new lighter one, so you are judging both changes together.
+      </p>
+      <div class="swatches">
+        <div class="sw"><i style="background: #f2f1ef"></i>was #f2f1ef</div>
+        <div class="sw"><i style="background: #faf9f7"></i>now #faf9f7</div>
+        <div class="sw"><i style="background: #ffffff"></i>cards #ffffff</div>
+      </div>
+    </div>
+
+    <section class="row f-inter">
+      <div class="meta">
+        <b>Inter Tight</b>
+        <span>What the site uses now. Neutral and serious — this is the one you are reacting against.</span>
+        <span class="tag now">On the site now</span>
+      </div>
+      <div class="spec">
+        <h2>The term’s results, without the long night of adding up.</h2>
+        <p class="lede">Teachers enter scores once. Brillanda works out totals, grades and positions.</p>
+        <div class="figs">
+          <span class="fig"><b>40%</b><span>continuous assessment</span></span>
+          <span class="fig"><b>₦280</b><span>per student, per term</span></span>
+          <span class="fig"><b>78.4</b><span>term average</span></span>
+        </div>
+      </div>
+      <div>
+        <div class="card">
+          <div class="top">Mathematics · JSS 2 Gold</div>
+          <table>
+            <thead><tr><th>Student</th><th>CA</th><th>Exam</th><th>Total</th><th>Grade</th><th>Pos</th></tr></thead>
+            <tbody>
+              <tr><td>Adaeze Nwosu</td><td>34</td><td>48</td><td>82</td><td><span class="badge">A</span></td><td>2nd</td></tr>
+              <tr><td>Fatima Yusuf</td><td>36</td><td>50</td><td>86</td><td><span class="badge">A</span></td><td>1st</td></tr>
+              <tr><td>Tunde Bakare</td><td>29</td><td>41</td><td>70</td><td><span class="badge">A</span></td><td>3rd</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <section class="row f-bricolage">
+      <div class="meta">
+        <b>Bricolage Grotesque</b>
+        <span>Mathieu Triay, 2022. Deliberately imperfect — mismatched widths and odd curves. The most characterful
+          here without becoming childish.</span>
+        <span class="tag">Open Font Licence</span>
+      </div>
+      <div class="spec">
+        <h2>The term’s results, without the long night of adding up.</h2>
+        <p class="lede">Teachers enter scores once. Brillanda works out totals, grades and positions.</p>
+        <div class="figs">
+          <span class="fig"><b>40%</b><span>continuous assessment</span></span>
+          <span class="fig"><b>₦280</b><span>per student, per term</span></span>
+          <span class="fig"><b>78.4</b><span>term average</span></span>
+        </div>
+      </div>
+      <div>
+        <div class="card">
+          <div class="top">Mathematics · JSS 2 Gold</div>
+          <table>
+            <thead><tr><th>Student</th><th>CA</th><th>Exam</th><th>Total</th><th>Grade</th><th>Pos</th></tr></thead>
+            <tbody>
+              <tr><td>Adaeze Nwosu</td><td>34</td><td>48</td><td>82</td><td><span class="badge">A</span></td><td>2nd</td></tr>
+              <tr><td>Fatima Yusuf</td><td>36</td><td>50</td><td>86</td><td><span class="badge">A</span></td><td>1st</td></tr>
+              <tr><td>Tunde Bakare</td><td>29</td><td>41</td><td>70</td><td><span class="badge">A</span></td><td>3rd</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <section class="row f-gabarito">
+      <div class="meta">
+        <b>Gabarito</b>
+        <span>Naipe Foundry. Rounded, confident and a bit playful. Reads as friendly without looking like a
+          children's app.</span>
+        <span class="tag">Open Font Licence</span>
+      </div>
+      <div class="spec">
+        <h2>The term’s results, without the long night of adding up.</h2>
+        <p class="lede">Teachers enter scores once. Brillanda works out totals, grades and positions.</p>
+        <div class="figs">
+          <span class="fig"><b>40%</b><span>continuous assessment</span></span>
+          <span class="fig"><b>₦280</b><span>per student, per term</span></span>
+          <span class="fig"><b>78.4</b><span>term average</span></span>
+        </div>
+      </div>
+      <div>
+        <div class="card">
+          <div class="top">Mathematics · JSS 2 Gold</div>
+          <table>
+            <thead><tr><th>Student</th><th>CA</th><th>Exam</th><th>Total</th><th>Grade</th><th>Pos</th></tr></thead>
+            <tbody>
+              <tr><td>Adaeze Nwosu</td><td>34</td><td>48</td><td>82</td><td><span class="badge">A</span></td><td>2nd</td></tr>
+              <tr><td>Fatima Yusuf</td><td>36</td><td>50</td><td>86</td><td><span class="badge">A</span></td><td>1st</td></tr>
+              <tr><td>Tunde Bakare</td><td>29</td><td>41</td><td>70</td><td><span class="badge">A</span></td><td>3rd</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <section class="row f-jakarta">
+      <div class="meta">
+        <b>Plus Jakarta Sans</b>
+        <span>Tokotype. Warm geometric with open shapes. Very widely used in education products, which cuts both
+          ways.</span>
+        <span class="tag">Open Font Licence</span>
+      </div>
+      <div class="spec">
+        <h2>The term’s results, without the long night of adding up.</h2>
+        <p class="lede">Teachers enter scores once. Brillanda works out totals, grades and positions.</p>
+        <div class="figs">
+          <span class="fig"><b>40%</b><span>continuous assessment</span></span>
+          <span class="fig"><b>₦280</b><span>per student, per term</span></span>
+          <span class="fig"><b>78.4</b><span>term average</span></span>
+        </div>
+      </div>
+      <div>
+        <div class="card">
+          <div class="top">Mathematics · JSS 2 Gold</div>
+          <table>
+            <thead><tr><th>Student</th><th>CA</th><th>Exam</th><th>Total</th><th>Grade</th><th>Pos</th></tr></thead>
+            <tbody>
+              <tr><td>Adaeze Nwosu</td><td>34</td><td>48</td><td>82</td><td><span class="badge">A</span></td><td>2nd</td></tr>
+              <tr><td>Fatima Yusuf</td><td>36</td><td>50</td><td>86</td><td><span class="badge">A</span></td><td>1st</td></tr>
+              <tr><td>Tunde Bakare</td><td>29</td><td>41</td><td>70</td><td><span class="badge">A</span></td><td>3rd</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <section class="row f-figtree">
+      <div class="meta">
+        <b>Figtree</b>
+        <span>Erik Kennedy. Soft geometric, cheerful but tidy. The safest of the friendly options.</span>
+        <span class="tag">Open Font Licence</span>
+      </div>
+      <div class="spec">
+        <h2>The term’s results, without the long night of adding up.</h2>
+        <p class="lede">Teachers enter scores once. Brillanda works out totals, grades and positions.</p>
+        <div class="figs">
+          <span class="fig"><b>40%</b><span>continuous assessment</span></span>
+          <span class="fig"><b>₦280</b><span>per student, per term</span></span>
+          <span class="fig"><b>78.4</b><span>term average</span></span>
+        </div>
+      </div>
+      <div>
+        <div class="card">
+          <div class="top">Mathematics · JSS 2 Gold</div>
+          <table>
+            <thead><tr><th>Student</th><th>CA</th><th>Exam</th><th>Total</th><th>Grade</th><th>Pos</th></tr></thead>
+            <tbody>
+              <tr><td>Adaeze Nwosu</td><td>34</td><td>48</td><td>82</td><td><span class="badge">A</span></td><td>2nd</td></tr>
+              <tr><td>Fatima Yusuf</td><td>36</td><td>50</td><td>86</td><td><span class="badge">A</span></td><td>1st</td></tr>
+              <tr><td>Tunde Bakare</td><td>29</td><td>41</td><td>70</td><td><span class="badge">A</span></td><td>3rd</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <section class="row f-outfit">
+      <div class="meta">
+        <b>Outfit</b>
+        <span>Smartsheet / Rodrigo Fuenzalida. Purely geometric — circular bowls, even strokes. Clean and modern, less
+          warm than the rest.</span>
+        <span class="tag">Open Font Licence</span>
+      </div>
+      <div class="spec">
+        <h2>The term’s results, without the long night of adding up.</h2>
+        <p class="lede">Teachers enter scores once. Brillanda works out totals, grades and positions.</p>
+        <div class="figs">
+          <span class="fig"><b>40%</b><span>continuous assessment</span></span>
+          <span class="fig"><b>₦280</b><span>per student, per term</span></span>
+          <span class="fig"><b>78.4</b><span>term average</span></span>
+        </div>
+      </div>
+      <div>
+        <div class="card">
+          <div class="top">Mathematics · JSS 2 Gold</div>
+          <table>
+            <thead><tr><th>Student</th><th>CA</th><th>Exam</th><th>Total</th><th>Grade</th><th>Pos</th></tr></thead>
+            <tbody>
+              <tr><td>Adaeze Nwosu</td><td>34</td><td>48</td><td>82</td><td><span class="badge">A</span></td><td>2nd</td></tr>
+              <tr><td>Fatima Yusuf</td><td>36</td><td>50</td><td>86</td><td><span class="badge">A</span></td><td>1st</td></tr>
+              <tr><td>Tunde Bakare</td><td>29</td><td>41</td><td>70</td><td><span class="badge">A</span></td><td>3rd</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <section class="row f-nunito">
+      <div class="meta">
+        <b>Nunito</b>
+        <span>Vernon Adams. Rounded terminals — the most openly friendly here. Risks looking like a primary-school
+          worksheet.</span>
+        <span class="tag">Open Font Licence</span>
+      </div>
+      <div class="spec">
+        <h2>The term’s results, without the long night of adding up.</h2>
+        <p class="lede">Teachers enter scores once. Brillanda works out totals, grades and positions.</p>
+        <div class="figs">
+          <span class="fig"><b>40%</b><span>continuous assessment</span></span>
+          <span class="fig"><b>₦280</b><span>per student, per term</span></span>
+          <span class="fig"><b>78.4</b><span>term average</span></span>
+        </div>
+      </div>
+      <div>
+        <div class="card">
+          <div class="top">Mathematics · JSS 2 Gold</div>
+          <table>
+            <thead><tr><th>Student</th><th>CA</th><th>Exam</th><th>Total</th><th>Grade</th><th>Pos</th></tr></thead>
+            <tbody>
+              <tr><td>Adaeze Nwosu</td><td>34</td><td>48</td><td>82</td><td><span class="badge">A</span></td><td>2nd</td></tr>
+              <tr><td>Fatima Yusuf</td><td>36</td><td>50</td><td>86</td><td><span class="badge">A</span></td><td>1st</td></tr>
+              <tr><td>Tunde Bakare</td><td>29</td><td>41</td><td>70</td><td><span class="badge">A</span></td><td>3rd</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <section class="row f-fraunces">
+      <div class="meta">
+        <b>Fraunces</b>
+        <span>Undercase Type. A “wonky” old-style serif — fun in a different way: characterful rather than cheerful.
+          Included as the outlier.</span>
+        <span class="tag">Open Font Licence</span>
+      </div>
+      <div class="spec">
+        <h2>The term’s results, without the long night of adding up.</h2>
+        <p class="lede">Teachers enter scores once. Brillanda works out totals, grades and positions.</p>
+        <div class="figs">
+          <span class="fig"><b>40%</b><span>continuous assessment</span></span>
+          <span class="fig"><b>₦280</b><span>per student, per term</span></span>
+          <span class="fig"><b>78.4</b><span>term average</span></span>
+        </div>
+      </div>
+      <div>
+        <div class="card">
+          <div class="top">Mathematics · JSS 2 Gold</div>
+          <table>
+            <thead><tr><th>Student</th><th>CA</th><th>Exam</th><th>Total</th><th>Grade</th><th>Pos</th></tr></thead>
+            <tbody>
+              <tr><td>Adaeze Nwosu</td><td>34</td><td>48</td><td>82</td><td><span class="badge">A</span></td><td>2nd</td></tr>
+              <tr><td>Fatima Yusuf</td><td>36</td><td>50</td><td>86</td><td><span class="badge">A</span></td><td>1st</td></tr>
+              <tr><td>Tunde Bakare</td><td>29</td><td>41</td><td>70</td><td><span class="badge">A</span></td><td>3rd</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+  </body>
+</html>

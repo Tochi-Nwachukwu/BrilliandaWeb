@@ -1,0 +1,323 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Brillanda Landing Review</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&display=swap">
+<style>
+:root{
+  --ground:#F5F5F3; --surface:#FFFFFF; --sunken:#EFEFEC;
+  --ink:#1F2023; --ink-2:#62666D; --ink-3:#8E9197;
+  --rule:#E4E4E0; --accent:#33353A; --accent-ink:#FFFFFF;
+  --good:#3F7A57; --good-bg:#EAF3EE;
+  --dot-off:#DCDCD8;
+  --shadow:0 1px 2px rgba(31,32,35,.04), 0 10px 28px -14px rgba(31,32,35,.14);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --ground:#141517; --surface:#1B1C1F; --sunken:#222428;
+    --ink:#ECEDEF; --ink-2:#A1A5AC; --ink-3:#72767D;
+    --rule:#2B2D31; --accent:#ECEDEF; --accent-ink:#141517;
+    --good:#7FB496; --good-bg:#1A241E;
+    --dot-off:#34363B;
+    --shadow:0 1px 2px rgba(0,0,0,.3), 0 10px 28px -14px rgba(0,0,0,.6);
+  }
+}
+:root[data-theme="dark"]{
+  --ground:#141517; --surface:#1B1C1F; --sunken:#222428;
+  --ink:#ECEDEF; --ink-2:#A1A5AC; --ink-3:#72767D;
+  --rule:#2B2D31; --accent:#ECEDEF; --accent-ink:#141517;
+  --good:#7FB496; --good-bg:#1A241E;
+  --dot-off:#34363B;
+  --shadow:0 1px 2px rgba(0,0,0,.3), 0 10px 28px -14px rgba(0,0,0,.6);
+}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background:var(--ground);color:var(--ink);font-family:"Instrument Sans",-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;font-size:15.5px;line-height:1.6;-webkit-font-smoothing:antialiased}
+a{color:inherit}
+:focus-visible{outline:2px solid var(--ink-2);outline-offset:3px;border-radius:4px}
+/* grid items default to min-width:auto, which lets the wide table stretch the page on phones */
+.page > *{min-width:0}
+.page{max-width:1080px;margin:0 auto;padding-inline:20px;padding-block:48px 72px;display:grid;gap:56px}
+h1,h2,h3{margin:0;text-wrap:balance;letter-spacing:-.02em;line-height:1.15}
+h1{font-size:clamp(30px,4.4vw,44px);font-weight:600}
+h2{font-size:22px;font-weight:600}
+h3{font-size:14px;font-weight:600;letter-spacing:0}
+p{margin:0}
+.lede{max-width:64ch;color:var(--ink-2);font-size:17px;margin-top:14px}
+
+/* recommendation */
+.verdict{display:grid;gap:10px;padding:22px 24px;border-radius:14px;background:var(--good-bg)}
+.verdict b{color:var(--ink)}
+.verdict p{max-width:72ch}
+.verdict .label{font-size:13px;font-weight:600;color:var(--good)}
+
+/* scorecard */
+.scroll{overflow-x:auto;background:var(--surface);border-radius:14px;box-shadow:var(--shadow)}
+table{border-collapse:collapse;width:100%;min-width:720px;font-variant-numeric:tabular-nums}
+th,td{padding:13px 16px;text-align:left;vertical-align:middle}
+thead th{font-size:13px;font-weight:600;color:var(--ink-2);border-bottom:1px solid var(--rule)}
+thead th a{text-decoration:none;color:var(--ink)}
+thead th a:hover{text-decoration:underline}
+tbody th{font-weight:500;font-size:14.5px;width:30%}
+tbody td{font-size:13px;color:var(--ink-2)}
+tbody tr + tr > *{border-top:1px solid var(--rule)}
+tfoot td,tfoot th{border-top:1px solid var(--rule);font-weight:600;font-size:15px}
+.dots{display:inline-flex;gap:4px;vertical-align:middle;margin-right:8px}
+.dots i{width:9px;height:9px;border-radius:50%;background:var(--dot-off)}
+.dots i.on{background:var(--ink)}
+col.best{background:var(--good-bg)}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+
+/* design sections */
+.design{display:grid;gap:20px}
+.design-head{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:10px 20px}
+.design-head p{color:var(--ink-2);max-width:62ch;margin-top:6px}
+.open{display:inline-flex;align-items:center;gap:8px;height:40px;padding:0 18px;border-radius:999px;background:var(--accent);color:var(--accent-ink);text-decoration:none;font-weight:600;font-size:14px;white-space:nowrap}
+.open:hover{opacity:.9}
+.total{font-size:13px;color:var(--ink-3);font-weight:500}
+.shots-wrap{overflow-x:auto;padding-bottom:4px}
+.shots{display:grid;grid-template-columns:repeat(3,minmax(0,1fr)) minmax(0,.296fr);gap:10px;min-width:680px}
+.shots figure{margin:0;display:grid;gap:6px}
+.shots a{display:block;border-radius:10px;overflow:hidden;background:var(--sunken);box-shadow:var(--shadow)}
+.shots img{display:block;width:100%;height:auto;max-width:100%}
+.shots figcaption{font-size:12px;color:var(--ink-3)}
+.notes{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px}
+.notes ul{margin:8px 0 0;padding-left:18px;display:grid;gap:6px;color:var(--ink-2);font-size:14.5px}
+.notes h3.bad{color:var(--ink)}
+hr{border:0;border-top:1px solid var(--rule);margin:0}
+.method{display:grid;gap:10px;color:var(--ink-2);font-size:14.5px;max-width:78ch}
+.method ul{margin:0;padding-left:18px;display:grid;gap:6px}
+@media (max-width:760px){
+  .notes{grid-template-columns:1fr;gap:18px}
+  .page{gap:44px;padding-block:32px 56px}
+}
+</style>
+
+</head>
+<body>
+<main class="page">
+  <header>
+    <h1>Brillanda landing page review</h1>
+    <p class="lede">Four drafts of the marketing page, each opened in Chrome on a laptop (1280 px) and a phone (390 px), in light and dark, with the live mark sheet tried by hand. Scores are out of 5 against what matters for selling a results system to Nigerian schools.</p>
+  </header>
+
+  <section class="verdict" aria-labelledby="verdict-title">
+    <span class="label" id="verdict-title">Recommendation</span>
+    <p><b>Build A, Chalkboard &amp; Marigold</b>, and borrow B's FAQ section. A is the only draft that looks like it was made for schools: the working mark sheet is one scroll down, its warm accents stay on the marketing site while the neutral base matches the app, and it holds up on phones and in dark mode with almost no motion to slow older devices. B's FAQ answers the questions a cautious proprietor actually asks (fees, spreadsheets, bad internet, leaving), which A doesn't cover.</p>
+  </section>
+
+  <section aria-labelledby="scorecard-title" style="display:grid;gap:16px">
+    <h2 id="scorecard-title">Scorecard</h2>
+    <div class="scroll">
+      <table>
+        <colgroup><col><col class="best"><col><col><col></colgroup>
+        <thead>
+          <tr>
+            <th scope="col">What we judged</th>
+            <th scope="col"><a href="a-chalkboard.html">A · Chalkboard</a></th>
+            <th scope="col"><a href="b-airy.html">B · Airy</a></th>
+            <th scope="col"><a href="c-motion.html">C · Motion</a></th>
+            <th scope="col"><a href="d-dark-tech.html">D · Dark Tech</a></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><th scope="row">Fits schools and proprietors</th>
+            <td><span class="dots" aria-hidden="true"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i></span>5<span class="sr"> of 5</span></td>
+            <td><span class="dots" aria-hidden="true"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i></span>4<span class="sr"> of 5</span></td>
+            <td><span class="dots" aria-hidden="true"><i class="on"></i><i class="on"></i><i></i><i></i><i></i></span>2<span class="sr"> of 5</span></td>
+            <td><span class="dots" aria-hidden="true"><i class="on"></i><i class="on"></i><i></i><i></i><i></i></span>2<span class="sr"> of 5</span></td></tr>
+          <tr><th scope="row">Fast on slow connections</th>
+            <td><span class="dots" aria-hidden="true"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i></span>938 KB*</td>
+            <td><span class="dots" aria-hidden="true"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i></span>490 KB*</td>
+            <td><span class="dots" aria-hidden="true"><i class="on"></i><i class="on"></i><i></i><i></i><i></i></span>708 KB* + 2 s preloader</td>
+            <td><span class="dots" aria-hidden="true"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i></span>151 KB</td></tr>
+          <tr><th scope="row">Smooth on low-end phones</th>
+            <td><span class="dots" aria-hidden="true"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i></span>5<span class="sr"> of 5</span></td>
+            <td><span class="dots" aria-hidden="true"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i></span>4<span class="sr"> of 5</span></td>
+            <td><span class="dots" aria-hidden="true"><i class="on"></i><i class="on"></i><i></i><i></i><i></i></span>2<span class="sr"> of 5</span></td>
+            <td><span class="dots" aria-hidden="true"><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i></span>3<span class="sr"> of 5</span></td></tr>
+          <tr><th scope="row">Readable and accessible</th>
+            <td><span class="dots" aria-hidden="true"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i></span>4<span class="sr"> of 5</span></td>
+            <td><span class="dots" aria-hidden="true"><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i></span>3<span class="sr"> of 5</span></td>
+            <td><span class="dots" aria-hidden="true"><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i></span>3<span class="sr"> of 5</span></td>
+            <td><span class="dots" aria-hidden="true"><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i></span>3<span class="sr"> of 5</span></td></tr>
+          <tr><th scope="row">Claims match what we're building</th>
+            <td><span class="dots" aria-hidden="true"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i></span>4<span class="sr"> of 5</span></td>
+            <td><span class="dots" aria-hidden="true"><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i></span>3<span class="sr"> of 5</span></td>
+            <td><span class="dots" aria-hidden="true"><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i></span>3<span class="sr"> of 5</span></td>
+            <td><span class="dots" aria-hidden="true"><i class="on"></i><i class="on"></i><i></i><i></i><i></i></span>2<span class="sr"> of 5</span></td></tr>
+          <tr><th scope="row">Look carries into the app</th>
+            <td><span class="dots" aria-hidden="true"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i></span>5<span class="sr"> of 5</span></td>
+            <td><span class="dots" aria-hidden="true"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i></span>4<span class="sr"> of 5</span></td>
+            <td><span class="dots" aria-hidden="true"><i class="on"></i><i class="on"></i><i></i><i></i><i></i></span>2<span class="sr"> of 5</span></td>
+            <td><span class="dots" aria-hidden="true"><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i></span>3<span class="sr"> of 5</span></td></tr>
+        </tbody>
+        <tfoot>
+          <tr><th scope="row">Total out of 30</th><td>27</td><td>22</td><td>14</td><td>18</td></tr>
+        </tfoot>
+      </table>
+    </div>
+  </section>
+
+  <hr>
+
+  <section class="design" aria-labelledby="a-title">
+    <div class="design-head">
+      <div>
+        <h2 id="a-title">A · Chalkboard &amp; Marigold <span class="total">27 / 30</span></h2>
+        <p>Warm and school-native. A split hero with illustrated classroom scenes, then the working mark sheet on a chalkboard band.</p>
+      </div>
+      <a class="open" href="a-chalkboard.html">Open draft A</a>
+    </div>
+    <div class="shots-wrap">
+      <div class="shots">
+        <figure><a href="shots/a-desktop-light-hero.jpg"><img src="shots/a-desktop-light-hero.jpg" alt="Draft A hero on a laptop, light theme" loading="lazy"></a><figcaption>Laptop, light</figcaption></figure>
+        <figure><a href="shots/a-desktop-light-grid.jpg"><img src="shots/a-desktop-light-grid.jpg" alt="Draft A live mark sheet section" loading="lazy"></a><figcaption>Live mark sheet</figcaption></figure>
+        <figure><a href="shots/a-desktop-dark-hero.jpg"><img src="shots/a-desktop-dark-hero.jpg" alt="Draft A hero, dark theme" loading="lazy"></a><figcaption>Laptop, dark</figcaption></figure>
+        <figure><a href="shots/a-phone-light-hero.jpg"><img src="shots/a-phone-light-hero.jpg" alt="Draft A hero on a phone" loading="lazy"></a><figcaption>Phone</figcaption></figure>
+      </div>
+    </div>
+    <div class="notes">
+      <div><h3>Works well</h3><ul>
+        <li>The product is on screen early, with the grid one scroll down</li>
+        <li>Chalkboard green and marigold feel like a school without being childish</li>
+        <li>Neutral base is the same family as the app's graphite</li>
+        <li>Phone and dark mode both hold up; motion is minimal</li>
+      </ul></div>
+      <div><h3 class="bad">Watch out for</h3><ul>
+        <li>Two web fonts plus four photos make it the heaviest page until the photos are compressed</li>
+        <li>A pill label above the headline and middle dots in the trust strip read as template habits</li>
+        <li>The testimonial portrait is still an illustration until there is a real quote from a real school</li>
+      </ul></div>
+      <div><h3 class="bad">Claims to fix</h3><ul>
+        <li>"Refused at the cell": the demo quietly drops a digit instead of showing an error</li>
+        <li>"Flags on anything that looks wrong" isn't in the BRD</li>
+        <li>History limits per plan are business decisions to confirm</li>
+      </ul></div>
+    </div>
+  </section>
+
+  <section class="design" aria-labelledby="b-title">
+    <div class="design-head">
+      <div>
+        <h2 id="b-title">B · Airy Minimal <span class="total">22 / 30</span></h2>
+        <p>Near-monochrome and expensive-feeling. A full-bleed dark classroom hero, then zigzag feature blocks, pricing cards and an FAQ.</p>
+      </div>
+      <a class="open" href="b-airy.html">Open draft B</a>
+    </div>
+    <div class="shots-wrap">
+      <div class="shots">
+        <figure><a href="shots/b-desktop-light-hero.jpg"><img src="shots/b-desktop-light-hero.jpg" alt="Draft B hero on a laptop" loading="lazy"></a><figcaption>Laptop, light</figcaption></figure>
+        <figure><a href="shots/b-desktop-light-grid.jpg"><img src="shots/b-desktop-light-grid.jpg" alt="Draft B stats band and live mark sheet" loading="lazy"></a><figcaption>Live mark sheet</figcaption></figure>
+        <figure><a href="shots/b-desktop-dark-hero.jpg"><img src="shots/b-desktop-dark-hero.jpg" alt="Draft B hero, dark theme" loading="lazy"></a><figcaption>Laptop, dark</figcaption></figure>
+        <figure><a href="shots/b-phone-light-hero.jpg"><img src="shots/b-phone-light-hero.jpg" alt="Draft B hero on a phone" loading="lazy"></a><figcaption>Phone</figcaption></figure>
+      </div>
+    </div>
+    <div class="notes">
+      <div><h3>Works well</h3><ul>
+        <li>Calm and premium; closest to the app's current graphite look</li>
+        <li>The FAQ answers a proprietor's real objections</li>
+        <li>Pricing cards are easy to compare</li>
+      </ul></div>
+      <div><h3 class="bad">Watch out for</h3><ul>
+        <li>The hero now works with a real photo, but it only shows students, not the product</li>
+        <li>On phones, Sign in and Sign up wrap onto two lines and the menu button looks empty</li>
+        <li>Atmosphere first: the product only appears on the second screen</li>
+      </ul></div>
+      <div><h3 class="bad">Claims to fix</h3><ul>
+        <li>A column-matching dropdown for spreadsheet import isn't planned</li>
+        <li>Automatic flags on odd results aren't in scope</li>
+        <li>"Multiple campuses" in the Standard plan isn't in scope</li>
+      </ul></div>
+    </div>
+  </section>
+
+  <section class="design" aria-labelledby="c-title">
+    <div class="design-head">
+      <div>
+        <h2 id="c-title">C · Cinematic Motion <span class="total">14 / 30</span></h2>
+        <p>Editorial and motion-led. A loading counter, line-by-line reveals, parallax, a custom cursor and a section that scrolls sideways.</p>
+      </div>
+      <a class="open" href="c-motion.html">Open draft C</a>
+    </div>
+    <div class="shots-wrap">
+      <div class="shots">
+        <figure><a href="shots/c-desktop-light-hero.jpg"><img src="shots/c-desktop-light-hero.jpg" alt="Draft C hero on a laptop" loading="lazy"></a><figcaption>Laptop, light</figcaption></figure>
+        <figure><a href="shots/c-desktop-light-grid.jpg"><img src="shots/c-desktop-light-grid.jpg" alt="Draft C pinned section with the live mark sheet" loading="lazy"></a><figcaption>Live mark sheet</figcaption></figure>
+        <figure><a href="shots/c-desktop-dark-hero.jpg"><img src="shots/c-desktop-dark-hero.jpg" alt="Draft C hero, dark theme" loading="lazy"></a><figcaption>Laptop, dark</figcaption></figure>
+        <figure><a href="shots/c-phone-light-hero.jpg"><img src="shots/c-phone-light-hero.jpg" alt="Draft C hero on a phone" loading="lazy"></a><figcaption>Phone</figcaption></figure>
+      </div>
+    </div>
+    <div class="notes">
+      <div><h3>Works well</h3><ul>
+        <li>Striking, well-crafted motion</li>
+        <li>Everything switches off properly for reduced-motion users</li>
+      </ul></div>
+      <div><h3 class="bad">Watch out for</h3><ul>
+        <li>A 2-second loading screen on every visit, even when the page is already loaded</li>
+        <li>The custom cursor runs an animation loop the whole time</li>
+        <li>8,200 px tall; the grid is cut off on phones</li>
+        <li>This motion language doesn't transfer to a data-entry app</li>
+      </ul></div>
+      <div><h3 class="bad">Claims to fix</h3><ul>
+        <li>Automatic flags and multiple campuses aren't in scope</li>
+        <li>"41 s for a class of report cards" is unproven</li>
+      </ul></div>
+    </div>
+  </section>
+
+  <section class="design" aria-labelledby="d-title">
+    <div class="design-head">
+      <div>
+        <h2 id="d-title">D · Dark Tech <span class="total">18 / 30</span></h2>
+        <p>Midnight navy with blue glows, a pill nav, accordion features and tilted UI cards, with a fully designed light mode.</p>
+      </div>
+      <a class="open" href="d-dark-tech.html">Open draft D</a>
+    </div>
+    <div class="shots-wrap">
+      <div class="shots">
+        <figure><a href="shots/d-desktop-dark-hero.jpg"><img src="shots/d-desktop-dark-hero.jpg" alt="Draft D hero, dark theme" loading="lazy"></a><figcaption>Laptop, dark (default)</figcaption></figure>
+        <figure><a href="shots/d-desktop-light-grid.jpg"><img src="shots/d-desktop-light-grid.jpg" alt="Draft D score entry section with accordion and live mark sheet, light theme" loading="lazy"></a><figcaption>Live mark sheet, light</figcaption></figure>
+        <figure><a href="shots/d-desktop-light-hero.jpg"><img src="shots/d-desktop-light-hero.jpg" alt="Draft D hero, light theme" loading="lazy"></a><figcaption>Laptop, light</figcaption></figure>
+        <figure><a href="shots/d-phone-light-hero.jpg"><img src="shots/d-phone-light-hero.jpg" alt="Draft D hero on a phone, light theme" loading="lazy"></a><figcaption>Phone</figcaption></figure>
+      </div>
+    </div>
+    <div class="notes">
+      <div><h3>Works well</h3><ul>
+        <li>The lightest page of the four</li>
+        <li>Accordions pack a lot of detail into little space</li>
+        <li>The best-built light/dark switch</li>
+      </ul></div>
+      <div><h3 class="bad">Watch out for</h3><ul>
+        <li>Reads as a developer-tools startup, not a school product</li>
+        <li>Blue replaces the brand graphite, and one headline word is highlighted</li>
+        <li>The top badge breaks awkwardly on phones; big blurred glows strain low-end phones</li>
+      </ul></div>
+      <div><h3 class="bad">Claims to fix</h3><ul>
+        <li>Absent students "excluded from the weighting": we count them as 0 (DECISIONS D-3)</li>
+        <li>Notes on individual cells aren't in scope</li>
+        <li>Automatic flags and multiple campuses aren't in scope</li>
+      </ul></div>
+    </div>
+  </section>
+
+  <hr>
+
+  <section class="method" aria-labelledby="method-title">
+    <h2 id="method-title">How this was checked</h2>
+    <ul>
+      <li>Opened in Chrome at 1280 px and 390 px, in light and dark, and with reduced motion on. No console errors, no sideways scrolling on any page.</li>
+      <li>Typed into each live mark sheet: totals, grades and positions update, and Enter moves down the column in all four. In all four, a score over the maximum loses its last digit silently instead of showing an error. The real build uses the app's own score rules.</li>
+      <li>The theme switch survives a reload in all four. Page weight includes fonts.</li>
+      <li>One bug was fixed so all four could be judged fairly: in A, B and C the mark sheet shared the logo's <code>.mark</code> class and rendered as a squashed flex row.</li>
+      <li>Photos in A, B and C are free stock photos from Pexels and Unsplash (credits in <code>photos/CREDITS.md</code>). *Page weights include them as uncompressed JPEGs; the real build serves compressed, right-sized versions. D has no photo slots. Testimonial portraits stay illustrated, because a real person’s face next to a sample quote would imply they said it.</li>
+      <li>Testimonials, school names, stats and prices in every draft are sample content. "Sign up" has nowhere to go yet; the chosen design gets a request-a-trial form.</li>
+    </ul>
+  </section>
+</main>
+
+</body>
+</html>

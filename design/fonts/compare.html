@@ -1,0 +1,397 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Display face candidates</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@300;400;500&family=Host+Grotesk:wght@300;400;500&family=Schibsted+Grotesk:wght@300;400;500&family=Archivo:wght@300;400;500&family=Geist:wght@300;400;500&family=Instrument+Sans:wght@400;500&family=EB+Garamond:wght@400;500&family=Instrument+Serif&family=Fraunces:opsz,wght@9..144,300;9..144,400&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --bg: #f2f1ef;
+        --ink: #16171a;
+        --ink-2: #5c5f66;
+        --ink-3: #95989e;
+        --rule: #dedcd8;
+        --sunken: #ebeae7;
+        --accent: #c8913a;
+        --success: #3f7a57;
+        --success-bg: #edf4f0;
+        --success-border: #ccdfd4;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--ink);
+        font-family: "Instrument Sans", sans-serif;
+        padding: 56px 40px 90px;
+      }
+      .head {
+        max-width: 60ch;
+        margin-bottom: 54px;
+      }
+      .head h1 {
+        font-family: "Inter Tight", sans-serif;
+        font-weight: 300;
+        font-size: 38px;
+        letter-spacing: -0.04em;
+        margin: 0 0 14px;
+      }
+      .head p {
+        margin: 0;
+        color: var(--ink-2);
+        line-height: 1.65;
+      }
+      .head code {
+        background: var(--sunken);
+        padding: 1px 6px;
+        border-radius: 3px;
+        font-size: 13px;
+      }
+
+      .row {
+        padding: 40px 0;
+        border-top: 1px solid var(--rule);
+        display: grid;
+        grid-template-columns: 190px 1fr;
+        gap: 40px;
+        align-items: start;
+      }
+      .meta b {
+        display: block;
+        font-size: 16px;
+        margin-bottom: 8px;
+      }
+      .meta span {
+        display: block;
+        font-size: 13px;
+        color: var(--ink-3);
+        line-height: 1.55;
+      }
+      .tag {
+        display: inline-block;
+        margin-top: 10px;
+        font-size: 10.5px;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        border: 1px solid var(--rule);
+        border-radius: 2px;
+        padding: 2px 7px;
+        color: var(--ink-3);
+      }
+      .tag.now {
+        border-color: var(--accent);
+        color: var(--accent);
+      }
+
+      .spec h2 {
+        margin: 0 0 18px;
+        font-weight: 300;
+        font-size: clamp(30px, 3.6vw, 52px);
+        letter-spacing: -0.045em;
+        line-height: 0.98;
+        max-width: 16ch;
+      }
+      .spec .lede {
+        margin: 0 0 22px;
+        color: var(--ink-2);
+        font-size: 15.5px;
+        max-width: 52ch;
+        line-height: 1.6;
+      }
+      .figs {
+        display: flex;
+        gap: 26px;
+        align-items: baseline;
+        flex-wrap: wrap;
+        font-variant-numeric: tabular-nums;
+      }
+      .fig b {
+        font-weight: 300;
+        font-size: 40px;
+        letter-spacing: -0.05em;
+      }
+      .fig span {
+        font-size: 12px;
+        color: var(--ink-3);
+        display: block;
+      }
+      .badge {
+        display: inline-block;
+        min-width: 24px;
+        padding: 1px 8px;
+        border-radius: 3px;
+        font-size: 12px;
+        font-weight: 500;
+        color: var(--success);
+        background: var(--success-bg);
+        border: 1px solid var(--success-border);
+      }
+
+      /* each candidate applies only to its own block's display type */
+      .f-inter .spec h2,
+      .f-inter .fig b {
+        font-family: "Inter Tight", sans-serif;
+      }
+      .f-host .spec h2,
+      .f-host .fig b {
+        font-family: "Host Grotesk", sans-serif;
+      }
+      .f-schibsted .spec h2,
+      .f-schibsted .fig b {
+        font-family: "Schibsted Grotesk", sans-serif;
+      }
+      .f-archivo .spec h2,
+      .f-archivo .fig b {
+        font-family: "Archivo", sans-serif;
+      }
+      .f-geist .spec h2,
+      .f-geist .fig b {
+        font-family: "Geist", sans-serif;
+      }
+
+      /* the serif-headline direction, as used on cluely.com */
+      .serif .spec h2 {
+        font-weight: 400;
+        letter-spacing: -0.015em;
+        line-height: 1.04;
+      }
+      .f-garamond .spec h2,
+      .f-garamond .fig b {
+        font-family: "EB Garamond", serif;
+      }
+      .f-garamond .spec .lede,
+      .f-garamond .fig span {
+        font-family: "Geist", sans-serif;
+      }
+      .f-instrumentserif .spec h2,
+      .f-instrumentserif .fig b {
+        font-family: "Instrument Serif", serif;
+      }
+      .f-fraunces .spec h2,
+      .f-fraunces .fig b {
+        font-family: "Fraunces", serif;
+        font-weight: 300;
+      }
+      .divider {
+        border-top: 1px solid var(--rule);
+        padding-top: 40px;
+        margin-top: 20px;
+      }
+      .divider h3 {
+        font-family: "Inter Tight", sans-serif;
+        font-weight: 400;
+        font-size: 22px;
+        letter-spacing: -0.03em;
+        margin: 0 0 8px;
+      }
+      .divider p {
+        margin: 0;
+        max-width: 62ch;
+        color: var(--ink-2);
+        line-height: 1.65;
+        font-size: 15px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="head">
+      <h1>Display face candidates</h1>
+      <p>
+        Contra uses <b>GT Standard</b> (Grilli Type, licensed). These are free faces in the same Swiss-grotesque
+        lineage. Each block shows the site's own headline, lede, animated figures and a grade badge, set in that face.
+        Body text stays <code>Instrument Sans</code> throughout, so only the display face changes.
+      </p>
+    </div>
+
+    <section class="row f-inter">
+      <div class="meta">
+        <b>Inter Tight</b>
+        <span>Rasmus Andersson. Tight-spaced sibling of Inter. Neutral, screen-first, very wide language coverage.</span>
+        <span class="tag now">On the site now</span>
+      </div>
+      <div class="spec">
+        <h2>The term’s results, without the long night of adding up.</h2>
+        <p class="lede">
+          Teachers enter scores once. Brillanda works out totals, grades and positions, builds the report cards, and
+          shows parents the result on a phone.
+        </p>
+        <div class="figs">
+          <span class="fig"><b>40%</b><span>continuous assessment</span></span>
+          <span class="fig"><b>₦280</b><span>per student, per term</span></span>
+          <span class="fig"><b>78.4</b><span>term average</span></span>
+          <span class="fig"><b>2nd</b><span>of 34 · <span class="badge">A</span></span></span>
+        </div>
+      </div>
+    </section>
+
+    <section class="row f-host">
+      <div class="meta">
+        <b>Host Grotesk</b>
+        <span>Ludwig Type, 2024. The closest of these to GT Standard: warm, slightly quirky Swiss grotesque with real
+          character at large sizes.</span>
+        <span class="tag">SIL Open Font Licence</span>
+      </div>
+      <div class="spec">
+        <h2>The term’s results, without the long night of adding up.</h2>
+        <p class="lede">
+          Teachers enter scores once. Brillanda works out totals, grades and positions, builds the report cards, and
+          shows parents the result on a phone.
+        </p>
+        <div class="figs">
+          <span class="fig"><b>40%</b><span>continuous assessment</span></span>
+          <span class="fig"><b>₦280</b><span>per student, per term</span></span>
+          <span class="fig"><b>78.4</b><span>term average</span></span>
+          <span class="fig"><b>2nd</b><span>of 34 · <span class="badge">A</span></span></span>
+        </div>
+      </div>
+    </section>
+
+    <section class="row f-schibsted">
+      <div class="meta">
+        <b>Schibsted Grotesk</b>
+        <span>Made for Norwegian newspapers. Confident, high-contrast headlines; reads as editorial rather than
+          technical.</span>
+        <span class="tag">SIL Open Font Licence</span>
+      </div>
+      <div class="spec">
+        <h2>The term’s results, without the long night of adding up.</h2>
+        <p class="lede">
+          Teachers enter scores once. Brillanda works out totals, grades and positions, builds the report cards, and
+          shows parents the result on a phone.
+        </p>
+        <div class="figs">
+          <span class="fig"><b>40%</b><span>continuous assessment</span></span>
+          <span class="fig"><b>₦280</b><span>per student, per term</span></span>
+          <span class="fig"><b>78.4</b><span>term average</span></span>
+          <span class="fig"><b>2nd</b><span>of 34 · <span class="badge">A</span></span></span>
+        </div>
+      </div>
+    </section>
+
+    <section class="row f-archivo">
+      <div class="meta">
+        <b>Archivo</b>
+        <span>Omnibus-Type. Straight Akzidenz-Grotesk descendant — the same ancestor GT Standard draws on. Sturdy and
+          plain.</span>
+        <span class="tag">SIL Open Font Licence</span>
+      </div>
+      <div class="spec">
+        <h2>The term’s results, without the long night of adding up.</h2>
+        <p class="lede">
+          Teachers enter scores once. Brillanda works out totals, grades and positions, builds the report cards, and
+          shows parents the result on a phone.
+        </p>
+        <div class="figs">
+          <span class="fig"><b>40%</b><span>continuous assessment</span></span>
+          <span class="fig"><b>₦280</b><span>per student, per term</span></span>
+          <span class="fig"><b>78.4</b><span>term average</span></span>
+          <span class="fig"><b>2nd</b><span>of 34 · <span class="badge">A</span></span></span>
+        </div>
+      </div>
+    </section>
+
+    <section class="row f-geist">
+      <div class="meta">
+        <b>Geist</b>
+        <span>Vercel, 2024. Tight, contemporary, software-looking. Excellent figures; the least warm of the five.</span>
+        <span class="tag">SIL Open Font Licence</span>
+      </div>
+      <div class="spec">
+        <h2>The term’s results, without the long night of adding up.</h2>
+        <p class="lede">
+          Teachers enter scores once. Brillanda works out totals, grades and positions, builds the report cards, and
+          shows parents the result on a phone.
+        </p>
+        <div class="figs">
+          <span class="fig"><b>40%</b><span>continuous assessment</span></span>
+          <span class="fig"><b>₦280</b><span>per student, per term</span></span>
+          <span class="fig"><b>78.4</b><span>term average</span></span>
+          <span class="fig"><b>2nd</b><span>of 34 · <span class="badge">A</span></span></span>
+        </div>
+      </div>
+    </section>
+
+    <section class="divider">
+      <h3>A different direction: a serif headline</h3>
+      <p>
+        This is what cluely.com does — an old-style serif for the headline, a plain grotesque for everything else. It
+        is a bigger change than swapping one sans for another, and it would carry through to the report card. Schools
+        have set certificates in serif for a century, so it is not an odd fit.
+      </p>
+    </section>
+
+    <section class="row serif f-garamond">
+      <div class="meta">
+        <b>EB Garamond</b>
+        <span>Georg Duffner &amp; Octavio Pardo. The face cluely.com uses for its headline — a revival of Claude
+          Garamont's 16th-century types. Warm, literary, unmistakably not a startup sans.</span>
+        <span class="tag">SIL Open Font Licence</span>
+      </div>
+      <div class="spec">
+        <h2>The term’s results, without the long night of adding up.</h2>
+        <p class="lede">
+          Teachers enter scores once. Brillanda works out totals, grades and positions, builds the report cards, and
+          shows parents the result on a phone.
+        </p>
+        <div class="figs">
+          <span class="fig"><b>40%</b><span>continuous assessment</span></span>
+          <span class="fig"><b>₦280</b><span>per student, per term</span></span>
+          <span class="fig"><b>78.4</b><span>term average</span></span>
+          <span class="fig"><b>2nd</b><span>of 34 · <span class="badge">A</span></span></span>
+        </div>
+      </div>
+    </section>
+
+    <section class="row serif f-instrumentserif">
+      <div class="meta">
+        <b>Instrument Serif</b>
+        <span>Rodrigo Fuenzalida &amp; Jordan Egstad. A modern display serif — tighter and more graphic than Garamond,
+          made for large headlines rather than reading.</span>
+        <span class="tag">SIL Open Font Licence</span>
+      </div>
+      <div class="spec">
+        <h2>The term’s results, without the long night of adding up.</h2>
+        <p class="lede">
+          Teachers enter scores once. Brillanda works out totals, grades and positions, builds the report cards, and
+          shows parents the result on a phone.
+        </p>
+        <div class="figs">
+          <span class="fig"><b>40%</b><span>continuous assessment</span></span>
+          <span class="fig"><b>₦280</b><span>per student, per term</span></span>
+          <span class="fig"><b>78.4</b><span>term average</span></span>
+          <span class="fig"><b>2nd</b><span>of 34 · <span class="badge">A</span></span></span>
+        </div>
+      </div>
+    </section>
+
+    <section class="row serif f-fraunces">
+      <div class="meta">
+        <b>Fraunces</b>
+        <span>Undercase Type. A “wonky” old-style with optical sizing: soft and characterful at headline size, and it
+          has real weight range.</span>
+        <span class="tag">SIL Open Font Licence</span>
+      </div>
+      <div class="spec">
+        <h2>The term’s results, without the long night of adding up.</h2>
+        <p class="lede">
+          Teachers enter scores once. Brillanda works out totals, grades and positions, builds the report cards, and
+          shows parents the result on a phone.
+        </p>
+        <div class="figs">
+          <span class="fig"><b>40%</b><span>continuous assessment</span></span>
+          <span class="fig"><b>₦280</b><span>per student, per term</span></span>
+          <span class="fig"><b>78.4</b><span>term average</span></span>
+          <span class="fig"><b>2nd</b><span>of 34 · <span class="badge">A</span></span></span>
+        </div>
+      </div>
+    </section>
+  </body>
+</html>

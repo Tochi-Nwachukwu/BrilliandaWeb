@@ -1,0 +1,839 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Brillanda — End of term, without the arithmetic</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ================= TOKENS ================= */
+:root[data-theme="dark"]{
+  --bg:#080B1C; --bg-2:#0B0F27; --surface:rgba(255,255,255,.035); --surface-2:rgba(255,255,255,.055);
+  --card:#0E1330; --card-2:#121843;
+  --rule:rgba(255,255,255,.10); --rule-2:rgba(255,255,255,.18);
+  --grid-line:rgba(255,255,255,.035);
+  --ink:#F2F4FF; --ink-2:#A8AECD; --ink-3:#727AA0;
+  --blue:#3B6BF0; --blue-2:#5B84FF; --blue-soft:rgba(59,107,240,.16); --blue-line:rgba(91,132,255,.42);
+  --glow-1:rgba(59,107,240,.42); --glow-2:rgba(91,132,255,.20);
+  --success:#54B884; --success-bg:rgba(84,184,132,.14); --success-line:rgba(84,184,132,.32);
+  --warn:#D8A34A; --warn-bg:rgba(216,163,74,.14); --warn-line:rgba(216,163,74,.32);
+  --danger:#D9736C; --danger-bg:rgba(217,115,108,.14); --danger-line:rgba(217,115,108,.32);
+  --shadow:0 20px 60px rgba(0,0,0,.5);
+  --shadow-sm:0 8px 28px rgba(0,0,0,.4);
+  --hero-veil:linear-gradient(180deg,rgba(8,11,28,.55),rgba(8,11,28,.86));
+}
+:root[data-theme="light"]{
+  --bg:#F7F8FC; --bg-2:#FFFFFF; --surface:rgba(16,24,64,.028); --surface-2:rgba(16,24,64,.05);
+  --card:#FFFFFF; --card-2:#F2F5FD;
+  --rule:rgba(16,24,64,.10); --rule-2:rgba(16,24,64,.18);
+  --grid-line:rgba(16,24,64,.045);
+  --ink:#0F1330; --ink-2:#565D80; --ink-3:#8990AE;
+  --blue:#2E5BE0; --blue-2:#3B6BF0; --blue-soft:rgba(46,91,224,.10); --blue-line:rgba(46,91,224,.30);
+  --glow-1:rgba(59,107,240,.20); --glow-2:rgba(91,132,255,.12);
+  --success:#2F7A54; --success-bg:rgba(47,122,84,.10); --success-line:rgba(47,122,84,.26);
+  --warn:#9A6B0E; --warn-bg:rgba(154,107,14,.10); --warn-line:rgba(154,107,14,.26);
+  --danger:#B0433C; --danger-bg:rgba(176,67,60,.10); --danger-line:rgba(176,67,60,.26);
+  --shadow:0 20px 56px rgba(15,19,48,.10);
+  --shadow-sm:0 8px 24px rgba(15,19,48,.07);
+  --hero-veil:linear-gradient(180deg,rgba(247,248,252,.30),rgba(247,248,252,.90));
+}
+
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);
+  font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+  font-size:16px;line-height:1.62;-webkit-font-smoothing:antialiased;overflow-x:hidden;
+  transition:background .4s ease,color .4s ease}
+h1,h2,h3,h4{font-family:Outfit,-apple-system,sans-serif;font-weight:400;margin:0;letter-spacing:-.02em;line-height:1.14;color:var(--ink)}
+p{margin:0}
+img,svg{max-width:100%;display:block}
+a{color:inherit;text-decoration:none}
+:focus-visible{outline:2px solid var(--blue-2);outline-offset:3px;border-radius:6px}
+.wrap{max-width:1180px;margin:0 auto;padding:0 28px}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+
+/* grid-line texture + corner glows */
+.tex{position:fixed;inset:0;z-index:0;pointer-events:none;
+  background-image:linear-gradient(var(--grid-line) 1px,transparent 1px),linear-gradient(90deg,var(--grid-line) 1px,transparent 1px);
+  background-size:110px 110px;
+  mask-image:radial-gradient(ellipse 100% 60% at 50% 0%,#000 30%,transparent 78%)}
+.glow{position:absolute;border-radius:50%;filter:blur(90px);pointer-events:none;z-index:0}
+main{position:relative;z-index:1}
+
+/* ================= BUTTONS ================= */
+.btn{position:relative;display:inline-flex;align-items:center;justify-content:center;gap:9px;
+  height:46px;padding:0 24px;border-radius:999px;border:1px solid transparent;cursor:pointer;
+  font-family:Inter;font-size:14.5px;font-weight:500;line-height:1;white-space:nowrap;
+  transition:background .25s ease,border-color .25s ease,color .25s ease,transform .25s ease,box-shadow .25s ease}
+.btn:active{transform:translateY(1px)}
+.btn-blue{background:var(--blue);color:#fff;box-shadow:0 6px 22px rgba(59,107,240,.34)}
+.btn-blue:hover{background:var(--blue-2);box-shadow:0 8px 28px rgba(59,107,240,.46)}
+.btn-line{border-color:var(--rule-2);color:var(--ink);background:var(--surface)}
+.btn-line:hover{background:var(--surface-2);border-color:var(--blue-line)}
+.btn-sm{height:40px;padding:0 18px;font-size:13.5px}
+
+/* ================= NAV ================= */
+.nav{position:fixed;top:0;left:0;right:0;z-index:90;padding:18px 0;transition:background .35s ease,padding .35s ease,box-shadow .35s}
+.nav.stuck{background:color-mix(in srgb,var(--bg) 82%,transparent);backdrop-filter:blur(18px);padding:12px 0;box-shadow:0 1px 0 var(--rule)}
+.nav-in{display:flex;align-items:center;gap:20px}
+.mark{display:flex;align-items:center;gap:9px;font-family:Outfit;font-weight:500;font-size:19px;letter-spacing:-.02em}
+.mark i{width:22px;height:22px;flex:none;font-style:normal;display:grid;place-items:center}
+.nav-pill{display:flex;gap:4px;padding:5px;border:1px solid var(--rule);border-radius:999px;background:var(--surface);backdrop-filter:blur(10px);margin:0 auto}
+.nav-pill a{padding:8px 15px;border-radius:999px;font-size:13.5px;color:var(--ink-2);transition:background .22s,color .22s}
+.nav-pill a:hover{color:var(--ink)}
+.nav-pill a.on{background:var(--blue-soft);color:var(--ink);border:1px solid var(--blue-line)}
+.nav-right{display:flex;align-items:center;gap:9px}
+.icon-btn{width:40px;height:40px;border-radius:999px;border:1px solid var(--rule);background:var(--surface);color:var(--ink-2);cursor:pointer;display:grid;place-items:center;transition:background .22s,color .22s,border-color .22s}
+.icon-btn:hover{background:var(--surface-2);color:var(--ink);border-color:var(--blue-line)}
+@media(max-width:1000px){.nav-pill{display:none}.nav-right .btn-line{display:none}}
+
+/* ================= HERO ================= */
+.hero{position:relative;padding:190px 0 96px;text-align:center;overflow:hidden}
+.hero .glow.g1{width:760px;height:520px;top:-230px;left:50%;transform:translateX(-50%);background:var(--glow-1)}
+.hero .glow.g2{width:460px;height:400px;top:60px;right:-120px;background:var(--glow-2)}
+.badge{display:inline-flex;align-items:center;gap:9px;padding:7px 15px 7px 9px;border:1px solid var(--rule);
+  border-radius:999px;background:var(--surface);font-size:13px;color:var(--ink-2);margin-bottom:28px;backdrop-filter:blur(8px)}
+.badge b{display:inline-flex;align-items:center;gap:6px;color:var(--ink);font-weight:500}
+.badge .dot{width:7px;height:7px;border-radius:50%;background:var(--blue-2);box-shadow:0 0 0 4px var(--blue-soft)}
+.hero h1{font-size:clamp(38px,6.2vw,74px);font-weight:400;letter-spacing:-.035em;line-height:1.04;max-width:16ch;margin:0 auto 22px}
+.hero h1 em{font-style:normal;color:var(--blue-2)}
+.hero .lede{color:var(--ink-2);font-size:clamp(15.5px,1.7vw,18px);max-width:54ch;margin:0 auto 34px;line-height:1.65}
+.hero-a{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+.hero-note{margin-top:22px;font-size:13.5px;color:var(--ink-3);display:flex;gap:8px;align-items:center;justify-content:center}
+
+/* ================= SECTION HEAD ================= */
+.shead{text-align:center;max-width:56ch;margin:0 auto 62px}
+.shead h2{font-size:clamp(28px,4vw,46px);font-weight:400;letter-spacing:-.03em;margin-bottom:14px}
+.shead p{color:var(--ink-2);font-size:16px;line-height:1.65}
+.sec{padding:96px 0;position:relative}
+
+/* ================= ZIGZAG + ACCORDION ================= */
+.zz{display:grid;grid-template-columns:1fr 1.12fr;gap:60px;align-items:center;margin-bottom:104px}
+.zz.rev .zc{order:2}.zz.rev .zv{order:1}
+.zc h3{font-size:clamp(24px,3vw,34px);font-weight:400;letter-spacing:-.028em;margin-bottom:12px}
+.zc > p{color:var(--ink-2);font-size:15.5px;line-height:1.65;max-width:42ch;margin-bottom:26px}
+.acc{border-top:1px solid var(--rule)}
+.acc details{border-bottom:1px solid var(--rule)}
+.acc summary{display:flex;align-items:center;gap:16px;padding:16px 0;cursor:pointer;list-style:none;
+  font-size:15.5px;font-weight:500;font-family:Outfit;letter-spacing:-.01em;transition:color .22s}
+.acc summary::-webkit-details-marker{display:none}
+.acc summary:hover{color:var(--blue-2)}
+.acc summary .ch{margin-left:auto;flex:none;transition:transform .3s cubic-bezier(.2,0,0,1);color:var(--ink-3)}
+.acc details[open] summary .ch{transform:rotate(180deg);color:var(--blue-2)}
+.acc details[open] summary{color:var(--ink)}
+.acc .ans{padding:0 30px 18px 0;color:var(--ink-2);font-size:14.5px;line-height:1.72}
+
+/* image cluster w/ glow border */
+.cluster{position:relative}
+.cl-main{position:relative;z-index:1;border:1px solid var(--blue-line);border-radius:12px;overflow:hidden;
+  background:var(--card);box-shadow:var(--shadow);}
+.cl-sub{position:absolute;right:-14px;bottom:-26px;width:52%;z-index:2;border:1px solid var(--blue-line);
+  border-radius:10px;overflow:hidden;background:var(--card-2);box-shadow:var(--shadow)}
+.cluster .glow{width:70%;height:60%;left:50%;top:50%;transform:translate(-50%,-50%);background:var(--glow-2);z-index:0}
+
+/* ================= MARK SHEET ================= */
+.sh-top{display:flex;align-items:center;gap:10px;padding:13px 16px;border-bottom:1px solid var(--rule)}
+.sh-top .t{font-size:13px;font-weight:500}
+.sh-top .s{margin-left:auto;font-size:11.5px;color:var(--ink-3);display:flex;align-items:center;gap:6px}
+.dot-ok{width:6px;height:6px;border-radius:50%;background:var(--success)}
+table.mk{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}
+table.mk th{background:var(--surface);color:var(--ink-3);font-size:11px;font-weight:500;text-align:center;padding:8px 4px;border-bottom:1px solid var(--rule);white-space:nowrap}
+table.mk th.nm{text-align:left;padding-left:16px}
+table.mk th small{display:block;font-size:9.5px;opacity:.7}
+table.mk td{padding:0;border-bottom:1px solid var(--rule);text-align:center;font-size:12.5px}
+table.mk tr:last-child td{border-bottom:0}
+td.nm{text-align:left;padding:7px 6px 7px 16px}
+td.nm b{display:block;font-weight:500;font-size:12.5px}
+td.nm span{font-size:10px;color:var(--ink-3)}
+td.cl{padding:3px}
+td.cl input{width:100%;max-width:48px;height:29px;text-align:center;font:inherit;font-size:12.5px;font-weight:500;
+  font-variant-numeric:tabular-nums;border:1px solid transparent;border-radius:5px;background:transparent;color:var(--ink);
+  transition:background .2s,border-color .2s;-moz-appearance:textfield}
+td.cl input::-webkit-outer-spin-button,td.cl input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+td.cl input:hover{border-color:var(--rule-2)}
+td.cl input:focus{outline:2px solid var(--blue-2);outline-offset:-1px}
+td.cl input.hi{background:var(--success-bg)}
+td.cl input.mid{background:var(--warn-bg)}
+td.cl input.lo{background:var(--danger-bg)}
+td.out{background:var(--surface);font-weight:600;padding:7px 4px}
+td.gr{padding:7px 4px}
+.gb{display:inline-block;min-width:23px;padding:1px 6px;border-radius:5px;font-size:11px;font-weight:600;border:1px solid}
+.g-a{background:var(--success-bg);color:var(--success);border-color:var(--success-line)}
+.g-c{background:var(--warn-bg);color:var(--warn);border-color:var(--warn-line)}
+.g-f{background:var(--danger-bg);color:var(--danger);border-color:var(--danger-line)}
+td.ps{padding:7px 4px;font-weight:600;font-size:12px;transition:background .6s ease}
+.flash{background:var(--blue-soft)}
+.sh-foot{padding:9px 16px;border-top:1px solid var(--rule);font-size:10.5px;color:var(--ink-3);display:flex;gap:11px;flex-wrap:wrap}
+
+@media(max-width:940px){
+  .zz,.zz.rev{grid-template-columns:1fr;gap:38px;margin-bottom:76px}
+  .zz.rev .zc{order:1}.zz.rev .zv{order:2}
+  .cl-sub{position:relative;right:0;bottom:0;width:100%;margin-top:14px}
+}
+</style>
+</head>
+<body>
+<div class="tex" aria-hidden="true"></div>
+
+<header class="nav" id="nav">
+  <div class="wrap nav-in">
+    <a class="mark" href="#top">
+      <i aria-hidden="true"><svg width="20" height="20" viewBox="0 0 22 22" fill="none"><path d="M3 3.5h6.4c2 0 3.3 1.2 3.3 3s-1.3 3-3.3 3H3V3.5Zm0 8.4h7c2.1 0 3.5 1.3 3.5 3.2s-1.4 3.2-3.5 3.2H3v-6.4Z" fill="currentColor"/><path d="M17.4 3v16" stroke="#5B84FF" stroke-width="2" stroke-linecap="round"/></svg></i>
+      Brillanda
+    </a>
+    <nav class="nav-pill" aria-label="Main">
+      <a href="#top" class="on">Home</a>
+      <a href="#what">What it does</a>
+      <a href="#work">How it works</a>
+      <a href="#stories">Stories</a>
+      <a href="#pricing">Pricing</a>
+    </nav>
+    <div class="nav-right">
+      <button class="icon-btn" id="themeBtn" aria-label="Switch theme"><svg id="themeIcon" width="16" height="16" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M15 10.4A6.5 6.5 0 017.6 3 6.5 6.5 0 1015 10.4Z"/></svg></button>
+      <a class="btn btn-line btn-sm" href="#signin">Sign in</a>
+      <a class="btn btn-blue btn-sm" href="#signup">Sign up<svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 8h10M9 4l4 4-4 4"/></svg></a>
+    </div>
+  </div>
+</header>
+
+<main>
+<!-- ================= HERO ================= -->
+<section class="hero" id="top">
+  <span class="glow g1" aria-hidden="true"></span>
+  <span class="glow g2" aria-hidden="true"></span>
+  <div class="wrap">
+    <span class="badge"><b><span class="dot"></span>Results &amp; records</b> for schools that still do it by hand</span>
+    <h1>End of term, without the <em>arithmetic</em>.</h1>
+    <p class="lede">Teachers enter scores the way they already do. Brillanda works out the totals, grades, positions and report cards — and gets them to parents the moment you approve.</p>
+    <div class="hero-a">
+      <a class="btn btn-blue" href="#signup">Start free for a term<svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 8h10M9 4l4 4-4 4"/></svg></a>
+      <a class="btn btn-line" href="#what">See it compute</a>
+    </div>
+    <p class="hero-note"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M13.5 4.5 6 12 2.5 8.5"/></svg>No card needed · one class set up in about ten minutes</p>
+  </div>
+</section>
+
+<style>
+/* ================= CTA BANNER ================= */
+.cta-banner{position:relative;border:1px solid var(--rule);border-radius:16px;overflow:hidden;background:var(--card);
+  padding:56px 52px;display:flex;align-items:center;gap:40px;flex-wrap:wrap;box-shadow:var(--shadow-sm)}
+.cta-banner .glow{width:520px;height:340px;top:-180px;left:-80px;background:var(--glow-1)}
+.cta-banner::after{content:"";position:absolute;inset:0;pointer-events:none;
+  background-image:linear-gradient(var(--grid-line) 1px,transparent 1px),linear-gradient(90deg,var(--grid-line) 1px,transparent 1px);
+  background-size:88px 88px}
+.cta-banner h2{position:relative;z-index:2;font-size:clamp(24px,3.2vw,38px);font-weight:400;letter-spacing:-.03em;max-width:15ch}
+.cta-banner .r{position:relative;z-index:2;margin-left:auto;display:flex;gap:12px;flex-wrap:wrap}
+
+/* ================= SHOWCASE CARDS ================= */
+.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+.card{border:1px solid var(--rule);border-radius:14px;overflow:hidden;background:var(--card);
+  transition:transform .35s cubic-bezier(.2,0,0,1),border-color .35s,box-shadow .35s}
+.card:hover{transform:translateY(-6px);border-color:var(--blue-line);box-shadow:var(--shadow)}
+.card-vis{position:relative;height:210px;overflow:hidden;background:var(--card-2);display:grid;place-items:center;padding:22px}
+.card-vis .glow{width:70%;height:70%;left:50%;top:50%;transform:translate(-50%,-50%);background:var(--glow-2)}
+.card-shot{position:relative;z-index:2;width:100%;border:1px solid var(--rule-2);border-radius:8px;overflow:hidden;
+  background:var(--card);box-shadow:var(--shadow-sm);transform:perspective(900px) rotateX(9deg) rotateZ(-3deg);
+  transition:transform .45s cubic-bezier(.2,0,0,1)}
+.card:hover .card-shot{transform:perspective(900px) rotateX(4deg) rotateZ(-1deg) translateY(-4px)}
+.card-body{padding:20px 22px 24px}
+.tags{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:12px}
+.tag{font-size:11px;padding:4px 10px;border-radius:999px;border:1px solid var(--rule);background:var(--surface);color:var(--ink-2)}
+.card-body h3{font-size:18.5px;font-weight:500;letter-spacing:-.02em;margin-bottom:7px}
+.card-body p{font-size:14px;color:var(--ink-2);line-height:1.6}
+@media(max-width:940px){.cards{grid-template-columns:1fr;max-width:460px;margin:0 auto}}
+
+/* mini UI shots */
+.ui{font-size:9px;line-height:1.4}
+.ui-bar{display:flex;align-items:center;gap:5px;padding:7px 9px;border-bottom:1px solid var(--rule)}
+.ui-bar b{font-size:8.5px;font-weight:600}
+.ui-bar .pill{margin-left:auto;font-size:7.5px;padding:2px 6px;border-radius:999px;border:1px solid var(--rule);color:var(--ink-3)}
+.ui-row{display:flex;align-items:center;gap:6px;padding:6px 9px;border-bottom:1px solid var(--rule)}
+.ui-row:last-child{border-bottom:0}
+.ui-av{width:14px;height:14px;border-radius:50%;background:var(--surface-2);flex:none}
+.ui-ln{height:5px;border-radius:3px;background:var(--surface-2)}
+.ui-chip{font-size:7.5px;padding:1.5px 5px;border-radius:4px;border:1px solid;font-weight:600}
+.ui-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;padding:9px}
+.ui-tile{border:1px solid var(--rule);border-radius:5px;padding:7px;background:var(--surface)}
+.ui-tile b{display:block;font-size:12px;font-weight:600;letter-spacing:-.02em}
+.ui-tile span{font-size:7px;color:var(--ink-3)}
+
+/* ================= STEPS ================= */
+.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:20px}
+.step{border:1px solid var(--rule);border-radius:14px;padding:26px 22px 28px;background:var(--card);position:relative;overflow:hidden;
+  transition:border-color .3s,transform .3s cubic-bezier(.2,0,0,1)}
+.step:hover{border-color:var(--blue-line);transform:translateY(-4px)}
+.step .n{width:34px;height:34px;border-radius:10px;border:1px solid var(--blue-line);background:var(--blue-soft);
+  color:var(--blue-2);display:grid;place-items:center;font-family:Outfit;font-weight:600;font-size:14px;margin-bottom:18px}
+.step h3{font-size:18px;font-weight:500;letter-spacing:-.02em;margin-bottom:9px}
+.step p{font-size:14px;color:var(--ink-2);line-height:1.62}
+@media(max-width:940px){.steps{grid-template-columns:1fr 1fr}}
+@media(max-width:620px){.steps{grid-template-columns:1fr}}
+
+/* ================= STORIES ================= */
+.st-head{display:flex;justify-content:space-between;align-items:flex-end;gap:24px;margin-bottom:38px;flex-wrap:wrap}
+.st-head h2{font-size:clamp(26px,3.6vw,42px);font-weight:400;letter-spacing:-.03em}
+.st-nav{display:flex;gap:9px}
+.st-vp{overflow:hidden}
+.st-track{display:flex;gap:22px;transition:transform .6s cubic-bezier(.2,0,0,1)}
+.quote{flex:none;width:calc((100% - 44px)/3);border:1px solid var(--rule);border-radius:14px;padding:24px 24px 22px;background:var(--card)}
+.q-top{display:flex;align-items:center;gap:11px;margin-bottom:16px}
+.q-av{width:36px;height:36px;border-radius:50%;overflow:hidden;background:var(--surface-2);flex:none}
+.q-av svg{width:100%;height:100%}
+.q-top b{display:block;font-size:14px;font-weight:600}
+.q-top span{font-size:12px;color:var(--ink-3)}
+.quote p{font-size:14.5px;color:var(--ink-2);line-height:1.68;margin-bottom:16px}
+.q-date{font-size:12px;color:var(--ink-3);padding-top:14px;border-top:1px solid var(--rule)}
+@media(max-width:940px){.quote{width:calc((100% - 22px)/2)}}
+@media(max-width:640px){.quote{width:100%}}
+
+/* ================= PRICING ================= */
+.plans{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
+.plan{border:1px solid var(--rule);border-radius:16px;padding:30px 28px 32px;background:var(--card);display:flex;flex-direction:column;position:relative;overflow:hidden}
+.plan.best{border-color:var(--blue-line)}
+.plan.best .glow{width:300px;height:200px;top:-120px;left:50%;transform:translateX(-50%);background:var(--glow-1)}
+.plan .tag2{position:relative;z-index:2;font-size:11px;letter-spacing:.04em;text-transform:uppercase;color:var(--blue-2);margin-bottom:12px;min-height:16px;display:block}
+.plan h3{position:relative;z-index:2;font-size:20px;font-weight:500;letter-spacing:-.02em}
+.plan .amt{position:relative;z-index:2;font-family:Outfit;font-weight:500;font-size:40px;letter-spacing:-.035em;margin:16px 0 3px;line-height:1}
+.plan .per{position:relative;z-index:2;font-size:13px;color:var(--ink-3)}
+.plan .lim{position:relative;z-index:2;font-size:14px;color:var(--ink-2);margin:18px 0 20px;padding-bottom:20px;border-bottom:1px solid var(--rule)}
+.plan ul{position:relative;z-index:2;list-style:none;padding:0;margin:0 0 28px;display:grid;gap:11px}
+.plan li{font-size:14px;color:var(--ink-2);display:flex;gap:10px}
+.plan li svg{flex:none;margin-top:5px;color:var(--success)}
+.plan .btn{position:relative;z-index:2;margin-top:auto;width:100%}
+@media(max-width:940px){.plans{grid-template-columns:1fr;max-width:420px;margin:0 auto}}
+
+/* ================= FOOTER ================= */
+footer{position:relative;margin-top:40px;border-top:1px solid var(--rule);background:var(--bg-2);overflow:hidden}
+footer .glow{width:620px;height:380px;bottom:-220px;right:-140px;background:var(--glow-1)}
+.f-in{position:relative;z-index:2;display:grid;grid-template-columns:1.6fr 1fr 1fr 1fr;gap:44px;padding:72px 0 56px}
+.f-brand p{color:var(--ink-2);font-size:14.5px;max-width:30ch;margin-top:14px;line-height:1.65}
+.f-col h4{font-size:12px;font-weight:600;color:var(--ink);margin-bottom:16px;font-family:Inter;letter-spacing:.02em}
+.f-col ul{list-style:none;padding:0;margin:0;display:grid;gap:10px}
+.f-col a{font-size:14px;color:var(--ink-2);transition:color .2s}
+.f-col a:hover{color:var(--blue-2)}
+.ghost{position:relative;z-index:1;font-family:Outfit;font-weight:600;font-size:clamp(64px,17vw,220px);
+  letter-spacing:-.05em;line-height:.8;color:var(--ink);opacity:.045;text-align:center;
+  padding:0 0 10px;user-select:none;pointer-events:none;white-space:nowrap}
+.f-bot{position:relative;z-index:2;display:flex;gap:18px;align-items:center;padding:22px 0 28px;border-top:1px solid var(--rule);font-size:13px;color:var(--ink-3);flex-wrap:wrap}
+.f-bot .sp{margin-left:auto;display:flex;gap:18px}
+@media(max-width:940px){.f-in{grid-template-columns:1fr 1fr;gap:34px}}
+@media(max-width:600px){.f-in{grid-template-columns:1fr}.f-bot .sp{margin-left:0}}
+
+/* reveal */
+.rv{opacity:0;transform:translateY(24px);transition:opacity .8s cubic-bezier(.2,0,0,1),transform .8s cubic-bezier(.2,0,0,1);transition-delay:var(--d,0ms)}
+.rv.in{opacity:1;transform:none}
+@media(prefers-reduced-motion:reduce){.rv{opacity:1!important;transform:none!important}.card,.step,.card-shot{transition:none!important}}
+</style>
+
+<!-- ================= WHAT IT DOES ================= -->
+<section class="sec" id="what">
+  <div class="wrap">
+    <div class="shead rv">
+      <h2>What Brillanda does</h2>
+      <p>Three jobs, done completely: the scores go in, the results come out, and the parents get them. Nothing else in the way.</p>
+    </div>
+
+    <!-- ZZ 1 -->
+    <div class="zz rv">
+      <div class="zc">
+        <h3>Score entry</h3>
+        <p>Students down the left, assessments across the top — the same shape as the mark sheet already on their desk.</p>
+        <div class="acc">
+          <details open>
+            <summary>A grid that behaves like a spreadsheet<svg class="ch" width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 6.5 8 10.5 12 6.5"/></svg></summary>
+            <div class="ans">Tab moves across, Enter moves down the column — the way teachers actually enter a set of scores. Sticky student names and a live total per row, so nobody loses their place at row 34.</div>
+          </details>
+          <details>
+            <summary>Refuses what a spreadsheet would accept<svg class="ch" width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 6.5 8 10.5 12 6.5"/></svg></summary>
+            <div class="ans">A score above the component maximum is rejected at the cell, not discovered at report time. The maximum sits in the column header so it never has to be remembered.</div>
+          </details>
+          <details>
+            <summary>Saves as they type<svg class="ch" width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 6.5 8 10.5 12 6.5"/></svg></summary>
+            <div class="ans">Every score saves on its own rather than waiting for a submit button at the end. A failed save is queued and retried, so a dropped connection halfway through third period costs nothing.</div>
+          </details>
+          <details>
+            <summary>Absences and notes<svg class="ch" width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 6.5 8 10.5 12 6.5"/></svg></summary>
+            <div class="ans">Mark a student absent for one component and it's excluded from the weighting properly. Add a note to any cell — "resat 14 Nov" — so the reason stays with the score instead of in someone's memory.</div>
+          </details>
+        </div>
+      </div>
+      <div class="zv">
+        <div class="cluster">
+          <span class="glow" aria-hidden="true"></span>
+          <div class="cl-main">
+            <div class="sh-top"><span class="t">JSS 1A · Mathematics · First Term</span><span class="s"><span class="dot-ok"></span>Saved just now</span></div>
+            <table class="mk"><thead><tr>
+              <th class="nm">Student</th><th>CA1<small>/10</small></th><th>CA2<small>/10</small></th><th>Exam<small>/80</small></th><th>Total<small>/100</small></th><th>Grade<small>&nbsp;</small></th><th>Pos.<small>&nbsp;</small></th>
+            </tr></thead><tbody id="mkBody"></tbody></table>
+            <div class="sh-foot"><span>A 70–100</span><span>B 60–69</span><span>C 50–59</span><span>D 45–49</span><span>E 40–44</span><span>F 0–39</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ZZ 2 -->
+    <div class="zz rev rv">
+      <div class="zc">
+        <h3>Results &amp; positions</h3>
+        <p>Every total, grade and position computed the same way, every term — with the workings on the record.</p>
+        <div class="acc">
+          <details open>
+            <summary>Weighted totals, your split<svg class="ch" width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 6.5 8 10.5 12 6.5"/></svg></summary>
+            <div class="ans">Define your CA-to-exam split once — 40/60, 30/70, or per class level — and every subject total follows it. Weights that don't sum to 100 are blocked before they can produce a wrong result.</div>
+          </details>
+          <details>
+            <summary>Your grading scale, not ours<svg class="ch" width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 6.5 8 10.5 12 6.5"/></svg></summary>
+            <div class="ans">Set your own grade bands and remarks. We pre-fill the common West African scale so you can start today, and flag any gap — a score between 39 and 40 that maps to nothing is caught at setup, not at publish.</div>
+          </details>
+          <details>
+            <summary>Positions, with ties handled<svg class="ch" width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 6.5 8 10.5 12 6.5"/></svg></summary>
+            <div class="ans">Subject and overall positions recalculate across the whole class as scores change, using one consistent ranking rule. Nobody recalculates by hand, and nobody disagrees about whose child came third.</div>
+          </details>
+          <details>
+            <summary>Flags on anything odd<svg class="ch" width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 6.5 8 10.5 12 6.5"/></svg></summary>
+            <div class="ans">A total of zero, a missing score, a class average that moved 25 points since last term — surfaced for you to check before publishing. Advisory only; they never block you.</div>
+          </details>
+        </div>
+      </div>
+      <div class="zv">
+        <div class="cluster">
+          <span class="glow" aria-hidden="true"></span>
+          <div class="cl-main">
+            <div class="sh-top"><span class="t">JSS 1A · Overall position</span><span class="s">34 students</span></div>
+            <div class="ui">
+              <div class="ui-row" style="padding:9px 14px"><span class="ui-av" style="background:var(--blue-soft);border:1px solid var(--blue-line)"></span><span style="flex:1"><b style="font-size:12.5px">Ibrahim Sule</b><br><span style="font-size:10px;color:var(--ink-3)">2021/0146</span></span><span class="ui-chip g-a">88.4</span></div>
+              <div class="ui-row" style="padding:9px 14px"><span class="ui-av"></span><span style="flex:1"><b style="font-size:12.5px">Adaeze Okonkwo</b><br><span style="font-size:10px;color:var(--ink-3)">2021/0142</span></span><span class="ui-chip g-a">82.0</span></div>
+              <div class="ui-row" style="padding:9px 14px"><span class="ui-av"></span><span style="flex:1"><b style="font-size:12.5px">Emeka Balogun</b><br><span style="font-size:10px;color:var(--ink-3)">2021/0144</span></span><span class="ui-chip g-a">75.2</span></div>
+              <div class="ui-row" style="padding:9px 14px"><span class="ui-av"></span><span style="flex:1"><b style="font-size:12.5px">Chidi Nwosu</b><br><span style="font-size:10px;color:var(--ink-3)">2021/0143</span></span><span class="ui-chip g-c">64.0</span></div>
+              <div class="ui-row" style="padding:9px 14px"><span class="ui-av"></span><span style="flex:1"><b style="font-size:12.5px">Fatima Bello</b><br><span style="font-size:10px;color:var(--ink-3)">2021/0145</span></span><span class="ui-chip g-c">57.0</span></div>
+            </div>
+          </div>
+          <div class="cl-sub">
+            <div class="ui-grid">
+              <div class="ui-tile"><b>78%</b><span>entered</span></div>
+              <div class="ui-tile"><b>12</b><span>classes</span></div>
+              <div class="ui-tile"><b>0</b><span>published</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ZZ 3 -->
+    <div class="zz rv">
+      <div class="zc">
+        <h3>Report cards &amp; publishing</h3>
+        <p>Nothing reaches a parent until you've reviewed it — and when it does, it's one action for the whole class.</p>
+        <div class="acc">
+          <details open>
+            <summary>A whole class in one action<svg class="ch" width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 6.5 8 10.5 12 6.5"/></svg></summary>
+            <div class="ans">Generate every report card for a class at once, with your logo, your grading key and your class teacher's remarks. Under two minutes for a class of thirty-four, and downloadable again next year.</div>
+          </details>
+          <details>
+            <summary>Review, then lock<svg class="ch" width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 6.5 8 10.5 12 6.5"/></svg></summary>
+            <div class="ans">Once a teacher marks a subject complete, lock it so it can't drift while you're checking. Every change to a score is recorded with who made it, when, and what it was before.</div>
+          </details>
+          <details>
+            <summary>Publish when you're ready<svg class="ch" width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 6.5 8 10.5 12 6.5"/></svg></summary>
+            <div class="ans">One action makes results visible to parents and enables their downloads. Publish per class rather than all-at-once, and unpublish if you spot a mistake — we'll tell you plainly that some parents may already have seen it.</div>
+          </details>
+          <details>
+            <summary>Parents check on their phone<svg class="ch" width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 6.5 8 10.5 12 6.5"/></svg></summary>
+            <div class="ans">No paper slips, no queue at the office, no "my child lost it". A parent signs in, sees the term, downloads the card. Parents with more than one child switch between them from one account.</div>
+          </details>
+        </div>
+      </div>
+      <div class="zv">
+        <div class="cluster">
+          <span class="glow" aria-hidden="true"></span>
+          <div class="cl-main">
+            <div class="ui" style="padding:18px 20px">
+              <div style="display:flex;gap:10px;align-items:center;padding-bottom:12px;border-bottom:2px solid var(--ink)">
+                <span style="width:32px;height:32px;border-radius:7px;background:var(--blue);color:#fff;display:grid;place-items:center;font-family:Outfit;font-weight:600;font-size:14px">S</span>
+                <span><b style="font-size:13px;font-family:Outfit;font-weight:600">Sunrise Academy, Lagos</b><br><span style="font-size:9.5px;color:var(--ink-3)">Terminal report · First Term, 2025/2026</span></span>
+              </div>
+              <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:11px 0;border-bottom:1px solid var(--rule)">
+                <span><span style="font-size:8.5px;color:var(--ink-3);display:block">Student</span><b style="font-size:11px">Adaeze O.</b></span>
+                <span><span style="font-size:8.5px;color:var(--ink-3);display:block">Admission</span><b style="font-size:11px">2021/0142</b></span>
+                <span><span style="font-size:8.5px;color:var(--ink-3);display:block">Class</span><b style="font-size:11px">JSS 1A</b></span>
+                <span><span style="font-size:8.5px;color:var(--ink-3);display:block">In class</span><b style="font-size:11px">34</b></span>
+              </div>
+              <table style="width:100%;border-collapse:collapse;margin-top:9px;font-variant-numeric:tabular-nums">
+                <tr><td style="padding:4px 3px;font-size:10.5px;border-bottom:1px solid var(--rule)">Mathematics</td><td style="padding:4px 3px;text-align:right;font-size:10.5px;border-bottom:1px solid var(--rule)">82</td><td style="padding:4px 3px;text-align:right;border-bottom:1px solid var(--rule)"><span class="ui-chip g-a">A</span></td></tr>
+                <tr><td style="padding:4px 3px;font-size:10.5px;border-bottom:1px solid var(--rule)">English Language</td><td style="padding:4px 3px;text-align:right;font-size:10.5px;border-bottom:1px solid var(--rule)">74</td><td style="padding:4px 3px;text-align:right;border-bottom:1px solid var(--rule)"><span class="ui-chip g-a">A</span></td></tr>
+                <tr><td style="padding:4px 3px;font-size:10.5px;border-bottom:1px solid var(--rule)">Basic Science</td><td style="padding:4px 3px;text-align:right;font-size:10.5px;border-bottom:1px solid var(--rule)">66</td><td style="padding:4px 3px;text-align:right;border-bottom:1px solid var(--rule)"><span class="ui-chip g-a">B</span></td></tr>
+                <tr><td style="padding:4px 3px;font-size:10.5px;border-bottom:1px solid var(--rule)">Social Studies</td><td style="padding:4px 3px;text-align:right;font-size:10.5px;border-bottom:1px solid var(--rule)">71</td><td style="padding:4px 3px;text-align:right;border-bottom:1px solid var(--rule)"><span class="ui-chip g-a">A</span></td></tr>
+                <tr><td style="padding:4px 3px;font-size:10.5px">Civic Education</td><td style="padding:4px 3px;text-align:right;font-size:10.5px">58</td><td style="padding:4px 3px;text-align:right"><span class="ui-chip g-c">C</span></td></tr>
+              </table>
+              <div style="display:flex;gap:14px;margin-top:11px;padding-top:10px;border-top:1px solid var(--rule)">
+                <span style="flex:1"><span style="font-size:8.5px;color:var(--ink-3);display:block">Term average</span><b style="font-size:13px;font-family:Outfit">70.2</b></span>
+                <span style="flex:1"><span style="font-size:8.5px;color:var(--ink-3);display:block">Position</span><b style="font-size:13px;font-family:Outfit">4th of 34</b></span>
+                <span style="flex:1"><span style="font-size:8.5px;color:var(--ink-3);display:block">Resumes</span><b style="font-size:13px;font-family:Outfit">12 Jan</b></span>
+              </div>
+            </div>
+          </div>
+          <div class="cl-sub">
+            <div class="ui-bar"><b>Publishing</b><span class="pill">JSS 1A</span></div>
+            <div class="ui-row"><span class="ui-ln" style="width:52%"></span><span class="ui-chip g-a" style="margin-left:auto">Published</span></div>
+            <div class="ui-row"><span class="ui-ln" style="width:64%"></span><span class="ui-chip g-c" style="margin-left:auto">Locked</span></div>
+            <div class="ui-row"><span class="ui-ln" style="width:44%"></span><span class="ui-chip" style="margin-left:auto;border-color:var(--rule);color:var(--ink-3)">Entry</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= CTA BANNER ================= -->
+<section style="padding:0 0 96px">
+  <div class="wrap">
+    <div class="cta-banner rv">
+      <span class="glow" aria-hidden="true"></span>
+      <h2>Let's get your next term sorted.</h2>
+      <div class="r">
+        <a class="btn btn-blue" href="#signup">Book a walkthrough<svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 8h10M9 4l4 4-4 4"/></svg></a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= SHOWCASE ================= -->
+<section class="sec" style="padding-top:0" id="showcase">
+  <div class="wrap">
+    <div class="shead rv">
+      <h2>One system, three views</h2>
+      <p>Each role sees only what it needs. A teacher's whole world is four menu items; a parent's is one screen.</p>
+    </div>
+    <div class="cards">
+      <div class="card rv" style="--d:0ms">
+        <div class="card-vis">
+          <span class="glow" aria-hidden="true"></span>
+          <div class="card-shot">
+            <div class="ui">
+              <div class="ui-bar"><b>Score entry</b><span class="pill">JSS 1A</span></div>
+              <div class="ui-row"><span class="ui-av"></span><span class="ui-ln" style="flex:1"></span><span class="ui-chip g-a">82</span></div>
+              <div class="ui-row"><span class="ui-av"></span><span class="ui-ln" style="flex:1"></span><span class="ui-chip g-c">64</span></div>
+              <div class="ui-row"><span class="ui-av"></span><span class="ui-ln" style="flex:1"></span><span class="ui-chip g-a">75</span></div>
+              <div class="ui-row"><span class="ui-av"></span><span class="ui-ln" style="flex:1"></span><span class="ui-chip g-f">38</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="tags"><span class="tag">Teacher</span><span class="tag">Grid</span><span class="tag">Autosave</span></div>
+          <h3>The teacher's grid</h3>
+          <p>Four menu items, one job. Pick a class, enter scores, mark it complete. No admin menus they'll never use.</p>
+        </div>
+      </div>
+
+      <div class="card rv" style="--d:110ms">
+        <div class="card-vis">
+          <span class="glow" aria-hidden="true"></span>
+          <div class="card-shot">
+            <div class="ui">
+              <div class="ui-bar"><b>Overview</b><span class="pill">First Term</span></div>
+              <div class="ui-grid">
+                <div class="ui-tile"><b>312</b><span>students</span></div>
+                <div class="ui-tile"><b>78%</b><span>entered</span></div>
+                <div class="ui-tile"><b>12</b><span>classes</span></div>
+              </div>
+              <div class="ui-row"><span class="ui-ln" style="width:46%"></span><span class="ui-chip g-a" style="margin-left:auto">Complete</span></div>
+              <div class="ui-row"><span class="ui-ln" style="width:58%"></span><span class="ui-chip g-c" style="margin-left:auto">In progress</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="tags"><span class="tag">Admin</span><span class="tag">Publishing</span><span class="tag">Audit</span></div>
+          <h3>The admin's board</h3>
+          <p>Answers one question on sight: what's blocking the end of term? Then lock, review and publish from the same screen.</p>
+        </div>
+      </div>
+
+      <div class="card rv" style="--d:220ms">
+        <div class="card-vis">
+          <span class="glow" aria-hidden="true"></span>
+          <div class="card-shot">
+            <div class="ui">
+              <div class="ui-bar"><b>Adaeze's results</b><span class="pill">Published</span></div>
+              <div style="padding:10px 9px">
+                <div style="font-family:Outfit;font-size:22px;font-weight:600;letter-spacing:-.03em">70.2</div>
+                <div style="font-size:8px;color:var(--ink-3);margin-bottom:8px">Term average · 4th of 34</div>
+                <div class="ui-row" style="padding:5px 0;border:0"><span class="ui-ln" style="width:50%"></span><span class="ui-chip g-a" style="margin-left:auto">A</span></div>
+                <div class="ui-row" style="padding:5px 0;border:0"><span class="ui-ln" style="width:62%"></span><span class="ui-chip g-a" style="margin-left:auto">B</span></div>
+                <div class="ui-row" style="padding:5px 0;border:0"><span class="ui-ln" style="width:42%"></span><span class="ui-chip g-c" style="margin-left:auto">C</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="tags"><span class="tag">Parent</span><span class="tag">Mobile</span><span class="tag">PDF</span></div>
+          <h3>The parent's screen</h3>
+          <p>Built phone-first, because that's where it gets opened. Term average, grades, and the report card to download.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= HOW IT WORKS ================= -->
+<section class="sec" style="padding-top:0" id="work">
+  <div class="wrap">
+    <div class="shead rv">
+      <h2>A term in four moves</h2>
+      <p>Set it up once in August. The other three happen every term — and only the second one takes real time.</p>
+    </div>
+    <div class="steps">
+      <div class="step rv" style="--d:0ms"><div class="n">1</div><h3>Set up</h3><p>Enter your classes, subjects and grading scale. We pre-fill the standard scale, so most schools check it and move on.</p></div>
+      <div class="step rv" style="--d:100ms"><div class="n">2</div><h3>Enter</h3><p>Teachers fill in the grid. It behaves like the spreadsheet they already use, but won't accept 150 out of 100.</p></div>
+      <div class="step rv" style="--d:200ms"><div class="n">3</div><h3>Review</h3><p>Lock the term and check the computed results, with flags on anything odd — before a parent ever sees it.</p></div>
+      <div class="step rv" style="--d:300ms"><div class="n">4</div><h3>Publish</h3><p>Approve once. Parents get results and downloadable report cards the same minute.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= STORIES ================= -->
+<section class="sec" style="padding-top:0" id="stories">
+  <div class="wrap">
+    <div class="st-head rv">
+      <h2>What schools say</h2>
+      <div class="st-nav">
+        <button class="icon-btn" id="qPrev" aria-label="Previous"><svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M10 3 5 8l5 5"/></svg></button>
+        <button class="icon-btn" id="qNext" aria-label="Next" style="background:var(--blue);border-color:var(--blue);color:#fff"><svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M6 3l5 5-5 5"/></svg></button>
+      </div>
+    </div>
+    <div class="st-vp rv">
+      <div class="st-track" id="qTrack">
+        <div class="quote">
+          <div class="q-top">
+            <span class="q-av"><svg viewBox="0 0 40 40"><rect width="40" height="40" fill="#2A3358"/><circle cx="20" cy="16" r="8" fill="#7A5A3E"/><path d="M6 40c0-8 6-13 14-13s14 5 14 13H6Z" fill="#1E2540"/></svg></span>
+            <span><b>Mrs. Folake Adeyemi</b><span>Vice Principal, Sunrise Academy</span></span>
+          </div>
+          <p>We used to lose the last week of term to arithmetic — three of us with calculators, checking each other. Now the totals are done before the teacher leaves the room.</p>
+          <div class="q-date">First Term, 2025/2026 · 312 students</div>
+        </div>
+        <div class="quote">
+          <div class="q-top">
+            <span class="q-av"><svg viewBox="0 0 40 40"><rect width="40" height="40" fill="#2A3358"/><circle cx="20" cy="16" r="8" fill="#6B4F38"/><path d="M6 40c0-8 6-13 14-13s14 5 14 13H6Z" fill="#243052"/></svg></span>
+            <span><b>Mr. Tunde Bakare</b><span>Proprietor, Grace Schools</span></span>
+          </div>
+          <p>The first term we used it, not one parent came to the office to query a position. In eleven years that had never happened. The workings are there, so there's nothing to argue about.</p>
+          <div class="q-date">First Term, 2025/2026 · 480 students</div>
+        </div>
+        <div class="quote">
+          <div class="q-top">
+            <span class="q-av"><svg viewBox="0 0 40 40"><rect width="40" height="40" fill="#2A3358"/><circle cx="20" cy="16" r="8" fill="#9A7654"/><path d="M6 40c0-8 6-13 14-13s14 5 14 13H6Z" fill="#1E2540"/></svg></span>
+            <span><b>Mrs. Ngozi Okafor</b><span>Mathematics, JSS 1–3</span></span>
+          </div>
+          <p>I enter my scores on the staff room laptop in about eight minutes. It used to be an evening's work at home with the register and a calculator.</p>
+          <div class="q-date">First Term, 2025/2026 · 3 classes</div>
+        </div>
+        <div class="quote">
+          <div class="q-top">
+            <span class="q-av"><svg viewBox="0 0 40 40"><rect width="40" height="40" fill="#2A3358"/><circle cx="20" cy="16" r="8" fill="#7A5A3E"/><path d="M6 40c0-8 6-13 14-13s14 5 14 13H6Z" fill="#26304F"/></svg></span>
+            <span><b>Mr. Samuel Eze</b><span>Head of Academics</span></span>
+          </div>
+          <p>The flagging caught a subject where a teacher had entered exam scores in the CA column. We'd have printed 34 wrong report cards and found out from parents.</p>
+          <div class="q-date">Second Term, 2025/2026 · 206 students</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= PRICING ================= -->
+<section class="sec" style="padding-top:0" id="pricing">
+  <div class="wrap">
+    <div class="shead rv">
+      <h2>Priced by how many students you have</h2>
+      <p>Not per teacher, not per module. One price for the school, billed per term.</p>
+    </div>
+    <div class="plans">
+      <div class="plan rv" style="--d:0ms">
+        <span class="tag2">&nbsp;</span><h3>Trial</h3>
+        <div class="amt">Free</div><div class="per">for one full term</div>
+        <div class="lim">Up to 150 students</div>
+        <ul>
+          <li><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M13 4.5 6.3 11.5 3 8.2"/></svg>Score entry &amp; computation</li>
+          <li><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M13 4.5 6.3 11.5 3 8.2"/></svg>Report cards</li>
+          <li><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M13 4.5 6.3 11.5 3 8.2"/></svg>One term of history</li>
+        </ul>
+        <a class="btn btn-line" href="#signup">Start free</a>
+      </div>
+      <div class="plan best rv" style="--d:110ms">
+        <span class="glow" aria-hidden="true"></span>
+        <span class="tag2">Most schools</span><h3>Basic</h3>
+        <div class="amt">₦45,000</div><div class="per">per term</div>
+        <div class="lim">Up to 400 students</div>
+        <ul>
+          <li><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M13 4.5 6.3 11.5 3 8.2"/></svg>Everything in Trial</li>
+          <li><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M13 4.5 6.3 11.5 3 8.2"/></svg>Parent &amp; student portal</li>
+          <li><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M13 4.5 6.3 11.5 3 8.2"/></svg>Three years of history</li>
+        </ul>
+        <a class="btn btn-blue" href="#signup">Choose Basic</a>
+      </div>
+      <div class="plan rv" style="--d:220ms">
+        <span class="tag2">&nbsp;</span><h3>Standard</h3>
+        <div class="amt">₦85,000</div><div class="per">per term</div>
+        <div class="lim">Up to 1,200 students</div>
+        <ul>
+          <li><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M13 4.5 6.3 11.5 3 8.2"/></svg>Everything in Basic</li>
+          <li><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M13 4.5 6.3 11.5 3 8.2"/></svg>Unlimited history</li>
+          <li><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M13 4.5 6.3 11.5 3 8.2"/></svg>Multiple campuses</li>
+        </ul>
+        <a class="btn btn-line" href="#signup">Choose Standard</a>
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer>
+  <span class="glow" aria-hidden="true"></span>
+  <div class="wrap">
+    <div class="f-in">
+      <div class="f-brand">
+        <a class="mark" href="#top"><i aria-hidden="true"><svg width="20" height="20" viewBox="0 0 22 22" fill="none"><path d="M3 3.5h6.4c2 0 3.3 1.2 3.3 3s-1.3 3-3.3 3H3V3.5Zm0 8.4h7c2.1 0 3.5 1.3 3.5 3.2s-1.4 3.2-3.5 3.2H3v-6.4Z" fill="currentColor"/><path d="M17.4 3v16" stroke="#5B84FF" stroke-width="2" stroke-linecap="round"/></svg></i>Brillanda</a>
+        <p>Results and records for schools that want one thing done properly. Built in Lagos.</p>
+      </div>
+      <div class="f-col"><h4>Product</h4><ul>
+        <li><a href="#what">What it does</a></li><li><a href="#showcase">The three views</a></li>
+        <li><a href="#work">How it works</a></li><li><a href="#pricing">Pricing</a></li>
+      </ul></div>
+      <div class="f-col"><h4>For schools</h4><ul>
+        <li><a href="#signup">Book a walkthrough</a></li><li><a href="#signup">Moving from spreadsheets</a></li>
+        <li><a href="#signup">Help centre</a></li><li><a href="#signin">Sign in</a></li>
+      </ul></div>
+      <div class="f-col"><h4>Company</h4><ul>
+        <li><a href="#">About</a></li><li><a href="#">Privacy</a></li>
+        <li><a href="#">Terms</a></li><li><a href="#">Contact</a></li>
+      </ul></div>
+    </div>
+    <div class="ghost" aria-hidden="true">Brillanda</div>
+    <div class="f-bot">
+      <span>© 2026 Brillanda. All rights reserved.</span>
+      <span class="sp"><a href="#">Terms of service</a><a href="#">Privacy policy</a><a href="#">Accessibility</a></span>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  var RM=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var root=document.documentElement;
+
+  /* ---- theme ---- */
+  var sun='<path d="M9 2v1.6M9 14.4V16M2 9h1.6M14.4 9H16M4 4l1.1 1.1M12.9 12.9 14 14M14 4l-1.1 1.1M5.1 12.9 4 14"/><circle cx="9" cy="9" r="3.2"/>';
+  var moon='<path d="M15 10.4A6.5 6.5 0 017.6 3 6.5 6.5 0 1015 10.4Z"/>';
+  var tb=document.getElementById('themeBtn'), ti=document.getElementById('themeIcon');
+  try{ var sv=localStorage.getItem('brillanda-v4-theme'); if(sv) root.setAttribute('data-theme',sv); }catch(e){}
+  function syncIcon(){ ti.innerHTML = root.getAttribute('data-theme')==='dark' ? moon : sun; }
+  syncIcon();
+  tb.addEventListener('click',function(){
+    var n = root.getAttribute('data-theme')==='dark' ? 'light' : 'dark';
+    root.setAttribute('data-theme',n);
+    try{ localStorage.setItem('brillanda-v4-theme',n); }catch(e){}
+    syncIcon();
+  });
+
+  /* ---- nav ---- */
+  var nav=document.getElementById('nav');
+  var links=[].slice.call(document.querySelectorAll('.nav-pill a'));
+  var secs=links.map(function(a){ return document.querySelector(a.getAttribute('href')); });
+  function onScroll(){
+    nav.classList.toggle('stuck', window.scrollY>30);
+    var y=window.scrollY+140, best=0;
+    secs.forEach(function(s,i){ if(s && s.offsetTop<=y) best=i; });
+    links.forEach(function(a,i){ a.classList.toggle('on', i===best); });
+  }
+  window.addEventListener('scroll',onScroll,{passive:true}); onScroll();
+
+  /* ---- reveals ---- */
+  if(RM){ document.querySelectorAll('.rv').forEach(function(el){ el.classList.add('in'); }); }
+  else{
+    var io=new IntersectionObserver(function(es){
+      es.forEach(function(e){ if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); } });
+    },{threshold:.12,rootMargin:'0px 0px -6% 0px'});
+    document.querySelectorAll('.rv').forEach(function(el){ io.observe(el); });
+  }
+
+  /* ---- accordion: one open per group ---- */
+  document.querySelectorAll('.acc').forEach(function(group){
+    var all=[].slice.call(group.querySelectorAll('details'));
+    all.forEach(function(d){
+      d.addEventListener('toggle',function(){
+        if(d.open) all.forEach(function(o){ if(o!==d) o.open=false; });
+      });
+    });
+  });
+
+  /* ---- stories carousel ---- */
+  var track=document.getElementById('qTrack'), qi=0;
+  var slides=[].slice.call(track.children);
+  function perView(){ return window.innerWidth<=640 ? 1 : (window.innerWidth<=940 ? 2 : 3); }
+  function go(n){
+    var max=Math.max(slides.length-perView(),0);
+    qi=Math.min(Math.max(n,0),max);
+    var w=slides[0].getBoundingClientRect().width+22;
+    track.style.transform='translateX('+(-qi*w)+'px)';
+  }
+  document.getElementById('qNext').addEventListener('click',function(){ go(qi+1); });
+  document.getElementById('qPrev').addEventListener('click',function(){ go(qi-1); });
+  window.addEventListener('resize',function(){ go(qi); });
+
+  /* ---- live mark sheet ---- */
+  var COMP=[{k:'ca1',max:10},{k:'ca2',max:10},{k:'exam',max:80}];
+  var SCALE=[[70,100,'A','g-a'],[60,69,'B','g-a'],[50,59,'C','g-c'],[45,49,'D','g-c'],[40,44,'E','g-c'],[0,39,'F','g-f']];
+  var studs=[
+    {n:'Adaeze Okonkwo',id:'2021/0142',ca1:8,ca2:9,exam:65},
+    {n:'Chidi Nwosu',id:'2021/0143',ca1:7,ca2:6,exam:51},
+    {n:'Emeka Balogun',id:'2021/0144',ca1:9,ca2:8,exam:58},
+    {n:'Fatima Bello',id:'2021/0145',ca1:6,ca2:7,exam:44},
+    {n:'Ibrahim Sule',id:'2021/0146',ca1:10,ca2:9,exam:71}
+  ];
+  var body=document.getElementById('mkBody');
+  function tone(v,m){ if(v===''||isNaN(v)) return ''; var p=v/m; return p>=.7?'hi':(p>=.5?'mid':'lo'); }
+  function tot(s){ var t=0; COMP.forEach(function(c){ var v=parseFloat(s[c.k]); if(!isNaN(v)) t+=v; }); return t; }
+  function grd(t){ for(var i=0;i<SCALE.length;i++){ if(t>=SCALE[i][0]&&t<=SCALE[i][1]) return SCALE[i]; } return SCALE[SCALE.length-1]; }
+  function ord(n){ var s=['th','st','nd','rd'],v=n%100; return n+(s[(v-20)%10]||s[v]||s[0]); }
+  studs.forEach(function(s,i){
+    var tr=document.createElement('tr');
+    tr.innerHTML='<td class="nm"><b>'+s.n+'</b><span>'+s.id+'</span></td>'+
+      COMP.map(function(c){return '<td class="cl"><input type="number" min="0" max="'+c.max+'" value="'+s[c.k]+'" data-i="'+i+'" data-k="'+c.k+'" data-max="'+c.max+'" aria-label="'+c.k.toUpperCase()+' for '+s.n+', maximum '+c.max+'"></td>';}).join('')+
+      '<td class="out" data-tot="'+i+'"></td><td class="gr" data-gr="'+i+'"></td><td class="ps" data-pos="'+i+'"></td>';
+    body.appendChild(tr);
+  });
+  body.addEventListener('input',function(e){
+    var el=e.target; if(el.tagName!=='INPUT') return;
+    var mx=+el.dataset.max, v=el.value;
+    if(v!=='' && (+v>mx||+v<0)){ el.value=v.slice(0,-1); return; }
+    studs[+el.dataset.i][el.dataset.k]= v===''?0:+v; paint(true);
+  });
+  body.addEventListener('keydown',function(e){
+    if(e.key!=='Enter') return; e.preventDefault();
+    var ins=[].slice.call(body.querySelectorAll('input')), i=ins.indexOf(e.target), nx=ins[i+COMP.length];
+    if(nx){ nx.focus(); nx.select(); }
+  });
+  function paint(flash){
+    var rk=studs.map(function(s,i){return {i:i,t:tot(s)};}).sort(function(a,b){return b.t-a.t;});
+    var pos={},last=null,lr=0;
+    rk.forEach(function(r,idx){ var v=(last!==null&&r.t===last)?lr:idx+1; pos[r.i]=v; last=r.t; lr=v; });
+    studs.forEach(function(s,i){
+      var t=tot(s), g=grd(t);
+      body.querySelector('[data-tot="'+i+'"]').textContent=t;
+      body.querySelector('[data-gr="'+i+'"]').innerHTML='<span class="gb '+g[3]+'">'+g[2]+'</span>';
+      var pc=body.querySelector('[data-pos="'+i+'"]'), np=ord(pos[i]);
+      if(flash&&pc.textContent!==np){ pc.classList.add('flash'); setTimeout(function(){pc.classList.remove('flash');},700); }
+      pc.textContent=np;
+      COMP.forEach(function(c){
+        var inp=body.querySelector('input[data-i="'+i+'"][data-k="'+c.k+'"]');
+        inp.classList.remove('hi','mid','lo');
+        var cl=tone(parseFloat(inp.value),c.max); if(cl) inp.classList.add(cl);
+      });
+    });
+  }
+  paint(false);
+})();
+</script>
+</body>
+</html>

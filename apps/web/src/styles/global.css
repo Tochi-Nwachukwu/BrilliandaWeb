@@ -1,0 +1,72 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  @apply bg-bg font-sans text-text-primary antialiased;
+}
+
+/* Shared motion that Tailwind's config can't express as one class. */
+@keyframes bob {
+  50% { transform: translateY(-7px); }
+}
+@keyframes fade-in {
+  from { opacity: 0; }
+}
+@keyframes sheet-in {
+  from { transform: translateX(calc(100% + 24px)); }
+}
+@keyframes sheet-up {
+  from { transform: translateY(calc(100% + 24px)); }
+}
+
+/* A liquid that rises to a card's progress, with a slow wave on top (school and class cards). */
+.liquid {
+  position: absolute;
+  inset: auto 0 0 0;
+  z-index: 0;
+  height: calc(var(--p) * 100%);
+  background: var(--tint);
+  animation: liquid-fill 1.6s cubic-bezier(0.3, 1.15, 0.5, 1) var(--d, 0s) both;
+}
+.liquid svg {
+  position: absolute;
+  left: 0;
+  bottom: calc(100% - 1px);
+  width: 200%;
+  height: 14px;
+  fill: var(--tint);
+  animation: liquid-wave 7s linear infinite;
+}
+.liquid svg + svg {
+  height: 18px;
+  opacity: 0.55;
+  animation-duration: 11s;
+  animation-direction: reverse;
+}
+@keyframes twinkle {
+  0%, 100% { transform: scale(0.3) rotate(0deg); opacity: 0; }
+  45% { transform: scale(1) rotate(45deg); opacity: 1; }
+  70% { opacity: 0.8; }
+}
+@keyframes draw-line {
+  to { stroke-dashoffset: 0; }
+}
+@keyframes liquid-fill {
+  from { height: 0; }
+}
+@keyframes liquid-wave {
+  to { transform: translateX(-50%); }
+}
+
+/* Respect the device's reduced-motion setting everywhere, not just where a class remembers to. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 1ms !important;
+    animation-delay: 0ms !important;
+    transition-duration: 1ms !important;
+    transition-delay: 0ms !important;
+  }
+}

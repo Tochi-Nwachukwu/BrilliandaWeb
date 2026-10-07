@@ -1,0 +1,1517 @@
+<title>Brillanda Dashboards</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&family=Outfit:wght@400;500;600&display=swap">
+<style>
+/* Tokens: apps/web/src/styles/tokens.css, plus a dark set and the ink canvas used by draft B. */
+:root {
+  --page: #EFEDE8;
+  --bg: #FAF9F7;
+  --surface: #FFFFFF;
+  --sunken: #F0EEEA;
+  --border: #E4E1DC;
+  --border-strong: #CCC8C1;
+  --edge: #DCD8D1;
+  --divider: #F0EDE8;
+  --hover: #F7F5F2;
+  --text: #16171A;
+  --text-2: #5C5F66;
+  --text-3: #95989E;
+  --btn: #16171A;
+  --btn-hover: #000000;
+  --btn-text: #FAF9F7;
+  --accent: #C8913A;
+  --accent-soft: #F5E9D5;
+  --ok: #3F7A57;   --ok-bg: #EAF3EE;
+  --warn: #A9760C; --warn-bg: #FBF3E1;
+  --bad: #B3423B;  --bad-bg: #FBEAE8;
+  --canvas: #16171A;
+  --canvas-2: #1F2023;
+  --canvas-text: #FAF9F7;
+  --canvas-muted: #A9ACB2;
+  --canvas-line: #3A3C41;
+  --bezel: #16171A;
+  --scrim: rgba(22, 23, 26, 0.38);
+  --shadow-raised:
+    0 1px 1px rgba(38, 30, 20, 0.05),
+    0 3px 7px -2px rgba(38, 30, 20, 0.055),
+    0 16px 34px -14px rgba(38, 30, 20, 0.13);
+  --shadow-float:
+    0 1px 2px rgba(38, 30, 20, 0.06),
+    0 12px 28px -8px rgba(38, 30, 20, 0.18),
+    0 40px 80px -30px rgba(38, 30, 20, 0.25);
+  --display: "Outfit", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --body: "Instrument Sans", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --spring: cubic-bezier(.3, 1.15, .5, 1);
+  --ease-out: cubic-bezier(.2, .8, .2, 1);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --page: #0A0B0C; --bg: #121314; --surface: #1A1B1E; --sunken: #232427;
+    --border: #2A2C30; --border-strong: #3A3C41; --edge: #2E3034; --divider: #202225; --hover: #1F2023;
+    --text: #EDEBE6; --text-2: #A9ACB2; --text-3: #71747B;
+    --btn: #EDEBE6; --btn-hover: #FFFFFF; --btn-text: #121314;
+    --accent: #D6A04E; --accent-soft: #3A2E1C;
+    --ok: #6FB08A; --ok-bg: #1B2A21; --warn: #D9A53A; --warn-bg: #2E2614; --bad: #E07A72; --bad-bg: #33201E;
+    --canvas: #0D0E10; --canvas-2: #16171A; --canvas-text: #EDEBE6; --canvas-muted: #8D9097; --canvas-line: #33353A;
+    --bezel: #2A2C30; --scrim: rgba(0, 0, 0, 0.55);
+    --shadow-raised: 0 1px 1px rgba(0,0,0,.4), 0 8px 24px -10px rgba(0,0,0,.6);
+    --shadow-float: 0 1px 2px rgba(0,0,0,.5), 0 30px 70px -20px rgba(0,0,0,.8);
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --page: #0A0B0C; --bg: #121314; --surface: #1A1B1E; --sunken: #232427;
+  --border: #2A2C30; --border-strong: #3A3C41; --edge: #2E3034; --divider: #202225; --hover: #1F2023;
+  --text: #EDEBE6; --text-2: #A9ACB2; --text-3: #71747B;
+  --btn: #EDEBE6; --btn-hover: #FFFFFF; --btn-text: #121314;
+  --accent: #D6A04E; --accent-soft: #3A2E1C;
+  --ok: #6FB08A; --ok-bg: #1B2A21; --warn: #D9A53A; --warn-bg: #2E2614; --bad: #E07A72; --bad-bg: #33201E;
+  --canvas: #0D0E10; --canvas-2: #16171A; --canvas-text: #EDEBE6; --canvas-muted: #8D9097; --canvas-line: #33353A;
+  --bezel: #2A2C30; --scrim: rgba(0, 0, 0, 0.55);
+  --shadow-raised: 0 1px 1px rgba(0,0,0,.4), 0 8px 24px -10px rgba(0,0,0,.6);
+  --shadow-float: 0 1px 2px rgba(0,0,0,.5), 0 30px 70px -20px rgba(0,0,0,.8);
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html, body { background: var(--page); }
+body { font-family: var(--body); color: var(--text); font-size: 15px; line-height: 1.5; -webkit-font-smoothing: antialiased; }
+button { font: inherit; color: inherit; cursor: pointer; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+h1, h2, h3, p { margin: 0; }
+ul { list-style: none; margin: 0; padding: 0; }
+.tab { font-variant-numeric: tabular-nums; }
+
+/* ---------- Viewer ---------- */
+.page { max-width: 1400px; margin-inline: auto; padding-inline: clamp(16px, 3vw, 40px); padding-block: 28px 72px; }
+.viewer-top { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 20px 40px; }
+.wordmark { display: inline-flex; align-items: center; gap: 7px; font-family: var(--display); font-weight: 500; font-size: 19px; letter-spacing: -0.02em; }
+.wordmark i { width: 7px; height: 7px; border-radius: 50%; background: var(--accent); }
+.viewer h1 { font-family: var(--display); font-weight: 500; font-size: clamp(30px, 4.4vw, 50px); line-height: 1.02; letter-spacing: -0.035em; margin-top: 14px; text-wrap: balance; }
+.viewer-lede { color: var(--text-2); max-width: 60ch; margin-top: 12px; font-size: 16px; }
+.pick { max-width: 34ch; color: var(--text-2); font-size: 14px; }
+.pick b { color: var(--text); font-weight: 600; }
+
+.drafts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin-top: 28px; }
+.draft-btn { display: grid; grid-template-columns: 44px minmax(0, 1fr); gap: 14px; align-items: center; text-align: left; padding: 14px; border-radius: 14px; border: 1px solid var(--border); background: transparent; transition: background-color .2s, border-color .2s, box-shadow .2s; }
+.draft-btn:hover { border-color: var(--border-strong); }
+.draft-btn[aria-pressed="true"] { background: var(--surface); border-color: var(--edge); box-shadow: var(--shadow-raised); }
+.draft-btn svg { width: 44px; height: 44px; }
+.draft-btn strong { display: block; font-family: var(--display); font-weight: 500; font-size: 17px; letter-spacing: -0.01em; }
+.draft-btn span { display: block; color: var(--text-2); font-size: 13px; line-height: 1.4; }
+
+.controls { display: flex; flex-wrap: wrap; gap: 12px 24px; align-items: center; margin-top: 18px; }
+.ctl { display: flex; align-items: center; gap: 10px; }
+.ctl > span { font-size: 13px; color: var(--text-2); }
+.seg { display: inline-flex; padding: 3px; border-radius: 10px; background: var(--sunken); }
+.seg button { border: 0; background: none; padding: 6px 12px; border-radius: 8px; font-size: 13px; font-weight: 500; color: var(--text-2); transition: background-color .2s, color .2s; }
+.seg button[aria-pressed="true"] { background: var(--surface); color: var(--text); box-shadow: 0 1px 2px rgba(38,30,20,.12); }
+
+.stage { margin-top: 22px; display: flex; justify-content: center; }
+.frame { position: relative; width: 100%; max-width: 1360px; background: var(--bg); border: 1px solid var(--edge); border-radius: 18px; box-shadow: var(--shadow-float); overflow: hidden; }
+.frame.phone { max-width: 400px; height: 820px; border: 10px solid var(--bezel); border-radius: 46px; }
+.frame.phone .app { height: 100%; overflow-y: auto; overscroll-behavior: contain; }
+
+.notes { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px 40px; margin-top: 36px; }
+.notes h3 { font-size: 13px; font-weight: 500; color: var(--text-2); margin-bottom: 6px; }
+.notes p { max-width: 46ch; }
+.research { margin-top: 32px; border-top: 1px solid var(--border); padding-top: 18px; }
+.research summary { cursor: pointer; font-family: var(--display); font-size: 18px; font-weight: 500; }
+.research-body { display: grid; grid-template-columns: minmax(0, 3fr) minmax(0, 2fr); gap: 32px; margin-top: 16px; }
+.research-body li { padding: 6px 0; color: var(--text-2); }
+.research-body li b { color: var(--text); font-weight: 600; }
+.research-body a { color: var(--text); text-decoration-color: var(--accent); text-underline-offset: 3px; }
+@media (max-width: 820px) {
+  .drafts, .notes, .research-body { grid-template-columns: 1fr; }
+}
+
+/* ---------- App (all drafts) ---------- */
+.app { container: app / inline-size; background: var(--bg); color: var(--text); min-height: 780px; }
+.shell { display: grid; grid-template-columns: 236px minmax(0, 1fr); min-height: inherit; }
+.main { min-width: 0; padding: 22px clamp(20px, 3.5cqi, 44px) 56px; }
+.rail { display: flex; flex-direction: column; gap: 22px; padding: 22px 14px; border-right: 1px solid var(--divider); }
+.rail .wordmark { padding-inline: 10px; font-size: 18px; }
+.school { display: flex; align-items: center; gap: 10px; padding: 10px; border-radius: 12px; background: var(--surface); box-shadow: var(--shadow-raised); }
+.crest { flex: none; display: grid; place-items: center; width: 34px; height: 34px; border-radius: 10px; background: var(--btn); color: var(--btn-text); font-family: var(--display); font-weight: 500; font-size: 14px; }
+.school b { display: block; font-size: 13.5px; font-weight: 600; line-height: 1.25; }
+.school span { display: block; font-size: 12px; color: var(--text-2); }
+.nav { display: grid; gap: 2px; }
+.nav a { display: flex; align-items: center; gap: 11px; height: 36px; padding: 0 10px; border-radius: 9px; color: var(--text-2); font-size: 14px; font-weight: 500; text-decoration: none; }
+.nav a:hover { background: var(--hover); color: var(--text); }
+.nav a[aria-current="page"] { background: var(--surface); color: var(--text); box-shadow: var(--shadow-raised); }
+.nav .count { margin-left: auto; min-width: 20px; height: 20px; padding: 0 6px; border-radius: 99px; background: var(--accent); color: #fff; font-size: 11.5px; display: grid; place-items: center; }
+.nav-soon { display: grid; gap: 2px; }
+.nav-soon p { font-size: 12px; color: var(--text-3); padding: 0 10px 4px; }
+.nav-soon span { display: flex; align-items: center; gap: 11px; height: 32px; padding: 0 10px; color: var(--text-3); font-size: 13.5px; }
+.rail-user { margin-top: auto; display: flex; align-items: center; gap: 10px; padding: 8px 10px; font-size: 13px; }
+.rail-user b { display: block; font-weight: 600; }
+.rail-user span { color: var(--text-2); font-size: 12px; }
+.avatar { flex: none; display: grid; place-items: center; width: 32px; height: 32px; border-radius: 50%; background: var(--accent-soft); color: var(--text); font-size: 12.5px; font-weight: 600; }
+.ic { width: 18px; height: 18px; flex: none; }
+
+.topbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: clamp(24px, 4cqi, 40px); }
+.search { display: flex; align-items: center; gap: 10px; flex: 0 1 360px; min-width: 0; height: 38px; padding: 0 8px 0 12px; border-radius: 10px; border: 1px solid var(--border); background: var(--surface); color: var(--text-3); font-size: 14px; text-align: left; }
+.search:hover { border-color: var(--border-strong); }
+.search span { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+kbd { font-family: var(--body); font-size: 11.5px; padding: 2px 6px; border-radius: 6px; background: var(--sunken); color: var(--text-2); }
+.top-right { display: flex; align-items: center; gap: 8px; }
+.sample { font-size: 12px; color: var(--text-2); padding: 4px 9px; border-radius: 99px; border: 1px dashed var(--border-strong); white-space: nowrap; }
+.icon-btn { position: relative; display: grid; place-items: center; width: 38px; height: 38px; border-radius: 10px; border: 0; background: transparent; color: var(--text-2); }
+.icon-btn:hover { background: var(--hover); color: var(--text); }
+.icon-btn .dot { position: absolute; top: 9px; right: 10px; width: 7px; height: 7px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 0 2px var(--bg); }
+.mobile-brand { display: none; }
+
+.tabbar { display: none; position: sticky; bottom: 0; z-index: 5; grid-template-columns: repeat(4, 1fr); padding: 6px 8px calc(8px + env(safe-area-inset-bottom, 0px)); background: color-mix(in oklab, var(--surface) 88%, transparent); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); border-top: 1px solid var(--divider); }
+.tabbar a { display: grid; justify-items: center; gap: 2px; padding: 6px 0; font-size: 11px; font-weight: 500; color: var(--text-3); text-decoration: none; }
+.tabbar a[aria-current="page"] { color: var(--text); }
+.tabbar a[aria-current="page"] .ic { color: var(--accent); }
+
+@container app (max-width: 760px) {
+  .shell { grid-template-columns: minmax(0, 1fr); }
+  .rail { display: none; }
+  .tabbar { display: grid; }
+  .main { padding: 14px 16px 36px; }
+  .search { flex: 0 0 38px; width: 38px; padding: 0; justify-content: center; }
+  .search span, .search kbd { display: none; }
+  .sample { display: none; }
+  .mobile-brand { display: inline-flex; }
+}
+
+/* Shared parts */
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; height: 38px; padding: 0 16px; border-radius: 10px; border: 0; background: var(--btn); color: var(--btn-text); font-size: 14px; font-weight: 500; white-space: nowrap; transition: background-color .2s; }
+.btn:hover { background: var(--btn-hover); }
+.btn.ghost { background: transparent; color: var(--text); box-shadow: inset 0 0 0 1px var(--border); }
+.btn.ghost:hover { background: var(--hover); box-shadow: inset 0 0 0 1px var(--border-strong); }
+.btn.sm { height: 32px; padding: 0 12px; font-size: 13px; border-radius: 9px; }
+.btn.on-canvas { background: var(--canvas-text); color: var(--canvas); }
+.btn.on-canvas.ghost { background: transparent; color: var(--canvas-text); box-shadow: inset 0 0 0 1px var(--canvas-line); }
+
+.chip { display: inline-flex; align-items: center; gap: 6px; height: 24px; padding: 0 9px; border-radius: 99px; background: var(--sunken); color: var(--text); font-size: 12.5px; font-weight: 500; white-space: nowrap; }
+.chip i { width: 7px; height: 7px; border-radius: 50%; background: var(--text-3); }
+.chip.ok { background: var(--ok-bg); } .chip.ok i { background: var(--ok); }
+.chip.warn { background: var(--warn-bg); } .chip.warn i { background: var(--warn); }
+.chip.bad { background: var(--bad-bg); } .chip.bad i { background: var(--bad); }
+.chip.ink i { background: var(--text); }
+.chip.ready i { background: transparent; box-shadow: inset 0 0 0 2px var(--ok); }
+.grade { display: inline-grid; place-items: center; width: 28px; height: 24px; border-radius: 7px; font-size: 13px; font-weight: 600; }
+.grade.ok { background: var(--ok-bg); } .grade.warn { background: var(--warn-bg); } .grade.bad { background: var(--bad-bg); }
+
+.h2 { font-size: 14px; font-weight: 500; color: var(--text-2); margin-bottom: 12px; display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+.h2 a { font-size: 13px; color: var(--text-2); text-decoration: none; }
+.h2 a:hover { color: var(--text); }
+.date-line { font-size: 13.5px; color: var(--text-2); }
+.display { font-family: var(--display); font-weight: 500; letter-spacing: -0.035em; line-height: 1.02; text-wrap: balance; }
+.lede { color: var(--text-2); font-size: 17px; max-width: 58ch; margin-top: 12px; text-wrap: pretty; }
+.lede b { color: var(--text); font-weight: 600; }
+
+.soak { position: relative; height: 8px; border-radius: 99px; background: var(--sunken); overflow: hidden; }
+.soak i { position: absolute; inset: 0 auto 0 0; width: var(--w); border-radius: inherit; background: var(--text); animation: soak 1.2s var(--ease-out) both; animation-delay: var(--d, 0s); }
+.soak.accent i { background: var(--accent); }
+@keyframes soak { from { width: 0; filter: blur(2px); } }
+
+.strip { display: flex; gap: 2px; align-items: center; height: 18px; }
+.strip i { flex: none; width: 3px; height: 14px; border-radius: 2px; background: var(--divider); }
+.strip i.on { background: var(--text); animation: tick .3s var(--ease-out) both; animation-delay: var(--d); }
+@keyframes tick { from { transform: scaleY(.3); background: var(--divider); } }
+
+.soon-row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; color: var(--text-3); font-size: 13.5px; }
+.soon-row span.pill { display: inline-flex; align-items: center; gap: 7px; height: 30px; padding: 0 12px; border-radius: 99px; border: 1px dashed var(--border-strong); }
+
+/* The morphing button: button -> loader -> check -> toast */
+.morph { position: relative; display: inline-flex; align-items: center; justify-content: center; gap: 7px; height: 34px; padding: 0 14px; border-radius: 10px; border: 0; background: var(--btn); color: var(--btn-text); font-size: 13.5px; font-weight: 500; white-space: nowrap; overflow: hidden; transition: width .5s var(--spring), border-radius .5s var(--spring), background-color .35s; }
+.morph .lbl { display: inline-flex; align-items: center; gap: 7px; transition: opacity .18s, filter .18s; }
+.morph .spin { position: absolute; inset: 0; margin: auto; width: 16px; height: 16px; border-radius: 50%; border: 2px solid currentColor; border-right-color: transparent; opacity: 0; animation: spin .7s linear infinite; transition: opacity .15s; }
+.morph.busy .lbl { opacity: 0; filter: blur(4px); }
+.morph.busy .spin { opacity: 1; }
+.morph.done { background: var(--ok); color: #fff; cursor: default; }
+.morph.done .lbl { animation: unblur .3s var(--ease-out) both; }
+@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes unblur { from { opacity: 0; filter: blur(4px); } }
+
+/* Charts */
+.chart text { font-family: var(--body); font-size: 11.5px; fill: var(--text-2); }
+.chart .grid { stroke: var(--divider); stroke-width: 1; }
+.chart .line { fill: none; stroke: var(--accent); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.chart .area { fill: var(--accent); opacity: .12; }
+.chart .pt { fill: var(--accent); stroke: var(--surface); stroke-width: 2; }
+.chart .hit { fill: transparent; cursor: pointer; }
+.chart .val { fill: var(--text); font-weight: 600; }
+
+/* ---------- Draft A: Paper ---------- */
+.a-hello .display { font-size: clamp(34px, 5.4cqi, 60px); margin-top: 8px; }
+.a-meter { margin-top: 28px; display: grid; gap: 10px; max-width: 760px; }
+.a-meter .bar { display: flex; gap: 2px; height: 10px; }
+.a-meter .bar i { height: 100%; border-radius: 3px; animation: soak 1.2s var(--ease-out) both; }
+.a-meter .legend { display: flex; flex-wrap: wrap; gap: 6px 18px; font-size: 13px; color: var(--text-2); }
+.a-meter .legend span { display: inline-flex; align-items: center; gap: 7px; }
+.a-meter .legend i { width: 9px; height: 9px; border-radius: 3px; }
+.a-cols { display: grid; grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); gap: 40px; margin-top: 44px; }
+.a-list > li { display: grid; grid-template-columns: 10px minmax(0, 1fr) auto; gap: 14px; align-items: start; padding: 14px 12px; margin-inline: -12px; border-radius: 12px; }
+.a-list > li:hover { background: var(--hover); }
+.a-list > li + li { box-shadow: 0 -1px 0 var(--divider); }
+.a-list .mark { width: 8px; height: 8px; border-radius: 50%; margin-top: 7px; background: var(--text-3); }
+.a-list .mark.warn { background: var(--warn); } .a-list .mark.bad { background: var(--bad); } .a-list .mark.ok { background: var(--ok); } .a-list .mark.accent { background: var(--accent); }
+.a-list b { display: block; font-weight: 600; font-size: 14.5px; }
+.a-list p { color: var(--text-2); font-size: 13.5px; margin-top: 2px; }
+.a-list .acts { display: flex; gap: 6px; align-self: center; }
+.a-table { margin-top: 44px; }
+.a-row { display: grid; grid-template-columns: minmax(0, 11rem) minmax(0, 1fr) 8.5rem 9.5rem; gap: 20px; align-items: center; padding: 14px 12px; margin-inline: -12px; border-radius: 12px; }
+.a-row:hover { background: var(--hover); }
+.a-row + .a-row { box-shadow: 0 -1px 0 var(--divider); }
+.a-row .name { font-family: var(--display); font-size: 19px; font-weight: 500; letter-spacing: -0.01em; }
+.a-row .sub { font-size: 12.5px; color: var(--text-2); }
+.a-row .num { font-size: 13.5px; color: var(--text-2); text-align: right; }
+.a-soon { margin-top: 44px; }
+.a-continue { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 20px; align-items: center; margin-top: 32px; padding: 22px 24px; border-radius: 16px; background: var(--surface); border: 1px solid var(--edge); box-shadow: var(--shadow-raised); max-width: 820px; }
+.a-continue small { font-size: 13px; color: var(--text-2); }
+.a-continue h2 { font-family: var(--display); font-weight: 500; font-size: 26px; letter-spacing: -0.02em; margin-top: 2px; }
+.a-continue p { color: var(--text-2); font-size: 14px; margin-top: 4px; }
+.a-classes { margin-top: 40px; }
+.a-class { display: grid; grid-template-columns: minmax(0, 13rem) minmax(0, 1fr) auto; gap: 12px 24px; align-items: center; padding: 16px 12px; margin-inline: -12px; border-radius: 12px; }
+.a-class:hover { background: var(--hover); }
+.a-class + .a-class { box-shadow: 0 -1px 0 var(--divider); }
+.a-class .t { font-weight: 600; } .a-class .s { font-size: 13px; color: var(--text-2); }
+.a-class .mid { display: flex; align-items: center; gap: 14px; min-width: 0; }
+.a-class .mid .strip { overflow: hidden; min-width: 0; }
+.a-class .cnt { font-size: 13px; color: var(--text-2); white-space: nowrap; }
+.a-class .end { display: flex; align-items: center; gap: 12px; justify-content: flex-end; }
+.mini-dist { display: flex; align-items: flex-end; gap: 3px; height: 24px; }
+.mini-dist i { width: 7px; border-radius: 2px 2px 0 0; background: var(--text-3); opacity: .55; }
+.a-child { display: flex; gap: 8px; flex-wrap: wrap; }
+.child-btn { display: inline-flex; align-items: center; gap: 9px; height: 40px; padding: 0 14px 0 5px; border-radius: 99px; border: 1px solid var(--border); background: transparent; font-size: 14px; font-weight: 500; }
+.child-btn[aria-pressed="true"] { background: var(--surface); border-color: var(--edge); box-shadow: var(--shadow-raised); }
+.child-btn .avatar { width: 30px; height: 30px; font-size: 12px; }
+.child-btn small { color: var(--text-2); font-weight: 400; }
+.notice { display: flex; gap: 10px; align-items: flex-start; margin-top: 22px; padding: 12px 14px; border-radius: 12px; background: var(--sunken); font-size: 14px; max-width: 640px; }
+.notice .ic { margin-top: 1px; color: var(--text-2); }
+.a-figs { display: flex; flex-wrap: wrap; gap: 20px 48px; margin-top: 30px; }
+.a-figs dt { font-size: 13px; color: var(--text-2); }
+.a-figs dd { margin: 2px 0 0; font-family: var(--display); font-weight: 500; font-size: clamp(34px, 5cqi, 48px); letter-spacing: -0.03em; line-height: 1; }
+.a-figs dd small { font-size: 16px; color: var(--text-2); letter-spacing: 0; margin-left: 4px; }
+.a-actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 26px; }
+.subj { display: grid; grid-template-columns: minmax(0, 12rem) minmax(0, 1fr) 2.6rem 2rem; gap: 16px; align-items: center; padding: 10px 0; }
+.subj + .subj { box-shadow: 0 -1px 0 var(--divider); }
+.subj .n { font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.subj .v { text-align: right; font-weight: 600; font-size: 14px; }
+.remark { margin-top: 22px; padding-left: 16px; box-shadow: inset 2px 0 0 var(--accent); max-width: 56ch; }
+.remark p { font-family: var(--display); font-size: 19px; line-height: 1.35; letter-spacing: -0.01em; }
+.remark small { display: block; margin-top: 6px; color: var(--text-2); font-size: 13px; }
+.a-stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 24px; margin-top: 34px; max-width: 900px; }
+.a-stats dt { font-size: 13px; color: var(--text-2); }
+.a-stats dd { margin: 4px 0 0; font-family: var(--display); font-size: 34px; font-weight: 500; letter-spacing: -0.03em; line-height: 1; }
+.a-school { display: grid; grid-template-columns: minmax(0, 1.4fr) 7.5rem 5rem minmax(0, 1fr) 6.5rem; gap: 18px; align-items: center; padding: 12px; margin-inline: -12px; border-radius: 12px; font-size: 14px; }
+.a-school:hover { background: var(--hover); }
+.a-school + .a-school { box-shadow: 0 -1px 0 var(--divider); }
+.a-school b { display: block; font-weight: 600; } .a-school span.c { font-size: 12.5px; color: var(--text-2); }
+.a-school .r { text-align: right; color: var(--text-2); font-size: 13px; }
+.feed li { display: grid; grid-template-columns: 4.5rem minmax(0, 1fr); gap: 12px; padding: 9px 0; font-size: 14px; }
+.feed li span { color: var(--text-3); font-size: 12.5px; padding-top: 1px; }
+@container app (max-width: 960px) {
+  .a-cols { grid-template-columns: minmax(0, 1fr); gap: 32px; }
+  .a-row { grid-template-columns: minmax(0, 1fr) auto; }
+  .a-row .soak, .a-row .num { grid-column: 1 / -1; }
+  .a-row .num { text-align: left; }
+  .a-school { grid-template-columns: minmax(0, 1fr) auto; }
+  .a-school .hide-sm { display: none; }
+}
+@container app (max-width: 760px) {
+  .a-class { grid-template-columns: minmax(0, 1fr) auto; }
+  .a-class .mid { grid-column: 1 / -1; grid-row: 2; }
+  .a-class .mini-dist { display: none; }
+  .a-continue { grid-template-columns: minmax(0, 1fr); }
+  .a-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .subj { grid-template-columns: minmax(0, 1fr) 2.6rem 2rem; }
+  .subj .soak { grid-column: 1 / -1; grid-row: 2; }
+  .a-list > li { grid-template-columns: 10px minmax(0, 1fr); }
+  .a-list .acts { grid-column: 2; }
+}
+
+/* ---------- Draft B: Constellation ---------- */
+.d-b .rail { background: var(--canvas); color: var(--canvas-text); border-right: 0; }
+.d-b .rail .school { background: var(--canvas-2); box-shadow: none; }
+.d-b .rail .school span, .d-b .rail-user span { color: var(--canvas-muted); }
+.d-b .crest { background: var(--accent); color: #16171A; }
+.d-b .nav a { color: var(--canvas-muted); }
+.d-b .nav a:hover { background: var(--canvas-2); color: var(--canvas-text); }
+.d-b .nav a[aria-current="page"] { background: var(--canvas-2); color: var(--canvas-text); box-shadow: inset 2px 0 0 var(--accent); }
+.d-b .nav-soon p, .d-b .nav-soon span { color: #6E7178; }
+.d-b .rail .avatar { background: var(--canvas-2); color: var(--canvas-text); }
+.canvas { position: relative; isolation: isolate; border-radius: 22px; background: var(--canvas); color: var(--canvas-text); padding: clamp(20px, 3cqi, 34px); overflow: hidden; }
+.canvas::after { content: ""; position: absolute; inset: 0; z-index: -1; opacity: .5; pointer-events: none; background-image: radial-gradient(var(--canvas-line) 1px, transparent 1.2px); background-size: 22px 22px; mask-image: linear-gradient(180deg, #000, transparent 85%); -webkit-mask-image: linear-gradient(180deg, #000, transparent 85%); }
+.canvas .grain { position: absolute; inset: 0; z-index: -1; opacity: .09; pointer-events: none; mix-blend-mode: screen; }
+.b-head { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 18px 32px; align-items: flex-end; }
+.b-big { font-family: var(--display); font-weight: 500; letter-spacing: -0.04em; line-height: .92; font-size: clamp(56px, 10cqi, 112px); }
+.b-big small { font-size: .32em; letter-spacing: -0.01em; color: var(--canvas-muted); margin-left: 8px; }
+.b-cap { color: var(--canvas-muted); font-size: 15px; max-width: 44ch; margin-top: 10px; }
+.b-cap b { color: var(--canvas-text); font-weight: 500; }
+.b-legend { display: grid; grid-template-columns: auto auto; gap: 8px 22px; font-size: 12.5px; color: var(--canvas-muted); }
+.b-legend span { display: inline-flex; align-items: center; gap: 8px; white-space: nowrap; }
+.b-legend svg { width: 16px; height: 16px; overflow: visible; }
+.b-scroll { overflow-x: auto; margin: 18px -8px 0; padding: 0 8px; scrollbar-width: thin; }
+.b-svg { display: block; width: 100%; min-width: 560px; height: auto; }
+.b-svg text { font-family: var(--body); fill: var(--canvas-muted); font-size: 12px; }
+.b-svg .row-l { font-size: 12.5px; fill: var(--canvas-text); }
+.b-svg .link { stroke: var(--accent); stroke-width: 1.2; opacity: .5; }
+.b-svg .link.v { opacity: .22; }
+.b-svg .m { cursor: pointer; outline: none; }
+.b-svg .m .out { fill: none; stroke: var(--canvas-muted); stroke-width: 1.4; }
+.b-svg .m .fill { fill: var(--accent); }
+.b-svg .m .lock { fill: none; stroke: var(--canvas-text); stroke-width: 1.2; }
+.b-svg .m:hover .out, .b-svg .m:focus-visible .out { stroke: var(--canvas-text); stroke-width: 2; }
+.b-svg .m .hit { fill: transparent; }
+.b-svg .m.done .out { stroke: var(--accent); }
+.pop { transform-box: fill-box; transform-origin: center; animation: pop .55s var(--spring) both; animation-delay: var(--d, 0s); }
+@keyframes pop { from { opacity: 0; transform: scale(.3); } }
+.draw { stroke-dasharray: 1; stroke-dashoffset: 1; animation: draw .9s var(--ease-out) forwards; animation-delay: var(--d, 0s); }
+@keyframes draw { to { stroke-dashoffset: 0; } }
+.b-under { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 32px; margin-top: 36px; }
+.b-under li { padding: 10px 0; font-size: 14px; }
+.b-under li + li { box-shadow: 0 -1px 0 var(--divider); }
+.b-under li b { font-weight: 600; }
+.b-under li p { color: var(--text-2); font-size: 13.5px; margin-top: 2px; }
+.b-under .acts { display: flex; gap: 6px; margin-top: 8px; }
+.b-rings { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px 20px; margin-top: 26px; }
+.b-ring { display: grid; justify-items: center; gap: 8px; text-align: center; border: 0; background: none; color: inherit; padding: 6px; border-radius: 16px; }
+.b-ring:hover { background: var(--canvas-2); }
+.b-ring svg { width: 100%; max-width: 190px; height: auto; overflow: visible; }
+.b-ring svg text { font-family: var(--display); fill: var(--canvas-text); }
+.b-ring b { font-weight: 600; font-size: 14px; }
+.b-ring span { color: var(--canvas-muted); font-size: 12.5px; }
+.b-ring .dot-off { fill: none; stroke: var(--canvas-line); stroke-width: 1.3; }
+.b-ring .dot-on { fill: var(--accent); }
+.b-ring-act { min-height: 34px; display: grid; place-items: center; }
+.b-parent { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: 20px 40px; align-items: center; }
+.b-emblem { width: 100%; max-width: 440px; height: auto; justify-self: center; overflow: visible; }
+.b-emblem text { font-family: var(--body); fill: var(--canvas-muted); font-size: 11.5px; }
+.b-emblem .petal { fill: var(--accent); cursor: pointer; transform-box: view-box; transform-origin: 200px 200px; animation: bloom .8s var(--spring) both; animation-delay: var(--d); }
+.b-emblem .petal:hover, .b-emblem .petal:focus-visible { fill: var(--canvas-text); outline: none; }
+@keyframes bloom { from { transform: scale(.35) rotate(-12deg); opacity: 0; } }
+.b-emblem .ring { fill: none; stroke: var(--canvas-line); stroke-dasharray: 2 4; }
+.b-emblem .center-n { font-family: var(--display); font-size: 46px; fill: var(--canvas-text); font-weight: 500; letter-spacing: -0.03em; }
+.b-kids { display: flex; gap: 8px; flex-wrap: wrap; }
+.b-kids .child-btn { border-color: var(--canvas-line); color: var(--canvas-text); }
+.b-kids .child-btn[aria-pressed="true"] { background: var(--canvas-2); border-color: var(--canvas-line); box-shadow: none; }
+.b-kids .child-btn small { color: var(--canvas-muted); }
+.b-kids .avatar { background: var(--accent); color: #16171A; }
+.b-schools { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 18px 26px; margin-top: 26px; }
+.b-school { display: grid; justify-items: center; gap: 8px; border: 0; background: none; color: inherit; padding: 8px; border-radius: 14px; text-align: center; max-width: 150px; }
+.b-school:hover { background: var(--canvas-2); }
+.b-school svg { overflow: visible; }
+.b-school b { font-size: 13px; font-weight: 600; line-height: 1.25; }
+.b-school span { font-size: 12px; color: var(--canvas-muted); }
+@container app (max-width: 960px) {
+  .b-under { grid-template-columns: minmax(0, 1fr); gap: 20px; }
+  .b-rings { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .b-parent { grid-template-columns: minmax(0, 1fr); }
+}
+
+/* ---------- Draft C: Term spine ---------- */
+.d-c .shell { grid-template-columns: minmax(0, 1fr); }
+.d-c .rail { display: none; }
+.d-c .main { max-width: 1240px; width: 100%; margin-inline: auto; }
+.c-bar { display: flex; align-items: center; gap: 24px; margin-bottom: 26px; }
+.c-bar .wordmark { font-size: 18px; }
+.c-nav { display: flex; gap: 2px; flex: 1; min-width: 0; overflow: hidden; }
+.c-nav a { padding: 7px 12px; border-radius: 99px; font-size: 14px; font-weight: 500; color: var(--text-2); text-decoration: none; white-space: nowrap; }
+.c-nav a:hover { color: var(--text); background: var(--hover); }
+.c-nav a[aria-current="page"] { color: var(--text); background: var(--surface); box-shadow: var(--shadow-raised); }
+.c-bar .top-right { margin-left: auto; }
+.spine-wrap { overflow-x: auto; margin-inline: -4px; padding: 4px; scrollbar-width: none; }
+.spine { position: relative; display: grid; grid-template-columns: repeat(var(--n), minmax(0, 1fr)); min-width: 520px; padding: 5px; border-radius: 99px; background: var(--sunken); }
+.spine .pill { position: absolute; top: 5px; bottom: 5px; left: 0; width: 0; border-radius: 99px; background: var(--btn); will-change: transform, width; }
+.spine button { position: relative; z-index: 1; display: flex; align-items: center; justify-content: center; gap: 8px; height: 46px; padding: 0 10px; border: 0; border-radius: 99px; background: none; color: var(--text-2); font-size: 14px; font-weight: 500; white-space: nowrap; transition: color .25s; }
+.spine button .k { display: grid; place-items: center; width: 18px; height: 18px; border-radius: 50%; box-shadow: inset 0 0 0 1.5px currentColor; font-size: 10px; flex: none; }
+.spine button.past .k { background: var(--text); box-shadow: none; color: var(--bg); }
+.spine button.past .k svg { width: 11px; height: 11px; }
+.spine button .sub { font-weight: 400; font-size: 12.5px; opacity: .7; }
+.spine button[aria-current="step"] { color: var(--text); }
+.spine button.sel { color: var(--btn-text); }
+.spine button.sel.past .k { background: var(--btn-text); color: var(--btn); }
+.brief { margin-top: 30px; max-width: 30ch; font-family: var(--display); font-weight: 500; font-size: clamp(28px, 4.2cqi, 46px); line-height: 1.08; letter-spacing: -0.03em; text-wrap: balance; transition: opacity .16s, filter .16s; }
+.brief.out { opacity: 0; filter: blur(6px); }
+.brief-meta { margin-top: 12px; font-size: 14px; color: var(--text-2); display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: center; }
+.c-cards { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; margin-top: 34px; }
+.c-card { position: relative; display: grid; gap: 14px; align-content: space-between; min-height: 176px; padding: 18px; border-radius: 18px; background: var(--surface); border: 1px solid var(--edge); overflow: hidden; }
+.c-card .blk { width: 64px; height: 64px; }
+.c-card dt { font-size: 13.5px; color: var(--text-2); }
+.c-card dd { margin: 4px 0 0; font-family: var(--display); font-size: 36px; font-weight: 500; letter-spacing: -0.03em; line-height: 1; }
+.c-card dd small { font-size: 15px; color: var(--text-2); letter-spacing: 0; margin-left: 3px; }
+.c-card p { font-size: 13px; color: var(--text-2); }
+.c-card.lead { background: var(--btn); color: var(--btn-text); border-color: transparent; }
+.c-card.lead dt, .c-card.lead dd small, .c-card.lead p { color: color-mix(in oklab, var(--btn-text) 65%, transparent); }
+.blk .bg { fill: var(--sunken); }
+.blk .fg { fill: var(--accent); }
+.c-card.lead .blk .bg { fill: color-mix(in oklab, var(--btn-text) 14%, transparent); }
+.c-split { display: grid; grid-template-columns: minmax(0, 7fr) minmax(0, 4fr); gap: 36px; margin-top: 40px; }
+.heat-scroll { overflow-x: auto; scrollbar-width: thin; }
+.heat { display: grid; grid-template-columns: 4.6rem repeat(9, minmax(34px, 1fr)); gap: 4px; min-width: 470px; }
+.heat .hl { font-size: 12px; color: var(--text-2); display: flex; align-items: center; }
+.heat .ht { font-size: 11px; color: var(--text-2); text-align: center; padding-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.heat .cell { height: 28px; border-radius: 7px; border: 0; padding: 0; background: var(--sunken); cursor: pointer; position: relative; animation: pop .5s var(--spring) both; animation-delay: var(--d); }
+.heat .cell:hover { outline: 2px solid var(--text); outline-offset: 1px; }
+.heat .cell.locked::after { content: ""; position: absolute; inset: 0; margin: auto; width: 6px; height: 6px; border-radius: 50%; background: var(--bg); }
+.heat-legend { display: flex; flex-wrap: wrap; gap: 8px 18px; margin-top: 14px; font-size: 12.5px; color: var(--text-2); }
+.heat-legend span { display: inline-flex; align-items: center; gap: 7px; }
+.heat-legend i { width: 14px; height: 14px; border-radius: 4px; position: relative; }
+.c-list li { padding: 12px 0; font-size: 14px; }
+.c-list li + li { box-shadow: 0 -1px 0 var(--divider); }
+.c-list b { font-weight: 600; }
+.c-list p { color: var(--text-2); font-size: 13.5px; margin-top: 2px; }
+.c-list .acts { display: flex; gap: 6px; margin-top: 8px; }
+.c-class { display: grid; gap: 14px; align-content: space-between; min-height: 200px; padding: 18px; border-radius: 18px; background: var(--surface); border: 1px solid var(--edge); }
+.c-class .top { display: flex; justify-content: space-between; gap: 12px; align-items: flex-start; }
+.c-class b { font-weight: 600; font-size: 15px; } .c-class span.s { display: block; font-size: 13px; color: var(--text-2); }
+.c-class .big { font-family: var(--display); font-weight: 500; font-size: 34px; letter-spacing: -0.03em; line-height: 1; }
+.c-class .big small { font-size: 15px; color: var(--text-2); letter-spacing: 0; }
+.c-class .foot { display: flex; align-items: center; justify-content: space-between; gap: 10px; min-height: 34px; }
+.c-dist { margin-top: 40px; max-width: 720px; }
+.c-subjects { display: grid; grid-template-columns: repeat(9, minmax(0, 1fr)); gap: 6px; }
+.c-subj { display: grid; gap: 6px; align-content: end; padding: 10px 8px; border-radius: 12px; background: var(--surface); border: 1px solid var(--edge); min-height: 120px; text-align: center; cursor: pointer; }
+.c-subj .col { align-self: end; border-radius: 6px; background: var(--accent); animation: rise .8s var(--spring) both; animation-delay: var(--d); }
+@keyframes rise { from { transform: scaleY(0); transform-origin: bottom; } }
+.c-subj b { font-size: 15px; font-weight: 600; } .c-subj span { font-size: 11px; color: var(--text-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.c-schools { margin-top: 40px; }
+@container app (max-width: 1000px) {
+  .c-cards { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .c-split { grid-template-columns: minmax(0, 1fr); }
+  .c-subjects { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+@container app (max-width: 760px) {
+  .c-nav { display: none; }
+  .c-bar { margin-bottom: 18px; }
+  .c-card { min-height: 150px; padding: 14px; }
+  .c-card dd { font-size: 30px; }
+  .c-card .blk { width: 48px; height: 48px; }
+}
+
+/* ---------- Overlays (outside the container, so fixed positioning works) ---------- */
+.tip { position: fixed; z-index: 60; pointer-events: none; max-width: 260px; padding: 8px 11px; border-radius: 10px; background: var(--btn); color: var(--btn-text); font-size: 12.5px; line-height: 1.4; box-shadow: var(--shadow-float); opacity: 0; transform: translateY(4px); transition: opacity .12s, transform .12s; }
+.tip.show { opacity: 1; transform: none; }
+.tip b { font-weight: 600; }
+.scrim { position: fixed; inset: 0; z-index: 40; background: var(--scrim); opacity: 0; pointer-events: none; transition: opacity .25s; }
+.scrim.show { opacity: 1; pointer-events: auto; }
+.sheet { position: fixed; z-index: 45; top: 12px; right: 12px; bottom: 12px; width: min(400px, calc(100% - 24px)); display: flex; flex-direction: column; border-radius: 20px; background: var(--surface); color: var(--text); box-shadow: var(--shadow-float); transform: translateX(calc(100% + 24px)); transition: transform .5s var(--spring); overflow: auto; }
+.sheet.show { transform: none; }
+.sheet-in { padding: 22px; display: grid; gap: 18px; }
+.sheet-head { display: flex; justify-content: space-between; gap: 12px; align-items: flex-start; }
+.sheet h2 { font-family: var(--display); font-weight: 500; font-size: 26px; letter-spacing: -0.02em; line-height: 1.1; }
+.sheet .sub { color: var(--text-2); font-size: 14px; margin-top: 4px; }
+.sheet dl { display: grid; grid-template-columns: auto 1fr; gap: 10px 18px; font-size: 14px; }
+.sheet dt { color: var(--text-2); }
+.sheet dd { margin: 0; text-align: right; font-weight: 500; }
+.sheet .acts { display: flex; gap: 8px; flex-wrap: wrap; }
+.pal { position: fixed; z-index: 50; top: 14vh; left: 50%; width: min(560px, calc(100% - 32px)); transform: translate(-50%, -8px) scale(.98); opacity: 0; pointer-events: none; border-radius: 18px; background: var(--surface); box-shadow: var(--shadow-float); border: 1px solid var(--edge); overflow: hidden; transition: opacity .18s, transform .35s var(--spring); }
+.pal.show { opacity: 1; pointer-events: auto; transform: translate(-50%, 0) scale(1); }
+.pal-in { display: flex; align-items: center; gap: 10px; padding: 0 16px; height: 56px; box-shadow: 0 1px 0 var(--divider); color: var(--text-3); }
+.pal-in input { flex: 1; min-width: 0; height: 100%; border: 0; background: none; outline: none; font: inherit; font-size: 16px; color: var(--text); }
+.pal-list { max-height: 340px; overflow: auto; padding: 8px; }
+.pal-list p { font-size: 12px; color: var(--text-3); padding: 8px 10px 4px; }
+.pal-list button { display: flex; align-items: center; gap: 12px; width: 100%; height: 42px; padding: 0 10px; border: 0; border-radius: 10px; background: none; text-align: left; font-size: 14.5px; }
+.pal-list button .ic { color: var(--text-3); }
+.pal-list button[aria-selected="true"] { background: var(--hover); }
+.pal-list button span { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pal-list button small { color: var(--text-3); font-size: 12.5px; }
+.pal-empty { padding: 20px 12px; color: var(--text-2); font-size: 14px; }
+.toast { position: fixed; z-index: 70; left: 50%; bottom: 24px; display: flex; align-items: center; gap: 10px; height: 46px; padding: 0 18px 0 8px; border-radius: 99px; background: var(--btn); color: var(--btn-text); font-size: 14px; font-weight: 500; box-shadow: var(--shadow-float); transform: translate(-50%, 20px) scale(.85); opacity: 0; pointer-events: none; transition: transform .5s var(--spring), opacity .2s; white-space: nowrap; max-width: calc(100% - 32px); }
+.toast.show { transform: translate(-50%, 0) scale(1); opacity: 1; }
+.toast i { display: grid; place-items: center; width: 30px; height: 30px; border-radius: 50%; background: var(--ok); color: #fff; }
+.toast span { overflow: hidden; text-overflow: ellipsis; }
+.frame.phone .scrim, .frame.phone .sheet, .frame.phone .pal, .frame.phone .toast { position: absolute; }
+.frame.phone .sheet { top: auto; left: 8px; right: 8px; bottom: 8px; width: auto; max-height: 78%; transform: translateY(calc(100% + 24px)); border-radius: 26px; }
+.frame.phone .sheet.show { transform: none; }
+.frame.phone .toast { bottom: 90px; }
+.frame.phone .pal { top: 60px; }
+@media (max-width: 600px) {
+  .sheet { top: auto; left: 8px; right: 8px; width: auto; max-height: 80vh; transform: translateY(calc(100% + 24px)); }
+  .sheet.show { transform: none; }
+  .toast { bottom: 84px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .01ms !important; animation-delay: 0s !important; transition-duration: .01ms !important; }
+}
+</style>
+
+<div class="page">
+  <header class="viewer">
+    <div class="viewer-top">
+      <div>
+        <span class="wordmark"><i></i>Brillanda</span>
+        <h1>Three ways to open the app</h1>
+        <p class="viewer-lede">One design language for the four homes: school admin, teacher, parent and the Brillanda team. Same data, same tokens, three different ideas of what the first screen should be. Click things: marks, rings, stages, buttons, and try <kbd>Ctrl</kbd> <kbd>K</kbd>.</p>
+      </div>
+      <p class="pick"><b>My pick:</b> C as the frame for every role, B's constellation as the admin's drill-down, and A's rules for type, spacing and motion everywhere.</p>
+    </div>
+
+    <div class="drafts" role="group" aria-label="Draft">
+      <button class="draft-btn" data-set="draft" data-val="a" type="button">
+        <svg viewBox="0 0 44 44" aria-hidden="true"><rect x="1" y="1" width="42" height="42" rx="11" fill="var(--sunken)"/><rect x="10" y="12" width="20" height="4" rx="2" fill="var(--text)"/><rect x="10" y="21" width="24" height="3" rx="1.5" fill="var(--border-strong)"/><rect x="10" y="28" width="14" height="3" rx="1.5" fill="var(--accent)"/></svg>
+        <div><strong>A. Paper</strong><span>Clean. Craft is the wow.</span></div>
+      </button>
+      <button class="draft-btn" data-set="draft" data-val="b" type="button">
+        <svg viewBox="0 0 44 44" aria-hidden="true"><rect x="1" y="1" width="42" height="42" rx="11" fill="var(--canvas)"/><path d="M12 14L22 22L32 16M22 22L20 32" stroke="var(--accent)" stroke-width="1.2" opacity=".6"/><rect x="9" y="11" width="6" height="6" rx="1.5" fill="var(--accent)"/><circle cx="22" cy="22" r="3.5" fill="var(--accent)"/><path d="M32 12.5l3.5 3.5-3.5 3.5-3.5-3.5z" fill="var(--accent)"/><circle cx="20" cy="32" r="3" fill="none" stroke="var(--canvas-muted)"/></svg>
+        <div><strong>B. Constellation</strong><span>Abstract. The term drawn as data.</span></div>
+      </button>
+      <button class="draft-btn" data-set="draft" data-val="c" type="button">
+        <svg viewBox="0 0 44 44" aria-hidden="true"><rect x="1" y="1" width="42" height="42" rx="11" fill="var(--sunken)"/><rect x="7" y="10" width="30" height="8" rx="4" fill="var(--border-strong)" opacity=".5"/><rect x="15" y="10" width="12" height="8" rx="4" fill="var(--text)"/><path d="M8 36V26a10 10 0 0 1 10 10z" fill="var(--accent)"/><rect x="24" y="26" width="10" height="10" rx="2" fill="var(--text)" opacity=".85"/></svg>
+        <div><strong>C. Term spine</strong><span>Mixture. The results cycle, with abstract moments.</span></div>
+      </button>
+    </div>
+
+    <div class="controls">
+      <div class="ctl"><span>Role</span><div class="seg" role="group" aria-label="Role">
+        <button type="button" data-set="role" data-val="admin">School admin</button>
+        <button type="button" data-set="role" data-val="teacher">Teacher</button>
+        <button type="button" data-set="role" data-val="parent">Parent</button>
+        <button type="button" data-set="role" data-val="super">Brillanda team</button>
+      </div></div>
+      <div class="ctl"><span>Device</span><div class="seg" role="group" aria-label="Device">
+        <button type="button" data-set="device" data-val="desktop">Desktop</button>
+        <button type="button" data-set="device" data-val="phone">Phone</button>
+      </div></div>
+      <div class="ctl"><span>Moment</span><div class="seg" role="group" aria-label="Moment in the term">
+        <button type="button" data-set="moment" data-val="week">Week 11</button>
+        <button type="button" data-set="moment" data-val="day1">Day one</button>
+      </div></div>
+      <div class="ctl"><span>Theme</span><div class="seg" role="group" aria-label="Theme">
+        <button type="button" data-set="theme" data-val="system">System</button>
+        <button type="button" data-set="theme" data-val="light">Light</button>
+        <button type="button" data-set="theme" data-val="dark">Dark</button>
+      </div></div>
+    </div>
+  </header>
+
+  <main class="stage">
+    <div class="frame" id="frame">
+      <div class="app" id="app"></div>
+      <div class="scrim" id="scrim"></div>
+      <aside class="sheet" id="sheet" aria-label="Details" aria-hidden="true"><div class="sheet-in" id="sheet-in"></div></aside>
+      <div class="pal" id="pal" role="dialog" aria-label="Search and jump" aria-hidden="true">
+        <div class="pal-in"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="6"/><path d="M20 20l-4.3-4.3"/></svg><input id="pal-q" type="text" placeholder="Search classes, students or actions" autocomplete="off" aria-label="Search"><kbd>Esc</kbd></div>
+        <div class="pal-list" id="pal-list" role="listbox"></div>
+      </div>
+      <div class="toast" id="toast" role="status" aria-live="polite"><i><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7"/></svg></i><span id="toast-t"></span></div>
+    </div>
+  </main>
+  <div class="tip" id="tip" role="tooltip"></div>
+
+  <section class="notes" id="notes" aria-live="polite"></section>
+
+  <details class="research">
+    <summary>What the research said</summary>
+    <div class="research-body">
+      <ul>
+        <li><b>Calm beats complete.</b> The most-admired 2026 products (Linear, Vercel) remove everything that doesn't move you to the next decision. Every draft opens with one sentence and one number.</li>
+        <li><b>Progressive disclosure.</b> Show the next decision, reveal detail on demand: the side sheet in B and C, the rows in A.</li>
+        <li><b>The key number goes top-left</b>, and it's different per role: subjects in (admin), classes finished (teacher), position and average (parent), trial requests (team).</li>
+        <li><b>Role-adaptive homes, one shell.</b> Same nav pattern and components; different defaults per role (HubSpot, Asana).</li>
+        <li><b>Command palette.</b> Ctrl/⌘ K to jump to a class, find a student or run an action (Linear, Raycast, Slack).</li>
+        <li><b>Design empty states up front.</b> The "Day one" toggle shows each home before any score exists.</li>
+        <li><b>Warmth in B2B.</b> Small, earned moments: the morphing "Mark complete" button, the published toast. No confetti, glows or bouncy easing; that follows the motion brief in your PDF.</li>
+        <li><b>Where local products fall short.</b> SAFSMS and Edves open on a wall of widgets (finance, events, attendance). Brillanda's edge is focus on the results cycle, and honesty about what's still to come.</li>
+      </ul>
+      <ul>
+        <li><a href="https://www.saasui.design/blog/7-saas-ui-design-trends-2026" target="_blank" rel="noopener">SaaSUI: 7 SaaS UI trends for 2026</a></li>
+        <li><a href="https://www.saasframe.io/blog/the-anatomy-of-high-performance-saas-dashboard-design-2026-trends-patterns" target="_blank" rel="noopener">SaaSFrame: anatomy of a dashboard</a></li>
+        <li><a href="https://artofstyleframe.com/blog/dashboard-design-patterns-web-apps/" target="_blank" rel="noopener">Art of Styleframe: 4 dashboard layouts</a></li>
+        <li><a href="https://www.designspells.com" target="_blank" rel="noopener">Design Spells</a></li>
+        <li><a href="https://www.saasui.design/pattern/empty-state/attio" target="_blank" rel="noopener">Attio empty states</a></li>
+        <li><a href="https://safsms.com/" target="_blank" rel="noopener">SAFSMS</a> and <a href="https://infoguidenigeria.com/school-management-system-software/" target="_blank" rel="noopener">Nigerian school software roundup</a></li>
+        <li>Mobbin and Saaspo refused automated access, so they aren't used here.</li>
+      </ul>
+    </div>
+  </details>
+</div>
+
+<script>
+(() => {
+"use strict";
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const RM = matchMedia("(prefers-reduced-motion: reduce)");
+const fmt = (n, d = 0) => Number(n).toLocaleString("en-GB", { minimumFractionDigits: d, maximumFractionDigits: d });
+const ord = (n) => n + (n % 100 >= 11 && n % 100 <= 13 ? "th" : ["th", "st", "nd", "rd"][n % 10] || "th");
+const plural = (n, one, many) => `${n} ${n === 1 ? one : many || one + "s"}`;
+
+function rng(seed) {
+  return () => { seed |= 0; seed = (seed + 0x6D2B79F5) | 0; let t = Math.imul(seed ^ (seed >>> 15), 1 | seed); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
+}
+
+/* ---------- Icons: one stroke weight everywhere ---------- */
+const I = {
+  home: '<path d="M4 11l8-7 8 7v8a1 1 0 0 1-1 1h-4v-6H9v6H5a1 1 0 0 1-1-1z"/>',
+  classes: '<rect x="4" y="4" width="7" height="7" rx="1.5"/><rect x="13" y="4" width="7" height="7" rx="1.5"/><rect x="4" y="13" width="7" height="7" rx="1.5"/><rect x="13" y="13" width="7" height="7" rx="1.5"/>',
+  students: '<circle cx="9" cy="8" r="3.2"/><path d="M3 20c0-3.3 2.7-5.5 6-5.5s6 2.2 6 5.5"/><path d="M16 4.8a3 3 0 0 1 0 6"/><path d="M18 14.8c1.9.7 3 2.4 3 5.2"/>',
+  staff: '<rect x="4" y="4" width="16" height="16" rx="3"/><circle cx="12" cy="10" r="2.5"/><path d="M8 17c.8-1.8 2.2-2.6 4-2.6s3.2.8 4 2.6"/>',
+  scores: '<path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13.5 6.5l4 4"/>',
+  publish: '<path d="M4 12l16-8-6 16-3-7z"/><path d="M11 13l9-9"/>',
+  settings: '<path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/>',
+  search: '<circle cx="11" cy="11" r="6"/><path d="M20 20l-4.3-4.3"/>',
+  bell: '<path d="M6 16v-5a6 6 0 0 1 12 0v5l1.5 2h-15z"/><path d="M10 20a2 2 0 0 0 4 0"/>',
+  file: '<path d="M7 3h7l5 5v13H7z"/><path d="M14 3v5h5"/>',
+  school: '<path d="M3 10l9-5 9 5-9 5z"/><path d="M7 12.5V17c1.5 1.5 3 2 5 2s3.5-.5 5-2v-4.5"/>',
+  inbox: '<path d="M4 13l2.5-8h11L20 13v6H4z"/><path d="M4 13h5l1 2h4l1-2h5"/>',
+  activity: '<path d="M3 12h4l3-7 4 14 3-7h4"/>',
+  check: '<path d="M5 12.5l4.5 4.5L19 7"/>',
+  chevron: '<path d="M9 6l6 6-6 6"/>',
+  download: '<path d="M12 4v11M7 10l5 5 5-5M5 20h14"/>',
+  attendance: '<rect x="4" y="4" width="16" height="16" rx="3"/><path d="M8 12l3 3 5-6"/>',
+  fees: '<rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 10h18"/>',
+  timetable: '<circle cx="12" cy="12" r="8"/><path d="M12 8v4l3 2"/>',
+  messages: '<path d="M4 5h16v11H9l-5 4z"/>',
+  plus: '<path d="M12 5v14M5 12h14"/>',
+  user: '<circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-6 8-6s8 2 8 6"/>',
+  clock: '<circle cx="12" cy="12" r="8"/><path d="M12 8v4l3 2"/>',
+  close: '<path d="M6 6l12 12M18 6L6 18"/>',
+  results: '<path d="M4 20V10M10 20V4M16 20v-7"/><path d="M3 20h18"/>',
+};
+const icon = (n, cls = "ic") => `<svg class="${cls}" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">${I[n]}</svg>`;
+
+/* ---------- Sample data (all invented, marked as sample in the UI) ---------- */
+const SUBJECTS = [
+  { n: "Mathematics", s: "Maths", g: "core", t: "Mr Tunde Bakare" },
+  { n: "English Language", s: "English", g: "core", t: "Mrs Grace Okon" },
+  { n: "Computer Studies", s: "Computer", g: "prac", t: "Ms Halima Bello" },
+  { n: "Agricultural Science", s: "Agric", g: "prac", t: "Mr Chinedu Eze" },
+  { n: "Physical and Health Education", s: "PHE", g: "prac", t: "Mr Emeka Nwosu" },
+  { n: "Civic Education", s: "Civic", g: "arts", t: "Mr Musa Danjuma" },
+  { n: "Christian Religious Studies", s: "CRS", g: "arts", t: "Mrs Ngozi Ibe" },
+  { n: "French", s: "French", g: "arts", t: "Mrs Aisha Lawal" },
+  { n: "Yoruba", s: "Yoruba", g: "arts", t: "Mrs Bisi Adewale" },
+];
+const ARMS = ["JSS 1A", "JSS 1B", "JSS 2A", "JSS 2B", "JSS 3A", "JSS 3B", "SS 1A", "SS 1B", "SS 2A", "SS 2B", "SS 3A", "SS 3B"];
+const CLASSES = ["JSS 1", "JSS 2", "JSS 3", "SS 1", "SS 2", "SS 3"];
+const DUE = "Friday 5 December";
+const isDone = (c) => c.st === "complete" || c.st === "locked";
+
+function buildSchool(moment) {
+  const r = rng(11);
+  const sizes = ARMS.map(() => 26 + Math.floor(r() * 9));
+  const cells = ARMS.map((arm, ai) => SUBJECTS.map((sub, si) => {
+    const x = r();
+    let st = "complete", pct = 100;
+    if (x < 0.1) { st = "none"; pct = 0; } else if (x < 0.36) { st = "progress"; pct = Math.round(25 + r() * 65); }
+    return { ai, si, arm, sub, st, pct, students: sizes[ai] };
+  }));
+  const at = (arm, s) => cells[ARMS.indexOf(arm)][SUBJECTS.findIndex((x) => x.s === s)];
+  const set = (arm, s, st, pct) => { const c = at(arm, s); c.st = st; c.pct = pct; return c; };
+  cells[0].forEach((c) => { c.st = "complete"; c.pct = 100; });
+  cells[10].forEach((c) => { c.st = "complete"; c.pct = 100; });
+  cells[11].forEach((c, i) => { if (i < 3) { c.st = "locked"; c.pct = 100; } });
+  cells[3].forEach((c, i) => { if (i % 3 !== 1) { c.st = i % 2 ? "none" : "progress"; c.pct = c.st === "none" ? 0 : 18 + i * 3; } });
+  set("JSS 2A", "Maths", "progress", 100);
+  set("JSS 2B", "Maths", "progress", 58);
+  set("SS 1A", "Maths", "none", 0);
+  set("SS 2A", "Maths", "locked", 100);
+  set("JSS 3A", "Agric", "complete", 100).unlock = "Two continuous assessment scores went into the wrong column.";
+  set("SS 2B", "English", "complete", 100).unlock = "Adaobi Nnaji's exam script turned up after I marked the sheet complete.";
+  if (moment === "day1") cells.flat().forEach((c) => { c.st = "none"; c.pct = 0; delete c.unlock; });
+  return { cells, sizes, at };
+}
+
+function adminStats(sc, moment) {
+  const flat = sc.cells.flat();
+  const done = flat.filter(isDone).length;
+  const prog = flat.filter((c) => c.st === "progress").length;
+  const none = flat.filter((c) => c.st === "none").length;
+  const ready = ARMS.filter((a, i) => sc.cells[i].every(isDone));
+  const unlocks = flat.filter((c) => c.unlock);
+  const toMark = flat.filter((c) => c.st === "progress" && c.pct === 100).length;
+  const byT = {};
+  flat.forEach((c) => { if (c.st === "none" || (c.st === "progress" && c.pct < 50)) (byT[c.sub.t] ||= []).push(c); });
+  const behind = Object.entries(byT).map(([t, cs]) => ({ t, cs })).sort((a, b) => b.cs.length - a.cs.length);
+  const classes = CLASSES.map((k, i) => {
+    const rows = [sc.cells[2 * i], sc.cells[2 * i + 1]];
+    const d = rows.flat().filter(isDone).length;
+    return { k, arms: [ARMS[2 * i], ARMS[2 * i + 1]], done: d, total: 18, pct: d / 18, students: sc.sizes[2 * i] + sc.sizes[2 * i + 1], open: rows.flat().filter((c) => !isDone(c)).length };
+  });
+  const armDone = ARMS.map((a, i) => ({ a, d: sc.cells[i].filter(isDone).length }));
+  const worst = armDone.slice().sort((x, y) => x.d - y.d)[0];
+  const students = sc.sizes.reduce((a, b) => a + b, 0);
+  const readyParents = ready.reduce((s, a) => s + sc.sizes[ARMS.indexOf(a)], 0);
+  return { flat, done, prog, none, ready, unlocks, toMark, behind, classes, worst, students, unlinked: 26, readyParents, day1: moment === "day1" };
+}
+
+const GRADE = (v) => v >= 70 ? "A" : v >= 60 ? "B" : v >= 50 ? "C" : v >= 45 ? "D" : "F";
+const GTONE = { A: "ok", B: "ok", C: "warn", D: "bad", F: "bad" };
+
+function buildTeacher(sc, moment) {
+  const r = rng(5);
+  const names = ["Ifeanyi Obi", "Zainab Yusuf", "Tolu Adeyemi", "Chisom Nwankwo", "David Etim"];
+  return [["JSS 2A", "Maths"], ["JSS 2B", "Maths"], ["SS 1A", "Maths"], ["SS 2A", "Maths"]].map(([arm, s], i) => {
+    const c = sc.at(arm, s);
+    const key = arm + "/" + s;
+    let st = c.st === "progress" && c.pct === 100 ? "ready" : c.st;
+    if (state.marked.has(key) && moment !== "day1") st = "complete";
+    const n = c.students;
+    const done = Math.round((n * c.pct) / 100);
+    const scores = Array.from({ length: done }, () => Math.max(18, Math.min(97, Math.round(62 + (r() + r() + r() - 1.5) * 26))));
+    const dist = ["A", "B", "C", "D", "F"].map((g) => scores.filter((v) => GRADE(v) === g).length);
+    return { key, arm, subject: c.sub.n, n, done, st, dist, next: names[i], avg: scores.length ? scores.reduce((a, b) => a + b, 0) / scores.length : 0 };
+  });
+}
+
+const CHILDREN = [
+  { id: "chi", first: "Chiamaka", last: "Okafor", now: "JSS 2B", then: "JSS 1B", term: "Third term, 2025/2026", published: "24 July", avg: 73.8, pos: 4, of: 32, trend: [["First", 66.2], ["Second", 70.5], ["Third", 73.8]],
+    scores: [88, 74, 82, 69, 71, 77, 80, 58, 65], remark: "Chiamaka is careful and asks good questions. French needs steady practice over the holiday.", by: "Mrs Grace Okon, class teacher" },
+  { id: "obi", first: "Obinna", last: "Okafor", now: "SS 1A", then: "JSS 3A", term: "Third term, 2025/2026", published: "24 July", avg: 64.1, pos: 11, of: 29, trend: [["First", 61.0], ["Second", 62.7], ["Third", 64.1]],
+    scores: [58, 66, 79, 72, 68, 61, 70, 47, 56], remark: "Obinna has grown in confidence this year. Mathematics will come with more practice at home.", by: "Mr Musa Danjuma, class teacher" },
+];
+
+const SCHOOLS = [
+  { n: "Greenfield College", c: "Lekki, Lagos", st: "active", students: 374, pct: 0.66, last: "2 min ago" },
+  { n: "Crestview Academy", c: "Wuse, Abuja", st: "active", students: 612, pct: 0.83, last: "Just now" },
+  { n: "Kings' Model School", c: "Enugu", st: "trial", day: 9, students: 198, pct: 0.22, last: "1 hour ago" },
+  { n: "Bright Future Secondary", c: "Ibadan", st: "active", students: 455, pct: 0.58, last: "12 min ago" },
+  { n: "St. Anne's Girls' School", c: "Owerri", st: "trial", day: 23, students: 287, pct: 0.64, last: "3 hours ago" },
+  { n: "Hilltop Secondary", c: "Jos", st: "suspended", students: 240, pct: 0, last: "12 days ago" },
+  { n: "Al-Ameen Academy", c: "Kano", st: "active", students: 530, pct: 0.47, last: "40 min ago" },
+  { n: "Rivers Pearl College", c: "Port Harcourt", st: "active", students: 389, pct: 0.76, last: "5 min ago" },
+];
+const TRIALS = [
+  { n: "Unity Heights School", c: "Asaba", students: 412, when: "2 hours ago", who: "Mr Efe Okoro, proprietor" },
+  { n: "Graceland Schools", c: "Abeokuta", students: 268, when: "Yesterday", who: "Mrs Kemi Sowole, principal" },
+  { n: "Starlight Academy", c: "Kaduna", students: 505, when: "3 days ago", who: "Mallam Idris Sule, administrator" },
+];
+const ACTIVITY = [
+  ["9:42", "Crestview Academy marked 14 subjects complete"],
+  ["9:15", "Kings' Model School invited 11 teachers"],
+  ["8:50", "Rivers Pearl College imported 389 students"],
+  ["Yesterday", "St. Anne's Girls' School changed its grading scale"],
+  ["Yesterday", "Hilltop Secondary: suspension reminder sent"],
+];
+
+/* ---------- State ---------- */
+const store = { get(k) { try { return localStorage.getItem("bd:" + k); } catch { return null; } }, set(k, v) { try { localStorage.setItem("bd:" + k, v); } catch {} } };
+const state = {
+  draft: store.get("draft") || "c",
+  role: store.get("role") || "admin",
+  device: store.get("device") || "desktop",
+  moment: store.get("moment") || "week",
+  theme: store.get("theme") || "system",
+  child: 0,
+  marked: new Set(),
+  sheets: {},
+};
+
+/* ---------- Shared shell pieces ---------- */
+const WHO = {
+  admin: { name: "Funmilayo Adeyemi", title: "Mrs Adeyemi", first: "Mrs Adeyemi", role: "School admin", init: "FA" },
+  teacher: { name: "Tunde Bakare", title: "Mr Bakare", first: "Tunde", role: "Mathematics", init: "TB" },
+  parent: { name: "Ngozi Okafor", title: "Mrs Okafor", first: "Ngozi", role: "Parent", init: "NO" },
+  super: { name: "Kelechi Obi", title: "Kelechi", first: "Kelechi", role: "Brillanda team", init: "KO" },
+};
+const NAV = {
+  admin: [["home", "Home"], ["classes", "Classes"], ["scores", "Scores"], ["publish", "Publishing"], ["students", "Students"], ["staff", "Staff"], ["settings", "Settings"]],
+  teacher: [["home", "Home"], ["classes", "My classes"], ["scores", "Scores"], ["students", "Students"]],
+  parent: [["home", "Home"], ["results", "Results"], ["file", "Report cards"], ["user", "Profile"]],
+  super: [["home", "Overview"], ["school", "Schools"], ["inbox", "Trial requests", 3], ["activity", "Activity"], ["settings", "Settings"]],
+};
+const SOON = [["attendance", "Attendance"], ["fees", "Fees"], ["timetable", "Timetable"], ["messages", "Messages"]];
+
+const brand = () => `<span class="wordmark"><i></i>Brillanda</span>`;
+const schoolBlock = (role) => role === "super"
+  ? `<div class="school"><span class="crest">B</span><div><b>Brillanda</b><span>8 schools</span></div></div>`
+  : `<div class="school"><span class="crest">GC</span><div><b>Greenfield College</b><span>Lekki, Lagos. Sample school</span></div></div>`;
+const navList = (role) => `<nav class="nav" aria-label="Main">${NAV[role].map(([i, l, n], k) => `<a href="#" ${k === 0 ? 'aria-current="page"' : ""} data-toast="In the app this opens ${esc(l)}">${icon(i)}${l}${n ? `<span class="count">${n}</span>` : ""}</a>`).join("")}</nav>`;
+const soonBlock = (role) => role === "admin" ? `<div class="nav-soon"><p>Coming soon</p>${SOON.map(([i, l]) => `<span>${icon(i)}${l}</span>`).join("")}</div>` : "";
+const railUser = (role) => `<div class="rail-user"><span class="avatar">${WHO[role].init}</span><div><b>${WHO[role].name}</b><span>${WHO[role].role}</span></div></div>`;
+const searchBtn = () => `<button class="search" type="button" data-cmd>${icon("search")}<span>Search or jump to</span><kbd>Ctrl K</kbd></button>`;
+const topRight = (role) => `<div class="top-right"><span class="sample">Sample data</span><button class="icon-btn" type="button" aria-label="Notifications" data-toast="No new notifications">${icon("bell")}${role !== "parent" ? '<span class="dot"></span>' : ""}</button></div>`;
+const tabbar = (role) => `<nav class="tabbar" aria-label="Main">${NAV[role].slice(0, 4).map(([i, l], k) => `<a href="#" ${k === 0 ? 'aria-current="page"' : ""} data-toast="In the app this opens ${esc(l)}">${icon(i)}${l.split(" ")[0]}</a>`).join("")}</nav>`;
+
+function railShell(role, body) {
+  return `<div class="shell"><aside class="rail">${brand()}${schoolBlock(role)}${navList(role)}${soonBlock(role)}${railUser(role)}</aside>
+    <div class="main"><div class="topbar"><span class="mobile-brand">${brand()}</span>${searchBtn()}${topRight(role)}</div>${body}</div>${tabbar(role)}</div>`;
+}
+function barShell(role, body) {
+  return `<div class="shell"><div class="main"><div class="c-bar">${brand()}<nav class="c-nav" aria-label="Main">${NAV[role].map(([i, l], k) => `<a href="#" ${k === 0 ? 'aria-current="page"' : ""} data-toast="In the app this opens ${esc(l)}">${l}</a>`).join("")}</nav><div class="top-right">${searchBtn()}<span class="avatar" title="${WHO[role].name}">${WHO[role].init}</span></div></div>${body}</div>${tabbar(role)}</div>`;
+}
+
+const num = (v, d = 0) => `<span class="tab" data-count="${v}" data-dec="${d}">${fmt(v, d)}</span>`;
+const chip = (st) => ({
+  none: `<span class="chip"><i></i>Not started</span>`,
+  progress: `<span class="chip warn"><i></i>In progress</span>`,
+  ready: `<span class="chip ready"><i></i>All scores in</span>`,
+  complete: `<span class="chip ok"><i></i>Complete</span>`,
+  locked: `<span class="chip ink"><i></i>Locked</span>`,
+  active: `<span class="chip ok"><i></i>Active</span>`,
+  trial: `<span class="chip warn"><i></i>Trial</span>`,
+  suspended: `<span class="chip bad"><i></i>Suspended</span>`,
+})[st];
+const morph = (label, done, toast, extra = "") => `<button class="morph" type="button" data-morph data-done="${esc(done)}" data-msg="${esc(toast)}" ${extra}><span class="lbl">${label}</span><span class="spin" aria-hidden="true"></span></button>`;
+const strip = (n, on, delay = 0) => `<span class="strip" aria-label="${on} of ${n} students done">${Array.from({ length: n }, (_, i) => `<i class="${i < on ? "on" : ""}" style="--d:${(delay + i * 18) / 1000}s"></i>`).join("")}</span>`;
+const soak = (frac, d = 0, cls = "") => `<span class="soak ${cls}"><i style="--w:${(frac * 100).toFixed(1)}%;--d:${d}s"></i></span>`;
+const grade = (v) => { const g = GRADE(v); return `<span class="grade ${GTONE[g]}">${g}</span>`; };
+const hello = () => { const h = new Date().getHours(); return h < 12 ? "Good morning" : h < 17 ? "Good afternoon" : "Good evening"; };
+const dateLine = (m) => m === "day1" ? "Monday 8 September. First term, 2026/2027, week 1 of 13." : "Monday 24 November. First term, 2026/2027, week 11 of 13.";
+const soonRow = () => `<div class="soon-row"><span>Coming soon</span>${SOON.map(([i, l]) => `<span class="pill">${icon(i)}${l}</span>`).join("")}</div>`;
+
+function sheet(key, html) { state.sheets[key] = html; return `data-sheet="${esc(key)}"`; }
+
+/* Admin sheets: one per cell, shared by B and C */
+function cellSheet(c) {
+  const status = c.st === "progress" && c.pct === 100 ? "ready" : c.st;
+  const done = Math.round((c.students * c.pct) / 100);
+  const acts = c.unlock
+    ? `${morph("Reopen sheet", "Reopened", `${c.arm} ${c.sub.n} reopened for ${c.sub.t}`)}<button class="btn ghost sm" data-toast="Request declined">Decline</button>`
+    : status === "none" || status === "progress"
+      ? `${morph("Remind " + c.sub.t.split(" ")[0] + " " + c.sub.t.split(" ").slice(-1), "Reminder sent", `Reminder sent to ${c.sub.t}`)}<button class="btn ghost sm" data-toast="In the app this opens the score sheet">Open scores</button>`
+      : status === "ready" ? `<button class="btn ghost sm" data-toast="In the app this opens the score sheet">Open scores</button>`
+      : `<button class="btn ghost sm" data-toast="In the app this opens the results">See results</button>`;
+  return sheet(`cell:${c.ai}:${c.si}`, `
+    <div class="sheet-head"><div><h2>${c.arm} ${esc(c.sub.n)}</h2><p class="sub">${esc(c.sub.t)}</p></div><button class="icon-btn" data-close aria-label="Close">${icon("close")}</button></div>
+    <div>${chip(status)}</div>
+    <div>${soak(c.pct / 100, 0, "accent")}</div>
+    <dl><dt>Students with every score</dt><dd class="tab">${done} of ${c.students}</dd><dt>Assessments</dt><dd>First CA, second CA, exam</dd><dt>Due</dt><dd>${DUE}</dd></dl>
+    ${c.unlock ? `<div class="remark"><p>“${esc(c.unlock)}”</p><small>${esc(c.sub.t)} asks to reopen this sheet</small></div>` : ""}
+    <div class="acts">${acts}</div>`);
+}
+
+/* ---------- Charts ---------- */
+function trendChart(ch) {
+  const W = 360, H = 150, pl = 30, pr = 18, pt = 22, pb = 26;
+  const lo = 50, hi = 80;
+  const x = (i) => pl + (i * (W - pl - pr)) / (ch.trend.length - 1);
+  const y = (v) => pt + ((hi - v) / (hi - lo)) * (H - pt - pb);
+  const pts = ch.trend.map(([, v], i) => [x(i), y(v)]);
+  const line = pts.map((p, i) => (i ? "L" : "M") + p[0].toFixed(1) + " " + p[1].toFixed(1)).join(" ");
+  const area = `${line} L${pts[pts.length - 1][0]} ${H - pb} L${pts[0][0]} ${H - pb} Z`;
+  return `<svg class="chart" viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="Average by term: ${ch.trend.map(([t, v]) => `${t} term ${v}`).join(", ")}">
+    ${[50, 60, 70, 80].map((t) => `<line class="grid" x1="${pl}" x2="${W - pr}" y1="${y(t)}" y2="${y(t)}"/><text x="${pl - 8}" y="${y(t) + 4}" text-anchor="end">${t}</text>`).join("")}
+    <path class="area" d="${area}"/><path class="line" d="${line}"/>
+    ${ch.trend.map(([t, v], i) => `<text x="${x(i)}" y="${H - 6}" text-anchor="middle">${t}</text>`).join("")}
+    ${pts.map((p, i) => `<circle class="pt" cx="${p[0]}" cy="${p[1]}" r="${i === pts.length - 1 ? 5 : 3.5}"/>`).join("")}
+    <text class="val" x="${pts[pts.length - 1][0]}" y="${pts[pts.length - 1][1] - 11}" text-anchor="end">${fmt(ch.trend[ch.trend.length - 1][1], 1)}</text>
+    ${ch.trend.map(([t, v], i) => `<rect class="hit" x="${x(i) - 26}" y="${pt - 10}" width="52" height="${H - pt - pb + 10}" data-tip="<b>${t} term</b><br>Average ${fmt(v, 1)}"/>`).join("")}
+  </svg>`;
+}
+
+function distChart(dist, label) {
+  const W = 420, H = 180, pl = 8, pb = 26, pt = 22;
+  const max = Math.max(1, ...dist);
+  const bw = (W - pl * 2) / 5;
+  const G = ["A", "B", "C", "D", "F"];
+  return `<svg class="chart" viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="Grade distribution for ${esc(label)}: ${G.map((g, i) => `${g} ${dist[i]}`).join(", ")}">
+    <line class="grid" x1="0" x2="${W}" y1="${H - pb}" y2="${H - pb}"/>
+    ${dist.map((v, i) => { const h = ((H - pb - pt) * v) / max; const x0 = pl + i * bw + 14; const w = bw - 28;
+      return `<path d="M${x0} ${H - pb} V${H - pb - h + 4} Q${x0} ${H - pb - h} ${x0 + 4} ${H - pb - h} H${x0 + w - 4} Q${x0 + w} ${H - pb - h} ${x0 + w} ${H - pb - h + 4} V${H - pb} Z" fill="var(--accent)" class="pop" style="--d:${i * 0.06}s"/>
+      <text class="val" x="${x0 + w / 2}" y="${H - pb - h - 7}" text-anchor="middle">${v}</text>
+      <text x="${x0 + w / 2}" y="${H - 8}" text-anchor="middle">${G[i]}</text>
+      <rect class="hit" x="${pl + i * bw}" y="0" width="${bw}" height="${H}" data-tip="<b>Grade ${G[i]}</b><br>${plural(v, "student")}"/>`; }).join("")}
+  </svg>`;
+}
+
+/* ============================================================
+   Draft A: Paper
+   ============================================================ */
+function aAdmin() {
+  const sc = buildSchool(state.moment);
+  const s = adminStats(sc, state.moment);
+  const lede = s.day1
+    ? `The term has started and no scores are in yet. Teachers can start entering them today. They're due ${DUE}.`
+    : `${num(s.done)} of 108 subjects are in, and ${plural(s.toMark, "more is", "more are")} waiting to be marked complete. Scores are due ${DUE}.`;
+  const seg = [[s.done, "var(--text)", "Complete"], [s.prog, "var(--accent)", "In progress"], [s.none, "var(--border-strong)", "Not started"]];
+  const needs = s.day1 ? [
+    ["accent", "Check this term's grading scale", "It was copied from last session. Change it before the first score goes in.", `<button class="btn ghost sm" data-toast="In the app this opens the grading scale">Review scale</button>`],
+    ["warn", `${s.unlinked} students have no parent linked`, "Parents can't see results until they're invited.", morph("Invite parents", "Invites sent", `Invites sent to ${s.unlinked} parents`)],
+    ["", "Tell teachers the deadline", `Scores are due ${DUE}. One message goes to all 9 teachers.`, morph("Send reminder", "Sent", "Reminder sent to 9 teachers")],
+  ] : [
+    ...s.unlocks.map((c) => ["bad", `${c.sub.t} asks to reopen ${c.arm} ${c.sub.s}`, `“${c.unlock}”`, `${morph("Reopen", "Reopened", `${c.arm} ${c.sub.n} reopened`)}<button class="btn ghost sm" data-toast="Request declined">Decline</button>`]),
+    ["warn", `${plural(s.behind.length, "teacher is", "teachers are")} behind`, s.behind.slice(0, 3).map((b) => `${b.t} (${plural(b.cs.length, "sheet")})`).join(", ") + (s.behind.length > 3 ? ` and ${s.behind.length - 3} more` : "") + ".", morph("Send reminder", "Sent", `Reminder sent to ${s.behind.length} teachers`)],
+    ["", `${s.unlinked} students have no parent linked`, "Parents can't see results until they're invited.", `<button class="btn ghost sm" data-toast="In the app this opens parent invites">Invite parents</button>`],
+  ];
+  const readyList = s.ready.length
+    ? `<ul class="a-list">${s.ready.map((a) => { const i = ARMS.indexOf(a); return `<li><span class="mark ok"></span><div><b>${a}</b><p>All 9 subjects complete. ${sc.sizes[i]} students, ${sc.sizes[i]} report cards.</p></div><div class="acts">${morph("Publish", "Published", `${a} results published. Parents are being emailed.`)}</div></li>`; }).join("")}</ul>`
+    : `<p class="lede" style="font-size:14.5px;margin-top:0">No class has every subject in yet. A class appears here the moment its last subject is marked complete.</p>`;
+  return `
+  <header class="a-hello"><p class="date-line">${dateLine(state.moment)}</p><h1 class="display">${hello()}, ${WHO.admin.first}.</h1><p class="lede">${lede}</p></header>
+  <div class="a-meter">
+    <div class="bar" role="img" aria-label="${s.done} complete, ${s.prog} in progress, ${s.none} not started">${seg.filter(([n]) => n).map(([n, c]) => `<i style="flex:${n};background:${c}" data-tip="${n} subjects"></i>`).join("")}</div>
+    <div class="legend">${seg.map(([n, c, l]) => `<span><i style="background:${c}"></i>${n} ${l.toLowerCase()}</span>`).join("")}</div>
+  </div>
+  <div class="a-cols">
+    <section><h2 class="h2">Needs you</h2><ul class="a-list">${needs.map(([tone, t, p, a]) => `<li><span class="mark ${tone}"></span><div><b>${esc(t)}</b><p>${esc(p)}</p></div><div class="acts">${a}</div></li>`).join("")}</ul></section>
+    <section><h2 class="h2">Ready to publish <a href="#" data-toast="In the app this opens Publishing">Publishing</a></h2>${readyList}</section>
+  </div>
+  <section class="a-table"><h2 class="h2">Classes <a href="#" data-toast="In the app this opens Classes">All classes</a></h2>
+    ${s.classes.map((c, i) => `<div class="a-row"><div><div class="name">${c.k}</div><div class="sub">${c.arms.join(" and ")}, ${c.students} students</div></div>${soak(c.pct, i * 0.08)}<div class="num tab">${c.done} of 18 subjects</div><div style="justify-self:end">${c.done === 18 ? `<span class="chip ok"><i></i>Ready to publish</span>` : c.done === 0 ? chip("none") : c.open > 6 ? `<span class="chip warn"><i></i>${c.open} open</span>` : `<span class="chip"><i></i>${c.open} open</span>`}</div></div>`).join("")}
+  </section>
+  <section class="a-soon">${soonRow()}</section>`;
+}
+
+function aTeacher() {
+  const sc = buildSchool(state.moment);
+  const T = buildTeacher(sc, state.moment);
+  const fin = T.filter((t) => t.st === "complete" || t.st === "locked").length;
+  const ready = T.find((t) => t.st === "ready");
+  const cont = T.find((t) => t.st === "progress");
+  const day1 = state.moment === "day1";
+  const lede = day1
+    ? `Four classes this term, ${T.reduce((a, t) => a + t.n, 0)} students. Nothing's entered yet; scores are due ${DUE}.`
+    : `You've finished ${num(fin)} of your 4 classes.${ready ? ` ${ready.arm} ${ready.subject} has every score in and is ready to mark complete.` : ""}`;
+  const card = day1
+    ? `<div class="a-continue"><div><small>Start here</small><h2>JSS 2A Mathematics</h2><p>${T[0].n} students, three assessments: first CA, second CA and the exam.</p></div><button class="btn" data-toast="In the app this opens the score sheet">Start entering scores</button></div>`
+    : cont ? `<div class="a-continue"><div><small>Pick up where you left off</small><h2>${cont.arm} ${cont.subject}</h2><p>${cont.n - cont.done} students left. Next up: ${cont.next}. Last saved yesterday at 4:40 pm.</p></div><button class="btn" data-toast="In the app this opens ${cont.arm} ${cont.subject} at ${cont.next}">Continue entering scores</button></div>` : "";
+  return `
+  <header class="a-hello"><p class="date-line">${dateLine(state.moment)}</p><h1 class="display">${hello()}, ${WHO.teacher.first}.</h1><p class="lede">${lede}</p></header>
+  ${card}
+  <section class="a-classes"><h2 class="h2">Your classes</h2>
+    ${T.map((t, i) => { const max = Math.max(1, ...t.dist); return `<div class="a-class"><div><div class="t">${t.subject}</div><div class="s">${t.arm}</div></div>
+      <div class="mid">${strip(t.n, t.done, i * 140)}<span class="cnt tab">${t.done} of ${t.n} done</span></div>
+      <div class="end">${t.done ? `<span class="mini-dist" data-tip="<b>${t.arm}</b><br>A ${t.dist[0]}, B ${t.dist[1]}, C ${t.dist[2]}, D ${t.dist[3]}, F ${t.dist[4]}">${t.dist.map((v) => `<i style="height:${Math.max(2, (v / max) * 24)}px"></i>`).join("")}</span>` : ""}
+      ${t.st === "ready" ? morph("Mark complete", "Complete", `${t.arm} ${t.subject} marked complete`, `data-mark="${t.key}"`) : chip(t.st)}</div></div>`; }).join("")}
+  </section>`;
+}
+
+function aParent() {
+  const ch = CHILDREN[state.child];
+  const best = ch.scores.indexOf(Math.max(...ch.scores));
+  const diff = ch.trend[2][1] - ch.trend[1][1];
+  return `
+  <div class="a-child" role="group" aria-label="Child">${CHILDREN.map((c, i) => `<button class="child-btn" type="button" data-child="${i}" aria-pressed="${i === state.child}"><span class="avatar">${c.first[0]}${c.last[0]}</span>${c.first} <small>${c.now}</small></button>`).join("")}</div>
+  <div class="notice">${icon("clock")}<p>${state.moment === "day1" ? "First term has just started." : "First term results aren't out yet."} You'll get an email when Greenfield College publishes them.</p></div>
+  <header class="a-hello" style="margin-top:28px"><p class="date-line">Latest result: ${ch.term}, ${ch.then}</p><h1 class="display">${ch.first} came ${ord(ch.pos)} of ${ch.of}.</h1><p class="lede">Average ${fmt(ch.avg, 1)}, ${diff >= 0 ? "up" : "down"} ${fmt(Math.abs(diff), 1)} on second term. Best subject: ${SUBJECTS[best].n}.</p></header>
+  <dl class="a-figs"><div><dt>Average</dt><dd>${num(ch.avg, 1)}</dd></div><div><dt>Position in ${ch.then}</dt><dd>${num(ch.pos)}<small>of ${ch.of}</small></dd></div><div><dt>Best subject</dt><dd>${num(ch.scores[best])}<small>${SUBJECTS[best].s}</small></dd></div></dl>
+  <div class="a-actions"><button class="btn" data-toast="In the app this downloads the PDF report card">${icon("download")}Download report card</button><button class="btn ghost" data-toast="In the app this opens results history">All terms</button></div>
+  <div class="a-cols">
+    <section><h2 class="h2">Subjects</h2>${SUBJECTS.map((s, i) => `<div class="subj"><span class="n">${s.n}</span>${soak(ch.scores[i] / 100, i * 0.05)}<span class="v tab">${ch.scores[i]}</span>${grade(ch.scores[i])}</div>`).join("")}</section>
+    <section><h2 class="h2">Average by term, 2025/2026</h2>${trendChart(ch)}<div class="remark"><p>“${esc(ch.remark)}”</p><small>${esc(ch.by)}</small></div></section>
+  </div>`;
+}
+
+function aSuper() {
+  const active = SCHOOLS.filter((s) => s.st === "active").length;
+  const trial = SCHOOLS.filter((s) => s.st === "trial").length;
+  const students = SCHOOLS.reduce((a, s) => a + s.students, 0);
+  return `
+  <header class="a-hello"><p class="date-line">Monday 24 November</p><h1 class="display">${hello()}, ${WHO.super.first}.</h1><p class="lede">${SCHOOLS.length} schools and ${fmt(students)} students on Brillanda. Three schools asked for a trial this week, and one has been suspended for 12 days.</p></header>
+  <dl class="a-stats"><div><dt>Active schools</dt><dd>${num(active)}</dd></div><div><dt>On trial</dt><dd>${num(trial)}</dd></div><div><dt>Students</dt><dd>${num(students)}</dd></div><div><dt>Signed in today</dt><dd>${num(1284)}</dd></div></dl>
+  <div class="a-cols">
+    <section><h2 class="h2">Trial requests</h2><ul class="a-list">${TRIALS.map((t) => `<li><span class="mark accent"></span><div><b>${t.n}, ${t.c}</b><p>${t.who}. About ${t.students} students. ${t.when}.</p></div><div class="acts">${morph("Create school", "Created", `${t.n} created. Invite sent to the admin.`)}</div></li>`).join("")}
+      <li><span class="mark bad"></span><div><b>Hilltop Secondary has been suspended for 12 days</b><p>Payment overdue. Staff and parents can't sign in.</p></div><div class="acts"><button class="btn ghost sm" data-toast="In the app this opens Hilltop Secondary">Review</button></div></li></ul></section>
+    <section><h2 class="h2">Activity</h2><ul class="feed">${ACTIVITY.map(([t, a]) => `<li><span>${t}</span>${esc(a)}</li>`).join("")}</ul></section>
+  </div>
+  <section class="a-table"><h2 class="h2">Schools</h2>
+    ${SCHOOLS.map((s, i) => `<div class="a-school"><div><b>${esc(s.n)}</b><span class="c">${s.c}</span></div><div>${chip(s.st)}</div><div class="tab hide-sm">${s.students}</div><div class="hide-sm">${s.st === "suspended" ? '<span class="c" style="color:var(--text-3);font-size:13px">No access</span>' : soak(s.pct, i * 0.06)}</div><div class="r hide-sm">${s.last}</div></div>`).join("")}
+  </section>`;
+}
+
+/* ============================================================
+   Draft B: Constellation
+   ============================================================ */
+const grain = `<svg class="grain" width="100%" height="100%" aria-hidden="true"><filter id="gr"><feTurbulence type="fractalNoise" baseFrequency=".9" numOctaves="2" stitchTiles="stitch"/><feColorMatrix values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 .9 0"/></filter><rect width="100%" height="100%" filter="url(#gr)"/></svg>`;
+
+function shapePath(g, cx, cy, s) {
+  if (g === "core") return `<rect x="${cx - s}" y="${cy - s}" width="${2 * s}" height="${2 * s}" rx="3" CLS/>`;
+  if (g === "prac") return `<circle cx="${cx}" cy="${cy}" r="${s * 1.1}" CLS/>`;
+  const d = s * 1.35;
+  return `<path d="M${cx} ${cy - d} L${cx + d} ${cy} L${cx} ${cy + d} L${cx - d} ${cy} Z" CLS/>`;
+}
+
+function bAdmin() {
+  const sc = buildSchool(state.moment);
+  const s = adminStats(sc, state.moment);
+  const W = 900, x0 = 92, y0 = 44, cw = (W - x0 - 20) / 9, rh = 40, S = 9;
+  const H = y0 + rh * 12 + 8;
+  const cx = (si) => x0 + cw * si + cw / 2;
+  const cy = (ai) => y0 + rh * ai + rh / 2;
+  let links = "", marks = "", defs = "";
+  sc.cells.forEach((row, ai) => row.forEach((c, si) => {
+    if (si < 8 && isDone(c) && isDone(row[si + 1])) links += `<line class="link draw" pathLength="1" x1="${cx(si)}" y1="${cy(ai)}" x2="${cx(si + 1)}" y2="${cy(ai)}" style="--d:${0.5 + (ai + si) * 0.02}s"/>`;
+    if (ai < 11 && isDone(c) && isDone(sc.cells[ai + 1][si])) links += `<line class="link v draw" pathLength="1" x1="${cx(si)}" y1="${cy(ai)}" x2="${cx(si)}" y2="${cy(ai + 1)}" style="--d:${0.6 + (ai + si) * 0.02}s"/>`;
+  }));
+  sc.cells.forEach((row, ai) => row.forEach((c, si) => {
+    const X = cx(si), Y = cy(ai), g = c.sub.g;
+    const status = c.st === "progress" && c.pct === 100 ? "all scores in, not yet marked complete" : c.st === "progress" ? `${c.pct}% entered` : c.st === "none" ? "not started" : c.st;
+    let fill = "";
+    if (isDone(c)) fill = shapePath(g, X, Y, S).replace("CLS", 'class="fill"');
+    else if (c.st === "progress") {
+      const id = `cl${ai}_${si}`; const top = Y + S * 1.4 - (2.8 * S * c.pct) / 100;
+      defs += `<clipPath id="${id}"><rect x="${X - 20}" y="${top}" width="40" height="${Y + 20 - top}"/></clipPath>`;
+      fill = shapePath(g, X, Y, S).replace("CLS", `class="fill" clip-path="url(#${id})"`);
+    }
+    const lock = c.st === "locked" ? `<circle class="lock" cx="${X}" cy="${Y}" r="${S + 6}"/>` : "";
+    const unlock = c.unlock ? `<circle cx="${X + S + 3}" cy="${Y - S - 3}" r="3.5" fill="var(--bad)"/>` : "";
+    marks += `<g class="m ${isDone(c) ? "done" : ""}" tabindex="0" role="button" aria-label="${c.arm} ${c.sub.n}: ${status}" data-tip="<b>${c.arm} ${esc(c.sub.n)}</b><br>${status}<br>${esc(c.sub.t)}" ${cellSheet(c)}>
+      <g class="pop" style="--d:${(ai * 9 + si) * 0.006}s"><rect class="hit" x="${X - cw / 2}" y="${Y - rh / 2}" width="${cw}" height="${rh}"/>${fill}${shapePath(g, X, Y, S).replace("CLS", 'class="out"')}${lock}${unlock}</g></g>`;
+  }));
+  const labels = SUBJECTS.map((sub, si) => `<text x="${cx(si)}" y="22" text-anchor="middle">${sub.s}</text>`).join("") + ARMS.map((a, ai) => `<text class="row-l" x="0" y="${cy(ai) + 4}">${a}</text>`).join("");
+  const lg = (g) => `<svg viewBox="-12 -12 24 24">${shapePath(g, 0, 0, 7).replace("CLS", 'fill="var(--accent)"')}</svg>`;
+  const lf = (k) => `<svg viewBox="-12 -12 24 24">${k === "none" ? '<circle r="7" fill="none" stroke="var(--canvas-muted)" stroke-width="1.4"/>' : k === "half" ? '<clipPath id="lgh"><rect x="-12" y="0" width="24" height="12"/></clipPath><circle r="7" fill="var(--accent)" clip-path="url(#lgh)"/><circle r="7" fill="none" stroke="var(--canvas-muted)" stroke-width="1.4"/>' : k === "lock" ? '<circle r="7" fill="var(--accent)"/><circle r="11" fill="none" stroke="var(--canvas-text)" stroke-width="1.2"/>' : '<circle r="7" fill="var(--accent)"/>'}</svg>`;
+  const unlockList = s.unlocks.length ? s.unlocks.map((c) => `<li ${cellSheet(c)} style="cursor:pointer"><b>${c.arm} ${c.sub.s}</b><p>${esc(c.sub.t)}: “${esc(c.unlock)}”</p></li>`).join("") : `<li><p>No requests. Teachers can ask to reopen a sheet after marking it complete.</p></li>`;
+  return `
+  <section class="canvas">${grain}
+    <div class="b-head">
+      <div><p class="date-line" style="color:var(--canvas-muted)">${dateLine(state.moment)}</p>
+        <div class="b-big" style="margin-top:10px">${num(s.done)}<small>of 108 subjects in</small></div>
+        <p class="b-cap">${s.day1 ? `Every mark is one subject in one arm. They're all empty today, and they fill in as teachers mark sheets complete.` : `Every mark is one subject in one arm. Complete neighbours join up, so a finished class reads as an unbroken line. <b>${s.worst.a}</b> has the most gaps.`}</p></div>
+      <div class="b-legend" aria-label="Legend">
+        <span>${lg("core")}Core</span><span>${lf("none")}Not started</span>
+        <span>${lg("prac")}Practical</span><span>${lf("half")}In progress</span>
+        <span>${lg("arts")}Arts</span><span>${lf("full")}Complete</span>
+        <span><svg viewBox="-12 -12 24 24"><circle r="4" fill="var(--bad)"/></svg>Reopen request</span><span>${lf("lock")}Locked</span>
+      </div>
+    </div>
+    <div class="b-scroll"><svg class="b-svg" viewBox="0 0 ${W} ${H}" role="group" aria-label="Score entry for every arm and subject"><defs>${defs}</defs>${labels}${links}${marks}</svg></div>
+  </section>
+  <div class="b-under">
+    <section><h2 class="h2">Reopen requests</h2><ul>${unlockList}</ul></section>
+    <section><h2 class="h2">Ready to publish</h2><ul>${s.ready.length ? s.ready.map((a) => `<li><b>${a}</b><p>All 9 subjects complete, ${sc.sizes[ARMS.indexOf(a)]} report cards.</p><div class="acts">${morph("Publish", "Published", `${a} results published. Parents are being emailed.`)}</div></li>`).join("") : `<li><p>No class is complete yet. A class lands here the moment its last subject is marked complete.</p></li>`}</ul></section>
+    <section><h2 class="h2">Behind</h2><ul>${s.behind.slice(0, 4).map((b) => `<li><b>${b.t}</b><p>${plural(b.cs.length, "sheet")} not started or under half done</p></li>`).join("")}</ul></section>
+  </div>
+  <div style="margin-top:36px">${soonRow()}</div>`;
+}
+
+function ring(t, i) {
+  const R = 78, C = 100;
+  const dots = Array.from({ length: t.n }, (_, k) => {
+    const a = (k / t.n) * Math.PI * 2 - Math.PI / 2;
+    return `<circle class="${k < t.done ? "dot-on pop" : "dot-off"}" style="--d:${0.1 + i * 0.12 + k * 0.012}s" cx="${(C + R * Math.cos(a)).toFixed(1)}" cy="${(C + R * Math.sin(a)).toFixed(1)}" r="4.6"/>`;
+  }).join("");
+  const outer = t.st === "locked" ? `<circle cx="100" cy="100" r="94" fill="none" stroke="var(--canvas-text)" stroke-width="1.2"/>` : t.st === "complete" ? `<circle cx="100" cy="100" r="94" fill="none" stroke="var(--accent)" stroke-width="1.2"/>` : "";
+  return `<svg viewBox="0 0 200 200" aria-hidden="true">${outer}${dots}<text x="100" y="104" text-anchor="middle" font-size="34" font-weight="500">${t.done}</text><text x="100" y="128" text-anchor="middle" font-size="13" style="fill:var(--canvas-muted);font-family:var(--body)">of ${t.n}</text></svg>`;
+}
+
+function teacherSheet(t) {
+  return sheet(`t:${t.key}`, `
+    <div class="sheet-head"><div><h2>${t.arm} ${t.subject}</h2><p class="sub">${t.done} of ${t.n} students have every score</p></div><button class="icon-btn" data-close aria-label="Close">${icon("close")}</button></div>
+    <div>${chip(t.st)}</div>
+    ${t.done ? `<div><h3 class="h2" style="margin-bottom:4px">Grades so far</h3>${distChart(t.dist, t.arm)}</div><dl><dt>Class average so far</dt><dd class="tab">${fmt(t.avg, 1)}</dd></dl>` : `<p class="sub">No scores yet. Grades appear here as you enter them.</p>`}
+    <div class="acts"><button class="btn" data-toast="In the app this opens the score sheet">Open score sheet</button></div>`);
+}
+
+function bTeacher() {
+  const T = buildTeacher(buildSchool(state.moment), state.moment);
+  const fin = T.filter((t) => t.st === "complete" || t.st === "locked").length;
+  const total = T.reduce((a, t) => a + t.n, 0), done = T.reduce((a, t) => a + t.done, 0);
+  const cont = T.find((t) => t.st === "progress");
+  return `
+  <section class="canvas">${grain}
+    <div class="b-head"><div><p class="date-line" style="color:var(--canvas-muted)">${dateLine(state.moment)}</p>
+      <div class="b-big" style="margin-top:10px">${num(done)}<small>of ${total} students scored</small></div>
+      <p class="b-cap">${state.moment === "day1" ? `${hello()}, ${WHO.teacher.first}. Each ring is a class and each dot a student. They light up as you enter scores.` : `${hello()}, ${WHO.teacher.first}. You've finished ${fin} of 4 classes. Each dot is a student with every score entered.`}</p></div></div>
+    <div class="b-rings">${T.map((t, i) => `<div><button class="b-ring" type="button" ${teacherSheet(t)} aria-label="${t.arm} ${t.subject}, ${t.done} of ${t.n}">${ring(t, i)}<b>${t.arm}</b><span>${t.subject}</span></button><div class="b-ring-act">${t.st === "ready" ? morph("Mark complete", "Complete", `${t.arm} ${t.subject} marked complete`, `data-mark="${t.key}"`) : `<span style="font-size:12.5px;color:var(--canvas-muted)">${{ none: "Not started", progress: "In progress", complete: "Complete", locked: "Locked by admin" }[t.st]}</span>`}</div></div>`).join("")}</div>
+  </section>
+  ${cont ? `<div class="a-continue" style="margin-top:24px"><div><small>Pick up where you left off</small><h2>${cont.arm} ${cont.subject}</h2><p>${cont.n - cont.done} students left. Next up: ${cont.next}.</p></div><button class="btn" data-toast="In the app this opens the score sheet">Continue entering scores</button></div>` : ""}`;
+}
+
+function emblem(ch) {
+  const C = 200, r0 = 58, R = 168, n = SUBJECTS.length, step = (Math.PI * 2) / n, gap = 0.1;
+  const pol = (a, r) => [(C + r * Math.cos(a)).toFixed(1), (C + r * Math.sin(a)).toFixed(1)];
+  const petals = SUBJECTS.map((s, i) => {
+    const v = ch.scores[i], r = r0 + ((R - r0) * v) / 100;
+    const a0 = i * step - Math.PI / 2 + gap / 2, a1 = (i + 1) * step - Math.PI / 2 - gap / 2;
+    const [x0, y0] = pol(a0, r0), [x1, y1] = pol(a0, r), [x2, y2] = pol(a1, r), [x3, y3] = pol(a1, r0);
+    const [lx, ly] = pol((a0 + a1) / 2, R + 16);
+    const am = (a0 + a1) / 2; const anchor = Math.cos(am) > 0.3 ? "start" : Math.cos(am) < -0.3 ? "end" : "middle";
+    return `<path class="petal" style="--d:${0.1 + i * 0.05}s" tabindex="0" d="M${x0} ${y0} L${x1} ${y1} A${r} ${r} 0 0 1 ${x2} ${y2} L${x3} ${y3} A${r0} ${r0} 0 0 0 ${x0} ${y0} Z" aria-label="${s.n}: ${v}, grade ${GRADE(v)}" data-tip="<b>${s.n}</b><br>${v}, grade ${GRADE(v)}"/><text x="${lx}" y="${ly}" text-anchor="${anchor}" dominant-baseline="middle">${s.s} ${v}</text>`;
+  }).join("");
+  const ringAt = (v) => r0 + ((R - r0) * v) / 100;
+  return `<svg class="b-emblem" viewBox="-40 -10 480 420" role="img" aria-label="${ch.first}'s result emblem">
+    <circle class="ring" cx="200" cy="200" r="${ringAt(50)}"/><circle class="ring" cx="200" cy="200" r="${ringAt(70)}"/><circle class="ring" cx="200" cy="200" r="${R}"/>
+    ${petals}
+    <text class="center-n" x="200" y="206" text-anchor="middle">${fmt(ch.avg, 1)}</text><text x="200" y="228" text-anchor="middle">average</text>
+  </svg>`;
+}
+
+function bParent() {
+  const ch = CHILDREN[state.child];
+  return `
+  <section class="canvas">${grain}
+    <div class="b-parent">
+      ${emblem(ch)}
+      <div>
+        <div class="b-kids" role="group" aria-label="Child">${CHILDREN.map((c, i) => `<button class="child-btn" type="button" data-child="${i}" aria-pressed="${i === state.child}"><span class="avatar">${c.first[0]}${c.last[0]}</span>${c.first} <small>${c.now}</small></button>`).join("")}</div>
+        <p class="date-line" style="color:var(--canvas-muted);margin-top:24px">${ch.term}, ${ch.then}</p>
+        <div class="b-big" style="margin-top:8px">${ord(ch.pos)}<small>of ${ch.of}</small></div>
+        <p class="b-cap">${ch.first}'s term as one shape. Each petal is a subject; the longer it reaches, the higher the score. The dotted rings mark 50 and 70.</p>
+        <div class="a-actions"><button class="btn on-canvas" data-toast="In the app this downloads the PDF report card">${icon("download")}Report card</button><button class="btn on-canvas ghost" data-toast="In the app this saves the emblem as an image to share">Save emblem</button></div>
+      </div>
+    </div>
+  </section>
+  <div class="notice">${icon("clock")}<p>First term results aren't out yet. You'll get an email when Greenfield College publishes them.</p></div>
+  <div class="a-cols" style="margin-top:32px">
+    <section><h2 class="h2">Subjects</h2>${SUBJECTS.map((s, i) => `<div class="subj"><span class="n">${s.n}</span>${soak(ch.scores[i] / 100, i * 0.05, "accent")}<span class="v tab">${ch.scores[i]}</span>${grade(ch.scores[i])}</div>`).join("")}</section>
+    <section><h2 class="h2">Average by term</h2>${trendChart(ch)}<div class="remark"><p>“${esc(ch.remark)}”</p><small>${esc(ch.by)}</small></div></section>
+  </div>`;
+}
+
+function bSuper() {
+  const students = SCHOOLS.reduce((a, s) => a + s.students, 0);
+  const sch = SCHOOLS.map((s, i) => {
+    const r = Math.sqrt(s.students) * 1.9, D = r * 2 + 8, c = D / 2;
+    const id = `sc${i}`, top = c + r - 2 * r * s.pct;
+    const ring = s.st === "trial" ? `stroke-dasharray="4 4" stroke="var(--accent)"` : s.st === "suspended" ? `stroke="var(--canvas-muted)"` : `stroke="var(--accent)"`;
+    const shape = `<svg width="${D}" height="${D}" viewBox="0 0 ${D} ${D}" aria-hidden="true"><clipPath id="${id}"><rect x="0" y="${top}" width="${D}" height="${D}"/></clipPath>
+      ${s.st !== "suspended" ? `<circle cx="${c}" cy="${c}" r="${r}" fill="var(--accent)" clip-path="url(#${id})" class="pop" style="--d:${i * 0.07}s"/>` : `<line x1="${c - r * 0.7}" y1="${c + r * 0.7}" x2="${c + r * 0.7}" y2="${c - r * 0.7}" stroke="var(--canvas-muted)" stroke-width="1.4"/>`}
+      <circle cx="${c}" cy="${c}" r="${r}" fill="none" stroke-width="1.4" ${ring}/></svg>`;
+    return `<button class="b-school" type="button" data-tip="<b>${esc(s.n)}</b><br>${s.students} students${s.st === "suspended" ? "<br>Suspended" : `<br>${Math.round(s.pct * 100)}% of scores in`}" ${sheet(`s:${i}`, `
+      <div class="sheet-head"><div><h2>${esc(s.n)}</h2><p class="sub">${s.c}</p></div><button class="icon-btn" data-close aria-label="Close">${icon("close")}</button></div>
+      <div>${chip(s.st)}</div>
+      <dl><dt>Students</dt><dd class="tab">${s.students}</dd><dt>Scores in this term</dt><dd class="tab">${s.st === "suspended" ? "No access" : Math.round(s.pct * 100) + "%"}</dd>${s.st === "trial" ? `<dt>Trial</dt><dd>Day ${s.day} of 30</dd>` : ""}<dt>Last active</dt><dd>${s.last}</dd></dl>
+      <div class="acts">${s.st === "suspended" ? morph("Restore access", "Restored", `${s.n} restored`) : s.st === "trial" ? morph("Convert to paid", "Converted", `${s.n} moved to a paid plan`) : `<button class="btn ghost sm" data-toast="In the app this opens the school">Open school</button>`}</div>`)}>${shape}<b>${esc(s.n)}</b><span>${s.c}</span></button>`;
+  }).join("");
+  return `
+  <section class="canvas">${grain}
+    <div class="b-head"><div><p class="date-line" style="color:var(--canvas-muted)">Monday 24 November</p>
+      <div class="b-big" style="margin-top:10px">${num(students)}<small>students in ${SCHOOLS.length} schools</small></div>
+      <p class="b-cap">Each circle is a school, sized by students and filled by how much of this term's scores are in. A dashed ring is a trial; a struck-through one is suspended.</p></div></div>
+    <div class="b-schools">${sch}</div>
+  </section>
+  <div class="b-under">
+    <section><h2 class="h2">Trial requests</h2><ul>${TRIALS.map((t) => `<li><b>${t.n}, ${t.c}</b><p>${t.who}. About ${t.students} students. ${t.when}.</p><div class="acts">${morph("Create school", "Created", `${t.n} created. Invite sent to the admin.`)}</div></li>`).join("")}</ul></section>
+    <section><h2 class="h2">Activity</h2><ul class="feed">${ACTIVITY.map(([t, a]) => `<li><span>${t}</span>${esc(a)}</li>`).join("")}</ul></section>
+    <section><h2 class="h2">Today</h2><ul><li><b>${fmt(1284)} people signed in</b><p>71% teachers, 22% parents, 7% admins</p></li><li><b>Hilltop Secondary suspended 12 days</b><p>Payment overdue</p></li></ul></section>
+  </div>`;
+}
+
+/* ============================================================
+   Draft C: Term spine
+   ============================================================ */
+function spineHTML(stages, current, id) {
+  return `<div class="spine-wrap"><div class="spine" data-spine="${id}" data-current="${current}" style="--n:${stages.length}"><span class="pill" aria-hidden="true"></span>
+    ${stages.map((s, i) => `<button type="button" data-stage="${i}" class="${i < current ? "past" : ""}" ${i === current ? 'aria-current="step"' : ""}><span class="k">${i < current ? icon("check") : i + 1}</span>${s.k}${s.sub ? `<span class="sub">${s.sub}</span>` : ""}</button>`).join("")}
+  </div></div>`;
+}
+function block(kind, frac) {
+  frac = Math.max(0, Math.min(1, frac));
+  if (kind === "quarter") {
+    const a = (Math.PI / 2) * frac, x = 64 * Math.sin(a), y = 64 - 64 * Math.cos(a);
+    return `<svg class="blk" viewBox="0 0 64 64" aria-hidden="true"><path class="bg" d="M0 64 V0 A64 64 0 0 1 64 64 Z"/>${frac > 0 ? `<path class="fg" d="M0 64 V0 A64 64 0 0 1 ${x.toFixed(1)} ${y.toFixed(1)} Z"/>` : ""}</svg>`;
+  }
+  if (kind === "half") {
+    const id = "hb" + Math.random().toString(36).slice(2, 8);
+    const arch = "M0 64 V32 A32 32 0 0 1 64 32 V64 Z";
+    return `<svg class="blk" viewBox="0 0 64 64" aria-hidden="true"><clipPath id="${id}"><rect x="0" y="${64 - 64 * frac}" width="64" height="64"/></clipPath><path class="bg" d="${arch}"/><path class="fg" clip-path="url(#${id})" d="${arch}"/></svg>`;
+  }
+  if (kind === "grid") {
+    const on = Math.round(frac * 9);
+    return `<svg class="blk" viewBox="0 0 64 64" aria-hidden="true">${Array.from({ length: 9 }, (_, i) => `<rect class="${i < on ? "fg" : "bg"}" x="${(i % 3) * 22}" y="${Math.floor(i / 3) * 22}" width="20" height="20" rx="${i < on ? 10 : 4}"/>`).join("")}</svg>`;
+  }
+  const r = 26, L = 2 * Math.PI * r;
+  return `<svg class="blk" viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="${r}" fill="none" class="bg" style="fill:none;stroke:var(--sunken)" stroke-width="12"/><circle cx="32" cy="32" r="${r}" fill="none" style="stroke:var(--accent)" stroke-width="12" stroke-dasharray="${(L * frac).toFixed(1)} ${L.toFixed(1)}" transform="rotate(-90 32 32)"/></svg>`;
+}
+const card = (kind, frac, label, val, note, lead = "") => `<div class="c-card ${lead}">${block(kind, frac)}<div><dl><dt>${label}</dt><dd>${val}</dd></dl>${note ? `<p style="margin-top:6px">${note}</p>` : ""}</div></div>`;
+
+function cAdmin() {
+  const sc = buildSchool(state.moment);
+  const s = adminStats(sc, state.moment);
+  const cur = s.day1 ? 0 : 1;
+  const stages = [
+    { k: "Term opens", sub: "8 Sep", b: `Term opened on 8 September with ${s.students} students in 12 arms. The grading scale and assessments were copied from last session.` },
+    { k: "Scores in", sub: s.day1 ? "" : "now", b: s.day1 ? `No scores yet. Teachers can start entering them today; the deadline is ${DUE}.` : `${s.done} of 108 subjects are in. ${s.worst.a} is furthest behind, and ${plural(s.unlocks.length, "teacher has", "teachers have")} asked to reopen a sheet.` },
+    { k: "Review", b: "Once subjects are complete, you check totals and positions here, and can override a result if you give a reason." },
+    { k: "Publish", b: s.ready.length ? `${plural(s.ready.length, "arm is", "arms are")} ready. Publishing locks their scores and emails ${s.readyParents} parents.` : "No arm is ready yet. Publishing locks an arm's scores and emails its parents." },
+    { k: "Parents read", b: "Last term, 91% of parents opened their child's report card within a week of publishing." },
+  ];
+  state.spine = { stages, cur };
+  const heat = `<div class="heat-scroll"><div class="heat" role="group" aria-label="Score entry by arm and subject"><span></span>${SUBJECTS.map((x) => `<span class="ht">${x.s}</span>`).join("")}
+    ${sc.cells.map((row, ai) => `<span class="hl">${ARMS[ai]}</span>${row.map((c, si) => {
+      const bg = isDone(c) ? (c.st === "locked" ? "var(--text)" : "var(--accent)") : c.st === "progress" ? `color-mix(in oklab, var(--accent) ${Math.round(18 + c.pct * 0.5)}%, var(--sunken))` : "var(--sunken)";
+      const lab = c.st === "progress" && c.pct === 100 ? "all scores in" : c.st === "progress" ? `${c.pct}% entered` : c.st === "none" ? "not started" : c.st;
+      return `<button class="cell ${c.st === "locked" ? "locked" : ""}" style="background:${bg};--d:${(ai * 9 + si) * 0.004}s${c.unlock ? ";box-shadow:inset 0 0 0 2px var(--bad)" : ""}" aria-label="${c.arm} ${c.sub.n}: ${lab}" data-tip="<b>${c.arm} ${esc(c.sub.n)}</b><br>${lab}<br>${esc(c.sub.t)}" ${cellSheet(c)}></button>`; }).join("")}`).join("")}
+  </div></div>
+  <div class="heat-legend"><span><i style="background:var(--sunken)"></i>Not started</span><span><i style="background:color-mix(in oklab, var(--accent) 45%, var(--sunken))"></i>In progress</span><span><i style="background:var(--accent)"></i>Complete</span><span><i style="background:var(--text)"></i>Locked</span><span><i style="background:var(--sunken);box-shadow:inset 0 0 0 2px var(--bad)"></i>Reopen request</span></div>`;
+  const side = s.day1
+    ? `<ul class="c-list"><li><b>Check this term's grading scale</b><p>Copied from last session. Change it before the first score goes in.</p></li><li><b>${s.unlinked} students have no parent linked</b><p>Parents can't see results until they're invited.</p><div class="acts">${morph("Invite parents", "Invites sent", `Invites sent to ${s.unlinked} parents`)}</div></li></ul>`
+    : `<ul class="c-list">${s.unlocks.map((c) => `<li><b>${c.sub.t} asks to reopen ${c.arm} ${c.sub.s}</b><p>“${esc(c.unlock)}”</p><div class="acts">${morph("Reopen", "Reopened", `${c.arm} ${c.sub.n} reopened`)}<button class="btn ghost sm" data-toast="Request declined">Decline</button></div></li>`).join("")}
+       ${s.ready.map((a) => `<li><b>${a} is ready to publish</b><p>All 9 subjects complete.</p><div class="acts">${morph("Publish", "Published", `${a} results published. Parents are being emailed.`)}</div></li>`).join("")}</ul>`;
+  return `
+  ${spineHTML(stages, cur, "admin")}
+  <p class="brief" id="brief">${stages[cur].b}</p>
+  <div class="brief-meta"><span>${dateLine(state.moment)}</span><span class="sample">Sample data</span></div>
+  <div class="c-cards">
+    ${card("quarter", s.done / 108, "Subjects in", `${num(s.done)}<small>of 108</small>`, s.day1 ? "Due " + DUE : `${s.toMark} waiting to be marked complete`, "lead")}
+    ${card("grid", s.ready.length / 12, "Arms ready to publish", `${num(s.ready.length)}<small>of 12</small>`, s.ready.join(", ") || "None yet")}
+    ${card("half", s.day1 ? 0 : s.unlocks.length / 4, "Reopen requests", num(s.unlocks.length), s.unlocks.length ? "Waiting for you" : "None")}
+    ${card("ring", (s.students - s.unlinked) / s.students, "Parents linked", `${num(Math.round(((s.students - s.unlinked) / s.students) * 100))}<small>%</small>`, `${s.unlinked} students still without a parent`)}
+  </div>
+  <div class="c-split">
+    <section><h2 class="h2">Every arm, every subject <a href="#" data-toast="In the app this opens Scores">Scores</a></h2>${heat}</section>
+    <section><h2 class="h2">Needs you</h2>${side}</section>
+  </div>
+  <div style="margin-top:40px">${soonRow()}</div>`;
+}
+
+function cTeacher() {
+  const T = buildTeacher(buildSchool(state.moment), state.moment);
+  const day1 = state.moment === "day1";
+  const ready = T.find((t) => t.st === "ready");
+  const cont = T.find((t) => t.st === "progress");
+  const left = T.filter((t) => !["complete", "locked"].includes(t.st)).length;
+  const cur = day1 ? 0 : 0;
+  const stages = [
+    { k: "Enter scores", sub: day1 ? "" : "now", b: day1 ? `${hello()}, ${WHO.teacher.first}. Four classes this term, nothing entered yet. Scores are due ${DUE}.` : `${hello()}, ${WHO.teacher.first}. ${left === 1 ? "One class" : ["No classes", "One class", "Two classes", "Three classes", "Four classes"][left]} to go.${ready ? ` ${ready.arm} is ready to mark complete` : ""}${cont ? `; ${cont.arm} needs ${cont.n - cont.done} more students.` : "."}` },
+    { k: "Mark complete", b: "When every student has every score, mark the class complete. It locks your entries and tells your admin." },
+    { k: "Admin review", b: "Your admin checks totals and positions. If something's wrong after you've marked complete, ask them to reopen the sheet." },
+    { k: "Published", b: "Parents see results the moment your admin publishes. SS 2A Mathematics is already locked for publishing." },
+  ];
+  state.spine = { stages, cur };
+  const kinds = ["quarter", "grid", "half", "ring"];
+  const withData = T.find((t) => t.done === t.n && t.done) || T.find((t) => t.done) || T[0];
+  return `
+  ${spineHTML(stages, cur, "teacher")}
+  <p class="brief" id="brief">${stages[cur].b}</p>
+  <div class="brief-meta"><span>${dateLine(state.moment)}</span></div>
+  <div class="c-cards">${T.map((t, i) => `<div class="c-class"><div class="top"><div><b>${t.subject}</b><span class="s">${t.arm}</span></div>${block(kinds[i], t.done / t.n)}</div>
+    <div class="big">${num(t.done)}<small> of ${t.n} students</small></div>
+    <div class="foot">${t.st === "ready" ? morph("Mark complete", "Complete", `${t.arm} ${t.subject} marked complete`, `data-mark="${t.key}"`) : chip(t.st)}<button class="icon-btn" aria-label="Open ${t.arm} ${t.subject}" ${teacherSheet(t)}>${icon("chevron")}</button></div></div>`).join("")}</div>
+  ${withData.done ? `<section class="c-dist"><h2 class="h2">Grades so far, ${withData.arm} ${withData.subject}</h2>${distChart(withData.dist, withData.arm)}</section>` : `<section class="c-dist"><h2 class="h2">Grades</h2><p class="lede" style="font-size:15px;margin-top:0">A grade chart appears here once you've entered your first scores.</p></section>`}`;
+}
+
+function cParent() {
+  const ch = CHILDREN[state.child];
+  const cur = state.moment === "day1" ? 0 : 1;
+  const diff = ch.trend[2][1] - ch.trend[1][1];
+  const best = ch.scores.indexOf(Math.max(...ch.scores)), worst = ch.scores.indexOf(Math.min(...ch.scores));
+  const stages = [
+    { k: "Term opens", sub: "8 Sep", b: `First term started on 8 September. ${ch.first} is in ${ch.now} this year.` },
+    { k: "Exams", sub: cur === 1 ? "now" : "", b: `First term exams are on. Last term, ${ch.first} came ${ord(ch.pos)} of ${ch.of} with an average of ${fmt(ch.avg, 1)}, ${diff >= 0 ? "up" : "down"} ${fmt(Math.abs(diff), 1)} on the term before.` },
+    { k: "Results out", b: "Greenfield College publishes results after exams are marked. You'll get an email the same day." },
+    { k: "Report card", b: "The report card has every subject, the position in class and the teachers' remarks, ready to download." },
+  ];
+  if (state.moment === "day1") stages[0].b = `A new term has started. Last term, ${ch.first} came ${ord(ch.pos)} of ${ch.of} with an average of ${fmt(ch.avg, 1)}.`;
+  state.spine = { stages, cur };
+  return `
+  <div class="a-child" role="group" aria-label="Child">${CHILDREN.map((c, i) => `<button class="child-btn" type="button" data-child="${i}" aria-pressed="${i === state.child}"><span class="avatar">${c.first[0]}${c.last[0]}</span>${c.first} <small>${c.now}</small></button>`).join("")}</div>
+  <div style="margin-top:22px">${spineHTML(stages, cur, "parent")}</div>
+  <p class="brief" id="brief">${stages[cur].b}</p>
+  <div class="c-cards">
+    ${card("quarter", ch.avg / 100, "Average, third term", num(ch.avg, 1), `${diff >= 0 ? "Up" : "Down"} ${fmt(Math.abs(diff), 1)} on second term`, "lead")}
+    ${card("grid", 1 - (ch.pos - 1) / ch.of, `Position in ${ch.then}`, `${num(ch.pos)}<small>of ${ch.of}</small>`, "")}
+    ${card("half", ch.scores[best] / 100, "Best subject", num(ch.scores[best]), SUBJECTS[best].n)}
+    ${card("ring", ch.scores[worst] / 100, "Needs attention", num(ch.scores[worst]), SUBJECTS[worst].n)}
+  </div>
+  <section style="margin-top:36px"><h2 class="h2">Every subject, third term <a href="#" data-toast="In the app this downloads the PDF report card">Download report card</a></h2>
+    <div class="c-subjects">${SUBJECTS.map((s, i) => `<div class="c-subj" data-tip="<b>${s.n}</b><br>${ch.scores[i]}, grade ${GRADE(ch.scores[i])}" tabindex="0"><div class="col" style="height:${ch.scores[i] * 0.7}px;--d:${i * 0.05}s"></div><b class="tab">${ch.scores[i]}</b><span>${s.s}</span>${grade(ch.scores[i])}</div>`).join("")}</div>
+  </section>
+  <div class="a-cols"><section><h2 class="h2">Average by term</h2>${trendChart(ch)}</section><section><h2 class="h2">From school</h2><div class="remark" style="margin-top:0"><p>“${esc(ch.remark)}”</p><small>${esc(ch.by)}</small></div></section></div>`;
+}
+
+function cSuper() {
+  const stages = [
+    { k: "Requested", sub: "3", b: "Three schools asked for a trial this week. Unity Heights School in Asaba is the largest, at about 412 students." },
+    { k: "Call booked", sub: "1", b: "One call is booked: Graceland Schools, Thursday at 11:00." },
+    { k: "Set up", sub: "2", b: "Two schools are on trial. St. Anne's Girls' School is on day 23 of 30 and already has 64% of scores in." },
+    { k: "First results out", sub: "5", b: "Five schools have published results through Brillanda. Hilltop Secondary has been suspended for 12 days." },
+  ];
+  state.spine = { stages, cur: 0 };
+  const students = SCHOOLS.reduce((a, s) => a + s.students, 0);
+  return `
+  ${spineHTML(stages, 0, "super")}
+  <p class="brief" id="brief">${stages[0].b}</p>
+  <div class="brief-meta"><span>Monday 24 November</span><span class="sample">Sample data</span></div>
+  <div class="c-cards">
+    ${card("grid", 6 / 9, "Active schools", `${num(SCHOOLS.filter((s) => s.st === "active").length)}<small>of ${SCHOOLS.length}</small>`, "2 on trial, 1 suspended", "lead")}
+    ${card("quarter", 0.62, "Students", num(students), "Across every school")}
+    ${card("half", 1284 / 2400, "Signed in today", num(1284), "71% teachers")}
+    ${card("ring", 0.91, "Report cards read", `${num(91)}<small>%</small>`, "Within a week, last term")}
+  </div>
+  <div class="c-split">
+    <section class="c-schools" style="margin-top:0"><h2 class="h2">Schools</h2>${SCHOOLS.map((s, i) => `<div class="a-school"><div><b>${esc(s.n)}</b><span class="c">${s.c}</span></div><div>${chip(s.st)}</div><div class="tab hide-sm">${s.students}</div><div class="hide-sm">${s.st === "suspended" ? '<span style="color:var(--text-3);font-size:13px">No access</span>' : soak(s.pct, i * 0.06, "accent")}</div><div class="r hide-sm">${s.last}</div></div>`).join("")}</section>
+    <section><h2 class="h2">Trial requests</h2><ul class="c-list">${TRIALS.map((t) => `<li><b>${t.n}, ${t.c}</b><p>${t.who}. About ${t.students} students. ${t.when}.</p><div class="acts">${morph("Create school", "Created", `${t.n} created. Invite sent to the admin.`)}</div></li>`).join("")}</ul></section>
+  </div>`;
+}
+
+/* ---------- Notes per draft ---------- */
+const NOTES = {
+  a: [["What it bets on", "Craft is the wow: big type, generous spacing, one raised surface per screen, and motion only when you do something. It's closest to what's already built, so it's the fastest to ship."], ["Best for", "Teachers and admins who open it every day and want the next thing to do, not a picture."], ["Watch out for", "Next to the cinematic site it can read as plain. Its character lives in small details, so every detail has to be exact."]],
+  b: [["What it bets on", "The term becomes one picture. An admin sees all 108 subjects at once and spots the empty patch before reading a word; a parent gets an emblem of their child's term they'd want to keep."], ["Best for", "Admins in score-entry weeks. Parents, for whom the emblem is something to save and share."], ["Watch out for", "Shapes need their legend the first time. Everything the picture says also exists as text: each mark has a label for screen readers and a tooltip."]],
+  c: [["What it bets on", "Brillanda's whole job is one cycle: enter, check, publish, read. The spine says where you are in it, and the sentence under it says what that means today. Click any stage to see what it holds."], ["Best for", "Everyone. The same component carries a parent on a phone and the team's trial funnel."], ["Watch out for", "It lives on good sentences. The briefing is only as good as the rules that write it; they'd live in the app, built from the same data as the cards."]],
+};
+
+/* ---------- Render ---------- */
+const VIEWS = { a: { admin: aAdmin, teacher: aTeacher, parent: aParent, super: aSuper }, b: { admin: bAdmin, teacher: bTeacher, parent: bParent, super: bSuper }, c: { admin: cAdmin, teacher: cTeacher, parent: cParent, super: cSuper } };
+
+function applyTheme() {
+  const root = document.documentElement;
+  if (state.theme === "system") root.removeAttribute("data-theme"); else root.setAttribute("data-theme", state.theme);
+}
+
+function render() {
+  state.sheets = {};
+  state.spine = null;
+  const body = VIEWS[state.draft][state.role]();
+  const shell = state.draft === "c" ? barShell : railShell;
+  const app = $("#app");
+  app.className = "app d-" + state.draft;
+  app.innerHTML = shell(state.role, body);
+  $("#frame").classList.toggle("phone", state.device === "phone");
+  $$("[data-set]").forEach((b) => b.setAttribute("aria-pressed", String(state[b.dataset.set] === b.dataset.val)));
+  $("#notes").innerHTML = NOTES[state.draft].map(([h, p]) => `<div><h3>${h}</h3><p>${p}</p></div>`).join("");
+  closeAll();
+  hydrate();
+}
+
+function hydrate() {
+  $$("[data-count]").forEach((el) => {
+    const to = parseFloat(el.dataset.count), d = +el.dataset.dec || 0;
+    if (RM.matches || !to) { el.textContent = fmt(to, d); return; }
+    const t0 = performance.now(), dur = 900;
+    const tick = (t) => { const p = Math.min(1, (t - t0) / dur), e = 1 - Math.pow(1 - p, 3); el.textContent = fmt(to * e, d); if (p < 1) requestAnimationFrame(tick); };
+    el.textContent = fmt(0, d); requestAnimationFrame(tick);
+  });
+  const sp = $("[data-spine]");
+  if (sp && state.spine) initSpine(sp);
+}
+
+/* Liquid spine: the pill's two edges ride different springs, so the leading edge stretches ahead. */
+function initSpine(el) {
+  const pill = $(".pill", el), btns = $$("[data-stage]", el);
+  let L = 0, R = 0, vL = 0, vR = 0, tL = 0, tR = 0, kL = 260, kR = 260, raf = 0, sel = +el.dataset.current;
+  const target = (i) => { const b = btns[i]; return [b.offsetLeft, b.offsetLeft + b.offsetWidth]; };
+  const draw = () => { pill.style.transform = `translateX(${L}px)`; pill.style.width = `${Math.max(0, R - L)}px`; };
+  const mark = () => btns.forEach((b, i) => b.classList.toggle("sel", i === sel));
+  function go(i, instant) {
+    const [nl, nr] = target(i);
+    const right = nl > tL;
+    tL = nl; tR = nr;
+    kL = right ? 150 : 340; kR = right ? 340 : 150;
+    sel = i; mark();
+    if (instant || RM.matches) { L = tL; R = tR; vL = vR = 0; draw(); return; }
+    cancelAnimationFrame(raf);
+    let last = performance.now();
+    const step = (now) => {
+      let dt = Math.min(0.032, (now - last) / 1000); last = now;
+      const sub = 4; dt /= sub;
+      for (let k = 0; k < sub; k++) {
+        vL += (-kL * (L - tL) - 2 * 0.82 * Math.sqrt(kL) * vL) * dt; L += vL * dt;
+        vR += (-kR * (R - tR) - 2 * 0.82 * Math.sqrt(kR) * vR) * dt; R += vR * dt;
+      }
+      draw();
+      if (Math.abs(L - tL) + Math.abs(R - tR) + Math.abs(vL) + Math.abs(vR) > 0.3) raf = requestAnimationFrame(step); else { L = tL; R = tR; draw(); }
+    };
+    raf = requestAnimationFrame(step);
+  }
+  requestAnimationFrame(() => { [tL, tR] = target(sel); go(sel, true); });
+  new ResizeObserver(() => go(sel, true)).observe(el);
+  el.addEventListener("click", (e) => {
+    const b = e.target.closest("[data-stage]"); if (!b) return;
+    const i = +b.dataset.stage; if (i === sel) return;
+    go(i);
+    const brief = $("#brief"); if (!brief) return;
+    brief.classList.add("out");
+    setTimeout(() => { brief.textContent = state.spine.stages[i].b; brief.classList.remove("out"); }, RM.matches ? 0 : 170);
+  });
+}
+
+/* ---------- Morph button ---------- */
+function runMorph(btn) {
+  if (btn.classList.contains("busy") || btn.classList.contains("done")) return;
+  const lbl = $(".lbl", btn);
+  btn.style.width = btn.offsetWidth + "px";
+  void btn.offsetWidth;
+  btn.classList.add("busy");
+  btn.style.width = "34px"; btn.style.borderRadius = "17px";
+  setTimeout(() => {
+    btn.classList.remove("busy");
+    btn.classList.add("done");
+    lbl.innerHTML = icon("check") + esc(btn.dataset.done);
+    btn.style.width = "auto";
+    const w = btn.offsetWidth;
+    btn.style.width = "34px"; void btn.offsetWidth;
+    btn.style.width = w + "px"; btn.style.borderRadius = "10px";
+    btn.setAttribute("aria-disabled", "true");
+    if (btn.dataset.mark) state.marked.add(btn.dataset.mark);
+    toast(btn.dataset.msg);
+  }, RM.matches ? 200 : 900);
+}
+
+let toastT;
+function toast(msg) {
+  const t = $("#toast"); $("#toast-t").textContent = msg;
+  t.classList.remove("show"); void t.offsetWidth; t.classList.add("show");
+  clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove("show"), 2800);
+}
+
+/* ---------- Sheet ---------- */
+function openSheet(key) {
+  const html = state.sheets[key]; if (!html) return;
+  $("#sheet-in").innerHTML = html;
+  $("#sheet").classList.add("show"); $("#sheet").setAttribute("aria-hidden", "false");
+  $("#scrim").classList.add("show");
+  hideTip();
+  setTimeout(() => $("#sheet [data-close]")?.focus(), 50);
+}
+function closeAll() {
+  $("#sheet").classList.remove("show"); $("#sheet").setAttribute("aria-hidden", "true");
+  $("#pal").classList.remove("show"); $("#pal").setAttribute("aria-hidden", "true");
+  $("#scrim").classList.remove("show");
+}
+
+/* ---------- Command palette ---------- */
+const PAL = {
+  admin: [["Jump to", "classes", "JSS 2B", "Class"], ["Jump to", "scores", "JSS 2B Mathematics", "Score sheet"], ["Jump to", "user", "Adaobi Nnaji", "SS 2B student"], ["Jump to", "settings", "Grading scale", "Settings"], ["Do", "plus", "Invite a teacher", ""], ["Do", "students", "Import students", "CSV"], ["Do", "publish", "Publish SS 3A", ""]],
+  teacher: [["Jump to", "scores", "JSS 2B Mathematics", "Continue"], ["Jump to", "user", "Ifeanyi Obi", "JSS 2B"], ["Jump to", "results", "Grades so far, JSS 2A", ""], ["Do", "check", "Mark JSS 2A Mathematics complete", ""]],
+  parent: [["Jump to", "file", "Chiamaka's report card", "Third term"], ["Jump to", "file", "Obinna's report card", "Third term"], ["Jump to", "results", "Results history", ""], ["Do", "messages", "Contact Greenfield College", "Coming soon"]],
+  super: [["Jump to", "inbox", "Unity Heights School", "Trial request"], ["Jump to", "school", "Crestview Academy", "School"], ["Jump to", "school", "Hilltop Secondary", "Suspended"], ["Do", "plus", "Create a school", ""], ["Do", "activity", "See today's activity", ""]],
+};
+let palSel = 0, palItems = [];
+function openPal() {
+  $("#pal").classList.add("show"); $("#pal").setAttribute("aria-hidden", "false"); $("#scrim").classList.add("show");
+  const q = $("#pal-q"); q.value = ""; drawPal(); setTimeout(() => q.focus(), 30);
+}
+function drawPal() {
+  const q = $("#pal-q").value.trim().toLowerCase();
+  palItems = PAL[state.role].filter((x) => !q || (x[2] + " " + x[3]).toLowerCase().includes(q));
+  palSel = Math.min(palSel, Math.max(0, palItems.length - 1));
+  if (!palItems.length) { $("#pal-list").innerHTML = `<p class="pal-empty">Nothing matches “${esc(q)}”. Try a class like JSS 2B or a student's name.</p>`; return; }
+  let group = "";
+  $("#pal-list").innerHTML = palItems.map((x, i) => { const g = x[0] !== group ? `<p>${x[0]}</p>` : ""; group = x[0]; return `${g}<button type="button" role="option" data-pal="${i}" aria-selected="${i === palSel}">${icon(x[1])}<span>${esc(x[2])}</span><small>${esc(x[3])}</small></button>`; }).join("");
+}
+function pickPal(i) { const x = palItems[i]; if (!x) return; closeAll(); toast(x[0] === "Do" ? `In the app: ${x[2]}` : `In the app this opens ${x[2]}`); }
+
+/* ---------- Tooltip ---------- */
+const tip = $("#tip");
+function showTip(el, x, y) {
+  tip.innerHTML = el.dataset.tip; tip.classList.add("show");
+  const w = tip.offsetWidth, h = tip.offsetHeight;
+  let left = x + 14, top = y - h - 12;
+  if (left + w > innerWidth - 8) left = x - w - 14;
+  if (top < 8) top = y + 18;
+  tip.style.left = left + "px"; tip.style.top = top + "px";
+}
+function hideTip() { tip.classList.remove("show"); }
+document.addEventListener("pointermove", (e) => { const el = e.target.closest?.("[data-tip]"); if (el) showTip(el, e.clientX, e.clientY); else hideTip(); });
+document.addEventListener("focusin", (e) => { const el = e.target.closest?.("[data-tip]"); if (el) { const r = el.getBoundingClientRect(); showTip(el, r.left + r.width / 2, r.top); } });
+document.addEventListener("focusout", hideTip);
+
+/* ---------- Events ---------- */
+document.addEventListener("click", (e) => {
+  const t = e.target;
+  const set = t.closest("[data-set]");
+  if (set) {
+    state[set.dataset.set] = set.dataset.val; store.set(set.dataset.set, set.dataset.val);
+    if (set.dataset.set === "theme") { applyTheme(); $$('[data-set="theme"]').forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.val === state.theme))); return; }
+    if (set.dataset.set === "moment") state.marked.clear();
+    render(); return;
+  }
+  const m = t.closest("[data-morph]"); if (m) { e.stopPropagation(); runMorph(m); return; }
+  if (t.closest("[data-close]") || t === $("#scrim")) { closeAll(); return; }
+  if (t.closest("[data-cmd]")) { openPal(); return; }
+  const p = t.closest("[data-pal]"); if (p) { pickPal(+p.dataset.pal); return; }
+  const c = t.closest("[data-child]"); if (c) { state.child = +c.dataset.child; render(); return; }
+  const s = t.closest("[data-sheet]"); if (s) { openSheet(s.dataset.sheet); return; }
+  const to = t.closest("[data-toast]"); if (to) { e.preventDefault(); toast(to.dataset.toast); return; }
+  if (t.closest('a[href="#"]')) e.preventDefault();
+});
+document.addEventListener("keydown", (e) => {
+  if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") { e.preventDefault(); openPal(); return; }
+  if (e.key === "Escape") { closeAll(); return; }
+  if ($("#pal").classList.contains("show")) {
+    if (e.key === "ArrowDown") { e.preventDefault(); palSel = Math.min(palItems.length - 1, palSel + 1); drawPal(); }
+    else if (e.key === "ArrowUp") { e.preventDefault(); palSel = Math.max(0, palSel - 1); drawPal(); }
+    else if (e.key === "Enter") { e.preventDefault(); pickPal(palSel); }
+    return;
+  }
+  if ((e.key === "Enter" || e.key === " ") && e.target.matches?.("g[data-sheet], .c-subj")) { e.preventDefault(); if (e.target.dataset.sheet) openSheet(e.target.dataset.sheet); }
+});
+$("#pal-q").addEventListener("input", () => { palSel = 0; drawPal(); });
+
+applyTheme();
+render();
+})();
+</script>

@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Brillanda</title>
+    <!-- Outfit, the app's one typeface (DECISIONS.md D-15). swap: text shows in the system face at once. -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600&display=swap" />
+    <script>
+      // Apply the saved look before first paint, so a Neutral school never flashes Pastel.
+      try { if (localStorage.getItem("brillanda:look") === "neutral") document.documentElement.dataset.theme = "neutral"; } catch {}
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

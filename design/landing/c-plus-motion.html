@@ -1,0 +1,1500 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Brillanda — End of term, without the arithmetic</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@300;400;500&family=Instrument+Sans:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F2F1EF; --surface:#FFFFFF; --sunken:#EBEAE7;
+  --rule:#DEDCD8; --rule-2:#C6C3BD;
+  --ink:#16171A; --ink-2:#5C5F66; --ink-3:#95989E;
+  --dark:#0E0F11; --dark-2:#191A1D;
+  --accent:#C8913A;
+  --success:#3F7A57; --success-bg:#EDF4F0; --success-border:#CCDFD4;
+  --warning:#A9760C; --warning-bg:#FAF3E3;
+  --danger:#B3423B; --danger-bg:#FAEBE9;
+  --e-out:cubic-bezier(.16,1,.3,1);
+  --e-io:cubic-bezier(.62,.05,.01,.99);
+  --maxw:1280px;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0E0F11; --surface:#17181B; --sunken:#1E1F23;
+  --rule:#27292D; --rule-2:#3A3D42;
+  --ink:#EFEFEE; --ink-2:#A2A5AB; --ink-3:#70737A;
+  --dark:#0A0B0C; --dark-2:#141518;
+  --accent:#D3A356;
+  --success:#7FB496; --success-bg:#19231D; --success-border:#2D4335;
+  --warning:#D2A24C; --warning-bg:#241E13;
+  --danger:#D98B85; --danger-bg:#241918;
+}}
+:root[data-theme="dark"]{
+  --bg:#0E0F11; --surface:#17181B; --sunken:#1E1F23;
+  --rule:#27292D; --rule-2:#3A3D42;
+  --ink:#EFEFEE; --ink-2:#A2A5AB; --ink-3:#70737A;
+  --dark:#0A0B0C; --dark-2:#141518;
+  --accent:#D3A356;
+  --success:#7FB496; --success-bg:#19231D; --success-border:#2D4335;
+  --warning:#D2A24C; --warning-bg:#241E13;
+  --danger:#D98B85; --danger-bg:#241918;
+}
+
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);
+  font-family:"Instrument Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+  font-size:16px;line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+body.locked{overflow:hidden}
+h1,h2,h3,h4{font-family:"Inter Tight",-apple-system,sans-serif;font-weight:400;margin:0;letter-spacing:-.035em;line-height:1.02;color:var(--ink)}
+p{margin:0}
+img,svg{max-width:100%;display:block}
+a{color:inherit;text-decoration:none}
+:focus-visible{outline:2px solid var(--ink-2);outline-offset:3px}
+.wrap{max-width:var(--maxw);margin:0 auto;padding:0 40px}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+@media(max-width:700px){.wrap{padding:0 22px}}
+
+/* ============ MOTION PRIMITIVES ============ */
+/* line mask: inner rises from below its own box */
+.lm{display:block;overflow:hidden}
+.lm > span{display:block;transform:translateY(110%);transition:transform 1.15s var(--e-out);transition-delay:var(--d,0ms)}
+.is-in .lm > span,.lm.is-in > span{transform:translateY(0)}
+
+.fu{opacity:0;transform:translateY(26px);transition:opacity .9s var(--e-out),transform .9s var(--e-out);transition-delay:var(--d,0ms)}
+.is-in .fu,.fu.is-in{opacity:1;transform:none}
+
+/* media settle: starts scaled, eases to rest */
+.media{position:relative;overflow:hidden}
+.media > .inner{position:absolute;inset:0;transform:scale(1.18);transition:transform 1.7s var(--e-out)}
+.media.is-in > .inner{transform:scale(1)}
+.media > .inner > svg,.media > .inner > img{width:100%;height:100%;object-fit:cover}
+
+/* wipe: a panel slides off to reveal */
+.wipe{position:relative;overflow:hidden}
+.wipe::after{content:"";position:absolute;inset:0;background:var(--bg);transform:translateY(0);transition:transform 1.1s var(--e-io);transition-delay:var(--d,0ms);z-index:3}
+.wipe.is-in::after{transform:translateY(-101%)}
+
+@media (prefers-reduced-motion:reduce){
+  .lm > span{transform:none!important;transition:none!important}
+  .fu{opacity:1!important;transform:none!important;transition:none!important}
+  .media > .inner{transform:none!important;transition:none!important}
+  .wipe::after{display:none}
+  html{scroll-behavior:auto}
+  #cursor{display:none!important}
+}
+
+/* ============ PRELOADER ============ */
+#pre{position:fixed;inset:0;z-index:200;background:var(--dark);display:grid;place-items:center;
+  transition:transform 1.1s var(--e-io) .15s;will-change:transform}
+#pre.done{transform:translateY(-100%)}
+.pre-in{text-align:center;color:#F2F1EF;transition:opacity .5s ease}
+#pre.done .pre-in{opacity:0}
+.pre-mark{font-family:"Inter Tight";font-weight:400;font-size:clamp(34px,6vw,64px);letter-spacing:-.05em;overflow:hidden}
+.pre-mark span{display:block;transform:translateY(110%);transition:transform 1s var(--e-out) .1s}
+#pre.ready .pre-mark span{transform:none}
+.pre-bar{width:min(300px,52vw);height:1px;background:rgba(242,241,239,.2);margin:26px auto 0;position:relative;overflow:hidden}
+.pre-bar i{position:absolute;inset:0;background:#F2F1EF;transform:scaleX(0);transform-origin:left;transition:transform .2s linear}
+.pre-num{margin-top:14px;font-size:12px;letter-spacing:.14em;color:rgba(242,241,239,.5);font-variant-numeric:tabular-nums}
+
+/* ============ CUSTOM CURSOR ============ */
+#cursor{position:fixed;top:0;left:0;width:10px;height:10px;border-radius:50%;background:var(--ink);
+  pointer-events:none;z-index:190;mix-blend-mode:difference;
+  transform:translate3d(-50%,-50%,0);transition:width .35s var(--e-out),height .35s var(--e-out),background .3s;
+  display:grid;place-items:center;font-size:10px;letter-spacing:.1em;color:transparent;overflow:hidden;background:#fff}
+#cursor.grow{width:76px;height:76px;color:#0E0F11}
+#cursor span{opacity:0;transition:opacity .25s;white-space:nowrap;font-family:"Instrument Sans";font-weight:500}
+#cursor.grow span{opacity:1}
+@media (hover:none),(max-width:900px){#cursor{display:none}}
+
+/* ============ NAV ============ */
+.nav{position:fixed;top:0;left:0;right:0;z-index:120;padding:26px 0;
+  transition:background .5s var(--e-out),padding .5s var(--e-out),box-shadow .5s;
+  opacity:0;transform:translateY(-14px);transition-property:opacity,transform,background,padding}
+.nav.up{opacity:1;transform:none;transition:opacity .9s var(--e-out) .1s,transform .9s var(--e-out) .1s,background .5s var(--e-out),padding .5s var(--e-out)}
+.nav-in{display:flex;align-items:center;gap:32px}
+.nav.stuck{background:color-mix(in srgb,var(--bg) 86%,transparent);backdrop-filter:blur(16px);padding:16px 0;box-shadow:0 1px 0 var(--rule)}
+.mark{font-family:"Inter Tight";font-weight:500;font-size:20px;letter-spacing:-.04em;display:flex;align-items:center;gap:9px}
+.mark i{width:9px;height:9px;border-radius:50%;background:var(--accent);flex:none;font-style:normal}
+.nav.over-dark .mark,.nav.over-dark .nav-links a{color:#F2F1EF}
+.nav-links{display:flex;gap:30px;margin-left:auto}
+.nav-links a{font-size:14px;color:var(--ink-2)}
+.nav-right{display:flex;align-items:center;gap:8px;margin-left:34px}
+.nav.over-dark .nav-right .lnk{color:#F2F1EF}
+
+/* duplicated-label hover (the Exo Ape signature) */
+.lnk{position:relative;display:inline-block;overflow:hidden;line-height:1.25;vertical-align:middle}
+.lnk span{display:block;transition:transform .55s var(--e-out)}
+.lnk span:last-child{position:absolute;top:0;left:0;transform:translateY(105%)}
+.lnk:hover span:first-child{transform:translateY(-105%)}
+.lnk:hover span:last-child{transform:translateY(0)}
+
+.btn{position:relative;display:inline-flex;align-items:center;justify-content:center;
+  height:46px;padding:0 26px;border-radius:999px;border:1px solid transparent;cursor:pointer;
+  font-family:inherit;font-size:14.5px;font-weight:500;overflow:hidden;
+  transition:color .45s var(--e-out),border-color .45s var(--e-out),background .45s var(--e-out)}
+.btn .fill{position:absolute;inset:0;background:var(--ink);border-radius:999px;transform:translateY(101%);transition:transform .55s var(--e-out);z-index:0}
+.btn:hover .fill{transform:translateY(0)}
+.btn .lnk{position:relative;z-index:1}
+.btn-solid{background:var(--ink);color:var(--bg)}
+.btn-solid .fill{background:var(--accent)}
+.btn-solid:hover{color:#16171A}
+.btn-line{border-color:var(--rule-2);color:var(--ink)}
+.btn-line:hover{color:var(--bg);border-color:var(--ink)}
+.btn-onDark{border-color:rgba(242,241,239,.32);color:#F2F1EF}
+.btn-onDark .fill{background:#F2F1EF}
+.btn-onDark:hover{color:#0E0F11;border-color:#F2F1EF}
+.btn-sm{height:40px;padding:0 20px;font-size:13.5px}
+.burger{display:none;width:44px;height:44px;border:1px solid var(--rule-2);border-radius:999px;background:transparent;color:inherit;cursor:pointer}
+@media(max-width:900px){.nav-links{display:none}.burger{display:grid;place-items:center;margin-left:auto}.nav-right{margin-left:10px}.nav-right .btn-line{display:none}}
+
+/* ============ HERO ============ */
+.hero{position:relative;height:100svh;min-height:600px;overflow:hidden;background:var(--dark)}
+.hero-media{position:absolute;inset:0;overflow:hidden}
+.hero-media .inner{position:absolute;inset:-6% 0 -6%;transform:scale(1.2);transition:transform 2s var(--e-out) .1s;will-change:transform}
+.hero.go .hero-media .inner{transform:scale(1)}
+.hero-media svg{width:100%;height:100%;object-fit:cover}
+.hero-veil{position:absolute;inset:0;background:linear-gradient(180deg,rgba(10,11,12,.55),rgba(10,11,12,.3) 45%,rgba(10,11,12,.82))}
+.hero-in{position:relative;z-index:4;height:100%;display:flex;flex-direction:column;justify-content:flex-end;padding-bottom:9vh}
+.hero h1{color:#F2F1EF;font-size:clamp(42px,7.4vw,112px);font-weight:300;letter-spacing:-.045em;line-height:.97;max-width:15ch}
+.hero-row{display:flex;align-items:flex-end;justify-content:space-between;gap:40px;margin-top:38px;flex-wrap:wrap}
+.hero-row p{color:rgba(242,241,239,.66);font-size:clamp(15px,1.5vw,17.5px);max-width:40ch;line-height:1.6}
+.scroll-cue{position:absolute;left:40px;bottom:30px;z-index:5;display:flex;align-items:center;gap:12px;color:rgba(242,241,239,.5);font-size:11.5px;letter-spacing:.16em;text-transform:uppercase}
+.scroll-cue .ln{width:52px;height:1px;background:rgba(242,241,239,.3);position:relative;overflow:hidden}
+.scroll-cue .ln::after{content:"";position:absolute;inset:0;background:#F2F1EF;transform:translateX(-101%);animation:cue 2.4s var(--e-io) infinite}
+@keyframes cue{0%{transform:translateX(-101%)}50%{transform:translateX(0)}100%{transform:translateX(101%)}}
+@media(max-width:700px){.scroll-cue{left:22px}}
+</style>
+</head>
+<body class="locked">
+
+<!-- ============ PRELOADER ============ -->
+<div id="pre">
+  <div class="pre-in">
+    <div class="pre-mark"><span>Brillanda</span></div>
+    <div class="pre-bar"><i id="preBar"></i></div>
+    <div class="pre-num"><span id="preNum">0</span>—100</div>
+  </div>
+</div>
+
+<div id="cursor" aria-hidden="true"><span id="curLabel"></span></div>
+
+<!-- ============ NAV ============ -->
+<header class="nav over-dark" id="nav">
+  <div class="wrap nav-in">
+    <a class="mark" href="#top"><i aria-hidden="true"></i>Brillanda</a>
+    <nav class="nav-links" aria-label="Main">
+      <a class="lnk" href="#core"><span>The core</span><span aria-hidden="true">The core</span></a>
+      <a class="lnk" href="#beyond"><span>Modules</span><span aria-hidden="true">Modules</span></a>
+      <a class="lnk" href="#tour"><span>Product tour</span><span aria-hidden="true">Product tour</span></a>
+      <a class="lnk" href="#pricing"><span>Pricing</span><span aria-hidden="true">Pricing</span></a>
+      <a class="lnk" href="#faq"><span>FAQ</span><span aria-hidden="true">FAQ</span></a>
+    </nav>
+    <div class="nav-right">
+      <a class="btn btn-line btn-sm" id="siBtn" href="#signin" data-mag><span class="fill"></span><span class="lnk"><span>Sign in</span><span aria-hidden="true">Sign in</span></span></a>
+      <a class="btn btn-solid btn-sm" id="suBtn" href="#signup" data-mag><span class="fill"></span><span class="lnk"><span>Sign up</span><span aria-hidden="true">Sign up</span></span></a>
+      <button class="burger" aria-label="Menu"><svg width="16" height="16" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 6h14M2 12h14"/></svg></button>
+    </div>
+  </div>
+</header>
+
+<!-- ============ HERO ============ -->
+<section class="hero" id="top">
+  <div class="hero-media" data-parallax="0.22">
+    <div class="inner">
+      <!-- SWAP: <img src="classroom.jpg" alt=""> — wide classroom, strong window light -->
+      <svg viewBox="0 0 1600 1000" preserveAspectRatio="xMidYMid slice" role="img" aria-label="A classroom during a lesson">
+        <defs>
+          <linearGradient id="rm" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#46545E"/><stop offset="1" stop-color="#1F2A32"/></linearGradient>
+          <linearGradient id="bm" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#F0DDB4" stop-opacity=".34"/><stop offset="1" stop-color="#F0DDB4" stop-opacity="0"/></linearGradient>
+        </defs>
+        <rect width="1600" height="1000" fill="url(#rm)"/>
+        <rect x="1150" y="130" width="170" height="300" rx="7" fill="#7C909D" opacity=".55"/>
+        <rect x="1350" y="130" width="170" height="300" rx="7" fill="#7C909D" opacity=".55"/>
+        <path d="M1150 130 L430 1000 L1000 1000 L1520 130Z" fill="url(#bm)"/>
+        <rect x="120" y="150" width="640" height="360" rx="10" fill="#1C2A23"/>
+        <rect x="120" y="150" width="640" height="360" rx="10" fill="none" stroke="#3B4B42" stroke-width="7"/>
+        <path d="M172 226h320M172 276h440M172 326h256M172 376h390M172 426h200" stroke="#DCE5DB" stroke-opacity=".34" stroke-width="8" stroke-linecap="round"/>
+        <circle cx="900" cy="372" r="46" fill="#7A5A3E"/>
+        <path d="M854 366c0-28 21-45 46-45s46 17 46 45c-7-11-21-16-46-16s-39 5-46 16Z" fill="#241A14"/>
+        <path d="M824 580c0-43 34-74 76-74s76 31 76 74v44H824v-44Z" fill="#C7CDC7"/>
+        <g>
+          <rect x="90" y="672" width="360" height="20" rx="6" fill="#8A7659"/>
+          <rect x="124" y="692" width="22" height="130" fill="#6E5D46"/><rect x="396" y="692" width="22" height="130" fill="#6E5D46"/>
+          <circle cx="190" cy="600" r="44" fill="#6B4F38"/><path d="M146 594c0-27 20-44 44-44s44 17 44 44c-7-11-20-15-44-15s-37 4-44 15Z" fill="#1E1611"/>
+          <path d="M128 672c0-35 28-58 62-58s62 23 62 58H128Z" fill="#7E9CC0"/>
+          <circle cx="350" cy="610" r="40" fill="#8A6A4E"/><path d="M310 604c0-25 18-40 40-40s40 15 40 40c-6-10-18-14-40-14s-34 4-40 14Z" fill="#241A14"/>
+          <path d="M294 672c0-32 25-52 56-52s56 20 56 52H294Z" fill="#C8913A"/>
+        </g>
+        <g>
+          <rect x="580" y="722" width="400" height="22" rx="6" fill="#8A7659"/>
+          <rect x="618" y="744" width="24" height="140" fill="#6E5D46"/><rect x="920" y="744" width="24" height="140" fill="#6E5D46"/>
+          <circle cx="690" cy="638" r="48" fill="#9A7654"/><path d="M642 632c0-29 22-48 48-48s48 19 48 48c-7-12-22-17-48-17s-41 5-48 17Z" fill="#2B211A"/>
+          <path d="M622 722c0-38 30-62 68-62s68 24 68 62H622Z" fill="#DDE1DD"/>
+          <circle cx="866" cy="648" r="44" fill="#7A5A3E"/><path d="M822 642c0-27 20-44 44-44s44 17 44 44c-7-11-20-15-44-15s-37 4-44 15Z" fill="#1E1611"/>
+          <path d="M800 722c0-35 30-58 66-58s66 23 66 58H800Z" fill="#7E9CC0"/>
+        </g>
+        <g opacity=".92">
+          <rect x="1080" y="782" width="440" height="24" rx="6" fill="#8A7659"/>
+          <circle cx="1200" cy="686" r="50" fill="#6B4F38"/><path d="M1150 680c0-30 22-50 50-50s50 20 50 50c-8-12-22-17-50-17s-42 5-50 17Z" fill="#1E1611"/>
+          <path d="M1130 782c0-40 32-65 70-65s70 25 70 65h-140Z" fill="#C8913A"/>
+          <circle cx="1400" cy="696" r="46" fill="#8A6A4E"/><path d="M1354 690c0-28 21-46 46-46s46 18 46 46c-7-11-21-16-46-16s-39 5-46 16Z" fill="#241A14"/>
+          <path d="M1334 782c0-37 30-60 66-60s66 23 66 60h-132Z" fill="#DDE1DD"/>
+        </g>
+        <rect y="880" width="1600" height="120" fill="#151D23"/>
+      </svg>
+    </div>
+  </div>
+  <div class="hero-veil"></div>
+  <div class="wrap hero-in">
+    <h1 id="heroH">
+      <span class="lm"><span style="--d:0ms">End of term,</span></span>
+      <span class="lm"><span style="--d:110ms">without the</span></span>
+      <span class="lm"><span style="--d:220ms">arithmetic.</span></span>
+    </h1>
+    <div class="hero-row">
+      <p class="fu" style="--d:520ms">Teachers enter scores the way they already do. Brillanda works out the totals, grades, positions and report cards — and gets them to parents the moment you approve.</p>
+      <a class="btn btn-onDark fu" style="--d:620ms" href="#signup" data-mag><span class="fill"></span><span class="lnk"><span>Start free for a term</span><span aria-hidden="true">Start free for a term</span></span></a>
+    </div>
+  </div>
+  <div class="scroll-cue"><span class="ln"></span>Scroll to explore</div>
+</section>
+
+<style>
+/* ============ STATEMENT ============ */
+.statement{padding:22vh 0 18vh}
+.st-label{display:flex;align-items:center;gap:12px;font-size:11.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-3);margin-bottom:54px}
+.st-label .d{width:6px;height:6px;border-radius:50%;background:var(--accent);flex:none}
+.statement h2{font-size:clamp(28px,4.4vw,62px);font-weight:300;letter-spacing:-.04em;line-height:1.08;max-width:19ch}
+.st-sub{display:grid;grid-template-columns:1fr 1fr;gap:56px;margin-top:64px;padding-top:34px;border-top:1px solid var(--rule)}
+.st-sub p{color:var(--ink-2);font-size:16.5px;line-height:1.7;max-width:44ch}
+@media(max-width:860px){.st-sub{grid-template-columns:1fr;gap:26px}}
+
+/* ============ FULL-BLEED PARALLAX BAND ============ */
+.bleed{position:relative;height:88vh;min-height:520px;overflow:hidden;background:var(--dark)}
+.bleed .inner{position:absolute;inset:-12% 0;will-change:transform}
+.bleed svg{width:100%;height:100%;object-fit:cover}
+.bleed-veil{position:absolute;inset:0;background:linear-gradient(180deg,rgba(10,11,12,.4),rgba(10,11,12,.72))}
+.bleed-copy{position:absolute;inset:0;z-index:3;display:flex;align-items:flex-end;padding-bottom:9vh}
+.bleed-copy h2{color:#F2F1EF;font-size:clamp(28px,4.4vw,58px);font-weight:300;letter-spacing:-.04em;max-width:17ch}
+.bleed-copy p{color:rgba(242,241,239,.66);font-size:16.5px;max-width:42ch;margin-top:22px;line-height:1.65}
+
+/* ============ PINNED GRID SECTION ============ */
+.pin-outer{position:relative;height:280vh}
+.pin{position:sticky;top:0;height:100vh;overflow:hidden;display:flex;align-items:center}
+.pin-in{width:100%}
+.pin-head{display:flex;justify-content:space-between;align-items:flex-end;gap:36px;margin-bottom:38px;flex-wrap:wrap}
+.pin-head h2{font-size:clamp(26px,3.6vw,48px);font-weight:300;letter-spacing:-.04em;max-width:14ch}
+.pin-head .meta{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3);font-variant-numeric:tabular-nums}
+.pin-track{display:flex;gap:26px;will-change:transform}
+.pin-card{flex:none;width:min(560px,86vw);background:var(--surface);border:1px solid var(--rule);border-radius:4px;overflow:hidden;box-shadow:0 20px 60px rgba(14,15,17,.07)}
+.pin-card .cap{padding:16px 20px;border-top:1px solid var(--rule);display:flex;gap:14px;align-items:baseline}
+.pin-card .cap b{font-family:"Inter Tight";font-weight:500;font-size:15px;letter-spacing:-.02em}
+.pin-card .cap span{font-size:13.5px;color:var(--ink-2)}
+
+/* mark sheet */
+.sheet-top{display:flex;align-items:center;gap:10px;padding:14px 20px;border-bottom:1px solid var(--rule)}
+.sheet-top .t{font-weight:500;font-size:13.5px}
+.sheet-top .s{font-size:12px;color:var(--ink-3);margin-left:auto;display:flex;align-items:center;gap:6px}
+.dot-ok{width:6px;height:6px;border-radius:50%;background:var(--success)}
+table.mark{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}
+table.mark th{background:var(--sunken);color:var(--ink-2);font-size:11.5px;font-weight:500;text-align:center;padding:9px 5px;border-bottom:1px solid var(--rule);white-space:nowrap}
+table.mark th.nm{text-align:left;padding-left:20px}
+table.mark th small{display:block;color:var(--ink-3);font-size:10px}
+table.mark td{padding:0;border-bottom:1px solid var(--rule);text-align:center;font-size:13px}
+table.mark tr:last-child td{border-bottom:0}
+td.nm{text-align:left;padding:7px 8px 7px 20px}
+td.nm b{display:block;font-weight:500;font-size:13px}
+td.nm span{font-size:10.5px;color:var(--ink-3)}
+td.cell{padding:3px}
+td.cell input{width:100%;max-width:52px;height:30px;text-align:center;font:inherit;font-size:13px;font-weight:500;
+  font-variant-numeric:tabular-nums;border:1px solid transparent;border-radius:3px;background:var(--surface);color:var(--ink);
+  transition:background .2s var(--e-out),border-color .2s;-moz-appearance:textfield}
+td.cell input::-webkit-outer-spin-button,td.cell input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+td.cell input:hover{border-color:var(--rule)}
+td.cell input:focus{outline:2px solid var(--ink-2);outline-offset:-1px}
+td.cell input.hi{background:#EFF5F1}td.cell input.mid{background:#FAF4E9}td.cell input.lo{background:#FAEEED}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) td.cell input.hi{background:#17201B}:root:not([data-theme="light"]) td.cell input.mid{background:#211D14}:root:not([data-theme="light"]) td.cell input.lo{background:#221918}}
+:root[data-theme="dark"] td.cell input.hi{background:#17201B}
+:root[data-theme="dark"] td.cell input.mid{background:#211D14}
+:root[data-theme="dark"] td.cell input.lo{background:#221918}
+td.out{background:var(--sunken);font-weight:500;padding:7px 5px}
+td.gr{padding:7px 5px}
+.gb{display:inline-block;min-width:24px;padding:1px 7px;border-radius:3px;font-size:11.5px;font-weight:500;border:1px solid}
+.g-a{background:var(--success-bg);color:var(--success);border-color:var(--success-border)}
+.g-c{background:var(--warning-bg);color:var(--warning);border-color:color-mix(in srgb,var(--warning) 30%,transparent)}
+.g-f{background:var(--danger-bg);color:var(--danger);border-color:color-mix(in srgb,var(--danger) 30%,transparent)}
+td.pos{padding:7px 5px;font-weight:500;font-size:12.5px;transition:background .6s var(--e-out)}
+.flash{background:color-mix(in srgb,var(--accent) 22%,transparent)}
+.sheet-foot{padding:9px 20px;border-top:1px solid var(--rule);font-size:11px;color:var(--ink-3);display:flex;gap:13px;flex-wrap:wrap}
+
+/* rank list */
+.rank-row{display:flex;align-items:center;gap:13px;padding:10px 20px;border-bottom:1px solid var(--rule)}
+.rank-row:last-child{border-bottom:0}
+.rank-p{width:27px;height:27px;border-radius:50%;background:var(--sunken);display:grid;place-items:center;font-size:12px;font-weight:500;flex:none;font-variant-numeric:tabular-nums}
+.rank-row.top .rank-p{background:var(--accent);color:#16171A}
+.rank-n{flex:1;min-width:0}.rank-n b{display:block;font-size:13.5px;font-weight:500}.rank-n span{font-size:11px;color:var(--ink-3)}
+.rank-bar{width:84px;height:4px;border-radius:2px;background:var(--sunken);overflow:hidden;flex:none}
+.rank-bar i{display:block;height:100%;background:var(--ink-2);border-radius:2px;transform-origin:left;transform:scaleX(0);transition:transform 1.1s var(--e-out);transition-delay:var(--d,0ms)}
+.is-in .rank-bar i{transform:scaleX(1)}
+.rank-v{width:36px;text-align:right;font-size:13px;font-weight:500;font-variant-numeric:tabular-nums;flex:none}
+
+/* report card */
+.rc{padding:20px 22px;font-size:12px}
+.rc-h{display:flex;gap:11px;align-items:center;padding-bottom:13px;border-bottom:2px solid var(--ink)}
+.rc-logo{width:36px;height:36px;border-radius:3px;background:var(--ink);color:var(--bg);display:grid;place-items:center;font-family:"Inter Tight";font-weight:500;font-size:15px;flex:none}
+.rc-h h4{font-size:15px;font-weight:500;letter-spacing:-.025em}
+.rc-h p{font-size:10.5px;color:var(--ink-3)}
+.rc-meta{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:12px 0;border-bottom:1px solid var(--rule)}
+.rc-meta span{display:block;font-size:9.5px;color:var(--ink-3)}
+.rc-meta b{font-size:12px;font-weight:500}
+table.rct{width:100%;border-collapse:collapse;margin-top:9px;font-variant-numeric:tabular-nums}
+table.rct th{font-size:9.5px;color:var(--ink-3);text-align:right;padding:5px 4px;border-bottom:1px solid var(--rule);font-weight:500}
+table.rct th:first-child{text-align:left}
+table.rct td{padding:5px 4px;text-align:right;border-bottom:1px solid var(--rule);font-size:11.5px}
+table.rct td:first-child{text-align:left}
+table.rct tr:nth-child(even) td{background:var(--sunken)}
+.rc-foot{display:flex;gap:16px;margin-top:12px;padding-top:11px;border-top:1px solid var(--rule)}
+.rc-foot div{flex:1}.rc-foot span{display:block;font-size:9.5px;color:var(--ink-3)}
+.rc-foot b{font-size:14px;font-family:"Inter Tight";font-weight:400}
+
+/* ============ COUNTERS ============ */
+.nums{padding:16vh 0;border-top:1px solid var(--rule)}
+.nums-row{display:grid;grid-template-columns:repeat(3,1fr);gap:0}
+.num{padding:0 30px;border-left:1px solid var(--rule)}
+.num:first-child{border-left:0;padding-left:0}
+.num b{display:block;font-family:"Inter Tight";font-weight:300;font-size:clamp(42px,6.6vw,86px);letter-spacing:-.05em;line-height:1;margin-bottom:16px;font-variant-numeric:tabular-nums}
+.num span{font-size:15px;color:var(--ink-2);display:block;max-width:22ch}
+@media(max-width:800px){.nums-row{grid-template-columns:1fr;gap:44px}.num{border-left:0;padding:0}.num+.num{padding-top:44px;border-top:1px solid var(--rule)}}
+
+/* ============ STEPS ============ */
+.work{padding:14vh 0;border-top:1px solid var(--rule)}
+.work-head{margin-bottom:70px}
+.work-head h2{font-size:clamp(27px,4vw,54px);font-weight:300;letter-spacing:-.04em;max-width:13ch}
+.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:0}
+.step{padding:30px 26px 0;border-top:1px solid var(--ink);position:relative}
+.step:first-child{padding-left:0}
+.step .n{font-size:11.5px;letter-spacing:.16em;color:var(--ink-3);margin-bottom:26px;display:block;font-variant-numeric:tabular-nums}
+.step h3{font-size:21px;font-weight:400;letter-spacing:-.025em;margin-bottom:12px}
+.step p{font-size:14.5px;color:var(--ink-2);line-height:1.65}
+@media(max-width:860px){.steps{grid-template-columns:1fr}.step{padding:26px 0 30px}}
+
+/* ============ TESTIMONIAL ============ */
+.voices{padding:14vh 0;border-top:1px solid var(--rule)}
+.v-top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:44px}
+.v-top .c{font-size:12px;letter-spacing:.16em;color:var(--ink-3);font-variant-numeric:tabular-nums}
+.v-stage{display:grid;grid-template-columns:auto 1fr;gap:48px;align-items:center;min-height:250px}
+.v-pic{width:170px;height:210px;overflow:hidden;background:var(--sunken);flex:none;border-radius:3px}
+.v-pic svg{width:100%;height:100%}
+.v-slide{display:none}
+.v-slide.on{display:block;animation:vin .8s var(--e-out)}
+@keyframes vin{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
+.v-slide blockquote{margin:0 0 24px;font-family:"Inter Tight";font-weight:300;font-size:clamp(20px,2.7vw,34px);letter-spacing:-.03em;line-height:1.22;max-width:22ch}
+.v-who b{display:block;font-size:15px;font-weight:500}
+.v-who span{font-size:13.5px;color:var(--ink-3)}
+.v-nav{display:flex;gap:9px;margin-top:34px}
+.v-btn{width:46px;height:46px;border-radius:50%;border:1px solid var(--rule-2);background:transparent;color:var(--ink);cursor:pointer;display:grid;place-items:center;transition:background .4s var(--e-out),color .4s,border-color .4s}
+.v-btn:hover{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+@media(max-width:800px){.v-stage{grid-template-columns:1fr;gap:26px}.v-pic{width:120px;height:150px}}
+
+/* ============ PRICING ============ */
+.pricing{padding:14vh 0;border-top:1px solid var(--rule)}
+.p-head{margin-bottom:62px}
+.p-head h2{font-size:clamp(27px,4vw,54px);font-weight:300;letter-spacing:-.04em;max-width:14ch}
+.plan-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:0}
+.plan{padding:34px 30px 34px;border-left:1px solid var(--rule);display:flex;flex-direction:column}
+.plan:first-child{border-left:0;padding-left:0}
+.plan.best{position:relative}
+.plan.best::before{content:"";position:absolute;top:0;left:0;right:0;height:2px;background:var(--accent)}
+.plan .tag{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin-bottom:14px;display:block;min-height:16px}
+.plan h3{font-size:22px;font-weight:400;letter-spacing:-.025em}
+.plan .amt{font-family:"Inter Tight";font-weight:300;font-size:46px;letter-spacing:-.045em;margin:20px 0 4px;line-height:1}
+.plan .per{font-size:13px;color:var(--ink-3)}
+.plan .lim{font-size:14.5px;color:var(--ink-2);margin:20px 0 22px;padding-bottom:22px;border-bottom:1px solid var(--rule)}
+.plan ul{list-style:none;padding:0;margin:0 0 30px;display:grid;gap:11px}
+.plan li{font-size:14.5px;color:var(--ink-2);display:flex;gap:10px}
+.plan li svg{flex:none;margin-top:5px;color:var(--ink-3)}
+.plan .btn{margin-top:auto;align-self:flex-start}
+@media(max-width:860px){.plan-row{grid-template-columns:1fr}.plan{border-left:0;padding:30px 0}.plan+.plan{border-top:1px solid var(--rule)}}
+
+/* ============ CTA / FOOTER ============ */
+.cta{position:relative;padding:20vh 0;background:var(--dark);overflow:hidden;text-align:center}
+.cta h2{color:#F2F1EF;font-size:clamp(30px,5.4vw,76px);font-weight:300;letter-spacing:-.045em;max-width:16ch;margin:0 auto 26px;line-height:1.05}
+.cta p{color:rgba(242,241,239,.6);font-size:17px;max-width:46ch;margin:0 auto 40px;line-height:1.6}
+.cta-a{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+footer{background:var(--dark);color:#F2F1EF;padding:0 0 34px}
+.f-top{display:flex;justify-content:space-between;gap:40px;padding:60px 0;border-top:1px solid rgba(242,241,239,.12);flex-wrap:wrap}
+footer .mark{color:#F2F1EF}
+.f-cols{display:flex;gap:70px;flex-wrap:wrap}
+.f-cols h4{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:rgba(242,241,239,.4);margin-bottom:16px;font-family:"Instrument Sans";font-weight:500}
+.f-cols ul{list-style:none;padding:0;margin:0;display:grid;gap:11px}
+.f-cols a{font-size:14.5px;color:rgba(242,241,239,.78)}
+.f-bot{display:flex;align-items:center;gap:18px;padding-top:26px;border-top:1px solid rgba(242,241,239,.12);font-size:12.5px;color:rgba(242,241,239,.4);flex-wrap:wrap}
+.tbtn{margin-left:auto;display:inline-flex;align-items:center;gap:8px;background:transparent;border:1px solid rgba(242,241,239,.2);color:rgba(242,241,239,.75);font:inherit;font-size:12.5px;padding:9px 16px;border-radius:999px;cursor:pointer}
+.tbtn:hover{background:rgba(242,241,239,.08);color:#F2F1EF}
+</style>
+
+<!-- ============ STATEMENT ============ -->
+<section class="statement" id="statement" data-io>
+  <div class="wrap">
+    <p class="st-label fu"><span class="d"></span>Results &amp; records</p>
+    <h2>
+      <span class="lm"><span style="--d:0ms">We do one thing completely,</span></span>
+      <span class="lm"><span style="--d:110ms">rather than ten things partly.</span></span>
+    </h2>
+    <div class="st-sub">
+      <p class="fu" style="--d:260ms">The end of term is the busiest and most error-prone week in a school's year. Three staff with calculators, checking each other, losing days to arithmetic that a machine should have done.</p>
+      <p class="fu" style="--d:360ms">Brillanda takes the scores your teachers already record and carries them all the way to a parent's phone — computed, checked, approved by you, and kept for as long as the student is yours.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ BLEED BAND ============ -->
+<section class="bleed">
+  <div class="inner" data-parallax="0.18">
+    <!-- SWAP: <img src="staffroom.jpg" alt=""> -->
+    <svg viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice" role="img" aria-label="Teachers entering scores in the staff room">
+      <defs><linearGradient id="sr" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#E8E6E1"/><stop offset="1" stop-color="#C9C7C1"/></linearGradient></defs>
+      <rect width="1600" height="900" fill="url(#sr)"/>
+      <rect x="1080" y="70" width="210" height="270" rx="7" fill="#AFB6B8" opacity=".6"/>
+      <rect x="1320" y="70" width="210" height="270" rx="7" fill="#AFB6B8" opacity=".6"/>
+      <rect y="620" width="1600" height="280" fill="#A88F72"/>
+      <rect y="602" width="1600" height="20" rx="6" fill="#C1A582"/>
+      <path d="M560 602V420a9 9 0 019-9h300a9 9 0 019 9v182z" fill="#24262A"/>
+      <rect x="584" y="430" width="270" height="124" rx="4" fill="#F6F6F4"/>
+      <rect x="598" y="444" width="242" height="14" rx="4" fill="#E2E2DF"/>
+      <path d="M598 474h242M598 492h242M598 510h242M598 528h170" stroke="#E2E2DF" stroke-width="9" stroke-linecap="round"/>
+      <rect x="796" y="468" width="46" height="12" rx="6" fill="#3F7A57" opacity=".5"/>
+      <rect x="796" y="486" width="46" height="12" rx="6" fill="#C8913A" opacity=".65"/>
+      <path d="M538 602h384l18 18H520z" fill="#34373C"/>
+      <circle cx="390" cy="366" r="56" fill="#7A5A3E"/><path d="M334 360c0-34 25-55 56-55s56 21 56 55c-8-14-25-20-56-20s-48 6-56 20Z" fill="#241A14"/>
+      <path d="M312 602c0-49 37-82 84-82s84 33 84 82H312Z" fill="#7E9CC0"/>
+      <circle cx="1050" cy="380" r="52" fill="#9A7654"/><path d="M998 374c0-32 23-52 52-52s52 20 52 52c-8-13-23-18-52-18s-44 5-52 18Z" fill="#2B211A"/>
+      <path d="M972 602c0-46 35-77 78-77s78 31 78 77H972Z" fill="#DCDFDC"/>
+      <rect x="120" y="520" width="150" height="82" rx="7" fill="#C8913A" opacity=".8"/>
+      <rect x="1320" y="530" width="180" height="72" rx="7" fill="#B6BCBC"/>
+    </svg>
+  </div>
+  <div class="bleed-veil"></div>
+  <div class="bleed-copy" data-io>
+    <div class="wrap">
+      <h2><span class="lm"><span>Built for the school laptop you already have.</span></span></h2>
+      <p class="fu" style="--d:240ms">Scores save as they're typed, so nothing is lost when the connection drops halfway through third period.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ PINNED GRID ============ -->
+<div class="pin-outer" id="grid">
+  <div class="pin">
+    <div class="pin-in" data-io>
+      <div class="wrap pin-head">
+        <h2><span class="lm"><span>Type a score. Watch it work.</span></span></h2>
+        <span class="meta fu" style="--d:200ms">01 — 03 &nbsp;·&nbsp; Keep scrolling</span>
+      </div>
+      <div class="wrap" style="max-width:none;padding-left:max(40px,calc((100vw - 1280px)/2 + 40px));padding-right:0">
+        <div class="pin-track" id="pinTrack">
+
+          <div class="pin-card">
+            <div class="sheet-top"><span class="t">JSS 1A · Mathematics · First Term</span><span class="s"><span class="dot-ok"></span> Saved just now</span></div>
+            <table class="mark"><thead><tr>
+              <th class="nm">Student</th><th>CA1<small>/10</small></th><th>CA2<small>/10</small></th><th>Exam<small>/80</small></th><th>Total<small>/100</small></th><th>Grade<small>&nbsp;</small></th><th>Pos.<small>&nbsp;</small></th>
+            </tr></thead><tbody id="markBody"></tbody></table>
+            <div class="sheet-foot"><span>A 70–100</span><span>B 60–69</span><span>C 50–59</span><span>D 45–49</span><span>E 40–44</span><span>F 0–39</span></div>
+            <div class="cap"><b>Enter scores</b><span>Live — type in any cell</span></div>
+          </div>
+
+          <div class="pin-card">
+            <div class="sheet-top"><span class="t">JSS 1A · Overall position</span><span class="s">34 students</span></div>
+            <div>
+              <div class="rank-row top"><span class="rank-p">1</span><span class="rank-n"><b>Ibrahim Sule</b><span>2021/0146</span></span><span class="rank-bar"><i style="width:94%;--d:80ms"></i></span><span class="rank-v">88.4</span></div>
+              <div class="rank-row"><span class="rank-p">2</span><span class="rank-n"><b>Adaeze Okonkwo</b><span>2021/0142</span></span><span class="rank-bar"><i style="width:82%;--d:160ms"></i></span><span class="rank-v">82.0</span></div>
+              <div class="rank-row"><span class="rank-p">3</span><span class="rank-n"><b>Emeka Balogun</b><span>2021/0144</span></span><span class="rank-bar"><i style="width:75%;--d:240ms"></i></span><span class="rank-v">75.2</span></div>
+              <div class="rank-row"><span class="rank-p">4</span><span class="rank-n"><b>Chidi Nwosu</b><span>2021/0143</span></span><span class="rank-bar"><i style="width:64%;--d:320ms"></i></span><span class="rank-v">64.0</span></div>
+              <div class="rank-row"><span class="rank-p">5</span><span class="rank-n"><b>Fatima Bello</b><span>2021/0145</span></span><span class="rank-bar"><i style="width:57%;--d:400ms"></i></span><span class="rank-v">57.0</span></div>
+            </div>
+            <div class="cap"><b>Positions</b><span>Computed the same way every term</span></div>
+          </div>
+
+          <div class="pin-card">
+            <div class="rc">
+              <div class="rc-h"><div class="rc-logo">S</div><div><h4>Sunrise Academy, Lagos</h4><p>Terminal report · First Term, 2025/2026</p></div></div>
+              <div class="rc-meta">
+                <div><span>Student</span><b>Adaeze Okonkwo</b></div><div><span>Admission</span><b>2021/0142</b></div>
+                <div><span>Class</span><b>JSS 1A</b></div><div><span>In class</span><b>34</b></div>
+              </div>
+              <table class="rct"><thead><tr><th>Subject</th><th>CA</th><th>Exam</th><th>Total</th><th>Grade</th></tr></thead><tbody>
+                <tr><td>Mathematics</td><td>17</td><td>65</td><td>82</td><td>A</td></tr>
+                <tr><td>English Language</td><td>16</td><td>58</td><td>74</td><td>A</td></tr>
+                <tr><td>Basic Science</td><td>14</td><td>52</td><td>66</td><td>B</td></tr>
+                <tr><td>Social Studies</td><td>15</td><td>56</td><td>71</td><td>A</td></tr>
+                <tr><td>Civic Education</td><td>13</td><td>45</td><td>58</td><td>C</td></tr>
+              </tbody></table>
+              <div class="rc-foot"><div><span>Term average</span><b>70.2</b></div><div><span>Position</span><b>4th of 34</b></div><div><span>Resumes</span><b>12 Jan</b></div></div>
+            </div>
+            <div class="cap"><b>Report card</b><span>A whole class in one action</span></div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<style>
+/* ===== counters ===== */
+.nums{padding:14vh 0;border-top:1px solid var(--rule)}
+.nums-row{display:grid;grid-template-columns:repeat(4,1fr)}
+.num{padding:0 28px;border-left:1px solid var(--rule)}
+.num:first-child{border-left:0;padding-left:0}
+.num b{display:block;font-family:"Inter Tight";font-weight:300;font-size:clamp(36px,5.4vw,68px);letter-spacing:-.05em;line-height:1;margin-bottom:14px;font-variant-numeric:tabular-nums}
+.num span{font-size:14.5px;color:var(--ink-2);display:block;max-width:22ch}
+@media(max-width:860px){.nums-row{grid-template-columns:1fr 1fr;gap:38px}.num{border-left:0;padding:0}}
+@media(max-width:520px){.nums-row{grid-template-columns:1fr}}
+
+/* ===== editorial section head ===== */
+.ehead{margin-bottom:64px;max-width:44ch}
+.ehead .lbl{display:flex;align-items:center;gap:12px;font-size:11.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-3);margin-bottom:28px}
+.ehead .lbl .d{width:6px;height:6px;border-radius:50%;background:var(--accent);flex:none}
+.ehead h2{font-size:clamp(27px,4vw,54px);font-weight:300;letter-spacing:-.04em;line-height:1.06}
+.ehead p{color:var(--ink-2);font-size:16.5px;line-height:1.7;margin-top:22px;max-width:46ch}
+.sec-e{padding:14vh 0;border-top:1px solid var(--rule)}
+
+/* ===== roles (editorial columns) ===== */
+.roles{display:grid;grid-template-columns:repeat(4,1fr);gap:0}
+.role{padding:28px 26px 0;border-top:1px solid var(--ink);position:relative}
+.role:first-child{padding-left:0}
+.role .rn{font-size:11.5px;letter-spacing:.16em;color:var(--ink-3);display:block;margin-bottom:22px;font-variant-numeric:tabular-nums}
+.role h3{font-size:21px;font-weight:400;letter-spacing:-.025em;margin-bottom:10px}
+.role > p{font-size:14.5px;color:var(--ink-2);line-height:1.62;margin-bottom:20px}
+.role ul{list-style:none;padding:0;margin:0;display:grid;gap:9px}
+.role li{font-size:13.8px;color:var(--ink-2);display:flex;gap:9px;line-height:1.5}
+.role li svg{flex:none;margin-top:4px;color:var(--ink-3)}
+@media(max-width:980px){.roles{grid-template-columns:1fr 1fr;gap:0 26px}.role{padding:26px 0 30px}}
+@media(max-width:600px){.roles{grid-template-columns:1fr}}
+
+/* ===== capability list ===== */
+.caps{display:grid;grid-template-columns:repeat(3,1fr);gap:0 26px}
+.cap{padding:26px 0;border-top:1px solid var(--rule)}
+.cap h3{font-size:17.5px;font-weight:400;letter-spacing:-.02em;margin-bottom:8px;display:flex;align-items:center;gap:10px}
+.cap h3 svg{flex:none;color:var(--ink-3)}
+.cap p{font-size:14px;color:var(--ink-2);line-height:1.62}
+@media(max-width:940px){.caps{grid-template-columns:1fr 1fr}}
+@media(max-width:620px){.caps{grid-template-columns:1fr}}
+
+/* ===== beyond the core (dark inset) ===== */
+.beyond{background:var(--dark);color:#F2F1EF;border-radius:4px;padding:11vh 0;position:relative;overflow:hidden;margin:0}
+.beyond .ehead h2,.beyond .ehead .lbl{color:#F2F1EF}
+.beyond .ehead .lbl{color:rgba(242,241,239,.5)}
+.beyond .ehead p{color:rgba(242,241,239,.62)}
+.ex-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:0 44px}
+.ex{padding:30px 0;border-top:1px solid rgba(242,241,239,.16);display:grid;grid-template-columns:auto 1fr;gap:22px}
+.ex-ic{width:44px;height:44px;border-radius:2px;border:1px solid rgba(242,241,239,.22);display:grid;place-items:center;color:var(--accent);flex:none}
+.ex h3{color:#F2F1EF;font-size:19px;font-weight:400;letter-spacing:-.025em;margin-bottom:8px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.ex-tag{font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);border:1px solid rgba(200,145,58,.4);padding:3px 9px;border-radius:2px}
+.ex p{color:rgba(242,241,239,.66);font-size:14.5px;line-height:1.65;max-width:40ch}
+.beyond-note{margin-top:54px;padding-top:26px;border-top:1px solid rgba(242,241,239,.16);display:flex;gap:26px;align-items:flex-start;flex-wrap:wrap}
+.beyond-note p{color:rgba(242,241,239,.6);font-size:14.5px;line-height:1.7;max-width:56ch}
+@media(max-width:860px){.ex-grid{grid-template-columns:1fr}}
+
+/* ===== tour tabs (editorial) ===== */
+.tour-tabs{display:flex;gap:26px;border-bottom:1px solid var(--rule);margin-bottom:44px;overflow-x:auto;padding-bottom:0}
+.tour-tabs button{flex:none;background:transparent;border:0;border-bottom:1px solid transparent;margin-bottom:-1px;
+  padding:0 0 16px;font:inherit;font-family:"Inter Tight";font-size:15px;font-weight:400;letter-spacing:-.015em;
+  color:var(--ink-3);cursor:pointer;transition:color .3s var(--e-out),border-color .3s var(--e-out)}
+.tour-tabs button:hover{color:var(--ink-2)}
+.tour-tabs button.on{color:var(--ink);border-bottom-color:var(--ink)}
+.tour-pane{display:none;grid-template-columns:.84fr 1.16fr;gap:52px;align-items:center}
+.tour-pane.on{display:grid;animation:tfade .7s var(--e-out)}
+@keyframes tfade{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+.tour-pane h3{font-size:clamp(22px,2.8vw,32px);font-weight:300;letter-spacing:-.03em;margin-bottom:14px}
+.tour-pane > div > p{font-size:15.5px;color:var(--ink-2);line-height:1.68;margin-bottom:22px;max-width:40ch}
+.tour-pane ul{list-style:none;padding:0;margin:0;display:grid;gap:11px}
+.tour-pane li{font-size:14px;color:var(--ink-2);display:flex;gap:10px;line-height:1.55}
+.tour-pane li svg{flex:none;margin-top:4px;color:var(--accent)}
+.tvis{border:1px solid var(--rule);border-radius:3px;overflow:hidden;background:var(--surface);box-shadow:0 20px 60px rgba(14,15,17,.08)}
+@media(max-width:940px){.tour-pane.on{grid-template-columns:1fr;gap:32px}}
+
+/* app chrome bits reused in tour */
+.ch-bar{display:flex;align-items:center;gap:7px;padding:10px 14px;border-bottom:1px solid var(--rule);background:var(--sunken)}
+.ch-dot{width:8px;height:8px;border-radius:50%;background:var(--rule-2)}
+.ch-url{margin:0 auto;font-size:11px;color:var(--ink-3)}
+.pnl{border-top:1px solid var(--rule)}
+.pnl-h{padding:9px 14px;font-size:11.5px;font-weight:500;color:var(--ink-2);background:var(--sunken)}
+.prow{display:flex;align-items:center;gap:10px;padding:9px 14px;border-top:1px solid var(--rule);font-size:12px}
+.prow .n2{flex:1}
+.ps{font-size:10px;padding:2px 8px;border-radius:3px;border:1px solid;font-weight:500}
+.p-a{background:var(--success-bg);color:var(--success);border-color:var(--success-border)}
+.p-c{background:var(--warning-bg);color:var(--warning);border-color:color-mix(in srgb,var(--warning) 30%,transparent)}
+.p-f{background:var(--danger-bg);color:var(--danger);border-color:color-mix(in srgb,var(--danger) 30%,transparent)}
+.p-n{border-color:var(--rule);color:var(--ink-3)}
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;padding:14px}
+.kpi{border:1px solid var(--rule);border-radius:3px;padding:11px 12px}
+.kpi b{display:block;font-family:"Inter Tight";font-size:19px;font-weight:400;letter-spacing:-.03em;line-height:1.1}
+.kpi span{font-size:9.5px;color:var(--ink-3)}
+.mini-bar{height:4px;width:60px;border-radius:2px;background:var(--sunken);overflow:hidden;flex:none}
+.mini-bar i{display:block;height:100%;background:var(--ink-2)}
+
+/* ===== setup ===== */
+.setup{display:grid;grid-template-columns:1fr 1.02fr;gap:56px;align-items:center}
+.sitem{display:flex;gap:20px;padding:22px 0;border-top:1px solid var(--rule)}
+.sitem .sn{font-size:11.5px;letter-spacing:.14em;color:var(--ink-3);padding-top:4px;flex:none;font-variant-numeric:tabular-nums}
+.sitem h3{font-size:18px;font-weight:400;letter-spacing:-.025em;margin-bottom:7px}
+.sitem p{font-size:14.5px;color:var(--ink-2);line-height:1.62}
+@media(max-width:940px){.setup{grid-template-columns:1fr;gap:34px}}
+
+/* ===== security ===== */
+.trust3{display:grid;grid-template-columns:repeat(3,1fr);gap:0 36px}
+.tbox{padding:28px 0;border-top:1px solid var(--ink)}
+.tbox h3{font-size:19px;font-weight:400;letter-spacing:-.025em;margin-bottom:11px}
+.tbox p{font-size:14.5px;color:var(--ink-2);line-height:1.65}
+@media(max-width:860px){.trust3{grid-template-columns:1fr}}
+
+/* ===== faq ===== */
+.faq2{display:grid;grid-template-columns:.8fr 1.2fr;gap:56px;align-items:start}
+.faq2 .acc2{border-top:1px solid var(--rule)}
+.faq2 details{border-bottom:1px solid var(--rule)}
+.faq2 summary{display:flex;align-items:center;gap:18px;padding:22px 0;cursor:pointer;list-style:none;
+  font-family:"Inter Tight";font-size:16.5px;font-weight:400;letter-spacing:-.02em;transition:color .3s}
+.faq2 summary::-webkit-details-marker{display:none}
+.faq2 summary:hover{color:var(--ink-2)}
+.faq2 summary .ico{margin-left:auto;width:28px;height:28px;border-radius:50%;border:1px solid var(--rule-2);
+  display:grid;place-items:center;flex:none;transition:transform .35s var(--e-out),background .3s}
+.faq2 details[open] summary .ico{transform:rotate(45deg);background:var(--sunken)}
+.faq2 .ans{padding:0 40px 24px 0;color:var(--ink-2);font-size:15px;line-height:1.72}
+@media(max-width:900px){.faq2{grid-template-columns:1fr;gap:30px}}
+
+/* ===== newsletter ===== */
+.news{display:grid;grid-template-columns:1fr auto;gap:40px;align-items:center;padding:52px 0;border-top:1px solid var(--rule)}
+.news h3{font-size:clamp(20px,2.4vw,28px);font-weight:300;letter-spacing:-.03em;margin-bottom:9px}
+.news p{color:var(--ink-2);font-size:15px;max-width:46ch;line-height:1.65}
+.news-form{display:flex;gap:10px;flex-wrap:wrap}
+.news input{height:46px;padding:0 20px;border-radius:999px;border:1px solid var(--rule-2);background:transparent;
+  color:var(--ink);font:inherit;font-size:14.5px;min-width:250px}
+.news input::placeholder{color:var(--ink-3)}
+@media(max-width:800px){.news{grid-template-columns:1fr;gap:24px}}
+
+/* ===== footer extras ===== */
+.f-contact{display:grid;gap:11px;margin-top:22px}
+.f-contact a{display:flex;align-items:center;gap:11px;font-size:14px;color:rgba(242,241,239,.72)}
+.f-contact a:hover{color:#F2F1EF}
+.f-contact svg{flex:none;color:rgba(242,241,239,.4)}
+.socials{display:flex;gap:10px;margin-top:22px}
+.socials a{width:38px;height:38px;border-radius:50%;border:1px solid rgba(242,241,239,.2);display:grid;place-items:center;color:rgba(242,241,239,.7);transition:all .3s var(--e-out)}
+.socials a:hover{border-color:#F2F1EF;color:#F2F1EF;background:rgba(242,241,239,.06)}
+.ghost{font-family:"Inter Tight";font-weight:500;font-size:clamp(56px,15vw,190px);letter-spacing:-.05em;line-height:.82;
+  color:#F2F1EF;opacity:.05;text-align:center;padding:24px 0 8px;user-select:none;pointer-events:none;white-space:nowrap}
+</style>
+
+<!-- ============ COUNTERS ============ -->
+<section class="nums" data-io>
+  <div class="wrap nums-row">
+    <div class="num"><b><span data-count="312">0</span></b><span class="fu" style="--d:180ms">students on a single term sheet</span></div>
+    <div class="num"><b><span data-count="41">0</span>s</b><span class="fu" style="--d:260ms">to generate a full class of report cards</span></div>
+    <div class="num"><b><span data-count="8">0</span>min</b><span class="fu" style="--d:340ms">for a teacher to enter one subject</span></div>
+    <div class="num"><b><span data-count="0">0</span></b><span class="fu" style="--d:420ms">totals worked out by hand</span></div>
+  </div>
+</section>
+
+<!-- ============ ROLES ============ -->
+<section class="sec-e" id="roles" data-io>
+  <div class="wrap">
+    <div class="ehead">
+      <p class="lbl fu"><span class="d"></span>Who it's for</p>
+      <h2><span class="lm"><span style="--d:0ms">Four people, four</span></span><span class="lm"><span style="--d:110ms">very different jobs.</span></span></h2>
+      <p class="fu" style="--d:280ms">A teacher's whole world is four menu items. A proprietor's is the entire school. Everyone gets what their job needs and nothing they'd have to learn to ignore.</p>
+    </div>
+    <div class="roles">
+      <div class="role fu" style="--d:120ms">
+        <span class="rn">01</span>
+        <h3>Proprietors &amp; admins</h3>
+        <p>See what's blocking the end of term, and approve everything before it leaves the building.</p>
+        <ul>
+          <li><svg width="13" height="13" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M11.5 4 5.5 10 2.5 7"/></svg>Entry progress for every class</li>
+          <li><svg width="13" height="13" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M11.5 4 5.5 10 2.5 7"/></svg>Review, lock and publish per class</li>
+          <li><svg width="13" height="13" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M11.5 4 5.5 10 2.5 7"/></svg>Grading scale and term setup</li>
+          <li><svg width="13" height="13" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M11.5 4 5.5 10 2.5 7"/></svg>Full audit trail of every change</li>
+        </ul>
+      </div>
+      <div class="role fu" style="--d:200ms">
+        <span class="rn">02</span>
+        <h3>Teachers</h3>
+        <p>Four menu items, one job. Open a class, enter scores, mark it complete, go home.</p>
+        <ul>
+          <li><svg width="13" height="13" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M11.5 4 5.5 10 2.5 7"/></svg>Spreadsheet-style score grid</li>
+          <li><svg width="13" height="13" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M11.5 4 5.5 10 2.5 7"/></svg>Only their own classes and subjects</li>
+          <li><svg width="13" height="13" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M11.5 4 5.5 10 2.5 7"/></svg>Autosave and offline tolerance</li>
+          <li><svg width="13" height="13" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M11.5 4 5.5 10 2.5 7"/></svg>Class teacher remarks</li>
+        </ul>
+      </div>
+      <div class="role fu" style="--d:280ms">
+        <span class="rn">03</span>
+        <h3>Parents &amp; guardians</h3>
+        <p>No paper slips, no queue at the office. Phone-first, because that's where it gets opened.</p>
+        <ul>
+          <li><svg width="13" height="13" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M11.5 4 5.5 10 2.5 7"/></svg>Results the minute you publish</li>
+          <li><svg width="13" height="13" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M11.5 4 5.5 10 2.5 7"/></svg>Download the report card any time</li>
+          <li><svg width="13" height="13" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M11.5 4 5.5 10 2.5 7"/></svg>Several children, one account</li>
+          <li><svg width="13" height="13" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M11.5 4 5.5 10 2.5 7"/></svg>Every past term, kept</li>
+        </ul>
+      </div>
+      <div class="role fu" style="--d:360ms">
+        <span class="rn">04</span>
+        <h3>Students</h3>
+        <p>Their own record, and only their own — and only if your school turns it on.</p>
+        <ul>
+          <li><svg width="13" height="13" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M11.5 4 5.5 10 2.5 7"/></svg>Grades per subject, term by term</li>
+          <li><svg width="13" height="13" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M11.5 4 5.5 10 2.5 7"/></svg>Their own report card to download</li>
+          <li><svg width="13" height="13" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M11.5 4 5.5 10 2.5 7"/></svg>Position shown only if you allow it</li>
+          <li><svg width="13" height="13" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M11.5 4 5.5 10 2.5 7"/></svg>Off by default</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ CORE CAPABILITIES ============ -->
+<section class="sec-e" id="core" data-io>
+  <div class="wrap">
+    <div class="ehead">
+      <p class="lbl fu"><span class="d"></span>The core</p>
+      <h2><span class="lm"><span style="--d:0ms">Results and records,</span></span><span class="lm"><span style="--d:110ms">covered completely.</span></span></h2>
+      <p class="fu" style="--d:280ms">This is what Brillanda is for, and what every other part of the product serves. From the day a student is admitted to the day their final report card is downloaded.</p>
+    </div>
+    <div class="caps">
+      <div class="cap fu" style="--d:60ms"><h3><svg width="17" height="17" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="9" cy="6" r="3"/><path d="M3 15.5c1-2.6 3.2-4.2 6-4.2s5 1.6 6 4.2"/></svg>Student records</h3><p>Admission numbers, guardians, photos and status, with class placement tracked per session so every past year stays intact.</p></div>
+      <div class="cap fu" style="--d:120ms"><h3><svg width="17" height="17" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 2v9M5.5 7.5 9 11l3.5-3.5M3 14.5h12"/></svg>Spreadsheet import</h3><p>Upload what you already keep. Map your column names to ours, see exactly which rows failed and why, and import the clean ones anyway.</p></div>
+      <div class="cap fu" style="--d:180ms"><h3><svg width="17" height="17" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2.5" y="4" width="13" height="11" rx="1.5"/><path d="M2.5 8h13M6 2.5v3M12 2.5v3"/></svg>Sessions &amp; terms</h3><p>Two semesters or three terms, your call. Roll classes and subjects into a new session in one action instead of rebuilding each August.</p></div>
+      <div class="cap fu" style="--d:60ms"><h3><svg width="17" height="17" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 4.5h12M3 9h12M3 13.5h7"/></svg>Classes, arms &amp; subjects</h3><p>JSS 1 with its arms, and the subjects that apply at each level, so Further Maths never appears on a JSS 1 report card.</p></div>
+      <div class="cap fu" style="--d:120ms"><h3><svg width="17" height="17" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2.5 9a6.5 6.5 0 1 0 13 0 6.5 6.5 0 0 0-13 0ZM9 5.5V9l2.5 1.5"/></svg>Grading &amp; weighting</h3><p>Your CA-to-exam split and grade bands, different by class level if you need. Gaps and bad weights are caught at setup, not at publish.</p></div>
+      <div class="cap fu" style="--d:180ms"><h3><svg width="17" height="17" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2.5" y="3" width="13" height="12" rx="2"/><path d="M2.5 7h13M7 7v8"/></svg>Score entry</h3><p>Keyboard-first, autosaving, and strict about what it accepts. A score above the maximum is refused at the cell, not found at report time.</p></div>
+      <div class="cap fu" style="--d:60ms"><h3><svg width="17" height="17" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 2.5v13M3.5 6.5 9 2.5l5.5 4M3.5 11.5 9 15.5l5.5-4"/></svg>Results &amp; positions</h3><p>Weighted totals, grades and rankings recomputed across the whole class every time a score changes, with ties handled one consistent way.</p></div>
+      <div class="cap fu" style="--d:120ms"><h3><svg width="17" height="17" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 2h7l3.5 3.5V16H4z"/><path d="M11 2v4h3.5M6.5 10h5M6.5 12.8h3.5"/></svg>Report cards</h3><p>A whole class in one action, on your letterhead, with your grading key and the class teacher's words. Downloadable again next year.</p></div>
+      <div class="cap fu" style="--d:180ms"><h3><svg width="17" height="17" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3.5" y="8" width="11" height="7" rx="1.5"/><path d="M6 8V5.5a3 3 0 0 1 6 0V8"/></svg>Review &amp; publishing</h3><p>Entry, locked, reviewed, published. An explicit gate between a teacher finishing and a parent seeing, reversible if you spot a mistake.</p></div>
+      <div class="cap fu" style="--d:60ms"><h3><svg width="17" height="17" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 2.5 3.5 5v4.2c0 3.6 2.3 6.2 5.5 7 3.2-.8 5.5-3.4 5.5-7V5L9 2.5Z"/><path d="M6.8 9l1.6 1.6 3-3.2"/></svg>Audit trail</h3><p>Every score change, override and publish recorded with who, when and what it was before. Append-only — nobody can edit the record.</p></div>
+      <div class="cap fu" style="--d:120ms"><h3><svg width="17" height="17" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="9" cy="6.5" r="3"/><path d="M3 15.5c1-2.6 3.2-4.2 6-4.2s5 1.6 6 4.2"/></svg>Parent &amp; student portals</h3><p>Read-only, published terms only, and never a word about any other student. Designed at phone width first.</p></div>
+      <div class="cap fu" style="--d:180ms"><h3><svg width="17" height="17" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 15V8M7 15V4M11 15v-5M15 15V6"/></svg>Insights &amp; export</h3><p>Grade distribution, subject comparison and term-over-term trends, plus a full data export you can take whenever you like.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ BEYOND THE CORE ============ -->
+<section class="beyond" data-io id="beyond">
+  <div class="wrap">
+    <div class="ehead">
+      <p class="lbl fu"><span class="d"></span>Beyond the core</p>
+      <h2><span class="lm"><span style="--d:0ms">Four more, when</span></span><span class="lm"><span style="--d:110ms">you're ready for them.</span></span></h2>
+      <p class="fu" style="--d:280ms">These sit alongside results and records rather than competing for attention with them. Switch on the ones your school actually needs and ignore the rest — nothing here changes how score entry works.</p>
+    </div>
+    <div class="ex-grid">
+      <div class="ex fu" style="--d:80ms">
+        <span class="ex-ic"><svg width="20" height="20" viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="3" y="4.5" width="16" height="14" rx="2"/><path d="M3 9h16M7.5 2.5v4M14.5 2.5v4"/><path d="M8 13.2l1.8 1.8 4-4"/></svg></span>
+        <div>
+          <h3>Attendance <span class="ex-tag">Module</span></h3>
+          <p>Mark a whole class present in one tap, flag latecomers, and let the day's totals build themselves. Termly attendance can print on the report card alongside results, or stay separate — your call.</p>
+        </div>
+      </div>
+      <div class="ex fu" style="--d:160ms">
+        <span class="ex-ic"><svg width="20" height="20" viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="3" y="3.5" width="16" height="15" rx="2"/><path d="M3 8h16M8 8v10.5M13.5 8v10.5M3 13h16"/></svg></span>
+        <div>
+          <h3>Timetables <span class="ex-tag">Module</span></h3>
+          <p>Build a clash-free weekly grid per class that respects which teacher is where, then adjust by hand where reality disagrees. Teachers see only their own periods.</p>
+        </div>
+      </div>
+      <div class="ex fu" style="--d:240ms">
+        <span class="ex-ic"><svg width="20" height="20" viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M11 3.5l1.9 4.6 4.6 1.9-4.6 1.9L11 16.5l-1.9-4.6L4.5 10l4.6-1.9L11 3.5Z"/><path d="M17.5 3v3M19 4.5h-3"/></svg></span>
+        <div>
+          <h3>AI assistant <span class="ex-tag">Module</span></h3>
+          <p>Ask in plain English and get an answer from your own data — who hasn't entered scores, which class average moved, who's below the pass mark in Basic Science. It reads and drafts; it never changes a score on its own.</p>
+        </div>
+      </div>
+      <div class="ex fu" style="--d:320ms">
+        <span class="ex-ic"><svg width="20" height="20" viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="2.5" y="4" width="17" height="11.5" rx="2"/><path d="M7.5 18.5h7M11 15.5v3"/><path d="M8 9.5l1.6 1.6 3.4-3.4"/></svg></span>
+        <div>
+          <h3>CBT exams <span class="ex-tag">Module</span></h3>
+          <p>Objective tests on screen with a timer and a question navigator, marked the moment they're submitted. Runs over the hall's own Wi-Fi when the internet is down, and the scores post straight into the grid as an assessment component.</p>
+        </div>
+      </div>
+    </div>
+    <div class="beyond-note">
+      <p class="fu" style="--d:120ms"><strong style="color:#F2F1EF;font-weight:500">Still not in Brillanda, on purpose:</strong> school fees and accounting, payroll and HR, and a public website builder. Those are real jobs that deserve real software, and bolting on a weak version of each is how school systems end up with thirty modules and four good ones.</p>
+      <a class="btn btn-onDark fu" style="--d:200ms" href="#pricing" data-mag><span class="fill"></span><span class="lnk"><span>See what's included</span><span aria-hidden="true">See what's included</span></span></a>
+    </div>
+  </div>
+</section>
+
+<!-- ============ PRODUCT TOUR ============ -->
+<section class="sec-e" id="tour" data-io>
+  <div class="wrap">
+    <div class="ehead">
+      <p class="lbl fu"><span class="d"></span>A look inside</p>
+      <h2><span class="lm"><span style="--d:0ms">The actual screens,</span></span><span class="lm"><span style="--d:110ms">not a promise.</span></span></h2>
+    </div>
+    <div class="tour-tabs fu" style="--d:200ms" role="tablist">
+      <button class="on" data-t="0">Score entry</button>
+      <button data-t="1">Admin overview</button>
+      <button data-t="2">Publishing</button>
+      <button data-t="3">Report card</button>
+      <button data-t="4">Parent portal</button>
+      <button data-t="5">Attendance</button>
+      <button data-t="6">Activity log</button>
+    </div>
+
+    <div class="tour-pane on">
+      <div>
+        <h3>Scores in, without the errors</h3>
+        <p>Students down the left, assessments across the top. Tab across, Enter down the column, and every value checked against the maximum before it can save.</p>
+        <ul>
+          <li><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M13 4.5 6.3 11.5 3 8.2"/></svg>Sticky student names and live totals</li>
+          <li><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M13 4.5 6.3 11.5 3 8.2"/></svg>Saves per cell, queues and retries on a drop</li>
+          <li><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M13 4.5 6.3 11.5 3 8.2"/></svg>Absences excluded from the weighting properly</li>
+        </ul>
+      </div>
+      <div class="tvis">
+        <div class="ch-bar"><span class="ch-dot"></span><span class="ch-dot"></span><span class="ch-dot"></span><span class="ch-url">app.brillanda.com/score-entry</span></div>
+        <div class="sheet-top"><span class="t">JSS 1A · Mathematics · First Term</span><span class="s"><span class="saved-dot"></span>Saved just now</span></div>
+        <table class="mark"><thead><tr>
+          <th class="nm">Student</th><th>CA1<small>/10</small></th><th>CA2<small>/10</small></th><th>Exam<small>/80</small></th><th>Total<small>/100</small></th><th>Grade<small>&nbsp;</small></th><th>Pos.<small>&nbsp;</small></th>
+        </tr></thead><tbody id="mkBody2"></tbody></table>
+        <div class="sheet-foot"><span>Type in any cell</span><span style="margin-left:auto">A 70 · B 60 · C 50 · D 45 · E 40</span></div>
+      </div>
+    </div>
+
+    <div class="tour-pane">
+      <div>
+        <h3>What's blocking the end of term</h3>
+        <p>Not a wall of vanity numbers. The board answers one question on sight: which class is holding things up, and who needs chasing?</p>
+        <ul>
+          <li><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M13 4.5 6.3 11.5 3 8.2"/></svg>Entry progress per class and subject</li>
+          <li><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M13 4.5 6.3 11.5 3 8.2"/></svg>A "waiting on you" queue, not a puzzle to decode</li>
+          <li><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M13 4.5 6.3 11.5 3 8.2"/></svg>Last activity, so you know who's actually working</li>
+        </ul>
+      </div>
+      <div class="tvis">
+        <div class="ch-bar"><span class="ch-dot"></span><span class="ch-dot"></span><span class="ch-dot"></span><span class="ch-url">app.brillanda.com/overview</span></div>
+        <div class="kpis">
+          <div class="kpi"><b>312</b><span>Students</span></div><div class="kpi"><b>24</b><span>Teachers</span></div>
+          <div class="kpi"><b>78%</b><span>Entered</span></div><div class="kpi"><b>3/12</b><span>Published</span></div>
+        </div>
+        <div class="pnl"><div class="pnl-h">Term progress by class</div>
+          <div class="prow"><span class="n2">JSS 1A · 11 of 11</span><span class="mini-bar"><i style="width:100%"></i></span><span class="ps p-a">Published</span></div>
+          <div class="prow"><span class="n2">JSS 1B · 11 of 11</span><span class="mini-bar"><i style="width:100%"></i></span><span class="ps p-a">Complete</span></div>
+          <div class="prow"><span class="n2">JSS 2A · 9 of 11</span><span class="mini-bar"><i style="width:82%"></i></span><span class="ps p-c">In progress</span></div>
+          <div class="prow"><span class="n2">SS 1A · 2 of 12</span><span class="mini-bar"><i style="width:18%"></i></span><span class="ps p-f">Not started</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="tour-pane">
+      <div>
+        <h3>Nothing goes out unapproved</h3>
+        <p>Four stages between a teacher finishing and a parent seeing. Lock the subject, review the computed results, publish per class when you're satisfied.</p>
+        <ul>
+          <li><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M13 4.5 6.3 11.5 3 8.2"/></svg>Entry → Locked → Reviewed → Published</li>
+          <li><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M13 4.5 6.3 11.5 3 8.2"/></svg>Flags on anything that looks wrong</li>
+          <li><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M13 4.5 6.3 11.5 3 8.2"/></svg>Send back to a teacher with a note</li>
+        </ul>
+      </div>
+      <div class="tvis">
+        <div class="ch-bar"><span class="ch-dot"></span><span class="ch-dot"></span><span class="ch-dot"></span><span class="ch-url">app.brillanda.com/publishing</span></div>
+        <div class="pnl"><div class="pnl-h">Publishing · First Term</div>
+          <div class="prow"><span class="n2">JSS 1A</span><span class="mini-bar"><i style="width:100%"></i></span><span class="ps p-a">Published</span></div>
+          <div class="prow"><span class="n2">JSS 1B</span><span class="mini-bar"><i style="width:75%"></i></span><span class="ps p-c">Reviewed</span></div>
+          <div class="prow"><span class="n2">JSS 2A</span><span class="mini-bar"><i style="width:50%"></i></span><span class="ps p-c">Locked</span></div>
+          <div class="prow"><span class="n2">JSS 2B</span><span class="mini-bar"><i style="width:25%"></i></span><span class="ps p-n">Entry</span></div>
+        </div>
+        <div class="pnl"><div class="pnl-h">Flagged before publishing</div>
+          <div class="prow"><span class="n2">Civic Ed · class average moved 27 points</span><span class="ps p-c">Check</span></div>
+          <div class="prow"><span class="n2">Basic Science · 1 student has no scores</span><span class="ps p-c">Check</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="tour-pane">
+      <div>
+        <h3>A whole class in one action</h3>
+        <p>Your logo, your grading key, your class teacher's words. Generated for everyone at once and downloadable again next year when a parent misplaces theirs.</p>
+        <ul>
+          <li><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M13 4.5 6.3 11.5 3 8.2"/></svg>Under two minutes for a class of thirty-four</li>
+          <li><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M13 4.5 6.3 11.5 3 8.2"/></svg>Attendance can print alongside results</li>
+          <li><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M13 4.5 6.3 11.5 3 8.2"/></svg>Position hidden if your school prefers</li>
+        </ul>
+      </div>
+      <div class="tvis rc" style="padding:22px 24px">
+        <div class="rc-h"><div class="rc-logo">S</div><div><h4>Sunrise Academy, Lagos</h4><p>Terminal report · First Term, 2025/2026</p></div></div>
+        <div class="rc-meta">
+          <div><span>Student</span><b>Adaeze Okonkwo</b></div><div><span>Admission</span><b>2021/0142</b></div>
+          <div><span>Class</span><b>JSS 1A</b></div><div><span>Attendance</span><b>58 / 61</b></div>
+        </div>
+        <table class="rct"><thead><tr><th>Subject</th><th>CA</th><th>Exam</th><th>Total</th><th>Grade</th></tr></thead><tbody>
+          <tr><td>Mathematics</td><td>17</td><td>65</td><td>82</td><td>A</td></tr>
+          <tr><td>English Language</td><td>16</td><td>58</td><td>74</td><td>A</td></tr>
+          <tr><td>Basic Science</td><td>14</td><td>52</td><td>66</td><td>B</td></tr>
+          <tr><td>Social Studies</td><td>15</td><td>56</td><td>71</td><td>A</td></tr>
+          <tr><td>Civic Education</td><td>13</td><td>45</td><td>58</td><td>C</td></tr>
+        </tbody></table>
+        <div class="rc-foot"><div><span>Term average</span><b>70.2</b></div><div><span>Position</span><b>4th of 34</b></div><div><span>Resumes</span><b>12 Jan</b></div></div>
+      </div>
+    </div>
+
+    <div class="tour-pane">
+      <div>
+        <h3>Built for the phone it's opened on</h3>
+        <p>Most parents will never see Brillanda on a computer. The portal is designed at 375px first — average, grades, the teacher's remark, and a download.</p>
+        <ul>
+          <li><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M13 4.5 6.3 11.5 3 8.2"/></svg>Only their own child, only published terms</li>
+          <li><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M13 4.5 6.3 11.5 3 8.2"/></svg>Several children switchable from one account</li>
+          <li><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M13 4.5 6.3 11.5 3 8.2"/></svg>Nothing about any other student, ever</li>
+        </ul>
+      </div>
+      <div class="tvis" style="padding:26px;display:grid;place-items:center">
+        <div style="width:230px;border:1px solid var(--rule-2);border-radius:20px;overflow:hidden;background:var(--surface)">
+          <div style="padding:13px 15px;border-bottom:1px solid var(--rule);display:flex;align-items:center;gap:9px">
+            <span style="width:24px;height:24px;border-radius:50%;background:var(--sunken)"></span>
+            <span style="font-size:12px;font-weight:500">Adaeze Okonkwo</span>
+            <span class="ps p-a" style="margin-left:auto">Published</span>
+          </div>
+          <div style="padding:16px">
+            <div style="font-family:'Inter Tight';font-size:32px;font-weight:300;letter-spacing:-.04em;line-height:1">70.2</div>
+            <div style="font-size:10.5px;color:var(--ink-3);margin-bottom:14px">Term average · 4th of 34</div>
+            <div class="prow" style="padding:8px 0;border-top:1px solid var(--rule)"><span class="n2">Mathematics</span><span class="ps p-a">A</span></div>
+            <div class="prow" style="padding:8px 0"><span class="n2">English</span><span class="ps p-a">A</span></div>
+            <div class="prow" style="padding:8px 0"><span class="n2">Basic Science</span><span class="ps p-a">B</span></div>
+            <div class="prow" style="padding:8px 0"><span class="n2">Civic Education</span><span class="ps p-c">C</span></div>
+            <div style="margin-top:14px;padding:10px;border-radius:999px;background:var(--ink);color:var(--bg);text-align:center;font-size:11.5px;font-weight:500">Download report card</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="tour-pane">
+      <div>
+        <h3>The register, in one tap</h3>
+        <p>Part of the attendance module rather than the core, and built the same way: mark everyone present, then correct the exceptions, instead of tapping thirty-four times.</p>
+        <ul>
+          <li><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M13 4.5 6.3 11.5 3 8.2"/></svg>Mark all present, then flag the few who aren't</li>
+          <li><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M13 4.5 6.3 11.5 3 8.2"/></svg>Present, late and absent totals build live</li>
+          <li><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M13 4.5 6.3 11.5 3 8.2"/></svg>Termly totals can print on the report card</li>
+        </ul>
+      </div>
+      <div class="tvis">
+        <div class="ch-bar"><span class="ch-dot"></span><span class="ch-dot"></span><span class="ch-dot"></span><span class="ch-url">app.brillanda.com/attendance</span></div>
+        <div class="kpis" style="grid-template-columns:repeat(3,1fr)">
+          <div class="kpi"><b>31</b><span>Present</span></div><div class="kpi"><b>1</b><span>Late</span></div><div class="kpi"><b>2</b><span>Absent</span></div>
+        </div>
+        <div class="pnl"><div class="pnl-h">JSS 1A · Friday, 12 December</div>
+          <div class="prow"><span class="n2">Adaeze Okonkwo</span><span class="ps p-a">Present</span></div>
+          <div class="prow"><span class="n2">Chidi Nwosu</span><span class="ps p-a">Present</span></div>
+          <div class="prow"><span class="n2">Emeka Balogun</span><span class="ps p-c">Late</span></div>
+          <div class="prow"><span class="n2">Fatima Bello</span><span class="ps p-f">Absent</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="tour-pane">
+      <div>
+        <h3>Every change, on the record</h3>
+        <p>When a parent asks why a score changed, you have the answer rather than a memory. Append-only, and not editable by anyone — including you, and including us.</p>
+        <ul>
+          <li><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M13 4.5 6.3 11.5 3 8.2"/></svg>Old value and new value, side by side</li>
+          <li><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M13 4.5 6.3 11.5 3 8.2"/></svg>Overrides require a written reason</li>
+          <li><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M13 4.5 6.3 11.5 3 8.2"/></svg>Filter by person, date or record type</li>
+        </ul>
+      </div>
+      <div class="tvis">
+        <div class="ch-bar"><span class="ch-dot"></span><span class="ch-dot"></span><span class="ch-dot"></span><span class="ch-url">app.brillanda.com/activity</span></div>
+        <div class="pnl"><div class="pnl-h">Activity · last 24 hours</div>
+          <div class="prow"><span class="n2">Mrs. Okafor changed a score <b style="color:var(--ink)">64 → 68</b></span><span style="font-size:10.5px;color:var(--ink-3)">2h</span></div>
+          <div class="prow"><span class="n2">You locked JSS 1B · Mathematics</span><span style="font-size:10.5px;color:var(--ink-3)">4h</span></div>
+          <div class="prow"><span class="n2">You published JSS 1A results</span><span style="font-size:10.5px;color:var(--ink-3)">yesterday</span></div>
+          <div class="prow"><span class="n2">Mr. Adeyemi marked English complete</span><span style="font-size:10.5px;color:var(--ink-3)">yesterday</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ HOW IT WORKS ============ -->
+<section class="sec-e" id="work" data-io>
+  <div class="wrap">
+    <div class="ehead">
+      <p class="lbl fu"><span class="d"></span>How a term runs</p>
+      <h2><span class="lm"><span style="--d:0ms">A term in</span></span><span class="lm"><span style="--d:110ms">four moves.</span></span></h2>
+    </div>
+    <div class="steps">
+      <div class="step fu" style="--d:120ms"><span class="n">01</span><h3>Set up</h3><p>Enter your classes, subjects and grading scale. We pre-fill the standard scale, so most schools check it and move on.</p></div>
+      <div class="step fu" style="--d:240ms"><span class="n">02</span><h3>Enter</h3><p>Teachers fill in the grid. It behaves like the spreadsheet they already use, but won't accept 150 out of 100.</p></div>
+      <div class="step fu" style="--d:360ms"><span class="n">03</span><h3>Review</h3><p>Lock the term and check the computed results, with flags on anything odd — before a parent sees it.</p></div>
+      <div class="step fu" style="--d:480ms"><span class="n">04</span><h3>Publish</h3><p>Approve once. Parents get results and downloadable report cards the same minute.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ SETUP ============ -->
+<section class="sec-e" data-io>
+  <div class="wrap setup">
+    <div>
+      <div class="ehead" style="margin-bottom:34px">
+        <p class="lbl fu"><span class="d"></span>Getting started</p>
+        <h2><span class="lm"><span>Running before break ends.</span></span></h2>
+      </div>
+      <div class="sitem fu" style="--d:100ms"><span class="sn">01</span><div><h3>Register your school</h3><p>Name, logo and your admin account. Two minutes, no card, nothing to install.</p></div></div>
+      <div class="sitem fu" style="--d:180ms"><span class="sn">02</span><div><h3>Set your academic shape</h3><p>Session, terms, classes and arms, subjects per level, and your grading scale — pre-filled with the standard West African bands, ready to edit or accept.</p></div></div>
+      <div class="sitem fu" style="--d:260ms"><span class="sn">03</span><div><h3>Bring in students and staff</h3><p>Upload the spreadsheet you already keep. Map your columns to ours, fix the rows that fail, and invite teachers with their classes already assigned.</p></div></div>
+      <div class="sitem fu" style="--d:340ms"><span class="sn">04</span><div><h3>Let one teacher enter one subject</h3><p>That's the whole test. If they can do it unaided on the staff room laptop, the rest of the term looks after itself.</p></div></div>
+    </div>
+    <div class="fu" style="--d:200ms">
+      <div class="tvis">
+        <div class="ch-bar"><span class="ch-dot"></span><span class="ch-dot"></span><span class="ch-dot"></span><span class="ch-url">app.brillanda.com/setup/grading</span></div>
+        <div style="padding:20px 22px">
+          <div style="font-family:'Inter Tight';font-size:15px;font-weight:400;letter-spacing:-.02em;margin-bottom:5px">Grading scale</div>
+          <div style="font-size:12px;color:var(--ink-3);margin-bottom:16px">Pre-filled. Edit anything that isn't how your school runs.</div>
+          <div class="pnl" style="border-top:0">
+            <div class="prow" style="border-top:1px solid var(--rule)"><span class="n2">70 – 100</span><span class="ps p-a">A · Excellent</span></div>
+            <div class="prow"><span class="n2">60 – 69</span><span class="ps p-a">B · Very good</span></div>
+            <div class="prow"><span class="n2">50 – 59</span><span class="ps p-c">C · Good</span></div>
+            <div class="prow"><span class="n2">45 – 49</span><span class="ps p-c">D · Pass</span></div>
+            <div class="prow"><span class="n2">0 – 39</span><span class="ps p-f">F · Fail</span></div>
+          </div>
+          <div style="display:flex;gap:9px;align-items:center;margin-top:16px;padding:10px 13px;border-radius:3px;background:var(--success-bg);border:1px solid var(--success-border);font-size:12px;color:var(--success)">
+            <svg width="13" height="13" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M11.5 4 5.5 10 2.5 7"/></svg>
+            No gaps or overlaps. Weights total 100%.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ TRUST ============ -->
+<section class="sec-e" data-io>
+  <div class="wrap">
+    <div class="ehead">
+      <p class="lbl fu"><span class="d"></span>Your data</p>
+      <h2><span class="lm"><span style="--d:0ms">It's your school's</span></span><span class="lm"><span style="--d:110ms">record, not ours.</span></span></h2>
+    </div>
+    <div class="trust3">
+      <div class="tbox fu" style="--d:120ms"><h3>Role-based by default</h3><p>A teacher sees only the classes and subjects they're assigned to — enforced on the server, not hidden in the interface. Admin menus don't appear greyed out for them; they don't exist.</p></div>
+      <div class="tbox fu" style="--d:220ms"><h3>Export everything, any time</h3><p>Students, staff and every term's results as spreadsheets, downloadable without asking us or giving notice. If you leave, you leave with your records intact.</p></div>
+      <div class="tbox fu" style="--d:320ms"><h3>An unalterable history</h3><p>Score changes, overrides and publishing append to a log nobody can edit — not a teacher, not an admin, not us. When a parent queries a grade, the workings are there.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ VOICES ============ -->
+<section class="voices" data-io id="stories">
+  <div class="wrap">
+    <div class="v-top">
+      <h2 style="font-size:clamp(22px,2.6vw,32px);font-weight:300;letter-spacing:-.035em">What schools say</h2>
+      <span class="c"><span id="vNum">01</span> / 04</span>
+    </div>
+    <div class="v-stage">
+      <div class="v-pic">
+        <svg viewBox="0 0 170 210" role="img" aria-label="Vice principal, academics">
+          <rect width="170" height="210" fill="#E3E1DC"/><circle cx="85" cy="82" r="36" fill="#7A5A3E"/>
+          <path d="M49 78c0-22 16-36 36-36s36 14 36 36c-5-9-16-13-36-13s-31 4-36 13Z" fill="#241A14"/>
+          <path d="M31 210c0-35 24-58 54-58s54 23 54 58H31Z" fill="#22262A"/>
+        </svg>
+      </div>
+      <div>
+        <div class="v-slide on">
+          <blockquote>We used to lose the last week of term to arithmetic. Now the totals are done before the teacher leaves the room.</blockquote>
+          <div class="v-who"><b>Mrs. Folake Adeyemi</b><span>Vice Principal, Academics · 312 students</span></div>
+        </div>
+        <div class="v-slide">
+          <blockquote>Not one parent came to the office to query a position. In eleven years that had never happened.</blockquote>
+          <div class="v-who"><b>Mr. Tunde Bakare</b><span>Proprietor · 480 students</span></div>
+        </div>
+        <div class="v-slide">
+          <blockquote>I enter my scores on the staff room laptop in about eight minutes. It used to be an evening's work at home.</blockquote>
+          <div class="v-who"><b>Mrs. Ngozi Okafor</b><span>Mathematics, JSS 1–3</span></div>
+        </div>
+        <div class="v-slide">
+          <blockquote>The flagging caught a teacher entering exam scores in the CA column. We'd have printed 34 wrong cards.</blockquote>
+          <div class="v-who"><b>Mr. Samuel Eze</b><span>Head of Academics · 206 students</span></div>
+        </div>
+        <div class="v-nav">
+          <button class="v-btn" id="vPrev" aria-label="Previous story"><svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M10 2.5 4.5 8l5.5 5.5"/></svg></button>
+          <button class="v-btn" id="vNext" aria-label="Next story"><svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M6 2.5 11.5 8 6 13.5"/></svg></button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ PRICING ============ -->
+<section class="pricing" id="pricing" data-io>
+  <div class="wrap">
+    <div class="ehead">
+      <p class="lbl fu"><span class="d"></span>Pricing</p>
+      <h2><span class="lm"><span>Priced by how many students you have.</span></span></h2>
+      <p class="fu" style="--d:260ms">Not per teacher, not per module, no setup fee. One price for the school, billed per term, cancel whenever you like.</p>
+    </div>
+    <div class="plan-row">
+      <div class="plan fu" style="--d:120ms">
+        <span class="tag">&nbsp;</span><h3>Trial</h3>
+        <div class="amt">Free</div><div class="per">for one full term</div>
+        <div class="lim">Up to 150 students</div>
+        <ul>
+          <li><svg width="13" height="13" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M11.5 4 5.5 10 2.5 7"/></svg>The full core: records, scores, results, report cards</li>
+          <li><svg width="13" height="13" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M11.5 4 5.5 10 2.5 7"/></svg>Spreadsheet import</li>
+          <li><svg width="13" height="13" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M11.5 4 5.5 10 2.5 7"/></svg>One term of history</li>
+        </ul>
+        <a class="btn btn-line" href="#signup" data-mag><span class="fill"></span><span class="lnk"><span>Start free</span><span aria-hidden="true">Start free</span></span></a>
+      </div>
+      <div class="plan best fu" style="--d:240ms">
+        <span class="tag">Most schools</span><h3>Basic</h3>
+        <div class="amt">₦45,000</div><div class="per">per term</div>
+        <div class="lim">Up to 400 students</div>
+        <ul>
+          <li><svg width="13" height="13" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M11.5 4 5.5 10 2.5 7"/></svg>Everything in Trial</li>
+          <li><svg width="13" height="13" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M11.5 4 5.5 10 2.5 7"/></svg>Parent &amp; student portals</li>
+          <li><svg width="13" height="13" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M11.5 4 5.5 10 2.5 7"/></svg>Attendance &amp; timetables</li>
+          <li><svg width="13" height="13" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M11.5 4 5.5 10 2.5 7"/></svg>Three years of history</li>
+        </ul>
+        <a class="btn btn-solid" href="#signup" data-mag><span class="fill"></span><span class="lnk"><span>Choose Basic</span><span aria-hidden="true">Choose Basic</span></span></a>
+      </div>
+      <div class="plan fu" style="--d:360ms">
+        <span class="tag">&nbsp;</span><h3>Standard</h3>
+        <div class="amt">₦85,000</div><div class="per">per term</div>
+        <div class="lim">Up to 1,200 students</div>
+        <ul>
+          <li><svg width="13" height="13" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M11.5 4 5.5 10 2.5 7"/></svg>Everything in Basic</li>
+          <li><svg width="13" height="13" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M11.5 4 5.5 10 2.5 7"/></svg>AI assistant &amp; CBT exams</li>
+          <li><svg width="13" height="13" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M11.5 4 5.5 10 2.5 7"/></svg>Unlimited history, multiple campuses</li>
+          <li><svg width="13" height="13" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M11.5 4 5.5 10 2.5 7"/></svg>Email &amp; phone support</li>
+        </ul>
+        <a class="btn btn-line" href="#signup" data-mag><span class="fill"></span><span class="lnk"><span>Choose Standard</span><span aria-hidden="true">Choose Standard</span></span></a>
+      </div>
+    </div>
+    <p class="fu" style="--d:440ms;margin-top:30px;font-size:13.5px;color:var(--ink-3)">
+      The four extra modules are switched off until you want them. More than 1,200 students or several campuses? Talk to us about a school-group plan.
+    </p>
+  </div>
+</section>
+
+<!-- ============ FAQ ============ -->
+<section class="sec-e" id="faq" data-io>
+  <div class="wrap faq2">
+    <div>
+      <div class="ehead" style="margin-bottom:24px">
+        <p class="lbl fu"><span class="d"></span>Questions</p>
+        <h2><span class="lm"><span>Answered honestly.</span></span></h2>
+        <p class="fu" style="--d:260ms">Including the ones where the answer isn't what you were hoping for.</p>
+      </div>
+      <a class="btn btn-line fu" style="--d:340ms" href="#contact" data-mag><span class="fill"></span><span class="lnk"><span>Book a walkthrough</span><span aria-hidden="true">Book a walkthrough</span></span></a>
+    </div>
+    <div class="acc2 fu" style="--d:160ms">
+      <details open><summary>What's the difference between the core and the extra modules?<span class="ico"><svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M6 2v8M2 6h8"/></svg></span></summary>
+        <div class="ans">The core — records, score entry, results, report cards and publishing — is what every school gets and what we hold to the highest standard. Attendance, timetables, the AI assistant and CBT sit alongside it and are switched off until you want them. Nothing in the extras changes how score entry or computation behaves, which is deliberate: the part your term depends on shouldn't shift because you enabled a timetable.</div></details>
+      <details><summary>Does it handle school fees?<span class="ico"><svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M6 2v8M2 6h8"/></svg></span></summary>
+        <div class="ans">No. Fees, payroll and accounting are real jobs that deserve real software, and a weak version bolted on is how school systems end up with thirty modules and four good ones. If fee collection is your main problem today, we're honestly not your system.</div></details>
+      <details><summary>Our grading scale isn't the standard one. Can we change it?<span class="ico"><svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M6 2v8M2 6h8"/></svg></span></summary>
+        <div class="ans">Yes. Set your own grade bands, remarks and CA-to-exam split, with different rules for junior and senior classes if you run them differently. We pre-fill the common West African scale so you can start today, and we catch gaps at setup — a score between 39 and 40 that maps to nothing gets flagged before it can break a report card.</div></details>
+      <details><summary>We have years of records in Excel. Do we retype everything?<span class="ico"><svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M6 2v8M2 6h8"/></svg></span></summary>
+        <div class="ans">No. Upload the spreadsheet and match your column names to ours in a dropdown — if you called it "Surname" and we call it "Last name", you fix that in the interface rather than re-editing the file. Rows with problems are listed with the exact reason, the clean ones still import, and the failures download as a corrected template. On paid plans we do the first migration with you.</div></details>
+      <details><summary>Does the AI assistant change our data?<span class="ico"><svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M6 2v8M2 6h8"/></svg></span></summary>
+        <div class="ans">It reads and it drafts, but it doesn't change a score on its own. Ask who hasn't entered yet, which class average moved, or who's below the pass mark, and you get an answer from your own data. Anything that would alter a record still goes through the same review and audit trail as a human doing it by hand — a machine shouldn't be able to quietly move a child's grade.</div></details>
+      <details><summary>Our internet is unreliable. Will teachers lose their work?<span class="ico"><svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M6 2v8M2 6h8"/></svg></span></summary>
+        <div class="ans">Each score saves on its own as it's entered rather than waiting for a submit button, and a failed save is queued and retried instead of dropped. CBT exams run over the exam hall's own Wi-Fi when the internet is down, and sync when it returns.</div></details>
+      <details><summary>What if a wrong score gets published?<span class="ico"><svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M6 2v8M2 6h8"/></svg></span></summary>
+        <div class="ans">Unpublish, correct, publish again. Every change is recorded with who made it, when, and what it was before. We'll also say plainly that parents who already opened the results may have seen them — pretending otherwise would cost you more than the mistake.</div></details>
+      <details><summary>What happens to our data if we leave?<span class="ico"><svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M6 2v8M2 6h8"/></svg></span></summary>
+        <div class="ans">You export everything — students, staff and every term's results — as spreadsheets, at any time, without asking us or giving notice. It's your school's record. Holding it hostage would be a worse business than earning the renewal.</div></details>
+    </div>
+  </div>
+</section>
+
+<!-- ============ CTA ============ -->
+<section class="cta" data-io id="signup"><span id="signin" class="sr" aria-hidden="true"></span>
+  <div class="wrap">
+    <h2><span class="lm"><span style="--d:0ms">Try it on one class</span></span><span class="lm"><span style="--d:110ms">this term.</span></span></h2>
+    <p class="fu" style="--d:280ms">Set up a single class, let one teacher enter their scores, and see the report cards come out the other end. If it doesn't save you the week, don't keep it.</p>
+    <div class="cta-a fu" style="--d:380ms">
+      <a class="btn btn-onDark" href="#signup" data-mag><span class="fill"></span><span class="lnk"><span>Register your school</span><span aria-hidden="true">Register your school</span></span></a>
+      <a class="btn btn-onDark" href="#signin" data-mag><span class="fill"></span><span class="lnk"><span>Sign in</span><span aria-hidden="true">Sign in</span></span></a>
+    </div>
+    <p class="fu" style="--d:460ms;margin-top:26px;font-size:13.5px;color:rgba(242,241,239,.45)">Free for a full term · No card needed · Cancel any time</p>
+  </div>
+</section>
+
+<footer id="contact">
+  <div class="wrap">
+    <div class="news" style="border-top:0">
+      <div>
+        <h3 style="color:#F2F1EF">Notes from the staff room</h3>
+        <p style="color:rgba(242,241,239,.6)">What we're building, and the occasional practical piece on running results well. About once a month, never a sales blast.</p>
+      </div>
+      <form class="news-form" onsubmit="return false">
+        <label class="sr" for="nm">Email address</label>
+        <input id="nm" type="email" placeholder="you@yourschool.edu.ng" style="border-color:rgba(242,241,239,.25);color:#F2F1EF" required>
+        <button class="btn btn-onDark" type="submit" data-mag><span class="fill"></span><span class="lnk"><span>Join the list</span><span aria-hidden="true">Join the list</span></span></button>
+      </form>
+    </div>
+    <div class="f-top">
+      <div>
+        <a class="mark" href="#top"><i aria-hidden="true"></i>Brillanda</a>
+        <p style="color:rgba(242,241,239,.55);font-size:14.5px;max-width:30ch;margin-top:14px;line-height:1.65">Results and records for schools that want one thing done properly. Built in Nigeria, for schools here.</p>
+        <div class="f-contact">
+          <a href="mailto:hello@brillanda.com"><svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1.5" y="3.5" width="13" height="9" rx="1.5"/><path d="m2 4.5 6 4 6-4"/></svg>hello@brillanda.com</a>
+          <a href="tel:+2340000000000"><svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5.5 2.5 7 5.5 5.5 7a7 7 0 0 0 3.5 3.5L10.5 9l3 1.5v2a1 1 0 0 1-1.1 1A10.5 10.5 0 0 1 2.5 3.6a1 1 0 0 1 1-1.1h2Z"/></svg>+234 000 000 0000</a>
+          <a href="#"><svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 14.5s5-4.2 5-8a5 5 0 0 0-10 0c0 3.8 5 8 5 8Z"/><circle cx="8" cy="6.5" r="1.8"/></svg>Port Harcourt, Rivers State</a>
+        </div>
+        <div class="socials">
+          <a href="#" aria-label="X"><svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M12.2 1.5h2.3l-5 5.7 5.9 7.3h-4.6L7.2 9.9l-4.1 4.6H.8l5.4-6.1L.5 1.5h4.7l3.3 4.1 3.7-4.1Zm-.8 11.7h1.3L4.7 2.7H3.3l8.1 10.5Z"/></svg></a>
+          <a href="#" aria-label="Instagram"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="2" y="2" width="12" height="12" rx="3.5"/><circle cx="8" cy="8" r="2.8"/><circle cx="11.6" cy="4.4" r=".8" fill="currentColor"/></svg></a>
+          <a href="#" aria-label="LinkedIn"><svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M3.6 5.5H1.5v9h2.1v-9ZM2.55 1.5a1.2 1.2 0 1 0 0 2.4 1.2 1.2 0 0 0 0-2.4ZM14.5 9.7c0-2.5-1.3-3.7-3.1-3.7-1.4 0-2 .8-2.4 1.3V5.5H6.9v9H9v-5c0-.3 0-.5.1-.7.2-.5.7-1 1.5-1 1 0 1.4.8 1.4 2v4.7h2.1V9.7Z"/></svg></a>
+          <a href="#" aria-label="Facebook"><svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M9.3 14.5V8.6h2l.3-2.3H9.3V4.8c0-.7.2-1.1 1.2-1.1h1.2V1.6c-.2 0-.9-.1-1.8-.1-1.8 0-3 1.1-3 3.1v1.7H4.9v2.3h2v5.9h2.4Z"/></svg></a>
+        </div>
+      </div>
+      <div class="f-cols">
+        <div><h4>Core</h4><ul>
+          <li><a class="lnk" href="#core"><span>What's included</span><span aria-hidden="true">What's included</span></a></li>
+          <li><a class="lnk" href="#tour"><span>Product tour</span><span aria-hidden="true">Product tour</span></a></li>
+          <li><a class="lnk" href="#work"><span>How a term runs</span><span aria-hidden="true">How a term runs</span></a></li>
+          <li><a class="lnk" href="#pricing"><span>Pricing</span><span aria-hidden="true">Pricing</span></a></li>
+        </ul></div>
+        <div><h4>Modules</h4><ul>
+          <li><a class="lnk" href="#beyond"><span>Attendance</span><span aria-hidden="true">Attendance</span></a></li>
+          <li><a class="lnk" href="#beyond"><span>Timetables</span><span aria-hidden="true">Timetables</span></a></li>
+          <li><a class="lnk" href="#beyond"><span>AI assistant</span><span aria-hidden="true">AI assistant</span></a></li>
+          <li><a class="lnk" href="#beyond"><span>CBT exams</span><span aria-hidden="true">CBT exams</span></a></li>
+        </ul></div>
+        <div><h4>By role</h4><ul>
+          <li><a class="lnk" href="#roles"><span>Proprietors</span><span aria-hidden="true">Proprietors</span></a></li>
+          <li><a class="lnk" href="#roles"><span>Teachers</span><span aria-hidden="true">Teachers</span></a></li>
+          <li><a class="lnk" href="#roles"><span>Parents</span><span aria-hidden="true">Parents</span></a></li>
+          <li><a class="lnk" href="#roles"><span>Students</span><span aria-hidden="true">Students</span></a></li>
+        </ul></div>
+        <div><h4>Company</h4><ul>
+          <li><a class="lnk" href="#"><span>About</span><span aria-hidden="true">About</span></a></li>
+          <li><a class="lnk" href="#faq"><span>FAQ</span><span aria-hidden="true">FAQ</span></a></li>
+          <li><a class="lnk" href="#"><span>Privacy</span><span aria-hidden="true">Privacy</span></a></li>
+          <li><a class="lnk" href="#"><span>Terms</span><span aria-hidden="true">Terms</span></a></li>
+        </ul></div>
+      </div>
+    </div>
+    <div class="ghost" aria-hidden="true">Brillanda</div>
+    <div class="f-bot">
+      <span>©2026 Brillanda</span><span>Port Harcourt, Nigeria</span>
+      <button class="tbtn" id="themeBtn"><svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M13.5 9.3A5.8 5.8 0 016.7 2.5a5.8 5.8 0 106.8 6.8Z"/></svg><span id="themeLabel">Dark</span></button>
+    </div>
+  </div>
+</footer>
+
+<script>
+
+(function(){
+  var RM = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* ---------- PRELOADER ---------- */
+  var pre=document.getElementById('pre'), bar=document.getElementById('preBar'), num=document.getElementById('preNum');
+  var hero=document.getElementById('top'), nav=document.getElementById('nav');
+  function startPage(){
+    document.body.classList.remove('locked');
+    hero.classList.add('go');
+    nav.classList.add('up');
+    document.getElementById('heroH').classList.add('is-in');
+    hero.querySelectorAll('.fu').forEach(function(el){ el.classList.add('is-in'); });
+  }
+  if(RM){ pre.remove(); startPage(); }
+  else{
+    requestAnimationFrame(function(){ pre.classList.add('ready'); });
+    var p=0;
+    var tick=setInterval(function(){
+      p += Math.random()*14+6; if(p>100) p=100;
+      bar.style.transform='scaleX('+(p/100)+')';
+      num.textContent=Math.round(p);
+      if(p>=100){
+        clearInterval(tick);
+        setTimeout(function(){
+          pre.classList.add('done');
+          startPage();
+          setTimeout(function(){ pre.remove(); },1400);
+        },320);
+      }
+    },130);
+  }
+
+  /* ---------- SCROLL REVEALS ---------- */
+  var io=new IntersectionObserver(function(es){
+    es.forEach(function(e){
+      if(e.isIntersecting){ e.target.classList.add('is-in'); io.unobserve(e.target); }
+    });
+  },{threshold:.16,rootMargin:'0px 0px -8% 0px'});
+  document.querySelectorAll('[data-io], .media, .wipe').forEach(function(el){ io.observe(el); });
+  /* standalone reveal items not inside a [data-io] parent */
+  document.querySelectorAll('.lm, .fu').forEach(function(el){
+    if(!el.closest('[data-io]') && !el.closest('.hero')) io.observe(el);
+  });
+
+  /* ---------- COUNTERS ---------- */
+  var cio=new IntersectionObserver(function(es){
+    es.forEach(function(e){
+      if(!e.isIntersecting) return;
+      var el=e.target, to=+el.dataset.count, t0=null, dur=1500;
+      if(RM || to===0){ el.textContent=to; cio.unobserve(el); return; }
+      function step(ts){
+        if(!t0) t0=ts;
+        var k=Math.min((ts-t0)/dur,1), eased=1-Math.pow(1-k,3);
+        el.textContent=Math.round(to*eased);
+        if(k<1) requestAnimationFrame(step);
+      }
+      requestAnimationFrame(step); cio.unobserve(el);
+    });
+  },{threshold:.5});
+  document.querySelectorAll('[data-count]').forEach(function(el){ cio.observe(el); });
+
+  /* ---------- PARALLAX + PINNED TRACK + NAV STATE ---------- */
+  var pxEls=[].slice.call(document.querySelectorAll('[data-parallax]'));
+  var pinOuter=document.querySelector('.pin-outer'), track=document.getElementById('pinTrack');
+  var ticking=false;
+  function frame(){
+    ticking=false;
+    var y=window.scrollY, vh=window.innerHeight;
+
+    if(!RM){
+      pxEls.forEach(function(el){
+        var r=el.getBoundingClientRect();
+        if(r.bottom<-200||r.top>vh+200) return;
+        var sp=parseFloat(el.dataset.parallax)||.2;
+        var mid=r.top+r.height/2-vh/2;
+        el.style.transform='translate3d(0,'+(-mid*sp).toFixed(2)+'px,0)';
+      });
+
+      if(pinOuter&&track){
+        var pr=pinOuter.getBoundingClientRect();
+        var prog=Math.min(Math.max(-pr.top/(pinOuter.offsetHeight-vh),0),1);
+        var dist=Math.max(track.scrollWidth-window.innerWidth+80,0);
+        track.style.transform='translate3d('+(-prog*dist).toFixed(2)+'px,0,0)';
+      }
+    }
+
+    nav.classList.toggle('stuck', y>40);
+    var hb=hero.getBoundingClientRect().bottom;
+    var ctaEl=document.querySelector('.cta').getBoundingClientRect();
+    var overDark = hb>90 || (ctaEl.top<90 && ctaEl.bottom>90);
+    nav.classList.toggle('over-dark', overDark);
+    document.getElementById('siBtn').className='btn btn-sm '+(overDark?'btn-onDark':'btn-line');
+    document.getElementById('suBtn').className='btn btn-sm '+(overDark?'btn-onDark':'btn-solid');
+  }
+  window.addEventListener('scroll',function(){ if(!ticking){ ticking=true; requestAnimationFrame(frame); } },{passive:true});
+  window.addEventListener('resize',frame); frame();
+
+  /* ---------- CUSTOM CURSOR ---------- */
+  var cur=document.getElementById('cursor'), curL=document.getElementById('curLabel');
+  if(cur && !RM && window.matchMedia('(hover:hover)').matches){
+    var cx=window.innerWidth/2, cy=window.innerHeight/2, tx=cx, ty=cy;
+    window.addEventListener('mousemove',function(e){ tx=e.clientX; ty=e.clientY; },{passive:true});
+    (function loop(){
+      cx+=(tx-cx)*.16; cy+=(ty-cy)*.16;
+      cur.style.transform='translate3d('+cx+'px,'+cy+'px,0) translate(-50%,-50%)';
+      requestAnimationFrame(loop);
+    })();
+    document.querySelectorAll('a,button,input').forEach(function(el){
+      el.addEventListener('mouseenter',function(){
+        cur.classList.add('grow');
+        curL.textContent = el.dataset.cur || (el.tagName==='INPUT' ? 'Type' : '');
+      });
+      el.addEventListener('mouseleave',function(){ cur.classList.remove('grow'); curL.textContent=''; });
+    });
+  }
+
+  /* ---------- MAGNETIC BUTTONS ---------- */
+  if(!RM && window.matchMedia('(hover:hover)').matches){
+    document.querySelectorAll('[data-mag]').forEach(function(el){
+      el.addEventListener('mousemove',function(e){
+        var r=el.getBoundingClientRect();
+        var dx=(e.clientX-(r.left+r.width/2))*.22, dy=(e.clientY-(r.top+r.height/2))*.32;
+        el.style.transform='translate('+dx+'px,'+dy+'px)';
+      });
+      el.addEventListener('mouseleave',function(){
+        el.style.transition='transform .5s cubic-bezier(.16,1,.3,1)';
+        el.style.transform='';
+        setTimeout(function(){ el.style.transition=''; },520);
+      });
+    });
+  }
+
+  /* ---------- TESTIMONIAL SLIDER ---------- */
+  var slides=[].slice.call(document.querySelectorAll('.v-slide')), vi=0, vNum=document.getElementById('vNum');
+  function show(n){
+    vi=(n+slides.length)%slides.length;
+    slides.forEach(function(s,i){ s.classList.toggle('on',i===vi); });
+    vNum.textContent=String(vi+1).padStart(2,'0');
+  }
+  document.getElementById('vNext').addEventListener('click',function(){ show(vi+1); });
+  document.getElementById('vPrev').addEventListener('click',function(){ show(vi-1); });
+
+  /* ---------- THEME ---------- */
+  var tb=document.getElementById('themeBtn'), tl=document.getElementById('themeLabel');
+  function cur2(){ return document.documentElement.getAttribute('data-theme')||(window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light'); }
+  function syncT(){ tl.textContent=cur2()==='dark'?'Light':'Dark'; }
+  try{ var sv=localStorage.getItem('brillanda-theme'); if(sv) document.documentElement.setAttribute('data-theme',sv); }catch(e){}
+  syncT();
+  tb.addEventListener('click',function(){
+    var n=cur2()==='dark'?'light':'dark';
+    document.documentElement.setAttribute('data-theme',n);
+    try{ localStorage.setItem('brillanda-theme',n); }catch(e){}
+    syncT();
+  });
+
+  /* ---------- LIVE MARK SHEET ---------- */
+  var COMP=[{k:'ca1',max:10},{k:'ca2',max:10},{k:'exam',max:80}];
+  var SCALE=[[70,100,'A','g-a'],[60,69,'B','g-a'],[50,59,'C','g-c'],[45,49,'D','g-c'],[40,44,'E','g-c'],[0,39,'F','g-f']];
+  var studs=[
+    {n:'Adaeze Okonkwo',id:'2021/0142',ca1:8,ca2:9,exam:65},
+    {n:'Chidi Nwosu',id:'2021/0143',ca1:7,ca2:6,exam:51},
+    {n:'Emeka Balogun',id:'2021/0144',ca1:9,ca2:8,exam:58},
+    {n:'Fatima Bello',id:'2021/0145',ca1:6,ca2:7,exam:44},
+    {n:'Ibrahim Sule',id:'2021/0146',ca1:10,ca2:9,exam:71}
+  ];
+  var body=document.getElementById('mkBody2');
+  function tone(v,m){ if(v===''||isNaN(v)) return ''; var p=v/m; return p>=.7?'hi':(p>=.5?'mid':'lo'); }
+  function tot(s){ var t=0; COMP.forEach(function(c){ var v=parseFloat(s[c.k]); if(!isNaN(v)) t+=v; }); return t; }
+  function grd(t){ for(var i=0;i<SCALE.length;i++){ if(t>=SCALE[i][0]&&t<=SCALE[i][1]) return SCALE[i]; } return SCALE[SCALE.length-1]; }
+  function ord(n){ var s=['th','st','nd','rd'],v=n%100; return n+(s[(v-20)%10]||s[v]||s[0]); }
+  studs.forEach(function(s,i){
+    var tr=document.createElement('tr');
+    tr.innerHTML='<td class="nm"><b>'+s.n+'</b><span>'+s.id+'</span></td>'+
+      COMP.map(function(c){return '<td class="cell"><input type="number" min="0" max="'+c.max+'" value="'+s[c.k]+'" data-i="'+i+'" data-k="'+c.k+'" data-max="'+c.max+'" aria-label="'+c.k.toUpperCase()+' for '+s.n+', maximum '+c.max+'"></td>';}).join('')+
+      '<td class="out" data-tot="'+i+'"></td><td class="gr" data-gr="'+i+'"></td><td class="pos" data-pos="'+i+'"></td>';
+    body.appendChild(tr);
+  });
+  body.addEventListener('input',function(e){
+    var el=e.target; if(el.tagName!=='INPUT') return;
+    var mx=+el.dataset.max, v=el.value;
+    if(v!=='' && (+v>mx||+v<0)){ el.value=v.slice(0,-1); return; }
+    studs[+el.dataset.i][el.dataset.k]= v===''?0:+v; paint(true);
+  });
+  body.addEventListener('keydown',function(e){
+    if(e.key!=='Enter') return; e.preventDefault();
+    var ins=[].slice.call(body.querySelectorAll('input')), i=ins.indexOf(e.target), nx=ins[i+COMP.length];
+    if(nx){ nx.focus(); nx.select(); }
+  });
+  function paint(flash){
+    var rk=studs.map(function(s,i){return {i:i,t:tot(s)};}).sort(function(a,b){return b.t-a.t;});
+    var pos={},last=null,lr=0;
+    rk.forEach(function(r,idx){ var v=(last!==null&&r.t===last)?lr:idx+1; pos[r.i]=v; last=r.t; lr=v; });
+    studs.forEach(function(s,i){
+      var t=tot(s), g=grd(t);
+      body.querySelector('[data-tot="'+i+'"]').textContent=t;
+      body.querySelector('[data-gr="'+i+'"]').innerHTML='<span class="gb '+g[3]+'">'+g[2]+'</span>';
+      var pc=body.querySelector('[data-pos="'+i+'"]'), np=ord(pos[i]);
+      if(flash&&pc.textContent!==np){ pc.classList.add('flash'); setTimeout(function(){pc.classList.remove('flash');},700); }
+      pc.textContent=np;
+      COMP.forEach(function(c){
+        var inp=body.querySelector('input[data-i="'+i+'"][data-k="'+c.k+'"]');
+        inp.classList.remove('hi','mid','lo');
+        var cl=tone(parseFloat(inp.value),c.max); if(cl) inp.classList.add(cl);
+      });
+    });
+  }
+  paint(false);
+})();
+</script>
+</body>
+</html>

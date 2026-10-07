@@ -1,0 +1,60 @@
+<title>Brillanda Prototype</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap">
+<link rel="stylesheet" href="app.css">
+
+<div class="demo">
+  <p class="demo-l"><b>Brillanda prototype</b> Sample data. Everything you click works; nothing is saved.</p>
+  <div class="demo-r">
+    <div class="seg" role="group" aria-label="Look">
+      <button type="button" data-demo="look" data-v="pastel">Pastel</button>
+      <button type="button" data-demo="look" data-v="neutral">Neutral</button>
+      <button type="button" data-demo="look" data-v="calm">Calm</button>
+      <button type="button" data-demo="look" data-v="assembly">Assembly</button>
+      <button type="button" data-demo="look" data-v="frosted">Frosted</button>
+      <button type="button" data-demo="look" data-v="school">School colours</button>
+    </div>
+    <div class="seg" role="group" aria-label="School colours" id="school-seg" hidden>
+      <button type="button" data-demo="school" data-v="greenfield" title="Green and gold"><span style="display:inline-block;width:12px;height:12px;border-radius:50%;background:#1F5E3B;box-shadow:3px 0 0 #D4A537;margin-right:6px"></span>Greenfield</button>
+      <button type="button" data-demo="school" data-v="crestview" title="Navy and red"><span style="display:inline-block;width:12px;height:12px;border-radius:50%;background:#1E3A6E;box-shadow:3px 0 0 #D9534A;margin-right:6px"></span>Crestview</button>
+      <button type="button" data-demo="school" data-v="stanne" title="Purple and gold"><span style="display:inline-block;width:12px;height:12px;border-radius:50%;background:#4B2C82;box-shadow:3px 0 0 #E0B040;margin-right:6px"></span>St. Anne's</button>
+      <button type="button" data-demo="school" data-v="kings" title="Maroon and gold"><span style="display:inline-block;width:12px;height:12px;border-radius:50%;background:#6E1F2B;box-shadow:3px 0 0 #D9B26A;margin-right:6px"></span>Kings'</button>
+    </div>
+    <div class="seg" role="group" aria-label="View as">
+      <button type="button" data-demo="role" data-v="admin">School admin</button>
+      <button type="button" data-demo="role" data-v="teacher">Teacher</button>
+      <button type="button" data-demo="role" data-v="parent">Parent</button>
+      <button type="button" data-demo="role" data-v="super">Brillanda team</button>
+    </div>
+    <div class="seg" role="group" aria-label="Device">
+      <button type="button" data-demo="device" data-v="desktop">Desktop</button>
+      <button type="button" data-demo="device" data-v="phone">Phone</button>
+    </div>
+    <button class="reset" type="button" id="reset">Reset demo</button>
+  </div>
+</div>
+
+<div class="stage">
+  <div class="frame" id="frame">
+    <div class="wash" aria-hidden="true"></div>
+    <div class="app" id="app"></div>
+    <div class="scrim" id="scrim"></div>
+    <div class="modal" id="modal" role="dialog" aria-modal="true" aria-hidden="true"></div>
+    <aside class="sheet" id="sheet" role="dialog" aria-modal="true" aria-hidden="true"></aside>
+    <div class="pop-menu" id="pop" role="menu"></div>
+    <div class="pal" id="pal" role="dialog" aria-label="Search" aria-hidden="true">
+      <div class="pal-in"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="6"/><path d="M20 20l-4.3-4.3"/></svg><input id="pal-q" type="text" autocomplete="off" placeholder="Search classes, students, subjects or actions" aria-label="Search"><kbd>Esc</kbd></div>
+      <div class="pal-list" id="pal-list" role="listbox"></div>
+    </div>
+    <div class="stamp" id="stamp" aria-hidden="true"><svg viewBox="0 0 200 200"><defs><path id="stamp-path" d="M100,100 m-70,0 a70,70 0 1,1 140,0 a70,70 0 1,1 -140,0"/></defs>
+      <circle cx="100" cy="100" r="92" class="st-ring"/><circle cx="100" cy="100" r="84" class="st-dash"/><circle cx="100" cy="100" r="50" class="st-core"/>
+      <text class="st-text"><textPath href="#stamp-path" id="stamp-text" textLength="432" lengthAdjust="spacing">PUBLISHED • RESULTS SENT • </textPath></text>
+      <path class="st-check" pathLength="1" d="M78 101 l15 15 l30 -32"/></svg></div>
+    <div class="toast" id="toast" role="status" aria-live="polite"><i><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7"/></svg></i><span id="toast-t"></span></div>
+  </div>
+</div>
+<div class="tip" id="tip" role="tooltip"></div>
+
+<script src="data.js" charset="utf-8"></script>
+<script src="app.js" charset="utf-8"></script>

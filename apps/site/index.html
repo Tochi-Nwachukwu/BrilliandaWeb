@@ -1,0 +1,1048 @@
+<!doctype html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Brillanda — Results, records and report cards for Nigerian schools</title>
+    <meta
+      name="description"
+      content="Brillanda is school records software for Nigerian secondary and primary schools. Teachers enter scores, the system computes totals, grades and positions, and parents read the result on a phone."
+    />
+    <meta name="theme-color" content="#faf9f7" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#0e0f11" media="(prefers-color-scheme: dark)" />
+    <meta property="og:title" content="Brillanda — Results, records and report cards" />
+    <meta
+      property="og:description"
+      content="One place for scores, report cards and the parent portal. Built for Nigerian schools, terms, arms and CA/Exam weighting."
+    />
+    <meta property="og:type" content="website" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/favicon.svg" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500&family=Instrument+Sans:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <!-- Outfit has no naira sign. This loads Inter Tight cut down to that single glyph (under a
+         kilobyte) so ₦ in the prices matches the rest of the type instead of the device's guess. -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@300;400;500&text=%E2%82%A6&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="preload" as="image" href="/photos/classroom-lagos-960.webp" imagesrcset="/photos/classroom-lagos-480.webp 480w, /photos/classroom-lagos-960.webp 960w, /photos/classroom-lagos-1600.webp 1600w" imagesizes="100vw" />
+
+    <link rel="stylesheet" href="/src/styles/tokens.css" />
+    <link rel="stylesheet" href="/src/styles/base.css" />
+    <link rel="stylesheet" href="/src/styles/sections.css" />
+    <script type="module" src="/src/main.ts"></script>
+  </head>
+
+  <body class="is-loading">
+    <!-- First visit only. After that this element is removed before paint. -->
+    <div id="intro" aria-hidden="true">
+      <div class="intro-in">
+        <div class="intro-mark"><span>Brillanda</span></div>
+        <div class="intro-bar"><i></i></div>
+      </div>
+    </div>
+
+    <div id="cursor" aria-hidden="true"></div>
+
+    <a class="sr" href="#main">Skip to content</a>
+
+    <header class="nav over-dark" id="nav">
+      <div class="wrap nav-in">
+        <a class="mark" href="/" aria-label="Brillanda, home"><i></i>Brillanda</a>
+        <nav class="nav-links" aria-label="Sections">
+          <a href="#what">What it does</a>
+          <a href="#inside">Inside</a>
+          <a href="#term">How a term runs</a>
+          <a href="#pricing">Pricing</a>
+        </nav>
+        <div class="nav-right">
+          <a class="btn btn-line btn-sm" id="signin" href="/login"><span class="fill"></span><span>Sign in</span></a>
+          <a class="btn btn-solid btn-sm" href="#start"><span class="fill"></span><span>Request a trial</span></a>
+        </div>
+      </div>
+    </header>
+
+    <main id="main">
+      <!-- ============ hero ============ -->
+      <section class="hero" id="hero">
+        <div class="hero-media">
+          <div class="inner">
+            <img
+              src="/photos/classroom-lagos-960.webp"
+              srcset="
+                /photos/classroom-lagos-480.webp   480w,
+                /photos/classroom-lagos-960.webp   960w,
+                /photos/classroom-lagos-1600.webp 1600w
+              "
+              sizes="100vw"
+              alt="Students at their desks in a Nigerian classroom"
+              width="1600"
+              height="1067"
+              fetchpriority="high"
+            />
+          </div>
+          <div class="hero-veil"></div>
+        </div>
+
+        <div class="wrap hero-in">
+          <h1>
+            <span class="lm"><span>The term’s results,</span></span>
+            <span class="lm"><span style="--d: 90ms">without the long night</span></span>
+            <span class="lm"><span style="--d: 180ms">of adding up.</span></span>
+          </h1>
+          <div class="hero-row">
+            <p class="fu" style="--d: 180ms">
+              Teachers enter scores once. Brillanda works out totals, grades and positions, builds the report cards, and
+              shows parents the result on a phone.
+            </p>
+            <div class="fu" style="--d: 260ms; display: flex; gap: 10px; flex-wrap: wrap">
+              <a class="btn btn-solid" href="#start"><span class="fill"></span><span>Request a trial</span></a>
+              <a class="btn btn-on-dark" href="#inside"><span class="fill"></span><span>See it working</span></a>
+            </div>
+          </div>
+        </div>
+
+        <div class="scroll-cue" aria-hidden="true"><span class="ln"></span>Scroll</div>
+      </section>
+
+      <!-- ============ statement + counters ============ -->
+      <section class="wrap statement" id="what">
+        <h2>
+          <span class="lm"><span>A term ends and the</span></span>
+          <span class="lm"><span style="--d: 80ms">arithmetic begins. That</span></span>
+          <span class="lm"><span style="--d: 160ms">is the part we took away.</span></span>
+        </h2>
+
+        <div class="st-sub">
+          <p class="fu">
+            Continuous assessment in one book, exam scores in another, a calculator for the totals, and somebody staying
+            late to rank the class. Every term, in nearly every school.
+          </p>
+          <p class="fu" style="--d: 110ms">
+            Brillanda holds the scores, applies the grading your school already uses, and produces the same report card
+            you print today — only it is ready the moment the last teacher is done.
+          </p>
+        </div>
+
+        <div class="nums-row">
+          <div class="num fu">
+            <b data-count="3" data-suffix="">0</b>
+            <span>terms a session, set up once and reused</span>
+          </div>
+          <div class="num fu" style="--d: 100ms">
+            <b data-count="40" data-suffix="%">0</b>
+            <span>continuous assessment by default, and you can change it</span>
+          </div>
+          <div class="num fu" style="--d: 200ms">
+            <b data-count="0" data-suffix="" data-zero="One">0</b>
+            <span>place your scores live, from entry to printed report card</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ full-bleed band ============ -->
+      <section class="bleed" id="band">
+        <div class="inner" data-parallax>
+          <img
+            src="/photos/classroom-students-uniform-960.webp"
+            srcset="
+              /photos/classroom-students-uniform-480.webp   480w,
+              /photos/classroom-students-uniform-960.webp   960w,
+              /photos/classroom-students-uniform-1600.webp 1600w
+            "
+            sizes="100vw"
+            alt="Secondary school students in uniform during a lesson"
+            width="1600"
+            height="1067"
+            loading="lazy"
+          />
+        </div>
+        <div class="bleed-veil"></div>
+        <div class="bleed-copy">
+          <div class="wrap">
+            <h2 class="lm"><span>Built around how a Nigerian school actually runs.</span></h2>
+            <p class="fu">
+              Sessions and three terms. Classes with arms. CA and exam weighting per subject. Positions within the arm.
+              Nothing to bend into shape.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ who it's for ============ -->
+      <section class="wrap sec" id="roles">
+        <div class="ehead">
+          <span class="lbl"><i class="d"></i>Who signs in</span>
+          <h2 class="lm"><span>Four people, four different screens.</span></h2>
+          <p class="fu">Everyone sees their own work and nothing else. A teacher cannot open another teacher’s class.</p>
+        </div>
+
+        <div class="roles">
+          <article class="role fu">
+            <span class="rn">01</span>
+            <h3>Proprietor</h3>
+            <p>Sees the school at a glance and decides when results go out.</p>
+            <ul>
+              <li>Who has finished entering, who has not</li>
+              <li>Publishes results to parents</li>
+              <li>Approves changes after a sheet is locked</li>
+            </ul>
+          </article>
+          <article class="role fu" style="--d: 90ms">
+            <span class="rn">02</span>
+            <h3>School admin</h3>
+            <p>Sets up the session and keeps the records straight.</p>
+            <ul>
+              <li>Classes, arms, subjects and teachers</li>
+              <li>Students and their parents</li>
+              <li>Grading scale and CA/exam split</li>
+            </ul>
+          </article>
+          <article class="role fu" style="--d: 180ms">
+            <span class="rn">03</span>
+            <h3>Teacher</h3>
+            <p>Enters scores for the subjects assigned to them, and nothing more.</p>
+            <ul>
+              <li>One sheet per subject and arm</li>
+              <li>Totals and grades appear as you type</li>
+              <li>Marks the sheet complete when done</li>
+            </ul>
+          </article>
+          <article class="role fu" style="--d: 270ms">
+            <span class="rn">04</span>
+            <h3>Parent</h3>
+            <p>Opens the result on a phone, for each of their children.</p>
+            <ul>
+              <li>Subject scores, grades and the term average</li>
+              <li>Teacher and head teacher remarks</li>
+              <li>Downloads the report card as a PDF</li>
+            </ul>
+          </article>
+        </div>
+      </section>
+
+      <!-- ============ the six core capabilities ============ -->
+      <section class="wrap sec" id="core">
+        <div class="ehead">
+          <span class="lbl"><i class="d"></i>What is in it today</span>
+          <h2 class="lm"><span>Six things, done properly.</span></h2>
+          <p class="fu">
+            This is the whole of version one. We would rather these six work every day than have twenty that half work.
+          </p>
+        </div>
+
+        <div class="caps">
+          <article class="cap fu">
+            <h3>
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path d="M4 5h16M4 12h16M4 19h10" stroke-linecap="round" />
+              </svg>
+              Score entry
+            </h3>
+            <p>
+              A sheet per subject and arm. Type a score, see the total and grade immediately. Entries save on their own,
+              and keep trying if the network drops.
+            </p>
+          </article>
+          <article class="cap fu" style="--d: 70ms">
+            <h3>
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path d="M12 3v18M5 9l7-6 7 6" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+              Grades and positions
+            </h3>
+            <p>
+              Your own grading scale, your own CA/exam split. Positions are worked out within the arm, and a tie gives
+              both students the same position.
+            </p>
+          </article>
+          <article class="cap fu" style="--d: 140ms">
+            <h3>
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <rect x="5" y="3" width="14" height="18" rx="2" />
+                <path d="M9 8h6M9 12h6M9 16h3" stroke-linecap="round" />
+              </svg>
+              Report cards
+            </h3>
+            <p>
+              The school’s own header, the term’s scores, remarks and the attendance you record. Printed in a batch or
+              downloaded one at a time.
+            </p>
+          </article>
+          <article class="cap fu" style="--d: 210ms">
+            <h3>
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <rect x="7" y="2.5" width="10" height="19" rx="2.5" />
+                <path d="M11 18.5h2" stroke-linecap="round" />
+              </svg>
+              Parent portal
+            </h3>
+            <p>
+              Parents sign in and read the result for each of their children. Invited by email, or given a printed access
+              code if they have no email.
+            </p>
+          </article>
+          <article class="cap fu" style="--d: 280ms">
+            <h3>
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <circle cx="12" cy="12" r="9" />
+                <path d="M12 7v5l3 2" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+              Publishing control
+            </h3>
+            <p>
+              Nothing reaches a parent until the school says so. Publish a whole class or a single student, and unpublish
+              if something needs fixing.
+            </p>
+          </article>
+          <article class="cap fu" style="--d: 350ms">
+            <h3>
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path d="M12 3l7 3v6c0 4-3 7-7 9-4-2-7-5-7-9V6z" stroke-linejoin="round" />
+              </svg>
+              A record of changes
+            </h3>
+            <p>
+              Every score change is kept with who made it and when. If a mark is queried next term, the history answers
+              it.
+            </p>
+          </article>
+        </div>
+      </section>
+
+      <!-- ============ a look inside: three screens ============ -->
+      <section class="pin-outer" id="inside" data-pin>
+        <div class="pin">
+          <div class="pin-in">
+            <div class="wrap pin-head">
+              <h2 class="lm"><span>A look inside.</span></h2>
+              <span class="meta"><span data-tour-index>01</span> / 03 &nbsp;·&nbsp; the mark sheet is live, try it</span>
+            </div>
+
+            <div class="pin-rail">
+              <div class="pin-track" data-track>
+                <!-- card 1: the teacher's mark sheet -->
+                <article class="tour-card">
+                  <div>
+                    <div class="screen-top">
+                      <span class="t">Mathematics · JSS 2 Gold</span>
+                      <span class="s"><i class="dot-ok"></i>All changes saved</span>
+                    </div>
+                    <div class="sheet-scroll">
+                      <table class="sheet" id="grid">
+                        <thead>
+                          <tr>
+                            <th class="name">Student</th>
+                            <th>CA 1<small>max 20</small></th>
+                            <th>CA 2<small>max 20</small></th>
+                            <th>Exam<small>max 60</small></th>
+                            <th>Total<small>100</small></th>
+                            <th>Grade</th>
+                            <th>Position</th>
+                          </tr>
+                        </thead>
+                        <tbody data-grid-body></tbody>
+                      </table>
+                    </div>
+                    <div class="sheet-foot">
+                      <span>Type <b>ABS</b> for a student who was absent</span>
+                      <span>Empty means not entered yet</span>
+                      <span class="hint" data-grid-status>Positions update as you type</span>
+                    </div>
+                  </div>
+                  <div class="tour-cap">
+                    <b>Score entry</b>
+                    <span>The real calculation: this grid runs the same code as the product.</span>
+                  </div>
+                </article>
+
+                <!-- card 2: the report card -->
+                <article class="tour-card">
+                  <div class="card-doc" data-stats>
+                    <div class="doc-head">
+                      <span class="doc-logo">R</span>
+                      <div>
+                        <h4 data-placeholder>Royal Heights College <span class="sample">Sample</span></h4>
+                        <p>Terminal report · Second term, 2025/2026</p>
+                      </div>
+                    </div>
+                    <div class="doc-meta">
+                      <div><span>Student</span><b>Adaeze Nwosu</b></div>
+                      <div><span>Class</span><b>JSS 2 Gold</b></div>
+                      <div><span>Position</span><b>2nd of <span data-count="34" data-delay="500">0</span></b></div>
+                      <div><span>Average</span><b data-count="78.4" data-decimals="1" data-delay="500">0</b></div>
+                    </div>
+                    <table class="doc">
+                      <thead>
+                        <tr>
+                          <th>Subject</th>
+                          <th>CA</th>
+                          <th>Exam</th>
+                          <th>Total</th>
+                          <th>Grade</th>
+                          <th>Position</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr><td>Mathematics</td><td>34</td><td>48</td><td>82</td><td>A</td><td>2nd</td></tr>
+                        <tr><td>English Language</td><td>31</td><td>45</td><td>76</td><td>B</td><td>5th</td></tr>
+                        <tr><td>Basic Science</td><td>36</td><td>50</td><td>86</td><td>A</td><td>1st</td></tr>
+                        <tr><td>Social Studies</td><td>28</td><td>41</td><td>69</td><td>C</td><td>9th</td></tr>
+                      </tbody>
+                    </table>
+                    <div class="doc-foot">
+                      <div><span>Class teacher</span><b>A steady term. Keep it up.</b></div>
+                      <div>
+                        <span>Attendance</span>
+                        <b><span data-count="58" data-delay="900">0</span> / 60</b>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="tour-cap">
+                    <b>Report card</b>
+                    <span>Your header, your grades, printed in a batch or downloaded singly.</span>
+                  </div>
+                </article>
+
+                <!-- card 3: the parent's phone -->
+                <article class="tour-card">
+                  <div>
+                    <div class="screen-top">
+                      <span class="t">Parent portal</span>
+                      <span class="s">on a phone</span>
+                    </div>
+                    <div class="phone-frame">
+                      <div class="phone-head">
+                        <span class="doc-logo" style="width: 22px; height: 22px; font-size: 11px">A</span>
+                        Adaeze · JSS 2 Gold
+                      </div>
+                      <div class="phone-body">
+                        <div class="phone-average">78.4</div>
+                        <div class="phone-sub">Term average · 2nd of 34</div>
+                        <div class="phone-row"><span class="grow">Mathematics</span><span class="grade-badge" style="color: var(--success); border-color: var(--success-border); background: var(--success-bg)">A</span><b>82</b></div>
+                        <div class="phone-row"><span class="grow">English Language</span><span class="grade-badge" style="color: var(--success); border-color: var(--success-border); background: var(--success-bg)">B</span><b>76</b></div>
+                        <div class="phone-row"><span class="grow">Basic Science</span><span class="grade-badge" style="color: var(--success); border-color: var(--success-border); background: var(--success-bg)">A</span><b>86</b></div>
+                        <div class="phone-row"><span class="grow">Social Studies</span><span class="grade-badge" style="color: var(--warning); border-color: var(--warning-border); background: var(--warning-bg)">C</span><b>69</b></div>
+                        <div class="phone-cta">Download report card</div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="tour-cap">
+                    <b>Parent portal</b>
+                    <span>One sign-in, every child in the family, on the phone they already have.</span>
+                  </div>
+                </article>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ how a term runs ============ -->
+      <section class="wrap sec" id="term">
+        <div class="ehead">
+          <span class="lbl"><i class="d"></i>How a term runs</span>
+          <h2 class="lm"><span>From an empty session to a published result.</span></h2>
+          <p class="fu">Set the session up once. Every term after that is the last four steps.</p>
+        </div>
+
+        <div class="setup">
+          <div>
+            <div class="sitem fu">
+              <span class="sn">01</span>
+              <div>
+                <h3>We set your school up</h3>
+                <p>
+                  Send us your classes, arms, subjects and staff list. We create the school and the first admin account,
+                  then hand it over.
+                </p>
+              </div>
+            </div>
+            <div class="sitem fu" style="--d: 80ms">
+              <span class="sn">02</span>
+              <div>
+                <h3>Your admin adds the students</h3>
+                <p>
+                  Students, their arms and their parents. Parents are invited by email, or given a printed access code if
+                  they have none.
+                </p>
+              </div>
+            </div>
+            <div class="sitem fu" style="--d: 160ms">
+              <span class="sn">03</span>
+              <div>
+                <h3>Teachers enter their scores</h3>
+                <p>
+                  Each teacher sees only the subjects and arms assigned to them. They mark a sheet complete when it is
+                  done.
+                </p>
+              </div>
+            </div>
+            <div class="sitem fu" style="--d: 240ms">
+              <span class="sn">04</span>
+              <div>
+                <h3>The school reviews and publishes</h3>
+                <p>
+                  The proprietor sees which sheets are still outstanding, then publishes a class or a single student.
+                  Parents get the result the moment you do.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- data-stats: the bars fill and the counts run when this panel comes into view. -->
+          <div class="setup-vis fu" style="--d: 120ms" data-stats>
+            <img
+              src="/photos/teacher-marking-laptop-960.webp"
+              srcset="/photos/teacher-marking-laptop-480.webp 480w, /photos/teacher-marking-laptop-960.webp 960w"
+              sizes="(max-width: 940px) 100vw, 46vw"
+              alt="A teacher marking work beside a laptop"
+              width="960"
+              height="640"
+              loading="lazy"
+            />
+            <div class="screen-top" style="border-top: 1px solid var(--rule)">
+              <span class="t">Second term · entry status</span>
+              <span class="s">JSS 2 Gold</span>
+            </div>
+            <div class="rows">
+              <div class="row" style="--d: 0ms">
+                <span class="grow">Mathematics<span class="sub">Mr Okafor</span></span>
+                <span class="bar"><i style="--w: 100%; --d: 120ms"></i></span>
+                <span class="pill ok" style="--pd: 900ms">Complete</span>
+              </div>
+              <div class="row" style="--d: 90ms">
+                <span class="grow">English Language<span class="sub">Mrs Bello</span></span>
+                <span class="bar"><i style="--w: 100%; --d: 260ms"></i></span>
+                <span class="pill ok" style="--pd: 1040ms">Complete</span>
+              </div>
+              <div class="row" style="--d: 180ms">
+                <span class="grow">Basic Science<span class="sub">Mr Adeyemi</span></span>
+                <span class="bar"><i style="--w: 72%; --d: 400ms"></i></span>
+                <span class="pill mid" style="--pd: 1180ms"><span data-count="24" data-delay="400">0</span> of 34</span>
+              </div>
+              <div class="row" style="--d: 270ms">
+                <span class="grow">Social Studies<span class="sub">Miss Eze</span></span>
+                <span class="bar"><i style="--w: 12%; --d: 540ms"></i></span>
+                <span class="pill low" style="--pd: 1320ms">Not started</span>
+              </div>
+            </div>
+            <div class="setup-note">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path class="tick" d="M20 6L9 17l-5-5" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+              Two of four sheets complete. Publishing waits for you.
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ coming soon ============ -->
+      <section class="soon" id="soon">
+        <div class="wrap">
+          <div class="ehead">
+            <span class="lbl"><i class="d"></i>Next, not now</span>
+            <h2 class="lm"><span>Coming soon, right after the core.</span></h2>
+            <p class="fu">
+              These are being built next. They are not in the plans below and you are not paying for them — when they
+              arrive, we will tell you what changes.
+            </p>
+          </div>
+
+          <div class="soon-grid">
+            <article class="soon-item fu">
+              <span class="soon-ic">
+                <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                  <rect x="3" y="5" width="18" height="16" rx="2" />
+                  <path d="M3 10h18M8 3v4M16 3v4" stroke-linecap="round" />
+                </svg>
+              </span>
+              <div>
+                <h3>Attendance <span class="soon-tag">Coming soon</span></h3>
+                <p>Daily registers that feed the attendance figure on the report card instead of being typed in.</p>
+              </div>
+            </article>
+            <article class="soon-item fu" style="--d: 80ms">
+              <span class="soon-ic">
+                <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                  <path d="M3 7h18v12H3z" />
+                  <path d="M7 7V5a2 2 0 012-2h6a2 2 0 012 2v2M3 12h18" stroke-linecap="round" />
+                </svg>
+              </span>
+              <div>
+                <h3>Fees and payments <span class="soon-tag">Coming soon</span></h3>
+                <p>Invoices per term, what has been paid and what is outstanding, beside the student’s record.</p>
+              </div>
+            </article>
+            <article class="soon-item fu" style="--d: 160ms">
+              <span class="soon-ic">
+                <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                  <path d="M4 19V5a2 2 0 012-2h9l5 5v11a2 2 0 01-2 2H6a2 2 0 01-2-2z" stroke-linejoin="round" />
+                  <path d="M9 13h6M9 17h4" stroke-linecap="round" />
+                </svg>
+              </span>
+              <div>
+                <h3>Timetable <span class="soon-tag">Coming soon</span></h3>
+                <p>Periods per class and per teacher, visible to the staff room and to parents.</p>
+              </div>
+            </article>
+            <article class="soon-item fu" style="--d: 240ms">
+              <span class="soon-ic">
+                <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                  <path d="M4 5h16v12H8l-4 4z" stroke-linejoin="round" />
+                  <path d="M8 9h8M8 13h5" stroke-linecap="round" />
+                </svg>
+              </span>
+              <div>
+                <h3>Messages to parents <span class="soon-tag">Coming soon</span></h3>
+                <p>Announcements and term notices sent from the school, read in the same portal as the results.</p>
+              </div>
+            </article>
+          </div>
+
+          <div class="soon-note fu">
+            <p>
+              <strong>Why we say this out loud.</strong> Plenty of school software is sold on a feature list that is
+              mostly future. The six things above the fold are working now; these four are not. When you ask us in a
+              demo, that is the answer you will get.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ your data ============ -->
+      <section class="wrap sec" id="data">
+        <div class="ehead">
+          <span class="lbl"><i class="d"></i>Your data</span>
+          <h2 class="lm"><span>It stays yours, and it stays separate.</span></h2>
+        </div>
+
+        <div class="trust">
+          <article class="tbox fu">
+            <h3>One school cannot see another</h3>
+            <p>
+              Every record carries the school it belongs to, and the system refuses any request for a record that is not
+              yours. That rule is enforced in code, not left to care.
+            </p>
+          </article>
+          <article class="tbox fu" style="--d: 90ms">
+            <h3>Only what the role needs</h3>
+            <p>
+              A teacher reaches the subjects assigned to them. A parent reaches their own children. Nobody browses the
+              whole school by accident.
+            </p>
+          </article>
+          <article class="tbox fu" style="--d: 180ms">
+            <h3>Take it with you</h3>
+            <p>
+              Your students, scores and report cards can be exported at any time. If you ever leave, you leave with your
+              records.
+            </p>
+          </article>
+        </div>
+      </section>
+
+      <!-- ============ stories ============ -->
+      <section class="wrap sec" id="stories">
+        <div class="v-top">
+          <h2 class="lm"><span>What schools tell us</span></h2>
+          <span class="v-count"><span data-v-now>01</span> — 03 <span class="sample">Sample content</span></span>
+        </div>
+
+        <div class="stories-grid">
+          <div class="stories-photo fu">
+            <img
+              src="/photos/parent-phone-family-960.webp"
+              srcset="/photos/parent-phone-family-480.webp 480w, /photos/parent-phone-family-960.webp 960w"
+              sizes="(max-width: 900px) 100vw, 38vw"
+              alt="A parent looking at a phone with a child beside them"
+              width="960"
+              height="640"
+              loading="lazy"
+            />
+          </div>
+
+          <div class="stories-copy" data-voices>
+            <div class="v-slide" data-placeholder>
+              <blockquote>“The maths was done before I got home. That was the whole difference.”</blockquote>
+              <div class="v-who"><b>Mrs A. Bello</b><span>Vice Principal · sample quote, not a real school</span></div>
+            </div>
+            <div class="v-slide" data-placeholder hidden>
+              <blockquote>“Parents stopped calling the office to ask when results were coming.”</blockquote>
+              <div class="v-who"><b>Mr T. Okafor</b><span>Proprietor · sample quote, not a real school</span></div>
+            </div>
+            <div class="v-slide" data-placeholder hidden>
+              <blockquote>“I enter my scores on my phone during break. It saves by itself.”</blockquote>
+              <div class="v-who"><b>Miss C. Eze</b><span>Class teacher · sample quote, not a real school</span></div>
+            </div>
+
+            <div class="v-nav">
+              <button class="v-btn" data-v-prev aria-label="Previous quote">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+                  <path d="M15 5l-7 7 7 7" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+              </button>
+              <button class="v-btn" data-v-next aria-label="Next quote">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+                  <path d="M9 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ pricing ============ -->
+      <section class="wrap sec" id="pricing">
+        <div class="ehead">
+          <span class="lbl"><i class="d"></i>Pricing</span>
+          <h2 class="lm"><span>Per student, per term.</span></h2>
+          <p class="fu">
+            Billed to the school, not to parents. The figures below are indicative while we are in early access
+            <span class="sample">Sample</span> — the price you are quoted in a demo is the price you pay.
+          </p>
+        </div>
+
+        <div class="plan-row" data-placeholder>
+          <article class="plan fu">
+            <span class="tag">Small school</span>
+            <h3>Starter</h3>
+            <div class="amt">₦350</div>
+            <div class="per">per student, per term</div>
+            <div class="lim">Up to 300 students</div>
+            <ul>
+              <li>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5" stroke-linecap="round" stroke-linejoin="round" /></svg>
+                Score entry, grades and positions
+              </li>
+              <li>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5" stroke-linecap="round" stroke-linejoin="round" /></svg>
+                Report cards and the parent portal
+              </li>
+              <li>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5" stroke-linecap="round" stroke-linejoin="round" /></svg>
+                Email support
+              </li>
+            </ul>
+            <a class="btn btn-line" href="#start"><span class="fill"></span><span>Request a trial</span></a>
+          </article>
+
+          <article class="plan best fu" style="--d: 90ms">
+            <span class="tag">Most schools</span>
+            <h3>School</h3>
+            <div class="amt">₦280</div>
+            <div class="per">per student, per term</div>
+            <div class="lim">300 to 1,200 students</div>
+            <ul>
+              <li>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5" stroke-linecap="round" stroke-linejoin="round" /></svg>
+                Everything in Starter
+              </li>
+              <li>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5" stroke-linecap="round" stroke-linejoin="round" /></svg>
+                We set the session up with you
+              </li>
+              <li>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5" stroke-linecap="round" stroke-linejoin="round" /></svg>
+                Staff training session each term
+              </li>
+            </ul>
+            <a class="btn btn-solid" href="#start"><span class="fill"></span><span>Request a trial</span></a>
+          </article>
+
+          <article class="plan fu" style="--d: 180ms">
+            <span class="tag">Large school</span>
+            <h3>Group</h3>
+            <div class="amt">Let’s talk</div>
+            <div class="per">above 1,200 students</div>
+            <div class="lim">Quoted per school</div>
+            <ul>
+              <li>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5" stroke-linecap="round" stroke-linejoin="round" /></svg>
+                Everything in School
+              </li>
+              <li>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5" stroke-linecap="round" stroke-linejoin="round" /></svg>
+                A named person to call
+              </li>
+              <li>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5" stroke-linecap="round" stroke-linejoin="round" /></svg>
+                Help moving your old records in
+              </li>
+            </ul>
+            <a class="btn btn-line" href="#start"><span class="fill"></span><span>Talk to us</span></a>
+          </article>
+        </div>
+
+        <p class="price-note fu">
+          The modules marked “Coming soon” are not part of any plan and are not being charged for.
+        </p>
+      </section>
+
+      <!-- ============ faq ============ -->
+      <section class="wrap sec" id="faq">
+        <div class="faq">
+          <div class="ehead" style="margin-bottom: 0">
+            <span class="lbl"><i class="d"></i>Questions</span>
+            <h2 class="lm"><span>Before you ask.</span></h2>
+          </div>
+
+          <div class="acc fu">
+            <details>
+              <summary>
+                Can we keep our own grading scale?
+                <span class="ico"
+                  ><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14" stroke-linecap="round" /></svg
+                ></span>
+              </summary>
+              <div class="ans">
+                Yes. You set the grade letters and the mark each one starts at, and the CA/exam split. It applies to the
+                whole session, so a term already published is not disturbed.
+              </div>
+            </details>
+            <details>
+              <summary>
+                What happens when a teacher has no data?
+                <span class="ico"
+                  ><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14" stroke-linecap="round" /></svg
+                ></span>
+              </summary>
+              <div class="ans">
+                Scores save on their own as they are typed. If the connection drops mid-sheet, the entry is kept and sent
+                again when the line comes back, and the teacher can press save at any time.
+              </div>
+            </details>
+            <details>
+              <summary>
+                Can a parent see another family’s child?
+                <span class="ico"
+                  ><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14" stroke-linecap="round" /></svg
+                ></span>
+              </summary>
+              <div class="ans">
+                No. A parent account is linked to specific students, and the system will not return a record for any
+                other child, in your school or in anybody else’s.
+              </div>
+            </details>
+            <details>
+              <summary>
+                What if a parent has no email address?
+                <span class="ico"
+                  ><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14" stroke-linecap="round" /></svg
+                ></span>
+              </summary>
+              <div class="ans">
+                The school prints an access code for that parent. They use it once to set up their sign-in, and after
+                that the code is spent.
+              </div>
+            </details>
+            <details>
+              <summary>
+                A score was published with a mistake. Now what?
+                <span class="ico"
+                  ><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14" stroke-linecap="round" /></svg
+                ></span>
+              </summary>
+              <div class="ans">
+                The teacher asks for the sheet to be unlocked, the school approves it, the correction is made and the
+                result republished. The change, and who made it, is kept on the record.
+              </div>
+            </details>
+            <details>
+              <summary>
+                Do we need fast internet?
+                <span class="ico"
+                  ><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14" stroke-linecap="round" /></svg
+                ></span>
+              </summary>
+              <div class="ans">
+                No. The screens are deliberately light and each score is sent on its own, so a slow or unsteady
+                connection slows you down rather than stopping you.
+              </div>
+            </details>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ request a trial ============ -->
+      <section class="start" id="start">
+        <div class="wrap start-grid">
+          <div>
+            <h2 class="lm"><span>Start with one class.</span></h2>
+            <p class="start-lede fu">
+              Tell us about your school and we will set it up and walk your staff through it. There is no card and no
+              commitment — try it on a single arm for a term.
+            </p>
+            <ul class="start-points">
+              <li class="fu">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5" stroke-linecap="round" stroke-linejoin="round" /></svg>
+                We create the school and your first admin account
+              </li>
+              <li class="fu" style="--d: 70ms">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5" stroke-linecap="round" stroke-linejoin="round" /></svg>
+                A session with your teachers, in person or on a call
+              </li>
+              <li class="fu" style="--d: 140ms">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5" stroke-linecap="round" stroke-linejoin="round" /></svg>
+                Your records exported to you whenever you ask
+              </li>
+            </ul>
+          </div>
+
+          <div class="form-card fu">
+            <form class="form-grid" id="trial-form" novalidate>
+              <div class="field full">
+                <label for="schoolName">School name</label>
+                <input id="schoolName" name="schoolName" autocomplete="organization" required />
+                <span class="err" data-err="schoolName"></span>
+              </div>
+              <div class="field">
+                <label for="contactName">Your name</label>
+                <input id="contactName" name="contactName" autocomplete="name" required />
+                <span class="err" data-err="contactName"></span>
+              </div>
+              <div class="field">
+                <label for="role">Your role</label>
+                <select id="role" name="role" required>
+                  <option value="">Choose one</option>
+                  <option value="PROPRIETOR">Proprietor or owner</option>
+                  <option value="PRINCIPAL">Principal or head teacher</option>
+                  <option value="ADMIN">School administrator</option>
+                  <option value="TEACHER">Teacher</option>
+                  <option value="OTHER">Something else</option>
+                </select>
+                <span class="err" data-err="role"></span>
+              </div>
+              <div class="field">
+                <label for="email">Email</label>
+                <input id="email" name="email" type="email" inputmode="email" autocomplete="email" required />
+                <span class="err" data-err="email"></span>
+              </div>
+              <div class="field">
+                <label for="phone">Phone</label>
+                <input id="phone" name="phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="080..." required />
+                <span class="err" data-err="phone"></span>
+              </div>
+              <div class="field">
+                <label for="studentCount">About how many students?</label>
+                <input id="studentCount" name="studentCount" inputmode="numeric" placeholder="e.g. 420" required />
+                <span class="err" data-err="studentCount"></span>
+              </div>
+              <div class="field">
+                <label for="state">State</label>
+                <input id="state" name="state" autocomplete="address-level1" placeholder="e.g. Lagos" />
+                <span class="err" data-err="state"></span>
+              </div>
+
+              <div class="modules-pick">
+                <span>Which of the coming modules matter to you? <span class="hint">Optional — it tells us what to build first</span></span>
+                <div class="checks">
+                  <label><input type="checkbox" name="interests" value="ATTENDANCE" />Attendance</label>
+                  <label><input type="checkbox" name="interests" value="FEES" />Fees</label>
+                  <label><input type="checkbox" name="interests" value="TIMETABLE" />Timetable</label>
+                  <label><input type="checkbox" name="interests" value="MESSAGING" />Messages</label>
+                </div>
+              </div>
+
+              <div class="field full">
+                <label for="message">Anything we should know? <span class="hint">Optional</span></label>
+                <textarea id="message" name="message" rows="3"></textarea>
+                <span class="err" data-err="message"></span>
+              </div>
+
+              <!-- Bots fill this; people never see it. -->
+              <div class="honeypot" aria-hidden="true">
+                <label for="website">Website</label>
+                <input id="website" name="website" tabindex="-1" autocomplete="off" />
+              </div>
+
+              <div class="form-message bad" data-form-message hidden></div>
+
+              <div class="form-actions">
+                <button class="btn btn-solid" type="submit" data-submit>
+                  <span class="fill"></span><span>Send the request</span>
+                </button>
+                <span class="small">We reply within a working day. Your details are used for this request only.</span>
+              </div>
+            </form>
+
+            <div class="form-done" id="trial-done" hidden>
+              <h3>Thank you — it’s with us.</h3>
+              <p>
+                We will write to the email you gave to arrange the setup. If it is urgent, call us on the number in the
+                footer.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <div class="wrap">
+        <div class="f-top">
+          <div>
+            <span class="mark"><i></i>Brillanda</span>
+            <p class="f-blurb">School records, results and report cards, built for Nigerian schools.</p>
+            <div class="f-contact">
+              <a href="mailto:hello@brillanda.com">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                  <rect x="3" y="5" width="18" height="14" rx="2" />
+                  <path d="M3 7l9 6 9-6" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+                hello@brillanda.com
+              </a>
+              <a href="tel:+2348000000000" data-placeholder>
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                  <path d="M5 4h4l2 5-2.5 1.5a11 11 0 005 5L15 13l5 2v4a1 1 0 01-1 1A16 16 0 014 5a1 1 0 011-1z" stroke-linejoin="round" />
+                </svg>
+                +234 800 000 0000 <span class="sample">Sample</span>
+              </a>
+            </div>
+          </div>
+
+          <div class="f-cols">
+            <div>
+              <h4>Product</h4>
+              <ul>
+                <li><a href="#what">What it does</a></li>
+                <li><a href="#inside">A look inside</a></li>
+                <li><a href="#term">How a term runs</a></li>
+                <li><a href="#pricing">Pricing</a></li>
+              </ul>
+            </div>
+            <div>
+              <h4>School</h4>
+              <ul>
+                <li><a href="#start">Request a trial</a></li>
+                <li><a href="#faq">Questions</a></li>
+                <li><a href="#data">Your data</a></li>
+                <li><a href="/login" data-app-link>Sign in</a></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <div class="ghost" aria-hidden="true">Brillanda</div>
+
+        <div class="f-bot">
+          <span>© <span data-year>2026</span> Brillanda. All rights reserved.</span>
+          <span>Made in Nigeria, for Nigerian schools.</span>
+          <button class="tbtn" data-theme-toggle aria-label="Switch between light and dark">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+              <circle cx="12" cy="12" r="4" />
+              <path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4" stroke-linecap="round" />
+            </svg>
+            <span data-theme-label>Dark</span>
+          </button>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>
