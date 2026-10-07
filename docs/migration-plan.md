@@ -113,6 +113,20 @@ So the meeting point is **a set of typed functions**, one per thing a screen nee
 
 **Done when:** the gallery and an empty app shell match the look book at 360 and 1280 px.
 
+**Done (7 October 2026).** See it with `pnpm dev` at `localhost:3000/dev` (development only;
+production returns "not found"). Notes:
+
+- The shell's tabs follow the plan: **Home, Students, Classes, Subjects, More**. Publishing,
+  Staff and Settings were the old app's tabs; settings, sessions and terms, and admins go
+  under More.
+- shadcn/ui is set up (`packages/ui/components.json`) and adds parts in our style when a screen
+  needs one. None was needed yet: our own components already covered the gallery.
+- The command palette uses `cmdk` inside our own dialog, so it looks like the rest of the app.
+- DataList sits inside its own loading boundary because, in development only, the table library
+  reads the clock, which Next.js 16 doesn't allow while pre-rendering. Production is unaffected.
+- The saved look is now kept under `brillianda:look` (it was `brillanda:look`), so on the new
+  address everyone starts on Pastel once.
+
 ### Batch 3: Marketing site and signup screens (Phase 1)
 
 - The marketing site moved into Next.js, looking exactly as it does now.

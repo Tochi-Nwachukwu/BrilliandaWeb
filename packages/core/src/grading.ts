@@ -3,6 +3,10 @@
 
 export type GradeBand = { minScore: number; grade: string; remark: string; isPass: boolean };
 
+/** Where a subject's score sheet stands for one class arm and term. */
+export const ENTRY_STATES = ["NOT_STARTED", "IN_PROGRESS", "COMPLETE", "LOCKED"] as const;
+export type EntryState = (typeof ENTRY_STATES)[number];
+
 export type WeightedComponent = { id: string; weight: number; maxScore: number };
 
 /** One entered score. An absent student counts as 0 (DECISIONS.md D-3). */

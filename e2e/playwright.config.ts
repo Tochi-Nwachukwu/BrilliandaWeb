@@ -10,6 +10,8 @@ const launchOptions = localChromium && existsSync(localChromium) ? { executableP
 export default defineConfig({
   testDir: "./tests",
   fullyParallel: true,
+  // The dev server compiles each page on its first visit, which can take a few seconds.
+  expect: { timeout: 15_000 },
   retries: process.env.CI ? 1 : 0,
   reporter: process.env.CI ? "github" : "list",
   use: {

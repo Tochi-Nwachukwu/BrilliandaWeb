@@ -4,7 +4,7 @@
   "private": true,
   "description": "Playwright flows at 360 and 1280 px, as the plan asks.",
   "scripts": {
-    "test": "playwright test"
+    "e2e": "playwright test"
   },
   "devDependencies": {
     "@playwright/test": "^1.63.0",

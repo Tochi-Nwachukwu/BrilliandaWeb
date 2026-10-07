@@ -8,6 +8,8 @@ plan's stack batch by batch (docs/migration-plan.md), keeping its look and behav
 ## Commands
 
 - `pnpm install` once; `pnpm dev` runs the app at http://localhost:3000
+- `/dev` (development only) is the playground: the app shell, every shared component, and the
+  list patterns on sample students. Check changes to `packages/ui` there.
 - `pnpm test` (Vitest in packages), `pnpm typecheck`, `pnpm lint`, `pnpm build`
 - `pnpm e2e` runs Playwright at 360 and 1280 px. Locally, set `PW_CHROMIUM` to a Chromium path to
   skip the browser download.
@@ -51,3 +53,7 @@ plan's stack batch by batch (docs/migration-plan.md), keeping its look and behav
 - Tailwind v4 runs through `@tailwindcss/turbopack`; theme tokens are in CSS (`@theme`), not a JS config.
   Workspace packages need an `@source` line so their classes are found.
 - `legacy/` is outside the pnpm workspace on purpose. Don't import from it; copy what moves.
+- Screens use `AppShell` from `apps/web/src/components/shell`. The look (Pastel or Neutral) lives in
+  `src/lib/look.ts`; the `<head>` script in the root layout applies it before first paint.
+- `packages/ui` exports through `src/index.ts`. Interactive files start with "use client", so the
+  barrel is safe to import from Server Components.
