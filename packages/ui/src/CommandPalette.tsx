@@ -19,6 +19,13 @@ export type Command = {
   run?: () => void;
 };
 
+const OPEN_EVENT = "brillianda:open-palette";
+
+/** Opens the palette from a button, e.g. the search button on phones (no keyboard shortcut there). */
+export function openCommandPalette() {
+  window.dispatchEvent(new Event(OPEN_EVENT));
+}
+
 /** Ctrl/Cmd+K: jump to a page or start a task without leaving the keyboard (plan, Phase 0). */
 export function CommandPalette({ commands }: { commands: Command[] }) {
   const [open, setOpen] = useState(false);
@@ -32,8 +39,13 @@ export function CommandPalette({ commands }: { commands: Command[] }) {
         setOpen((value) => !value);
       }
     };
+    const onOpen = () => setOpen(true);
     document.addEventListener("keydown", onKey);
-    return () => document.removeEventListener("keydown", onKey);
+    window.addEventListener(OPEN_EVENT, onOpen);
+    return () => {
+      document.removeEventListener("keydown", onKey);
+      window.removeEventListener(OPEN_EVENT, onOpen);
+    };
   }, []);
 
   if (!open) return null;

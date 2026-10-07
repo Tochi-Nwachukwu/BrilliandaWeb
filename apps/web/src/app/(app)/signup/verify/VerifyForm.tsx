@@ -8,7 +8,7 @@ import { useEffect, useRef, useState, useTransition, type FormEvent } from "reac
 import { authLinkClass } from "@/components/auth/styles";
 import { FormError, useFocusOnFailure } from "@/components/auth/FormError";
 import { resendSignupCode, verifySignupEmail } from "@/data/actions/signup";
-import { errorsFor, firstErrors, type Errors } from "../form";
+import { errorsFor, firstErrors, type Errors } from "@/lib/form";
 
 const clock = (seconds: number) => `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, "0")}`;
 

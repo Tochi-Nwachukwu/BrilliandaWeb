@@ -1,6 +1,6 @@
 "use client";
 
-import { Badge, CommandPalette, Icon, Toaster, cx, type Command, type IconName } from "@brillianda/ui";
+import { Badge, CommandPalette, Icon, Toaster, cx, openCommandPalette, type Command, type IconName } from "@brillianda/ui";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState, type ReactNode } from "react";
@@ -54,6 +54,7 @@ export function AppShell({
   note,
   commands = [],
   signOut,
+  mark,
   children,
 }: {
   nav: NavItem[];
@@ -67,6 +68,8 @@ export function AppShell({
   commands?: Command[];
   /** A Server Action from the backend; until then a fake one. */
   signOut?: () => void | Promise<void>;
+  /** The phone top bar's left side: the school's logo and name (plan). Our wordmark if absent. */
+  mark?: ReactNode;
   children: ReactNode;
 }) {
   const pathname = usePathname();
@@ -119,7 +122,15 @@ export function AppShell({
 
       <div className="min-w-0 px-4 pb-32 pt-3 md:px-3 md:pb-12">
         <header className="mb-5 flex items-center justify-end gap-2.5 md:mb-6">
-          <Wordmark className="mr-auto text-lg md:hidden" />
+          <div className="mr-auto min-w-0 md:hidden">{mark ?? <Wordmark className="text-lg" />}</div>
+          <button
+            type="button"
+            onClick={openCommandPalette}
+            aria-label="Search and go to"
+            className="grid h-11 w-11 place-items-center rounded-full text-text-secondary transition-colors hover:bg-hover hover:text-text-primary focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-accent"
+          >
+            <Icon name="search" className="h-5 w-5" />
+          </button>
           {sampleData && (
             <Badge tone="warning" title="Screens use stand-in data until their part of the backend is built">
               Sample data

@@ -1,3 +1,4 @@
+import { open } from "./helpers";
 import { expect, test } from "@playwright/test";
 
 // The four signup screens on fake data (batch 3). Runs at phone and laptop size.
@@ -7,7 +8,7 @@ test("a school can sign up from start to finish", async ({ page }, testInfo) => 
   // The fake keeps every school it creates until the dev server restarts, so use a new name.
   const address = `brightstar-${testInfo.project.name}-${Date.now() % 100000}`;
 
-  await page.goto("/signup", { waitUntil: "networkidle" });
+  await open(page, "/signup");
   await page.getByRole("button", { name: "Continue" }).click();
   await expect(page.getByText("Tick at least one")).toBeVisible();
 
@@ -54,10 +55,12 @@ test("a school can sign up from start to finish", async ({ page }, testInfo) => 
   await expect(page.getByText(`${address}.brillianda.com is yours to take`)).toBeVisible();
   await page.getByRole("button", { name: "Create my school" }).click();
   await expect(page).toHaveURL(new RegExp(`/s/${address}$`));
+  // The new owner lands signed in on their school.
+  await expect(page.getByText("Brightstar College").locator("visible=true").first()).toBeVisible();
 });
 
 test("a closed tab picks up where it stopped", async ({ page }) => {
-  await page.goto("/signup", { waitUntil: "networkidle" });
+  await open(page, "/signup");
   await page.getByLabel("School name").fill("Riverside Academy");
   await page.getByText("Primary", { exact: true }).click();
   await page.getByLabel("State").selectOption("Oyo");
@@ -65,7 +68,7 @@ test("a closed tab picks up where it stopped", async ({ page }) => {
   await page.getByRole("button", { name: "Continue" }).click();
   await expect(page).toHaveURL(/\/signup\/account$/);
 
-  await page.goto("/signup", { waitUntil: "networkidle" });
+  await open(page, "/signup");
   await expect(page.getByLabel("School name")).toHaveValue("Riverside Academy");
   await page.getByRole("link", { name: "Continue" }).click();
   await expect(page).toHaveURL(/\/signup\/account$/);

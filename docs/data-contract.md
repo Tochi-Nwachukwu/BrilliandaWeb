@@ -52,3 +52,33 @@ Each batch adds its functions here. **Status:** `fake` (front end only) or `real
 - Fake taken addresses: `greenfield`, `surebloom`, `closedschool`, `royalheights`.
 - After `createSchool` the page does a full load of `url`. For real this is the one-time handover
   token on `<subdomain>.brillianda.com`; in development the fake returns `/s/<subdomain>`.
+
+### Signing in and the team (batch 4)
+
+About the `school` argument on these actions: in development pages live at `/s/<school>/…`, so the
+page passes the school it is on. The real actions must take the school from the request's host
+(`proxy.ts`) and ignore this argument, then check the person belongs to that school.
+
+| Function | Kind | Input / output | Used by | Status |
+|---|---|---|---|---|
+| `getCurrentMember` | read | `subdomain` → `SignedInMember \| null`; someone signed in at another school counts as signed out | school pages, sign-in | fake |
+| `getMySchools` | read | — → `SchoolSummary[]` (active schools of the signed-in person) | `/login` picker | fake |
+| `getInvite` | read | `subdomain, token` → `InviteDetails \| null` (open, used or expired; whether they already have an account) | accept invite | fake |
+| `listMembers` | read | `subdomain` → `SchoolMember[]`: owner, admins, open invites; empty for non-members | More › Admins | fake |
+| `signIn` | action | `school, signInSchema` → `ActionResult<null>`; unknown email, wrong password and another school's account all give the same message | sign in | fake |
+| `signOut` | action | `school` → redirects to the school's sign-in | account menu | fake |
+| `requestPasswordReset` | action | `school, emailOnlySchema` → `ActionResult<SampleEmail>`; the same answer whether or not the email is on file; link lasts 1 hour | forgot password | fake |
+| `resetPassword` | action | `school, token, newPasswordSchema` → `ActionResult<null>`; ends every other session | reset password | fake |
+| `sendMagicLink` | action | `school, emailOnlySchema` → `ActionResult<SampleEmail>`; same answer either way; works once, 1 hour | email sign-in link | fake |
+| `signInWithLink` | action | `school, token` → `ActionResult<null>`; called by a button press, so link scanners can't spend it | email sign-in link | fake |
+| `findMySchool` | action | `emailOnlySchema` → `ActionResult<SampleEmail>`; emails a link to each school; never says whether the email exists | `/login` | fake |
+| `acceptInvite` | action | `school, token, { password, confirmation } or { password, hasAccount: true }` → `ActionResult<null>`; signs in | accept invite | fake |
+| `inviteAdmin` | action | `school, inviteAdminSchema` → `ActionResult<SampleEmail & { resent }>`; owner only; re-inviting the same email resends | Admins | fake |
+| `cancelInvite` | action | `school, inviteId` → `ActionResult<null>`; owner only | Admins | fake |
+| `removeAdmin` | action | `school, userId` → `ActionResult<null>`; owner only; never the owner | Admins | fake |
+
+`SampleEmail` (`{ sampleLinks? }`) is **fake only**: the links an email would carry, so the screens
+can be clicked through. The real functions return nothing there. `src/data/samples.ts`
+(one-tap sample accounts on sign-in pages) is fake only too and goes when the fakes go.
+Sample accounts: `owner@greenfield.ng`, `admin@greenfield.ng` (also an admin at Surebloom),
+`owner@surebloom.ng`; password `brillianda`. Open invite: `/s/greenfield/invite/demo-invite`.

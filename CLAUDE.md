@@ -57,5 +57,10 @@ plan's stack batch by batch (docs/migration-plan.md), keeping its look and behav
 - `legacy/` is outside the pnpm workspace on purpose. Don't import from it; copy what moves.
 - Screens use `AppShell` from `apps/web/src/components/shell`. The look (Pastel or Neutral) lives in
   `src/lib/look.ts`; the `<head>` script in the root layout applies it before first paint.
+- Browser tests wait for `<html data-hydrated>` (set by `components/Hydrated.tsx`) through
+  `open()` in `e2e/tests/helpers.ts`. Don't use `waitUntil: "networkidle"`: Chrome's cached
+  prefetches can keep it waiting forever.
+- Anything that reads the clock in a Server Component needs `await connection()` (or a read of
+  cookies) before it, or Next 16 refuses to prerender.
 - `packages/ui` exports through `src/index.ts`. Interactive files start with "use client", so the
   barrel is safe to import from Server Components.

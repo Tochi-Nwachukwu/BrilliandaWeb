@@ -11,7 +11,14 @@ type FakeStore = {
   signupDrafts: Map<string, FakeSignupDraft>;
   users: FakeUser[];
   sessions: Map<string, { userId: string }>;
+  invites: FakeInvite[];
+  links: Map<string, FakeLink>;
 };
+
+/** createdAt 0 means "sent just now"; filled in the first time it is read (see fake/auth.ts). */
+export type FakeInvite = { id: string; token: string; subdomain: string; fullName: string; email: string; createdAt: number; usedAt?: number };
+/** Password reset and email sign-in links. */
+export type FakeLink = { kind: "reset" | "magic"; userId: string; subdomain: string; createdAt: number; usedAt?: number };
 
 /** A signup in progress. The password is only ever kept here, never sent back to a page. */
 export type FakeSignupDraft = {
@@ -40,6 +47,10 @@ function seed(): FakeStore {
       { id: "u3", fullName: "Ngozi Eze", email: "owner@surebloom.ng", password: "brillianda", schools: [{ subdomain: "surebloom", role: "owner" }] },
     ],
     sessions: new Map(),
+    invites: [
+      { id: "i1", token: "demo-invite", subdomain: "greenfield", fullName: "Chidi Okeke", email: "chidi@greenfield.ng", createdAt: 0 },
+    ],
+    links: new Map(),
   };
 }
 

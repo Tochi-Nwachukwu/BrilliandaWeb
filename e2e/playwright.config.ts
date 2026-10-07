@@ -10,7 +10,9 @@ const launchOptions = localChromium && existsSync(localChromium) ? { executableP
 export default defineConfig({
   testDir: "./tests",
   fullyParallel: true,
-  expect: { timeout: 10_000 },
+  // Generous for a small machine running two browsers against one server.
+  timeout: 60_000,
+  expect: { timeout: 15_000 },
   retries: process.env.CI ? 1 : 0,
   reporter: process.env.CI ? "github" : "list",
   use: {

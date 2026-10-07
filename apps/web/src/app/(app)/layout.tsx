@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Outfit } from "next/font/google";
+import { Hydrated } from "@/components/Hydrated";
 import { LOOK_SCRIPT } from "@/lib/look-script";
 import "../globals.css";
 
@@ -24,7 +25,10 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       <head>
         <script dangerouslySetInnerHTML={{ __html: LOOK_SCRIPT }} />
       </head>
-      <body>{children}</body>
+      <body>
+        {children}
+        <Hydrated />
+      </body>
     </html>
   );
 }

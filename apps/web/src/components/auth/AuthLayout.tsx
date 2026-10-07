@@ -1,7 +1,11 @@
 import { cx } from "@brillianda/ui";
 import Link from "next/link";
 import { cacheLife } from "next/cache";
+import { brandPalette, mix } from "@brillianda/core";
 import type { ReactNode } from "react";
+import { SchoolMark } from "../school/SchoolBrand";
+
+export type AuthSchool = { name: string; logoUrl: string | null; brandColor: string };
 
 // The frame for signup, sign in, invites and password resets (from the old app's AuthLayout).
 // Under 1024px it is one centred card; from there up it is a brand panel beside the form.
@@ -78,12 +82,33 @@ async function BrandPanel() {
   );
 }
 
+/** A school's own sign-in panel: its colour, its mark and its name, instead of ours. */
+async function SchoolPanel({ school }: { school: AuthSchool }) {
+  const p = brandPalette(school.brandColor);
+  const muted = mix(p.primaryText, p.primary, 0.28);
+  return (
+    <aside className="sticky top-0 hidden h-dvh flex-col justify-between overflow-y-auto p-12 lg:flex" style={{ background: p.primary, color: p.primaryText }}>
+      <SchoolMark {...school} className="h-12 w-12 text-base shadow-[inset_0_0_0_1px_rgba(255,255,255,0.18)]" />
+      <div>
+        <p className="max-w-[12em] font-display text-[40px] font-medium leading-[1.1] tracking-tight">{school.name}</p>
+        <p className="mt-4 max-w-[22rem] text-base" style={{ color: muted }}>
+          Classes, subjects and students, in one place.
+        </p>
+      </div>
+      <p className="text-sm" style={{ color: muted }}>
+        Powered by Brillianda · © {await currentYear()}
+      </p>
+    </aside>
+  );
+}
+
 export function AuthLayout({
   title,
   description,
   above,
   children,
   footer,
+  school,
 }: {
   title: string;
   description?: ReactNode;
@@ -91,15 +116,24 @@ export function AuthLayout({
   above?: ReactNode;
   children?: ReactNode;
   footer?: ReactNode;
+  /** A school's sign-in pages wear its name, mark and colour (plan: per-school sign-in). */
+  school?: AuthSchool;
 }) {
   return (
     <div className="min-h-dvh lg:grid lg:grid-cols-[5fr_7fr]">
-      <BrandPanel />
+      {school ? <SchoolPanel school={school} /> : <BrandPanel />}
       <main className="flex min-h-dvh flex-col items-center justify-center px-4 py-12 lg:px-16">
         <div className="w-full max-w-[400px] animate-rise">
-          <p className="mb-10 text-center lg:hidden">
-            <AuthWordmark />
-          </p>
+          {school ? (
+            <div className="mb-8 flex flex-col items-center gap-3 text-center lg:hidden">
+              <SchoolMark {...school} className="h-14 w-14 text-lg" />
+              <p className="font-display text-xl font-medium tracking-tight">{school.name}</p>
+            </div>
+          ) : (
+            <p className="mb-10 text-center lg:hidden">
+              <AuthWordmark />
+            </p>
+          )}
           <div className="rounded-xl border border-edge bg-surface p-6 shadow-raised sm:p-8 lg:rounded-none lg:border-0 lg:bg-transparent lg:p-0 lg:shadow-none">
             {above}
             <h1 className="font-display text-[26px] font-medium leading-tight tracking-tight lg:text-[32px]">{title}</h1>
@@ -107,6 +141,14 @@ export function AuthLayout({
             {children && <div className="mt-8">{children}</div>}
           </div>
           {footer && <div className="mt-6 text-center text-sm text-text-secondary lg:text-left">{footer}</div>}
+          {school && (
+            <p className="mt-10 text-center text-xs text-text-muted lg:hidden">
+              Powered by{" "}
+              <Link href="/" className="font-medium text-text-secondary hover:underline">
+                Brillianda
+              </Link>
+            </p>
+          )}
         </div>
       </main>
     </div>

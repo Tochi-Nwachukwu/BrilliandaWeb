@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { useRef, useState, useTransition, type FormEvent } from "react";
 import { FormError, useFocusOnFailure } from "@/components/auth/FormError";
 import { saveSchoolDetails } from "@/data/actions/signup";
-import { errorsFor, firstErrors, type Errors } from "./form";
+import { errorsFor, firstErrors, type Errors } from "@/lib/form";
 
 /** Screen 1: the school's details, and when its first session on Brillianda starts. */
 export function SchoolForm({ saved, defaultStart }: { saved: SchoolDetails | null; defaultStart: { month: number; year: number } }) {

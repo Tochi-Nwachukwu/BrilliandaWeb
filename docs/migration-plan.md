@@ -164,6 +164,21 @@ production returns "not found"). Notes:
 
 **Done when:** two fake schools show their own look and sign-in page, on a phone and a laptop.
 
+**Done (7 October 2026).** Notes:
+
+- The brand colour goes on buttons, the active tab and highlights; everything else stays Pastel
+  (or Neutral). `brandPalette` in `packages/core` works out readable text for any colour (WCAG AA,
+  tested over awkward colours; a few mid-tones get a slightly darker button so white text reads).
+- Pages: `/s/<school>/login`, `forgot-password`, `reset-password/<token>`, `magic-link`,
+  `magic/<token>`, `invite/<token>`; signed in: Home (batch 5), Students, Classes, Subjects
+  (placeholders for later batches), More › Admins. `/login` is Find my school plus the picker.
+- On a laptop the sign-in's brand panel becomes the school's own panel; on a phone the school's
+  mark sits on top and "Powered by Brillianda" at the foot. The phone top bar shows the school's
+  mark and a search button for the command palette (plan: logo, search, account menu).
+- Only the owner invites, resends, cancels and removes admins; admins see the team.
+- Not done here: the per-school app manifest (plan: Add to Home Screen) — it needs the logo
+  upload, which belongs with school settings.
+
 ### Batch 5: Home, checklist, sessions and terms (Phase 2)
 
 - Home in today's design: the setup checklist with the plan's steps (calendar, classes, arms,

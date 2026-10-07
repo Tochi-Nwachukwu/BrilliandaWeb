@@ -31,3 +31,27 @@ export type SignupDraft = {
 export type SubdomainCheck =
   | { available: true; subdomain: string }
   | { available: false; subdomain: string; reason: "taken" | "reserved" | "invalid"; message: string; suggestions: string[] };
+
+export type SchoolRole = "owner" | "admin";
+
+/** Who is signed in at a school, and as what. */
+export type SignedInMember = { userId: string; fullName: string; email: string; role: SchoolRole };
+
+/** Someone on a school's team, or invited to it. */
+export type SchoolMember = {
+  id: string;
+  fullName: string;
+  email: string;
+  role: SchoolRole;
+  status: "active" | "invited";
+  /** For invites: when it was sent (ms since 1970). */
+  invitedAt?: number;
+};
+
+export type InviteDetails = { schoolName: string; fullName: string; email: string; status: "open" | "used" | "expired"; hasAccount: boolean };
+
+/**
+ * FAKE ONLY: what the email would have said, so screens can be clicked through before real
+ * emails exist. The real functions never return this.
+ */
+export type SampleEmail = { sampleLinks?: { label: string; href: string }[] };

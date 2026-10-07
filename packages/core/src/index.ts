@@ -8,3 +8,5 @@ export * from "./trial";
 export * from "./nigeria";
 export * from "./subdomain";
 export * from "./signup";
+export * from "./brand";
+export * from "./auth";

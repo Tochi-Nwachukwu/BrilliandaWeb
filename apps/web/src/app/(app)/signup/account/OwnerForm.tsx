@@ -8,7 +8,7 @@ import { useRef, useState, useTransition, type FormEvent } from "react";
 import { authLinkClass } from "@/components/auth/styles";
 import { FormError, useFocusOnFailure } from "@/components/auth/FormError";
 import { saveOwnerAccount } from "@/data/actions/signup";
-import { errorsFor, firstErrors, type Errors } from "../form";
+import { errorsFor, firstErrors, type Errors } from "@/lib/form";
 
 /** Screen 2: the owner's account. The email becomes the school's primary email. */
 export function OwnerForm({ saved }: { saved: { fullName: string; email: string; phone?: string } | null }) {
