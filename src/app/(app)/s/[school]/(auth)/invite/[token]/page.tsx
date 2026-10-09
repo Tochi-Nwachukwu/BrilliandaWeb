@@ -1,5 +1,5 @@
-import { INVITE_LIFETIME_HOURS } from "@brillianda/core";
-import { PageSpinner } from "@brillianda/ui";
+import { INVITE_LIFETIME_HOURS } from "@brillianda/core/auth";
+import { PageSpinner } from "@brillianda/ui/Spinner";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { connection } from "next/server";

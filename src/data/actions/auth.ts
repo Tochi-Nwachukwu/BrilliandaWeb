@@ -5,7 +5,8 @@
 // About `school`: in development pages live at /s/<school>/…, so the page passes the school it is
 // on. The real actions must take the school from the request's host (proxy.ts), never from this
 // argument, and check the person belongs to it.
-import { emailOnlySchema, fieldErrorsOf, newPasswordSchema, signInSchema } from "@brillianda/core";
+import { emailOnlySchema, newPasswordSchema, signInSchema } from "@brillianda/core/auth";
+import { fieldErrorsOf } from "@brillianda/core/signup";
 import { redirect } from "next/navigation";
 import * as impl from "../fake/auth";
 import type { ActionResult, SampleEmail } from "../types";

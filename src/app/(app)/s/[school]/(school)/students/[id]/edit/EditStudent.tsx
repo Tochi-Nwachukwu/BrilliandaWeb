@@ -1,6 +1,6 @@
 "use client";
 
-import { PageHeader } from "@brillianda/ui";
+import { PageHeader } from "@brillianda/ui/PageHeader";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import type { ActionResult, ArmOption, GuardianMatch, StudentDetail } from "@/data/types";

@@ -1,12 +1,13 @@
 "use client";
 
-import { signInSchema } from "@brillianda/core";
-import { Button, PasswordField, TextField } from "@brillianda/ui";
+import { Button } from "@brillianda/ui/Button";
+import { PasswordField } from "@brillianda/ui/PasswordField";
+import { TextField } from "@brillianda/ui/TextField";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useRef, useState, useTransition, type FormEvent } from "react";
 import { FormError, useFocusOnFailure } from "@/components/auth/FormError";
-import { errorsFor, firstErrors, type Errors } from "@/lib/form";
+import { checkLater, firstErrors, type Errors } from "@/lib/form";
 import type { ActionResult } from "@/data/types";
 
 /** Email and password at one school. A wrong password and an unknown email read the same. */
@@ -41,10 +42,10 @@ export function SignInForm({
       setAttempt((n) => n + 1);
     });
 
-  const submit = (event: FormEvent) => {
+  const submit = async (event: FormEvent) => {
     event.preventDefault();
     setFailure(null);
-    const problems = errorsFor(signInSchema, values);
+    const problems = await checkLater(() => import("@brillianda/core/auth").then((m) => m.signInSchema), values);
     if (problems) {
       setErrors(problems);
       setAttempt((n) => n + 1);

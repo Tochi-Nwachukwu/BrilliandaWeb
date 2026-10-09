@@ -1,7 +1,9 @@
 "use client";
 
-import { normaliseSubdomain, subdomainProblem, SUBDOMAIN_MAX } from "@brillianda/core";
-import { Button, Spinner, cx } from "@brillianda/ui";
+import { normaliseSubdomain, subdomainProblem, SUBDOMAIN_MAX } from "@brillianda/core/subdomain";
+import { Button } from "@brillianda/ui/Button";
+import { cx } from "@brillianda/ui/cx";
+import { Spinner } from "@brillianda/ui/Spinner";
 import { useEffect, useId, useRef, useState, useTransition, type FormEvent } from "react";
 import { FormError } from "@/components/auth/FormError";
 import { checkSubdomain, createSchool } from "@/data/actions/signup";

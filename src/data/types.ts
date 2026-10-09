@@ -1,5 +1,10 @@
 // Shapes shared by every data function (docs/data-contract.md).
-import type { Band, CatalogueEntry, Department, ImportArm, ImportLevel, LinkKind, SchoolDetails, SchoolLevel, Section, StudentGender, StudentStatus, Term } from "@brillianda/core";
+import type { Term } from "@brillianda/core/calendar";
+import type { Department, Section } from "@brillianda/core/classes";
+import type { SchoolDetails, SchoolLevel } from "@brillianda/core/signup";
+import type { ImportArm, ImportLevel } from "@brillianda/core/studentImport";
+import type { StudentGender, StudentStatus } from "@brillianda/core/students";
+import type { Band, CatalogueEntry, LinkKind } from "@brillianda/core/subjects";
 
 /** What every write returns: the result, or a message for a person and errors under each field. */
 export type ActionResult<T> =

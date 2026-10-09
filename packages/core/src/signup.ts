@@ -4,11 +4,9 @@ import { z } from "zod";
 import { NIGERIAN_STATES, normaliseNigerianPhone } from "./nigeria";
 import { normaliseSubdomain, subdomainProblem } from "./subdomain";
 
-export const SCHOOL_LEVELS = ["NURSERY", "PRIMARY", "SECONDARY"] as const;
-export type SchoolLevel = (typeof SCHOOL_LEVELS)[number];
-export const SCHOOL_LEVEL_LABEL: Record<SchoolLevel, string> = { NURSERY: "Nursery", PRIMARY: "Primary", SECONDARY: "Secondary" };
+import { SCHOOL_LEVELS } from "./signupOptions";
 
-export const MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"] as const;
+export * from "./signupOptions";
 
 const phone = (message: string) =>
   z
@@ -39,8 +37,6 @@ export const ownerAccountSchema = z.object({
 export type OwnerAccount = z.infer<typeof ownerAccountSchema>;
 
 /** Screen 3. */
-export const CODE_LIFETIME_SECONDS = 10 * 60;
-export const RESEND_AFTER_SECONDS = 60;
 export const verifyCodeSchema = z.object({
   code: z.string().trim().regex(/^\d{6}$/, "Enter the 6 digits from the email"),
 });

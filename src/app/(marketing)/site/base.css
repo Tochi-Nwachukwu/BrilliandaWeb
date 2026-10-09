@@ -108,6 +108,7 @@ a {
     transform: none !important;
     opacity: 1 !important;
     transition: none !important;
+    animation: none !important;
   }
   #cursor {
     display: none !important;
@@ -512,4 +513,36 @@ a {
 }
 .intro-skip body.is-loading {
   overflow: auto;
+}
+/* With no intro to wait for, the hero comes in by CSS alone, from first paint, instead of waiting
+   for the page's script to start (the speed budget: main content within 2.5 s). */
+@keyframes hero-fu {
+  from {
+    opacity: 0;
+    transform: translateY(26px);
+  }
+}
+@keyframes hero-lm {
+  from {
+    transform: translateY(110%);
+  }
+}
+.intro-skip #hero .fu {
+  opacity: 1;
+  transform: none;
+  animation: hero-fu 0.9s var(--e-out) var(--d, 0ms) backwards;
+}
+/* The hero line is the page's main content, and Chrome counts it as shown only when a fade ends,
+   so it slides in without fading. */
+@keyframes hero-rise {
+  from {
+    transform: translateY(26px);
+  }
+}
+.intro-skip #hero .hero-row p.fu {
+  animation-name: hero-rise;
+}
+.intro-skip #hero .lm > span {
+  transform: none;
+  animation: hero-lm 1.15s var(--e-out) var(--d, 0ms) backwards;
 }

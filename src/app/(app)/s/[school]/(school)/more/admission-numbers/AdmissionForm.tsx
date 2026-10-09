@@ -1,7 +1,12 @@
 "use client";
 
-import { admissionPatternProblems, formatAdmissionNo } from "@brillianda/core";
-import { Alert, Button, Card, Stepper, TextField, toast } from "@brillianda/ui";
+import { admissionPatternProblems, formatAdmissionNo } from "@brillianda/core/admission";
+import { Alert } from "@brillianda/ui/Alert";
+import { Button } from "@brillianda/ui/Button";
+import { Card } from "@brillianda/ui/Cards";
+import { Stepper } from "@brillianda/ui/Stepper";
+import { TextField } from "@brillianda/ui/TextField";
+import { toast } from "@brillianda/ui/Toast";
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import type { ActionResult, AdmissionSettings } from "@/data/types";

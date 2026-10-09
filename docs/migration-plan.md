@@ -279,6 +279,21 @@ as workspaces. Mentions of `apps/web` and `legacy/` earlier in this plan describ
 
 **Done when:** the speed and accessibility checks pass in CI.
 
+**Done (9 October 2026), except the accessibility check:**
+
+- Each school is installable: `/s/<school>/manifest.webmanifest` names it, and
+  `/s/<school>/app-icon/<180|192|512>` draws its initials on its colour (also a maskable version).
+  The school layout links both, with Apple's home-screen tags. An uploaded logo replaces the
+  initials once uploads exist.
+- `OfflineBanner` in the app's root layout says when the phone has lost its connection.
+- `e2e/tests/budget.spec.ts` checks `/`, `/signup` and `/s/greenfield/login` at both sizes on every
+  push: 139 to 144 KB of JavaScript (was 178 to 220) and the main content shown within about
+  1.3 s locally. Getting there: per-file imports instead of the package barrels, zod loaded on the
+  first submit on the public screens, and the hero and auth card sliding in instead of fading from
+  nothing.
+- Still open: the WCAG 2.2 AA check needs `@axe-core/playwright`, a new dependency, so it waits
+  for a yes.
+
 ## What isn't in v1 (kept for later)
 
 Built today but "after v1" in the plan. Their code stays in `legacy/` and moves across, looking

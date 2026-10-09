@@ -1,7 +1,7 @@
 // FAKE: a copy of the national subject catalogue (plan: "The 2025 lists", "Beyond the 2025 lists").
 // The real one is platform data the backend seeds from a versioned file with a source link per
 // entry (NERDC curriculum offerings, 2025). Names as NERDC publishes them.
-import type { Band, CatalogueEntry, Role } from "@brillianda/core";
+import type { Band, CatalogueEntry, Role } from "@brillianda/core/subjects";
 
 const PRIMARY: Band[] = ["lowerPrimary", "upperPrimary"];
 const offers = (bands: Band[], role: Role) => bands.map((band) => ({ band, role }));

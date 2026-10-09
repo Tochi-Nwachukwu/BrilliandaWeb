@@ -2,7 +2,8 @@
 // data. The backend replaces these with real queries; the record of changes becomes the plan's
 // audit log.
 import "server-only";
-import { defaultTerms, sessionName, type SessionInput } from "@brillianda/core";
+import { defaultTerms, type SessionInput } from "@brillianda/core/calendar";
+import { sessionName } from "@brillianda/core/signup";
 import type { ActionResult, HomeSummary, SessionSetup, SetupProgress } from "../types";
 import { requireMember } from "./auth";
 import { recordChange } from "./changes";

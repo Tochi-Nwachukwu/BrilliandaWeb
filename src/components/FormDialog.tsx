@@ -1,9 +1,12 @@
 "use client";
 
-import { Button, ResponsiveDialog, SelectField, TextField } from "@brillianda/ui";
+import { Button } from "@brillianda/ui/Button";
+import { ResponsiveDialog } from "@brillianda/ui/ResponsiveDialog";
+import { SelectField, TextField } from "@brillianda/ui/TextField";
 import { useState, useTransition, type ReactNode } from "react";
 import { FormError } from "@/components/auth/FormError";
-import { errorsFor, firstErrors, type Errors } from "@/lib/form";
+import { errorsFor } from "@/lib/formCheck";
+import { firstErrors, type Errors } from "@/lib/form";
 import type { ActionResult } from "@/data/types";
 
 export type Field = { key: string; label: string; initial: string; hint?: string; placeholder?: string; upper?: boolean; options?: { value: string; label: string }[] };

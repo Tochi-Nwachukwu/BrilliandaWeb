@@ -1,16 +1,15 @@
 "use client";
 
-import {
-  armChip,
-  armNameSchema,
-  DEPARTMENT_LABEL,
-  DEPARTMENTS,
-  levelNameSchema,
-  newLevelSchema,
-  SECTION_LABEL,
-  type Section,
-} from "@brillianda/core";
-import { Badge, Button, Card, Icon, PageHeader, ResponsiveDialog, SelectField, cx, toast } from "@brillianda/ui";
+import { armChip, armNameSchema, DEPARTMENT_LABEL, DEPARTMENTS, levelNameSchema, newLevelSchema, SECTION_LABEL, type Section } from "@brillianda/core/classes";
+import { Badge } from "@brillianda/ui/Badge";
+import { Button } from "@brillianda/ui/Button";
+import { Card } from "@brillianda/ui/Cards";
+import { cx } from "@brillianda/ui/cx";
+import { Icon } from "@brillianda/ui/Icon";
+import { PageHeader } from "@brillianda/ui/PageHeader";
+import { ResponsiveDialog } from "@brillianda/ui/ResponsiveDialog";
+import { SelectField } from "@brillianda/ui/TextField";
+import { toast } from "@brillianda/ui/Toast";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useState, useTransition } from "react";

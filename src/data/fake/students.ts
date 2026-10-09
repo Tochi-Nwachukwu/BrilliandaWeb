@@ -1,19 +1,10 @@
 // FAKE: students and guardians on sample data. The backend replaces this with the students,
 // guardians and enrolments tables, the per-school admission counter and the audit log.
 import "server-only";
-import {
-  admissionPatternProblems,
-  armChip,
-  armLabel,
-  defaultAdmissionPattern,
-  formatAdmissionNo,
-  fullName,
-  normaliseNigerianPhone,
-  sameAdmissionNo,
-  STATUS_LABEL,
-  type StudentInput,
-  type StudentStatus,
-} from "@brillianda/core";
+import { admissionPatternProblems, defaultAdmissionPattern, formatAdmissionNo, sameAdmissionNo } from "@brillianda/core/admission";
+import { armChip, armLabel } from "@brillianda/core/classes";
+import { normaliseNigerianPhone } from "@brillianda/core/nigeria";
+import { fullName, STATUS_LABEL, type StudentInput, type StudentStatus } from "@brillianda/core/students";
 import type { ActionResult, AdmissionSettings, ArmOption, GuardianMatch, StudentDetail, StudentRow, StudentsList } from "../types";
 import { requireMember } from "./auth";
 import { recordChange } from "./changes";

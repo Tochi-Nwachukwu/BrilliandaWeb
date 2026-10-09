@@ -1,5 +1,5 @@
-import { suggestSubdomains } from "@brillianda/core";
-import { PageSpinner } from "@brillianda/ui";
+import { suggestSubdomains } from "@brillianda/core/subdomain";
+import { PageSpinner } from "@brillianda/ui/Spinner";
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";

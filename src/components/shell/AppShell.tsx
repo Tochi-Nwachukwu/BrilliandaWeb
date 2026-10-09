@@ -1,6 +1,10 @@
 "use client";
 
-import { Badge, CommandPalette, Icon, Toaster, cx, openCommandPalette, type Command, type IconName } from "@brillianda/ui";
+import { Badge } from "@brillianda/ui/Badge";
+import { CommandPalette, openCommandPalette, type Command } from "@brillianda/ui/CommandPalette";
+import { cx } from "@brillianda/ui/cx";
+import { Icon, type IconName } from "@brillianda/ui/Icon";
+import { Toaster } from "@brillianda/ui/Toast";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState, type ReactNode } from "react";

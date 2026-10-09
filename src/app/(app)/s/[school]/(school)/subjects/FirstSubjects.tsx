@@ -1,7 +1,8 @@
 "use client";
 
-import type { Band, CatalogueEntry } from "@brillianda/core";
-import { PageHeader, toast } from "@brillianda/ui";
+import type { Band, CatalogueEntry } from "@brillianda/core/subjects";
+import { PageHeader } from "@brillianda/ui/PageHeader";
+import { toast } from "@brillianda/ui/Toast";
 import { useRouter } from "next/navigation";
 import type { ActionResult } from "@/data/types";
 import { SubjectPicker } from "./SubjectPicker";

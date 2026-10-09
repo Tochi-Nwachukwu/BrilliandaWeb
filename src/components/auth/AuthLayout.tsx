@@ -1,7 +1,7 @@
-import { cx } from "@brillianda/ui";
+import { cx } from "@brillianda/ui/cx";
 import Link from "next/link";
 import { cacheLife } from "next/cache";
-import { brandPalette, mix } from "@brillianda/core";
+import { brandPalette, mix } from "@brillianda/core/brand";
 import type { ReactNode } from "react";
 import { SchoolMark } from "../school/SchoolBrand";
 
@@ -123,7 +123,7 @@ export function AuthLayout({
     <div className="min-h-dvh lg:grid lg:grid-cols-[5fr_7fr]">
       {school ? <SchoolPanel school={school} /> : <BrandPanel />}
       <main className="flex min-h-dvh flex-col items-center justify-center px-4 py-12 lg:px-16">
-        <div className="w-full max-w-[400px] animate-rise">
+        <div className="w-full max-w-[400px] animate-lift">
           {school ? (
             <div className="mb-8 flex flex-col items-center gap-3 text-center lg:hidden">
               <SchoolMark {...school} className="h-14 w-14 text-lg" />

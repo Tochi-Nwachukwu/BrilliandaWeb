@@ -2,7 +2,8 @@
 
 // Home's checklist and the school's calendar (docs/data-contract.md). About `school`: see
 // actions/auth.ts — the real actions take it from the request's host.
-import { fieldErrorsOf, sessionSchema } from "@brillianda/core";
+import { sessionSchema } from "@brillianda/core/calendar";
+import { fieldErrorsOf } from "@brillianda/core/signup";
 import { revalidatePath } from "next/cache";
 import * as impl from "../fake/home";
 import type { ActionResult, SessionSetup } from "../types";

@@ -2,7 +2,8 @@
 
 // Students (plan: "Adding one student", "Managing students"; docs/data-contract.md). Owners and
 // admins. About `school`: see actions/auth.ts — the real actions take it from the request's host.
-import { fieldErrorsOf, moveStudentsSchema, statusChangeSchema, studentSchema } from "@brillianda/core";
+import { fieldErrorsOf } from "@brillianda/core/signup";
+import { moveStudentsSchema, statusChangeSchema, studentSchema } from "@brillianda/core/students";
 import { revalidatePath } from "next/cache";
 import * as impl from "../fake/students";
 import type { ActionResult, AdmissionSettings, GuardianMatch } from "../types";

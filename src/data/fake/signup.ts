@@ -3,16 +3,9 @@
 // stored drafts, Resend for the code, Turnstile on the owner step, rate limits and one database
 // transaction on Create, then the one-time handover to the new subdomain.
 import "server-only";
-import {
-  alternativeSubdomains,
-  CODE_LIFETIME_SECONDS,
-  defaultTerms,
-  normaliseSubdomain,
-  RESEND_AFTER_SECONDS,
-  subdomainProblem,
-  type OwnerAccount,
-  type SchoolDetails,
-} from "@brillianda/core";
+import { defaultTerms } from "@brillianda/core/calendar";
+import { CODE_LIFETIME_SECONDS, RESEND_AFTER_SECONDS, type OwnerAccount, type SchoolDetails } from "@brillianda/core/signup";
+import { alternativeSubdomains, normaliseSubdomain, subdomainProblem } from "@brillianda/core/subdomain";
 import { cookies } from "next/headers";
 import type { ActionResult, SignupDraft, SubdomainCheck } from "../types";
 import { recordChange } from "./changes";

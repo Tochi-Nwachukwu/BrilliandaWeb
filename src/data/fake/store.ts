@@ -2,7 +2,11 @@
 // replaces it (docs/data-contract.md). It resets when the dev server restarts. Kept on globalThis
 // so a hot reload in development doesn't wipe it.
 import "server-only";
-import { armCodes, ARM_PRESETS, buildLadder, defaultLinks, defaultTerms, preTicked, type LinkKind, type StudentGender, type StudentStatus, type Department, type SchoolDetails, type SchoolLevel, type Section, type Term } from "@brillianda/core";
+import { defaultTerms, type Term } from "@brillianda/core/calendar";
+import { armCodes, ARM_PRESETS, buildLadder, type Department, type Section } from "@brillianda/core/classes";
+import { type SchoolDetails, type SchoolLevel } from "@brillianda/core/signup";
+import { type StudentGender, type StudentStatus } from "@brillianda/core/students";
+import { defaultLinks, preTicked, type LinkKind } from "@brillianda/core/subjects";
 import type { SchoolSummary } from "../types";
 import { CATALOGUE } from "./catalogue";
 

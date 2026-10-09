@@ -1,7 +1,7 @@
 "use server";
 
 // A school asking for a trial from the marketing site (docs/data-contract.md).
-import { validateTrialRequest } from "@brillianda/core";
+import { validateTrialRequest } from "@brillianda/core/trial";
 import * as impl from "../fake/trial";
 import type { ActionResult } from "../types";
 

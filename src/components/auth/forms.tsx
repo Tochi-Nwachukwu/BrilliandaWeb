@@ -1,10 +1,12 @@
 "use client";
 
-import { emailOnlySchema, newPasswordSchema } from "@brillianda/core";
-import { Badge, Button, PasswordField, TextField } from "@brillianda/ui";
+import { Badge } from "@brillianda/ui/Badge";
+import { Button } from "@brillianda/ui/Button";
+import { PasswordField } from "@brillianda/ui/PasswordField";
+import { TextField } from "@brillianda/ui/TextField";
 import Link from "next/link";
 import { useRef, useState, useTransition, type FormEvent, type ReactNode } from "react";
-import { errorsFor, firstErrors, type Errors } from "@/lib/form";
+import { checkLater, firstErrors, type Errors } from "@/lib/form";
 import type { ActionResult, SampleEmail } from "@/data/types";
 import { FormError, useFocusOnFailure } from "./FormError";
 
@@ -67,10 +69,10 @@ export function EmailRequestForm({
     );
   }
 
-  const submit = (event: FormEvent) => {
+  const submit = async (event: FormEvent) => {
     event.preventDefault();
     setFailure(null);
-    const problems = errorsFor(emailOnlySchema, { email });
+    const problems = await checkLater(() => import("@brillianda/core/auth").then((m) => m.emailOnlySchema), { email });
     if (problems) {
       setErrors(problems);
       setAttempt((n) => n + 1);
@@ -137,10 +139,10 @@ export function NewPasswordForm({
     if (errors[field]) setErrors((e) => ({ ...e, [field]: undefined }));
   };
 
-  const submit = (event: FormEvent) => {
+  const submit = async (event: FormEvent) => {
     event.preventDefault();
     setFailure(null);
-    const problems = errorsFor(newPasswordSchema, values);
+    const problems = await checkLater(() => import("@brillianda/core/auth").then((m) => m.newPasswordSchema), values);
     if (problems) {
       setErrors(problems);
       setAttempt((n) => n + 1);

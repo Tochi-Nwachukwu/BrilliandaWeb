@@ -1,7 +1,7 @@
 // Reading a school's student list in the browser (plan: "The browser parses it, so the preview
 // appears at once even on a slow connection"). CSV, Excel (.xlsx) and Word tables (.docx). The
 // Excel and Word readers load only when a file of that kind is picked.
-import { MAX_IMPORT_ROWS } from "@brillianda/core";
+import { MAX_IMPORT_ROWS } from "@brillianda/core/studentImport";
 
 export type Sheet = { headings: string[]; rows: string[][] };
 export type ReadResult = { ok: true; sheet: Sheet } | { ok: false; message: string };

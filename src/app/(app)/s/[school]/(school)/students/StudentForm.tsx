@@ -1,11 +1,18 @@
 "use client";
 
-import { GENDER_LABEL, GENDERS, NIGERIAN_STATES, studentSchema } from "@brillianda/core";
-import { Alert, Button, Card, SelectField, TextField, cx, toast } from "@brillianda/ui";
+import { NIGERIAN_STATES } from "@brillianda/core/nigeria";
+import { GENDER_LABEL, GENDERS, studentSchema } from "@brillianda/core/students";
+import { Alert } from "@brillianda/ui/Alert";
+import { Button } from "@brillianda/ui/Button";
+import { Card } from "@brillianda/ui/Cards";
+import { cx } from "@brillianda/ui/cx";
+import { SelectField, TextField } from "@brillianda/ui/TextField";
+import { toast } from "@brillianda/ui/Toast";
 import { useRouter } from "next/navigation";
 import { useRef, useState, useTransition, type ReactNode } from "react";
 import { FormError, useFocusOnFailure } from "@/components/auth/FormError";
-import { errorsFor, firstErrors, type Errors } from "@/lib/form";
+import { errorsFor } from "@/lib/formCheck";
+import { firstErrors, type Errors } from "@/lib/form";
 import type { ActionResult, ArmOption, GuardianMatch } from "@/data/types";
 import { ArmOptions } from "./StudentsView";
 

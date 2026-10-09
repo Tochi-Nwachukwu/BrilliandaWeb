@@ -1,7 +1,8 @@
 // FAKE: the school's subjects and which class levels take them, on sample data. The backend
 // replaces this with the catalogue table and the school's subjects and subject links.
 import "server-only";
-import { bandOf, DEPARTMENT_LABEL, defaultLinks, type Band, type Department, type LinkKind } from "@brillianda/core";
+import { DEPARTMENT_LABEL, type Department } from "@brillianda/core/classes";
+import { bandOf, defaultLinks, type Band, type LinkKind } from "@brillianda/core/subjects";
 import type { ActionResult, Subject, SubjectsSetup } from "../types";
 import { requireMember } from "./auth";
 import { CATALOGUE } from "./catalogue";

@@ -1,4 +1,4 @@
-import { PageHeader } from "@brillianda/ui";
+import { PageHeader } from "@brillianda/ui/PageHeader";
 import type { Metadata } from "next";
 import { setAdmissionFormat } from "@/data/actions/students";
 import { getSession } from "@/data/home";

@@ -63,5 +63,12 @@ and in the brillanda-v1 folder, for reference only.
   prefetches can keep it waiting forever.
 - Anything that reads the clock in a Server Component needs `await connection()` (or a read of
   cookies) before it, or Next 16 refuses to prerender.
-- `packages/ui` exports through `src/index.ts`. Interactive files start with "use client", so the
-  barrel is safe to import from Server Components.
+- Import one file at a time: `@brillianda/ui/Button`, `@brillianda/core/brand` (each package's
+  `exports` maps `./*` to its files). The barrels (`@brillianda/ui`, `@brillianda/core`) pull every
+  file into the bundle and broke the 170 KB first-load budget. Interactive ui files start with
+  "use client", so they are safe to import from Server Components.
+- The public screens (signup, sign-in, password) load their zod schema on the first submit
+  through `checkLater` in `src/lib/form.ts`; screens inside a school use `errorsFor` from
+  `src/lib/formCheck.ts`. Fixed choices that a public screen shows live in zod-free files
+  (`core/signupOptions.ts`). Main content must not fade in from opacity 0: Chrome then counts it
+  as shown late (or never), and `e2e/tests/budget.spec.ts` fails. Slide it in (`animate-lift`).

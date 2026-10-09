@@ -1,12 +1,16 @@
 "use client";
 
-import { MONTHS, NIGERIAN_STATES, SCHOOL_LEVEL_LABEL, SCHOOL_LEVELS, schoolDetailsSchema, type SchoolDetails, type SchoolLevel } from "@brillianda/core";
-import { Button, SelectField, TextField, cx } from "@brillianda/ui";
+import { NIGERIAN_STATES } from "@brillianda/core/nigeria";
+import type { SchoolDetails } from "@brillianda/core/signup";
+import { MONTHS, SCHOOL_LEVEL_LABEL, SCHOOL_LEVELS, type SchoolLevel } from "@brillianda/core/signupOptions";
+import { Button } from "@brillianda/ui/Button";
+import { cx } from "@brillianda/ui/cx";
+import { SelectField, TextField } from "@brillianda/ui/TextField";
 import { useRouter } from "next/navigation";
 import { useRef, useState, useTransition, type FormEvent } from "react";
 import { FormError, useFocusOnFailure } from "@/components/auth/FormError";
 import { saveSchoolDetails } from "@/data/actions/signup";
-import { errorsFor, firstErrors, type Errors } from "@/lib/form";
+import { checkLater, firstErrors, type Errors } from "@/lib/form";
 
 /** Screen 1: the school's details, and when its first session on Brillianda starts. */
 export function SchoolForm({ saved, defaultStart }: { saved: SchoolDetails | null; defaultStart: { month: number; year: number } }) {
@@ -33,10 +37,10 @@ export function SchoolForm({ saved, defaultStart }: { saved: SchoolDetails | nul
   const toggleLevel = (level: SchoolLevel) =>
     set("levels")(values.levels.includes(level) ? values.levels.filter((l) => l !== level) : SCHOOL_LEVELS.filter((l) => l === level || values.levels.includes(l)));
 
-  const submit = (event: FormEvent) => {
+  const submit = async (event: FormEvent) => {
     event.preventDefault();
     setFailure(null);
-    const problems = errorsFor(schoolDetailsSchema, values);
+    const problems = await checkLater(() => import("@brillianda/core/signup").then((m) => m.schoolDetailsSchema), values);
     if (problems) {
       setErrors(problems);
       setAttempt((n) => n + 1);

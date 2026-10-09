@@ -1,6 +1,6 @@
 // FAKE: the sample accounts at a school, for one-tap sign-in while there is no backend.
 import "server-only";
-import { ROLE_LABEL } from "@brillianda/core";
+import { ROLE_LABEL } from "@brillianda/core/auth";
 import { store } from "./store";
 
 export async function getSampleAccounts(subdomain: string) {

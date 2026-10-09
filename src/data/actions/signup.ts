@@ -2,13 +2,7 @@
 
 // The four signup screens' saves (plan: "Creating a school"; docs/data-contract.md). Each one
 // checks its input with the same schema the page used, then hands over to the implementation.
-import {
-  fieldErrorsOf,
-  ownerAccountSchema,
-  schoolAddressSchema,
-  schoolDetailsSchema,
-  verifyCodeSchema,
-} from "@brillianda/core";
+import { fieldErrorsOf, ownerAccountSchema, schoolAddressSchema, schoolDetailsSchema, verifyCodeSchema } from "@brillianda/core/signup";
 import * as impl from "../fake/signup";
 import type { ActionResult, SignupDraft, SubdomainCheck } from "../types";
 

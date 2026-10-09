@@ -2,7 +2,8 @@
 
 // Classes and arms (plan: "Quick setup", "Editing after setup"; docs/data-contract.md). Owners and
 // admins. About `school`: see actions/auth.ts — the real actions take it from the request's host.
-import { armNameSchema, classSetupSchema, DEPARTMENTS, fieldErrorsOf, levelNameSchema, newLevelSchema, type Department } from "@brillianda/core";
+import { armNameSchema, classSetupSchema, DEPARTMENTS, levelNameSchema, newLevelSchema, type Department } from "@brillianda/core/classes";
+import { fieldErrorsOf } from "@brillianda/core/signup";
 import { revalidatePath } from "next/cache";
 import * as impl from "../fake/classes";
 import type { ActionResult } from "../types";

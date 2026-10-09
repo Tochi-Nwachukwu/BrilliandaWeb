@@ -5,7 +5,8 @@
   "description": "Pure TypeScript shared by the browser and the server: validation schemas, generators and rules.",
   "type": "module",
   "exports": {
-    ".": "./src/index.ts"
+    ".": "./src/index.ts",
+    "./*": "./src/*.ts"
   },
   "scripts": {
     "typecheck": "tsc --noEmit",

@@ -1,7 +1,7 @@
 // FAKE: classes and arms on sample data. The backend replaces this with the class_levels,
 // arm_names and arms tables (plan: "The class ladder", "Arms", "Editing after setup").
 import "server-only";
-import { DEPARTMENT_LABEL, SECTION_LABEL, type ClassSetupInput, type Department, type Section } from "@brillianda/core";
+import { DEPARTMENT_LABEL, SECTION_LABEL, type ClassSetupInput, type Department, type Section } from "@brillianda/core/classes";
 import type { ActionResult, ClassStructure } from "../types";
 import { requireMember } from "./auth";
 import { recordChange } from "./changes";

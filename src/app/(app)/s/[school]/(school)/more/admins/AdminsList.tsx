@@ -1,13 +1,21 @@
 "use client";
 
-import { INVITE_LIFETIME_HOURS, inviteAdminSchema, ROLE_LABEL } from "@brillianda/core";
-import { Badge, Button, Icon, PageHeader, ResponsiveDialog, TextField, levelStyle, toast } from "@brillianda/ui";
+import { INVITE_LIFETIME_HOURS, inviteAdminSchema, ROLE_LABEL } from "@brillianda/core/auth";
+import { Badge } from "@brillianda/ui/Badge";
+import { Button } from "@brillianda/ui/Button";
+import { Icon } from "@brillianda/ui/Icon";
+import { levelStyle } from "@brillianda/ui/levels";
+import { PageHeader } from "@brillianda/ui/PageHeader";
+import { ResponsiveDialog } from "@brillianda/ui/ResponsiveDialog";
+import { TextField } from "@brillianda/ui/TextField";
+import { toast } from "@brillianda/ui/Toast";
 import { useRouter } from "next/navigation";
 import { useState, useTransition, type FormEvent } from "react";
 import { initials } from "@/lib/initials";
 import { SampleLinks } from "@/components/auth/forms";
 import { FormError } from "@/components/auth/FormError";
-import { errorsFor, firstErrors, type Errors } from "@/lib/form";
+import { errorsFor } from "@/lib/formCheck";
+import { firstErrors, type Errors } from "@/lib/form";
 import type { ActionResult, SampleEmail, SchoolMember } from "@/data/types";
 
 type Invite = (input: unknown) => Promise<ActionResult<SampleEmail & { resent: boolean }>>;

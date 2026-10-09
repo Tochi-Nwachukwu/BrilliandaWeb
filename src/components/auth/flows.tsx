@@ -1,6 +1,7 @@
 "use client";
 
-import { Button, PasswordField } from "@brillianda/ui";
+import { Button } from "@brillianda/ui/Button";
+import { PasswordField } from "@brillianda/ui/PasswordField";
 import { useRouter } from "next/navigation";
 import { useRef, useState, useTransition, type FormEvent } from "react";
 import { firstErrors, type Errors } from "@/lib/form";

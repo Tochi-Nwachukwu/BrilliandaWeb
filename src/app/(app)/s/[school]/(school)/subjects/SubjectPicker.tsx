@@ -1,7 +1,11 @@
 "use client";
 
-import { BAND_LABEL, preTicked, subjectCode, type Band, type CatalogueEntry } from "@brillianda/core";
-import { Badge, Button, FilterTabs, Icon, cx } from "@brillianda/ui";
+import { BAND_LABEL, preTicked, subjectCode, type Band, type CatalogueEntry } from "@brillianda/core/subjects";
+import { Badge } from "@brillianda/ui/Badge";
+import { Button } from "@brillianda/ui/Button";
+import { cx } from "@brillianda/ui/cx";
+import { Icon } from "@brillianda/ui/Icon";
+import { FilterTabs } from "@brillianda/ui/Tabs";
 import { useState, useTransition, type KeyboardEvent } from "react";
 import { FormError } from "@/components/auth/FormError";
 import type { ActionResult } from "@/data/types";

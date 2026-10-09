@@ -1,4 +1,4 @@
-import { Icon } from "@brillianda/ui";
+import { Icon } from "@brillianda/ui/Icon";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Suspense } from "react";

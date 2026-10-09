@@ -2,7 +2,8 @@
 
 // The school's team (docs/data-contract.md). Only the owner invites and removes admins (plan:
 // roles). About `school`: see actions/auth.ts — the real actions take it from the request's host.
-import { fieldErrorsOf, inviteAdminSchema } from "@brillianda/core";
+import { inviteAdminSchema } from "@brillianda/core/auth";
+import { fieldErrorsOf } from "@brillianda/core/signup";
 import { revalidatePath } from "next/cache";
 import * as impl from "../fake/auth";
 import type { ActionResult, SampleEmail } from "../types";

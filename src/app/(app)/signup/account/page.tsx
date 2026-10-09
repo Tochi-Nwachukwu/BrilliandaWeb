@@ -1,4 +1,4 @@
-import { PageSpinner } from "@brillianda/ui";
+import { PageSpinner } from "@brillianda/ui/Spinner";
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";

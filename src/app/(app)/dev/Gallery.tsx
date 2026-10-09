@@ -1,26 +1,19 @@
 "use client";
 
-import {
-  Alert,
-  Badge,
-  Button,
-  Card,
-  Dialog,
-  EmptyState,
-  FilterTabs,
-  Hero,
-  Kbd,
-  PageHeader,
-  PasswordField,
-  ProgressBar,
-  ResponsiveDialog,
-  Ring,
-  SelectField,
-  StatCard,
-  TextAreaField,
-  TextField,
-  toast,
-} from "@brillianda/ui";
+import { Alert } from "@brillianda/ui/Alert";
+import { Badge } from "@brillianda/ui/Badge";
+import { Button } from "@brillianda/ui/Button";
+import { Card, ProgressBar, StatCard } from "@brillianda/ui/Cards";
+import { EmptyState, Kbd } from "@brillianda/ui/EmptyState";
+import { Hero } from "@brillianda/ui/Hero";
+import { Dialog } from "@brillianda/ui/Overlay";
+import { PageHeader } from "@brillianda/ui/PageHeader";
+import { PasswordField } from "@brillianda/ui/PasswordField";
+import { ResponsiveDialog } from "@brillianda/ui/ResponsiveDialog";
+import { Ring } from "@brillianda/ui/Ring";
+import { FilterTabs } from "@brillianda/ui/Tabs";
+import { SelectField, TextAreaField, TextField } from "@brillianda/ui/TextField";
+import { toast } from "@brillianda/ui/Toast";
 import { useState, type ReactNode } from "react";
 
 function Section({ title, children }: { title: string; children: ReactNode }) {

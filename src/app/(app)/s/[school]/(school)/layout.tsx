@@ -1,5 +1,5 @@
-import { ROLE_LABEL } from "@brillianda/core";
-import { PageSpinner } from "@brillianda/ui";
+import { ROLE_LABEL } from "@brillianda/core/auth";
+import { PageSpinner } from "@brillianda/ui/Spinner";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
 import { AppShell, type NavItem } from "@/components/shell/AppShell";

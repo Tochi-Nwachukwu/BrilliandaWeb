@@ -179,3 +179,10 @@ The browser reads Excel (`exceljs`), CSV and Word tables (`.docx`, via `jszip`; 
 counts as the sheet) and builds the Excel templates with Class, Arm, Gender and State dropdowns
 (`src/lib/import`). Word import goes beyond the plan, which lists CSV and Excel. All the matching
 and validation rules are pure functions in `packages/core/src/studentImport.ts`, with tests.
+
+### Installable app (batch 10)
+
+No new functions. `src/app/(app)/s/[school]/manifest.webmanifest` and `app-icon/[size]` read
+`getSchoolBySubdomain` (name, colour, status). On a school's own address these sit at the root
+(`/manifest.webmanifest`, `/app-icon/192`), which `proxy.ts` will map like every other school
+path. A school logo upload, when it exists, would replace the drawn initials.

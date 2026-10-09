@@ -1,4 +1,4 @@
-import { validateTrialRequest as validate, type TrialErrors, type TrialRequest } from "@brillianda/core";
+import { validateTrialRequest as validate, type TrialErrors, type TrialRequest } from "@brillianda/core/trial";
 import { requestTrial } from "@/data/actions/trial";
 
 // The "request a trial" form, kept from the old site so the page looks and works the same. v1

@@ -1,7 +1,14 @@
 "use client";
 
-import { displayNigerianPhone, GENDER_LABEL, STATUS_LABEL } from "@brillianda/core";
-import { Badge, Button, Card, EmptyState, ResponsiveDialog, levelStyle, toast } from "@brillianda/ui";
+import { displayNigerianPhone } from "@brillianda/core/nigeria";
+import { GENDER_LABEL, STATUS_LABEL } from "@brillianda/core/students";
+import { Badge } from "@brillianda/ui/Badge";
+import { Button } from "@brillianda/ui/Button";
+import { Card } from "@brillianda/ui/Cards";
+import { EmptyState } from "@brillianda/ui/EmptyState";
+import { levelStyle } from "@brillianda/ui/levels";
+import { ResponsiveDialog } from "@brillianda/ui/ResponsiveDialog";
+import { toast } from "@brillianda/ui/Toast";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, useTransition, type ReactNode } from "react";

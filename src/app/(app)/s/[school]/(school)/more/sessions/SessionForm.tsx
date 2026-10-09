@@ -1,11 +1,17 @@
 "use client";
 
-import { defaultTerms, sessionName, sessionSchema, TERM_NAME_PRESETS, type Term, type TermNamePreset } from "@brillianda/core";
-import { Button, Card, SelectField, TextField, cx, toast } from "@brillianda/ui";
+import { defaultTerms, sessionSchema, TERM_NAME_PRESETS, type Term, type TermNamePreset } from "@brillianda/core/calendar";
+import { sessionName } from "@brillianda/core/signup";
+import { Button } from "@brillianda/ui/Button";
+import { Card } from "@brillianda/ui/Cards";
+import { cx } from "@brillianda/ui/cx";
+import { SelectField, TextField } from "@brillianda/ui/TextField";
+import { toast } from "@brillianda/ui/Toast";
 import { useRouter } from "next/navigation";
 import { useState, useTransition, type FormEvent } from "react";
 import { FormError } from "@/components/auth/FormError";
-import { errorsFor, firstErrors, type Errors } from "@/lib/form";
+import { errorsFor } from "@/lib/formCheck";
+import { firstErrors, type Errors } from "@/lib/form";
 import type { ActionResult, SessionSetup } from "@/data/types";
 
 /** Change the session year, how many terms, their names and their dates. */

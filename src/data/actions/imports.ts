@@ -3,7 +3,7 @@
 // Importing students (plan: "How an import runs"; docs/data-contract.md). The browser reads the
 // file and maps the columns; these check every row again and write. About `school`: see
 // actions/auth.ts — the real actions take it from the request's host.
-import { IMPORT_COLUMNS, MAX_IMPORT_ROWS, type CheckedRow, type RawRow } from "@brillianda/core";
+import { IMPORT_COLUMNS, MAX_IMPORT_ROWS, type CheckedRow, type RawRow } from "@brillianda/core/studentImport";
 import { revalidatePath } from "next/cache";
 import * as impl from "../fake/imports";
 import type { ActionResult, ImportResult } from "../types";

@@ -1,31 +1,21 @@
 "use client";
 
-import {
-  ARM_PRESETS,
-  armChip,
-  armCodes,
-  buildLadder,
-  classLevelsStepSchema,
-  classSetupSchema,
-  defaultRange,
-  ladderOptions,
-  MAX_ARMS,
-  previewSentence,
-  renameLadder,
-  SCHEME_LABEL,
-  SECTION_LABEL,
-  setupLabels,
-  type ArmPreset,
-  type ClassLevelDraft,
-  type LadderKey,
-  type NamingScheme,
-  type SchoolLevel,
-} from "@brillianda/core";
-import { Alert, Button, Card, Icon, PageHeader, SelectField, Stepper, cx, toast } from "@brillianda/ui";
+import { ARM_PRESETS, armChip, armCodes, buildLadder, classLevelsStepSchema, classSetupSchema, defaultRange, ladderOptions, MAX_ARMS, previewSentence, renameLadder, SCHEME_LABEL, SECTION_LABEL, setupLabels, type ArmPreset, type ClassLevelDraft, type LadderKey, type NamingScheme } from "@brillianda/core/classes";
+import { type SchoolLevel } from "@brillianda/core/signup";
+import { Alert } from "@brillianda/ui/Alert";
+import { Button } from "@brillianda/ui/Button";
+import { Card } from "@brillianda/ui/Cards";
+import { cx } from "@brillianda/ui/cx";
+import { Icon } from "@brillianda/ui/Icon";
+import { PageHeader } from "@brillianda/ui/PageHeader";
+import { Stepper } from "@brillianda/ui/Stepper";
+import { SelectField } from "@brillianda/ui/TextField";
+import { toast } from "@brillianda/ui/Toast";
 import { useRouter } from "next/navigation";
 import { useState, useTransition, type KeyboardEvent } from "react";
 import { FormError } from "@/components/auth/FormError";
-import { errorsFor, firstErrors, type Errors } from "@/lib/form";
+import { errorsFor } from "@/lib/formCheck";
+import { firstErrors, type Errors } from "@/lib/form";
 import type { ActionResult } from "@/data/types";
 
 type Names = ArmPreset | "own";

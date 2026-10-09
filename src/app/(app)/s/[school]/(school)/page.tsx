@@ -1,5 +1,8 @@
-import { termPosition, type TermPosition } from "@brillianda/core";
-import { Card, EmptyState, Hero, StatCard, levelStyle } from "@brillianda/ui";
+import { termPosition, type TermPosition } from "@brillianda/core/calendar";
+import { Card, StatCard } from "@brillianda/ui/Cards";
+import { EmptyState } from "@brillianda/ui/EmptyState";
+import { Hero } from "@brillianda/ui/Hero";
+import { levelStyle } from "@brillianda/ui/levels";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { connection } from "next/server";

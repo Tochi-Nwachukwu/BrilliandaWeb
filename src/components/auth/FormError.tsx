@@ -1,6 +1,7 @@
 "use client";
 
-import { Alert, cx } from "@brillianda/ui";
+import { Alert } from "@brillianda/ui/Alert";
+import { cx } from "@brillianda/ui/cx";
 import { useEffect, type RefObject } from "react";
 
 /**

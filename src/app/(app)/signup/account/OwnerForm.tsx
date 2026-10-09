@@ -1,14 +1,15 @@
 "use client";
 
-import { ownerAccountSchema } from "@brillianda/core";
-import { Button, PasswordField, TextField } from "@brillianda/ui";
+import { Button } from "@brillianda/ui/Button";
+import { PasswordField } from "@brillianda/ui/PasswordField";
+import { TextField } from "@brillianda/ui/TextField";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useRef, useState, useTransition, type FormEvent } from "react";
 import { authLinkClass } from "@/components/auth/styles";
 import { FormError, useFocusOnFailure } from "@/components/auth/FormError";
 import { saveOwnerAccount } from "@/data/actions/signup";
-import { errorsFor, firstErrors, type Errors } from "@/lib/form";
+import { checkLater, firstErrors, type Errors } from "@/lib/form";
 
 /** Screen 2: the owner's account. The email becomes the school's primary email. */
 export function OwnerForm({ saved }: { saved: { fullName: string; email: string } | null }) {
@@ -30,10 +31,10 @@ export function OwnerForm({ saved }: { saved: { fullName: string; email: string 
     if (errors[field]) setErrors((e) => ({ ...e, [field]: undefined }));
   };
 
-  const submit = (event: FormEvent) => {
+  const submit = async (event: FormEvent) => {
     event.preventDefault();
     setFailure(null);
-    const problems = errorsFor(ownerAccountSchema, values);
+    const problems = await checkLater(() => import("@brillianda/core/signup").then((m) => m.ownerAccountSchema), values);
     if (problems) {
       setErrors(problems);
       setAttempt((n) => n + 1);

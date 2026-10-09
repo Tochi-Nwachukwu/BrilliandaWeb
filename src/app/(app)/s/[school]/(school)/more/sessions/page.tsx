@@ -1,5 +1,9 @@
-import { termPosition } from "@brillianda/core";
-import { Alert, Badge, Card, PageHeader, cx } from "@brillianda/ui";
+import { termPosition } from "@brillianda/core/calendar";
+import { Alert } from "@brillianda/ui/Alert";
+import { Badge } from "@brillianda/ui/Badge";
+import { Card } from "@brillianda/ui/Cards";
+import { cx } from "@brillianda/ui/cx";
+import { PageHeader } from "@brillianda/ui/PageHeader";
 import type { Metadata } from "next";
 import { connection } from "next/server";
 import { saveSession } from "@/data/actions/home";

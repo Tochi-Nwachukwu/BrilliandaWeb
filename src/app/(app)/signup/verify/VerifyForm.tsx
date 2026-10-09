@@ -1,14 +1,16 @@
 "use client";
 
-import { CODE_LIFETIME_SECONDS, RESEND_AFTER_SECONDS, verifyCodeSchema } from "@brillianda/core";
-import { Button, TextField, toast } from "@brillianda/ui";
+import { CODE_LIFETIME_SECONDS, RESEND_AFTER_SECONDS } from "@brillianda/core/signupOptions";
+import { Button } from "@brillianda/ui/Button";
+import { TextField } from "@brillianda/ui/TextField";
+import { toast } from "@brillianda/ui/Toast";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState, useTransition, type FormEvent } from "react";
 import { authLinkClass } from "@/components/auth/styles";
 import { FormError, useFocusOnFailure } from "@/components/auth/FormError";
 import { resendSignupCode, verifySignupEmail } from "@/data/actions/signup";
-import { errorsFor, firstErrors, type Errors } from "@/lib/form";
+import { checkLater, firstErrors, type Errors } from "@/lib/form";
 
 const clock = (seconds: number) => `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, "0")}`;
 
@@ -43,10 +45,10 @@ export function VerifyForm({ email, codeSentAt }: { email: string; codeSentAt: n
   const resendIn = Math.max(0, RESEND_AFTER_SECONDS - elapsed);
   const expired = now !== null && expiresIn === 0;
 
-  const submit = (event: FormEvent) => {
+  const submit = async (event: FormEvent) => {
     event.preventDefault();
     setFailure(null);
-    const problems = errorsFor(verifyCodeSchema, { code });
+    const problems = await checkLater(() => import("@brillianda/core/signup").then((m) => m.verifyCodeSchema), { code });
     if (problems) {
       setErrors(problems);
       setAttempt((n) => n + 1);

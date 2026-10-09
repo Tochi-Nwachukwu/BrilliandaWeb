@@ -1,7 +1,9 @@
 // FAKE: importing students on sample data. The backend replaces this with a real check of every
 // row, chunked inserts tagged with an import batch id, and undo (plan: "How an import runs").
 import "server-only";
-import { checkRows, fullName, IMPORT_CHUNK, UNDO_HOURS, formatAdmissionNo, sameAdmissionNo, type CheckedRow, type ImportContext, type RawRow } from "@brillianda/core";
+import { formatAdmissionNo, sameAdmissionNo } from "@brillianda/core/admission";
+import { checkRows, IMPORT_CHUNK, UNDO_HOURS, type CheckedRow, type ImportContext, type RawRow } from "@brillianda/core/studentImport";
+import { fullName } from "@brillianda/core/students";
 import type { ActionResult, ImportBatchSummary, ImportResult, ImportSetup } from "../types";
 import { requireMember } from "./auth";
 import { recordChange } from "./changes";

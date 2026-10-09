@@ -1,6 +1,7 @@
 // The Excel templates (plan: "The templates"). A whole-school template has Class and Arm columns
 // whose dropdowns hold the school's own names; a per-class template needs neither.
-import { IMPORT_COLUMNS, NIGERIAN_STATES, type ImportArm, type ImportLevel } from "@brillianda/core";
+import { NIGERIAN_STATES } from "@brillianda/core/nigeria";
+import { IMPORT_COLUMNS, type ImportArm, type ImportLevel } from "@brillianda/core/studentImport";
 
 const EXAMPLES: Record<string, string> = {
   firstName: "Chiamaka",

@@ -1,5 +1,5 @@
-import { brandPalette, schoolInitials } from "@brillianda/core";
-import { cx } from "@brillianda/ui";
+import { brandPalette, schoolInitials } from "@brillianda/core/brand";
+import { cx } from "@brillianda/ui/cx";
 
 /**
  * The school's colour on buttons and highlights, everything else in our look (both Pastel and

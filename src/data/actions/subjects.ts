@@ -2,7 +2,9 @@
 
 // Subjects (plan: "How a school sets subjects"; docs/data-contract.md). Owners and admins. About
 // `school`: see actions/auth.ts — the real actions take it from the request's host.
-import { addSubjectsSchema, DEPARTMENTS, fieldErrorsOf, subjectNameSchema, type Department } from "@brillianda/core";
+import { DEPARTMENTS, type Department } from "@brillianda/core/classes";
+import { fieldErrorsOf } from "@brillianda/core/signup";
+import { addSubjectsSchema, subjectNameSchema } from "@brillianda/core/subjects";
 import { revalidatePath } from "next/cache";
 import * as impl from "../fake/subjects";
 import type { ActionResult } from "../types";

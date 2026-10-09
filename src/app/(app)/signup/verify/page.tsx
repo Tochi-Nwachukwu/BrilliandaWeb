@@ -1,4 +1,6 @@
-import { Badge, PageSpinner, Toaster } from "@brillianda/ui";
+import { Badge } from "@brillianda/ui/Badge";
+import { PageSpinner } from "@brillianda/ui/Spinner";
+import { Toaster } from "@brillianda/ui/Toast";
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";

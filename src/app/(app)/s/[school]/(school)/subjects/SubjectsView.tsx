@@ -1,7 +1,16 @@
 "use client";
 
-import { DEPARTMENT_LABEL, DEPARTMENTS, subjectNameSchema, type LinkKind } from "@brillianda/core";
-import { Badge, Button, Card, Icon, PageHeader, ResponsiveDialog, SelectField, cx, toast } from "@brillianda/ui";
+import { DEPARTMENT_LABEL, DEPARTMENTS } from "@brillianda/core/classes";
+import { subjectNameSchema, type LinkKind } from "@brillianda/core/subjects";
+import { Badge } from "@brillianda/ui/Badge";
+import { Button } from "@brillianda/ui/Button";
+import { Card } from "@brillianda/ui/Cards";
+import { cx } from "@brillianda/ui/cx";
+import { Icon } from "@brillianda/ui/Icon";
+import { PageHeader } from "@brillianda/ui/PageHeader";
+import { ResponsiveDialog } from "@brillianda/ui/ResponsiveDialog";
+import { SelectField } from "@brillianda/ui/TextField";
+import { toast } from "@brillianda/ui/Toast";
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import { FormDialog } from "@/components/FormDialog";

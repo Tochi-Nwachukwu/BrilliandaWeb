@@ -1,7 +1,19 @@
 "use client";
 
-import { checkRows, guessMapping, IMPORT_COLUMNS, mappingProblems, toCsv, type CheckedRow, type ImportColumnId, type ImportMapping, type RawRow } from "@brillianda/core";
-import { Alert, Badge, Button, Card, EmptyState, FilterTabs, Icon, PageHeader, ResponsiveDialog, SelectField, TextField, cx, toast } from "@brillianda/ui";
+import { checkRows, guessMapping, IMPORT_COLUMNS, mappingProblems, type CheckedRow, type ImportColumnId, type ImportMapping, type RawRow } from "@brillianda/core/studentImport";
+import { toCsv } from "@brillianda/core/students";
+import { Alert } from "@brillianda/ui/Alert";
+import { Badge } from "@brillianda/ui/Badge";
+import { Button } from "@brillianda/ui/Button";
+import { Card } from "@brillianda/ui/Cards";
+import { cx } from "@brillianda/ui/cx";
+import { EmptyState } from "@brillianda/ui/EmptyState";
+import { Icon } from "@brillianda/ui/Icon";
+import { PageHeader } from "@brillianda/ui/PageHeader";
+import { ResponsiveDialog } from "@brillianda/ui/ResponsiveDialog";
+import { FilterTabs } from "@brillianda/ui/Tabs";
+import { SelectField, TextField } from "@brillianda/ui/TextField";
+import { toast } from "@brillianda/ui/Toast";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useMemo, useRef, useState, useTransition } from "react";

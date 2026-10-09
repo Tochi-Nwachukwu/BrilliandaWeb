@@ -1,4 +1,5 @@
-import { Icon, PageHeader, type IconName } from "@brillianda/ui";
+import { Icon, type IconName } from "@brillianda/ui/Icon";
+import { PageHeader } from "@brillianda/ui/PageHeader";
 import type { Metadata } from "next";
 import Link from "next/link";
 

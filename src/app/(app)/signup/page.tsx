@@ -1,5 +1,6 @@
-import { defaultSessionStart } from "@brillianda/core";
-import { Alert, PageSpinner } from "@brillianda/ui";
+import { defaultSessionStart } from "@brillianda/core/signup";
+import { Alert } from "@brillianda/ui/Alert";
+import { PageSpinner } from "@brillianda/ui/Spinner";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { connection } from "next/server";

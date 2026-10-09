@@ -1,23 +1,19 @@
 "use client";
 
-import { GENDER_LABEL, matchesSearch, STATUS_DETAIL, STATUS_LABEL, STUDENT_STATUSES, toCsv, type StudentStatus } from "@brillianda/core";
-import {
-  ActionBar,
-  Badge,
-  Button,
-  DataList,
-  EmptyState,
-  FilterSheet,
-  Icon,
-  PageHeader,
-  ResponsiveDialog,
-  SelectField,
-  cx,
-  levelStyle,
-  toast,
-  type ColumnDef,
-  type Tone,
-} from "@brillianda/ui";
+import { GENDER_LABEL, matchesSearch, STATUS_DETAIL, STATUS_LABEL, STUDENT_STATUSES, toCsv, type StudentStatus } from "@brillianda/core/students";
+import { ActionBar } from "@brillianda/ui/ActionBar";
+import { Badge, type Tone } from "@brillianda/ui/Badge";
+import { Button } from "@brillianda/ui/Button";
+import { cx } from "@brillianda/ui/cx";
+import { DataList, type ColumnDef } from "@brillianda/ui/DataList";
+import { EmptyState } from "@brillianda/ui/EmptyState";
+import { FilterSheet } from "@brillianda/ui/FilterSheet";
+import { Icon } from "@brillianda/ui/Icon";
+import { levelStyle } from "@brillianda/ui/levels";
+import { PageHeader } from "@brillianda/ui/PageHeader";
+import { ResponsiveDialog } from "@brillianda/ui/ResponsiveDialog";
+import { SelectField } from "@brillianda/ui/TextField";
+import { toast } from "@brillianda/ui/Toast";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useMemo, useState, useTransition } from "react";

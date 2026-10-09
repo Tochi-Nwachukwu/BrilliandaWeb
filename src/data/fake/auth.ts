@@ -3,7 +3,7 @@
 // one cookie for every school; for real they are host-only per subdomain, so the membership check
 // below is what keeps schools apart in the fake.
 import "server-only";
-import { INVITE_LIFETIME_HOURS, LINK_LIFETIME_MINUTES } from "@brillianda/core";
+import { INVITE_LIFETIME_HOURS, LINK_LIFETIME_MINUTES } from "@brillianda/core/auth";
 import { cookies } from "next/headers";
 import type { ActionResult, InviteDetails, SampleEmail, SchoolMember, SchoolRole, SchoolSummary, SignedInMember } from "../types";
 import { recordChange } from "./changes";

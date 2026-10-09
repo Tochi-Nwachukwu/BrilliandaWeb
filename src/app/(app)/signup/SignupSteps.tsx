@@ -1,4 +1,4 @@
-import { cx } from "@brillianda/ui";
+import { cx } from "@brillianda/ui/cx";
 
 const LABELS = ["Your school", "Your account", "Check your email", "Your address"];
 

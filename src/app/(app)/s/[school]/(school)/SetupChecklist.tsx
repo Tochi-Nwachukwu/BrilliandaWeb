@@ -1,6 +1,10 @@
 "use client";
 
-import { Button, Icon, ProgressBar, cx, toast } from "@brillianda/ui";
+import { Button } from "@brillianda/ui/Button";
+import { ProgressBar } from "@brillianda/ui/Cards";
+import { cx } from "@brillianda/ui/cx";
+import { Icon } from "@brillianda/ui/Icon";
+import { toast } from "@brillianda/ui/Toast";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useTransition } from "react";

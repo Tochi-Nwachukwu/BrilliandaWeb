@@ -1,4 +1,5 @@
-import { EmptyState, PageHeader } from "@brillianda/ui";
+import { EmptyState } from "@brillianda/ui/EmptyState";
+import { PageHeader } from "@brillianda/ui/PageHeader";
 
 export default function DevSubjects() {
   return (
