@@ -92,7 +92,17 @@ export default async function SchoolHome({ params }: PageProps<"/s/[school]">) {
         <StatCard href={`${base}/more/admins`} icon="staff" label="Admins" value={summary.admins} note={summary.admins === 1 ? "Just you" : undefined} level={4} index={3} />
       </div>
 
-      <Card title="Recent changes" description="Who changed what, newest first.">
+      <Card
+        title="Recent changes"
+        description="Who changed what, newest first."
+        action={
+          summary.recent.length ? (
+            <Link href={`${base}/more/history`} className="rounded text-sm font-medium text-accent hover:underline focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-accent">
+              See all
+            </Link>
+          ) : undefined
+        }
+      >
         {summary.recent.length ? (
           <ul className="grid gap-1">
             {summary.recent.map((change, i) => (

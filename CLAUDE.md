@@ -72,3 +72,8 @@ and in the brillanda-v1 folder, for reference only.
   `src/lib/formCheck.ts`. Fixed choices that a public screen shows live in zod-free files
   (`core/signupOptions.ts`). Main content must not fade in from opacity 0: Chrome then counts it
   as shown late (or never), and `e2e/tests/budget.spec.ts` fails. Slide it in (`animate-lift`).
+- `e2e/tests/a11y.spec.ts` scans every screen with axe (WCAG 2.2 AA). Add each new screen to its
+  list. Text uses the text tokens, never a faded colour (`opacity-*`) on text, and a link inside a
+  sentence is underlined, not only coloured.
+- The service worker (`public/sw.js`) must never cache a page or data, only `/_next/static/` files
+  and `/offline`. Bump its `VERSION` when changing what it saves.

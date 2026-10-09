@@ -7,6 +7,9 @@ const JS_BUDGET_KB = 170;
 const LCP_BUDGET_MS = 2500;
 
 async function measure(page: Page, url: string) {
+  // One request first, so the test measures the page and not a server that has just started
+  // (the first request after a start once took 3.8 s here; the page itself takes about 1 s).
+  await page.request.get(url);
   await page.goto(url, { waitUntil: "load" });
   await page.waitForTimeout(1500);
   return page.evaluate(

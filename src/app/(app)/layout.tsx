@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Outfit } from "next/font/google";
 import { Hydrated } from "@/components/Hydrated";
 import { OfflineBanner } from "@/components/OfflineBanner";
+import { ServiceWorker } from "@/components/ServiceWorker";
 import { LOOK_SCRIPT } from "@/lib/look-script";
 import "../globals.css";
 
@@ -30,6 +31,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         {children}
         <OfflineBanner />
         <Hydrated />
+        <ServiceWorker />
       </body>
     </html>
   );

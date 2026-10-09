@@ -307,6 +307,13 @@ as workspaces. Mentions of `apps/web` and `legacy/` earlier in this plan describ
   read) and its logo (PNG, JPG or WebP, shrunk to 512 px and re-encoded in the browser; SVG
   refused). Owner only. The logo shows in the header and sign-in page and becomes the app icon.
   An optional checklist step, which never jumps ahead of the required ones.
+- Change history: More › Change history lists every change, grouped by day, filtered by person,
+  words, dates or one student (the filters live in the address, so a filtered view can be
+  shared), with a CSV download. Home's Recent changes and a student's Changes card link to it.
+- Opening offline: `public/sw.js` (no library) saves the app's own files and one `/offline` page.
+  A page that can't load shows that page, which reloads by itself when the connection returns.
+  It never saves a page with school data, so a shared phone keeps no student records. Production
+  builds only. With this, every v1 item in the plan has its front end, on fake data.
 
 ## What isn't in v1 (kept for later)
 

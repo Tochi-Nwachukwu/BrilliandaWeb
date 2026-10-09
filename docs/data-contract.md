@@ -195,7 +195,24 @@ the type and size itself. A Content Security Policy then needs that host in `img
 is recorded in the change history. The setup checklist has a new optional first item,
 `branding`, done once the owner has saved this screen.
 
+### Change history (after batch 10)
+
+| Function | Kind | Input / output | Used by | Status |
+|---|---|---|---|---|
+| `listChanges` | read | `subdomain`, `{ who?, search?, from?, to?, studentId?, limit? }` (days are ISO dates in Lagos time, both ends included) → `ChangeLog`: entries newest first, each with the student it was about (if any), the total that match, everyone who appears, and the filtered student | More › Change history, its CSV download | fake |
+
+The filtering happens on the server, as a real record of two years and more must. Every write
+already records a line (`recordChange` in the fakes: who, what, when, and the student when there
+is one); the real record is append-only (plan: safeguards). `GET
+/s/<school>/more/history/export` returns the same filters as a CSV (up to 1,000 lines, cells
+escaped against spreadsheet formulas), or 403 for anyone outside the school.
+
 ### Installable app (batch 10)
+
+The service worker (`public/sw.js`) and its page (`/offline`) live at the root of every school
+address; `proxy.ts` must serve both as they are, not as a school path. The worker only saves
+`/_next/static/` files and `/offline`, never a page or an API response.
+
 
 No new functions. `src/app/(app)/s/[school]/manifest.webmanifest` and `app-icon/[size]` read
 `getSchoolBySubdomain` (name, colour, status). On a school's own address these sit at the root

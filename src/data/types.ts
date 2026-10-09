@@ -71,6 +71,18 @@ export type SetupProgress = { items: { id: SetupItemId; done: boolean }[]; hidde
 /** One line of the school's record of changes. */
 export type ChangeEntry = { id: string; at: number; who: string; what: string };
 
+/** Narrowing the change history. Days are ISO dates in Lagos time, both ends included. */
+export type ChangeFilter = { who?: string; search?: string; from?: string; to?: string; studentId?: string; limit?: number };
+
+/** A page of the change history: newest first, how many match in all, and who to filter by. */
+export type ChangeLog = {
+  entries: (ChangeEntry & { student: { id: string; name: string } | null })[];
+  total: number;
+  people: string[];
+  /** Set when the filter names a student, so the page can say whose history this is. */
+  student: { id: string; name: string } | null;
+};
+
 /** The counts and recent changes on Home. */
 export type HomeSummary = { students: number; classes: number; arms: number; subjects: number; admins: number; recent: ChangeEntry[] };
 

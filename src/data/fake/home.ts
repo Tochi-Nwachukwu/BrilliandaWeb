@@ -6,14 +6,9 @@ import { defaultTerms, type SessionInput } from "@brillianda/core/calendar";
 import { sessionName } from "@brillianda/core/signup";
 import type { ActionResult, HomeSummary, SessionSetup, SetupProgress } from "../types";
 import { requireMember } from "./auth";
-import { recordChange } from "./changes";
+import { fixTimes, recordChange } from "./changes";
 import { store } from "./store";
 
-/** Seeded changes are stored as "minutes before the first read"; fix them to real times once. */
-function fixTimes() {
-  const now = Date.now();
-  for (const change of store.changes) if (change.at <= 0) change.at = now + change.at * 60_000;
-}
 
 function calendarOf(subdomain: string) {
   const saved = store.calendars.get(subdomain);

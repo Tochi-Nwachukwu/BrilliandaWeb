@@ -129,7 +129,17 @@ export function StudentPage({
           </ol>
         </Card>
 
-        <Card title="Changes" description="Who changed this record, newest first.">
+        <Card
+          title="Changes"
+          description="Who changed this record, newest first."
+          action={
+            student.changes.length ? (
+              <Link href={`/s/${school}/more/history?student=${student.id}`} className="rounded text-sm font-medium text-accent hover:underline focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-accent">
+                See all
+              </Link>
+            ) : undefined
+          }
+        >
           {student.changes.length ? (
             <ul className="grid gap-2">
               {student.changes.slice(0, 10).map((c) => (
