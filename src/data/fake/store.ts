@@ -31,6 +31,9 @@ type FakeStore = {
   admission: Map<string, { pattern: string; digits: number; next: number }>;
   subjects: { id: string; subdomain: string; catalogueId: string | null; name: string; code: string; position: number }[];
   subjectLinks: { subdomain: string; subjectId: string; levelId: string; kind: LinkKind; department: Department | null }[];
+  /** Remembered column mappings, by school (plan: Brillianda remembers it for next time). */
+  importMappings: Map<string, Record<string, string>>;
+  importBatches: { id: string; subdomain: string; at: number; by: string; created: string[]; updated: number; fileName: string; undoneAt: number | null }[];
 };
 
 /** Greenfield's subjects: the 2025 junior and senior lists, attached by default. */
@@ -188,6 +191,8 @@ function seed(): FakeStore {
     students: greenfieldStudents.students,
     guardians: greenfieldStudents.guardians,
     enrolments: greenfieldStudents.enrolments,
+    importMappings: new Map(),
+    importBatches: [],
     admission: new Map([["greenfield", { pattern: "GC/{YEAR}/{NUMBER}", digits: 4, next: greenfieldStudents.next }]]),
     subjects: greenfieldSubjects.subjects,
     subjectLinks: greenfieldSubjects.subjectLinks,

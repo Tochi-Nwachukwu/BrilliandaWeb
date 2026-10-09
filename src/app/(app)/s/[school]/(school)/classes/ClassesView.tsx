@@ -11,7 +11,8 @@ import {
   type Section,
 } from "@brillianda/core";
 import { Badge, Button, Card, Icon, PageHeader, ResponsiveDialog, SelectField, cx, toast } from "@brillianda/ui";
-import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import { FormError } from "@/components/auth/FormError";
 import { FormDialog } from "@/components/FormDialog";
@@ -44,6 +45,7 @@ type Open =
 /** The school's classes after setup, by section, with everything the plan lets you change. */
 export function ClassesView({ structure, actions }: { structure: ClassStructure; actions: ClassActions }) {
   const router = useRouter();
+  const studentsBase = usePathname().replace(/\/classes$/, "/students");
   const [open, setOpen] = useState<Open>(null);
   const [busy, startTransition] = useTransition();
   const names = new Map(structure.armNames.map((a) => [a.id, a]));
@@ -185,6 +187,7 @@ export function ClassesView({ structure, actions }: { structure: ClassStructure;
           level={open.level}
           name={names.get(open.arm.armNameId)}
           onlyArm={armsOf(open.level.id).length === 1}
+          importHref={`${studentsBase}/import?arm=${open.arm.id}`}
           busy={busy}
           onClose={() => setOpen(null)}
           setDepartment={(d) => run(() => actions.setArmDepartment(open.arm.id, d), d ? `Department set to ${DEPARTMENT_LABEL[d as keyof typeof DEPARTMENT_LABEL]}` : "Department cleared", () => setOpen(null))}
@@ -304,6 +307,7 @@ function ArmDialog({
   level,
   name,
   onlyArm,
+  importHref,
   busy,
   onClose,
   setDepartment,
@@ -314,6 +318,7 @@ function ArmDialog({
   level: ClassLevel;
   name?: ArmName;
   onlyArm: boolean;
+  importHref: string;
   busy: boolean;
   onClose: () => void;
   setDepartment: (department: string | null) => void;
@@ -324,6 +329,9 @@ function ArmDialog({
   return (
     <ResponsiveDialog open onClose={onClose} title={label} description={`${plural(arm.studentCount, "student")}. Code ${name?.code ?? ""}; rename arms under “Arm names”.`}>
       <div className="grid gap-5">
+        <Link href={importHref} className="inline-flex min-h-[42px] items-center justify-center gap-2 rounded-full bg-raise px-5 text-sm font-medium shadow-raised hover:bg-hover focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-accent">
+          Import students into {label}
+        </Link>
         {level.section === "senior" && (
           <SelectField label="Department" hint="Subject defaults follow the department." value={arm.department ?? ""} disabled={busy} onChange={(e) => setDepartment(e.target.value || null)}>
             <option value="">None</option>

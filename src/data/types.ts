@@ -1,5 +1,5 @@
 // Shapes shared by every data function (docs/data-contract.md).
-import type { Band, CatalogueEntry, Department, LinkKind, SchoolDetails, SchoolLevel, Section, StudentGender, StudentStatus, Term } from "@brillianda/core";
+import type { Band, CatalogueEntry, Department, ImportArm, ImportLevel, LinkKind, SchoolDetails, SchoolLevel, Section, StudentGender, StudentStatus, Term } from "@brillianda/core";
 
 /** What every write returns: the result, or a message for a person and errors under each field. */
 export type ActionResult<T> =
@@ -118,3 +118,16 @@ export type StudentDetail = StudentRow & {
 export type GuardianMatch = { id: string; name: string; phone: string; children: string[] };
 
 export type AdmissionSettings = { pattern: string; digits: number; next: number; preview: string };
+
+/** What the import page needs to check rows in the browser, and its recent imports. */
+export type ImportSetup = {
+  schoolName: string;
+  levels: ImportLevel[];
+  arms: ImportArm[];
+  existing: { id: string; admissionNo: string; fullName: string; dateOfBirth: string }[];
+  /** Headings (lower case) to columns, from the last import. */
+  savedMapping: Record<string, string>;
+  batches: ImportBatchSummary[];
+};
+export type ImportBatchSummary = { id: string; at: number; by: string; fileName: string; created: number; updated: number; undoable: boolean; undone: boolean };
+export type ImportResult = { batchId: string; created: number; updated: number; skipped: number; notImported: number; newStudents: { id: string; fullName: string; armLabel: string }[] };

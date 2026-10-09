@@ -258,6 +258,13 @@ More. Not yet: the photo (needs file storage from the backend). The plan's gate 
 
 **Done when (plan's gate, front-end side):** a 1,000-row list with planted errors can be fixed and imported on a phone, on fake data.
 
+**Done (9 October 2026).** Students › Import: upload (Excel, CSV, or a Word table; old .xls and
+.doc files get a "Save as" note), match columns (guessed, remembered), check and fix (in place in a
+bottom sheet, suggestions applied only by a tap, or download the rows to fix), Update or Skip for
+duplicates, import, and Undo within 24 hours. A per-class import starts from an arm on the Classes
+page. Templates are generated per school with dropdowns. The plan's gate is a browser test with a
+1,000-row file; a real .docx table import is tested too.
+
 ### Batch 10: Front-end hardening (Phase 5)
 
 - Each school's installable app (name and icon), and the offline banner.

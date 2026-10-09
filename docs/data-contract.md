@@ -164,3 +164,18 @@ default links, codes) are in `packages/core/src/subjects.ts`, with tests.
 Export is done in the browser from the list (`toCsv` in core escapes cells starting with =, +, - or
 @). Search ignores accents (`matchesSearch`). The student photo the plan lists is not built yet: it
 needs file storage from the backend.
+
+### Import (batch 9)
+
+| Function | Kind | Input / output | Used by | Status |
+|---|---|---|---|---|
+| `getImportSetup` | read | `subdomain` → `ImportSetup`: class levels and arms (for matching), existing students (for duplicates), the remembered column mapping, the last 5 imports | Import | fake |
+| `checkImport` | action | `rows` (mapped cells, ≤ 5,000), `armId \| null` → `CheckedRow[]` from `checkRows` in core; the server's own check | Import review | fake |
+| `commitImport` | action | `{ rows, armId, update: rowIndexes, fileName }` → `ImportResult`; re-checks, writes ready rows in chunks of 500 under one batch id, updates or skips duplicate admission numbers | Import | fake |
+| `undoImport` | action | `batchId` → `{ removed }`; within 24 hours and only if none of the new students was edited since | Import result / recent imports | fake |
+| `saveImportMapping` | action | heading (lower case) → column id; offered first next time | Import | fake |
+
+The browser reads Excel (`exceljs`), CSV and Word tables (`.docx`, via `jszip`; the first table
+counts as the sheet) and builds the Excel templates with Class, Arm, Gender and State dropdowns
+(`src/lib/import`). Word import goes beyond the plan, which lists CSV and Excel. All the matching
+and validation rules are pure functions in `packages/core/src/studentImport.ts`, with tests.
