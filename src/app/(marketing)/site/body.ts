@@ -1,6 +1,6 @@
-// The marketing page's markup, moved unchanged from the old site (apps/site/index.html in the old Vite app, tag vite-final)
-// so it looks exactly the same. Only the name changed (Brillianda). The copy describes the old
-// results product and is left as it is for now; if it is rewritten, turn this into components.
+// The marketing page's markup. The design came unchanged from the old site (apps/site/index.html,
+// tag vite-final); the words describe v1 (rewritten 9 October 2026). Class names and data-*
+// attributes drive the styles and motion in this folder, so keep them when changing copy.
 export const SITE_BODY = String.raw`<!-- First visit only. After that this element is removed before paint. -->
     <div id="intro" aria-hidden="true">
       <div class="intro-in">
@@ -19,12 +19,12 @@ export const SITE_BODY = String.raw`<!-- First visit only. After that this eleme
         <nav class="nav-links" aria-label="Sections">
           <a href="#what">What it does</a>
           <a href="#inside">Inside</a>
-          <a href="#term">How a term runs</a>
+          <a href="#term">Getting started</a>
           <a href="#pricing">Pricing</a>
         </nav>
         <div class="nav-right">
           <a class="btn btn-line btn-sm" id="signin" href="/login"><span class="fill"></span><span>Sign in</span></a>
-          <a class="btn btn-solid btn-sm" href="#start"><span class="fill"></span><span>Request a trial</span></a>
+          <a class="btn btn-solid btn-sm" href="/signup"><span class="fill"></span><span>Create your school</span></a>
         </div>
       </div>
     </header>
@@ -53,17 +53,17 @@ export const SITE_BODY = String.raw`<!-- First visit only. After that this eleme
 
         <div class="wrap hero-in">
           <h1>
-            <span class="lm"><span>The term’s results,</span></span>
-            <span class="lm"><span style="--d: 90ms">without the long night</span></span>
-            <span class="lm"><span style="--d: 180ms">of adding up.</span></span>
+            <span class="lm"><span>Your whole school,</span></span>
+            <span class="lm"><span style="--d: 90ms">set up in</span></span>
+            <span class="lm"><span style="--d: 180ms">an afternoon.</span></span>
           </h1>
           <div class="hero-row">
             <p class="fu" style="--d: 180ms">
-              Teachers enter scores once. Brillianda works out totals, grades and positions, builds the report cards, and
-              shows parents the result on a phone.
+              Classes, arms, subjects and every student, kept in one place and run from the phone you already have.
+              Bring your list from Excel or Word, and your school gets its own address.
             </p>
             <div class="fu" style="--d: 260ms; display: flex; gap: 10px; flex-wrap: wrap">
-              <a class="btn btn-solid" href="#start"><span class="fill"></span><span>Request a trial</span></a>
+              <a class="btn btn-solid" href="/signup"><span class="fill"></span><span>Create your school</span></a>
               <a class="btn btn-on-dark" href="#inside"><span class="fill"></span><span>See it working</span></a>
             </div>
           </div>
@@ -75,34 +75,34 @@ export const SITE_BODY = String.raw`<!-- First visit only. After that this eleme
       <!-- ============ statement + counters ============ -->
       <section class="wrap statement" id="what">
         <h2>
-          <span class="lm"><span>A term ends and the</span></span>
-          <span class="lm"><span style="--d: 80ms">arithmetic begins. That</span></span>
-          <span class="lm"><span style="--d: 160ms">is the part we took away.</span></span>
+          <span class="lm"><span>Every school keeps a register.</span></span>
+          <span class="lm"><span style="--d: 80ms">Most keep it in five places.</span></span>
+          <span class="lm"><span style="--d: 160ms">We put it in one.</span></span>
         </h2>
 
         <div class="st-sub">
           <p class="fu">
-            Continuous assessment in one book, exam scores in another, a calculator for the totals, and somebody staying
-            late to rank the class. Every term, in nearly every school.
+            Admission files in a cabinet, class lists in Excel, guardians’ numbers in somebody’s phone, and nobody sure
+            which copy is the latest. Every new session, it starts again.
           </p>
           <p class="fu" style="--d: 110ms">
-            Brillianda holds the scores, applies the grading your school already uses, and produces the same report card
-            you print today — only it is ready the moment the last teacher is done.
+            Brillianda holds the calendar, the classes and arms, the subjects each class takes, and every student with
+            their guardians, and keeps a record of who changed what.
           </p>
         </div>
 
         <div class="nums-row">
           <div class="num fu">
-            <b data-count="3" data-suffix="">0</b>
-            <span>terms a session, set up once and reused</span>
+            <b data-count="4" data-suffix="">0</b>
+            <span>short steps to your school’s own address</span>
           </div>
           <div class="num fu" style="--d: 100ms">
-            <b data-count="40" data-suffix="%">0</b>
-            <span>continuous assessment by default, and you can change it</span>
+            <b data-count="18" data-suffix="">0</b>
+            <span>classes from two answers: JSS 1 to SS 3, three arms each</span>
           </div>
           <div class="num fu" style="--d: 200ms">
-            <b data-count="0" data-suffix="" data-zero="One">0</b>
-            <span>place your scores live, from entry to printed report card</span>
+            <b data-count="5000" data-suffix="">0</b>
+            <span>students in one import, checked row by row before anything is saved</span>
           </div>
         </div>
       </section>
@@ -129,8 +129,8 @@ export const SITE_BODY = String.raw`<!-- First visit only. After that this eleme
           <div class="wrap">
             <h2 class="lm"><span>Built around how a Nigerian school actually runs.</span></h2>
             <p class="fu">
-              Sessions and three terms. Classes with arms. CA and exam weighting per subject. Positions within the arm.
-              Nothing to bend into shape.
+              Sessions and terms. Classes with arms. The 2025 curriculum’s subjects, and the old ones your older classes
+              still take. Guardians shared by brothers and sisters. Nothing to bend into shape.
             </p>
           </div>
         </div>
@@ -140,49 +140,47 @@ export const SITE_BODY = String.raw`<!-- First visit only. After that this eleme
       <section class="wrap sec" id="roles">
         <div class="ehead">
           <span class="lbl"><i class="d"></i>Who signs in</span>
-          <h2 class="lm"><span>Four people, four different screens.</span></h2>
-          <p class="fu">Everyone sees their own work and nothing else. A teacher cannot open another teacher’s class.</p>
+          <h2 class="lm"><span>The people who run the school, first.</span></h2>
+          <p class="fu">Owners and admins sign in at your school’s own address. Teachers and parents come next.</p>
         </div>
 
         <div class="roles">
           <article class="role fu">
             <span class="rn">01</span>
-            <h3>Proprietor</h3>
-            <p>Sees the school at a glance and decides when results go out.</p>
+            <h3>School owner</h3>
+            <p>Creates the school and holds its main email.</p>
             <ul>
-              <li>Who has finished entering, who has not</li>
-              <li>Publishes results to parents</li>
-              <li>Approves changes after a sheet is locked</li>
+              <li>Signs up in four short steps</li>
+              <li>Invites admins to help</li>
+              <li>Sets the school’s colour and calendar</li>
             </ul>
           </article>
           <article class="role fu" style="--d: 90ms">
             <span class="rn">02</span>
             <h3>School admin</h3>
-            <p>Sets up the session and keeps the records straight.</p>
+            <p>Keeps the records straight, day to day.</p>
             <ul>
-              <li>Classes, arms, subjects and teachers</li>
-              <li>Students and their parents</li>
-              <li>Grading scale and CA/exam split</li>
+              <li>Classes, arms and subjects</li>
+              <li>Adding, importing and moving students</li>
+              <li>Guardians and contact details</li>
             </ul>
           </article>
           <article class="role fu" style="--d: 180ms">
             <span class="rn">03</span>
-            <h3>Teacher</h3>
-            <p>Enters scores for the subjects assigned to them, and nothing more.</p>
+            <h3>Teachers <span class="soon-tag">Coming later</span></h3>
+            <p>Their own classes and subjects, nothing more.</p>
             <ul>
-              <li>One sheet per subject and arm</li>
-              <li>Totals and grades appear as you type</li>
-              <li>Marks the sheet complete when done</li>
+              <li>Class lists for the arms they teach</li>
+              <li>Built on the classes you set up now</li>
             </ul>
           </article>
           <article class="role fu" style="--d: 270ms">
             <span class="rn">04</span>
-            <h3>Parent</h3>
-            <p>Opens the result on a phone, for each of their children.</p>
+            <h3>Parents <span class="soon-tag">Coming later</span></h3>
+            <p>Their own children, on their own phone.</p>
             <ul>
-              <li>Subject scores, grades and the term average</li>
-              <li>Teacher and head teacher remarks</li>
-              <li>Downloads the report card as a PDF</li>
+              <li>Linked through the guardian on each record</li>
+              <li>One sign-in for brothers and sisters</li>
             </ul>
           </article>
         </div>
@@ -202,64 +200,56 @@ export const SITE_BODY = String.raw`<!-- First visit only. After that this eleme
           <article class="cap fu">
             <h3>
               <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                <path d="M4 5h16M4 12h16M4 19h10" stroke-linecap="round" />
+                <circle cx="12" cy="12" r="9" /><path d="M3 12h18M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18" stroke-linecap="round" />
               </svg>
-              Score entry
+              Your own address
             </h3>
             <p>
-              A sheet per subject and arm. Type a score, see the total and grade immediately. Entries save on their own,
-              and keep trying if the network drops.
+              Sign up in four short steps and your school gets an address like greenfield.brillianda.com, with its own logo and colour on the sign-in page.
             </p>
           </article>
           <article class="cap fu" style="--d: 70ms">
             <h3>
               <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                <path d="M12 3v18M5 9l7-6 7 6" stroke-linecap="round" stroke-linejoin="round" />
+                <rect x="4" y="4" width="7" height="7" rx="2" /><rect x="13" y="4" width="7" height="7" rx="2" /><rect x="4" y="13" width="7" height="7" rx="2" /><rect x="13" y="13" width="7" height="7" rx="2" />
               </svg>
-              Grades and positions
+              Classes and arms
             </h3>
             <p>
-              Your own grading scale, your own CA/exam split. Positions are worked out within the arm, and a tie gives
-              both students the same position.
+              Pick your first and last class and how many arms each has. JSS 1 to SS 3 with three arms is 18 classes, made in one step.
             </p>
           </article>
           <article class="cap fu" style="--d: 140ms">
             <h3>
               <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                <rect x="5" y="3" width="14" height="18" rx="2" />
-                <path d="M9 8h6M9 12h6M9 16h3" stroke-linecap="round" />
+                <path d="M5 5.5A1.5 1.5 0 0 1 6.5 4H19v13H6.5A1.5 1.5 0 0 0 5 18.5z" /><path d="M5 18.5A1.5 1.5 0 0 0 6.5 20H19" stroke-linecap="round" />
               </svg>
-              Report cards
+              Subjects
             </h3>
             <p>
-              The school’s own header, the term’s scores, remarks and the attendance you record. Printed in a batch or
-              downloaded one at a time.
+              Start from the 2025 national curriculum, ticked for your classes. Keep the older subjects your senior classes still take, and add your own.
             </p>
           </article>
           <article class="cap fu" style="--d: 210ms">
             <h3>
               <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                <rect x="7" y="2.5" width="10" height="19" rx="2.5" />
-                <path d="M11 18.5h2" stroke-linecap="round" />
+                <circle cx="9" cy="8" r="3.2" /><path d="M3 20c0-3.3 2.7-5.5 6-5.5s6 2.2 6 5.5" stroke-linecap="round" /><path d="M16 4.8a3 3 0 0 1 0 6M18 14.8c1.9.7 3 2.4 3 5.2" stroke-linecap="round" />
               </svg>
-              Parent portal
+              Students and guardians
             </h3>
             <p>
-              Parents sign in and read the result for each of their children. Invited by email, or given a printed access
-              code if they have no email.
+              Add a student in under a minute on a phone. Brothers and sisters share one guardian. Move a class at once, and find anyone by name, even without the accents.
             </p>
           </article>
           <article class="cap fu" style="--d: 280ms">
             <h3>
               <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                <circle cx="12" cy="12" r="9" />
-                <path d="M12 7v5l3 2" stroke-linecap="round" stroke-linejoin="round" />
+                <path d="M12 16V4M7 9l5-5 5 5" stroke-linecap="round" stroke-linejoin="round" /><path d="M5 20h14" stroke-linecap="round" />
               </svg>
-              Publishing control
+              Import your list
             </h3>
             <p>
-              Nothing reaches a parent until the school says so. Publish a whole class or a single student, and unpublish
-              if something needs fixing.
+              Upload your Excel sheet or Word table of up to 5,000 students. Every row is checked, mistakes are explained, and a whole import can be undone for a day.
             </p>
           </article>
           <article class="cap fu" style="--d: 350ms">
@@ -270,8 +260,7 @@ export const SITE_BODY = String.raw`<!-- First visit only. After that this eleme
               A record of changes
             </h3>
             <p>
-              Every score change is kept with who made it and when. If a mark is queried next term, the history answers
-              it.
+              Every change is kept with who made it and when. If a record is questioned next term, the history answers it.
             </p>
           </article>
         </div>
@@ -283,120 +272,115 @@ export const SITE_BODY = String.raw`<!-- First visit only. After that this eleme
           <div class="pin-in">
             <div class="wrap pin-head">
               <h2 class="lm"><span>A look inside.</span></h2>
-              <span class="meta"><span data-tour-index>01</span> / 03 &nbsp;·&nbsp; the mark sheet is live, try it</span>
+              <span class="meta"><span data-tour-index>01</span> / 03 &nbsp;·&nbsp; sample data</span>
             </div>
 
             <div class="pin-rail">
               <div class="pin-track" data-track>
-                <!-- card 1: the teacher's mark sheet -->
+                <!-- card 1: setting up classes -->
                 <article class="tour-card">
                   <div>
                     <div class="screen-top">
-                      <span class="t">Mathematics · JSS 2 Gold</span>
-                      <span class="s"><i class="dot-ok"></i>All changes saved</span>
+                      <span class="t">Set up your classes · step 2 of 2</span>
+                      <span class="s"><i class="dot-ok"></i>Flowers</span>
                     </div>
                     <div class="sheet-scroll">
-                      <table class="sheet" id="grid">
+                      <table class="sheet">
                         <thead>
                           <tr>
-                            <th class="name">Student</th>
-                            <th>CA 1<small>max 20</small></th>
-                            <th>CA 2<small>max 20</small></th>
-                            <th>Exam<small>max 60</small></th>
-                            <th>Total<small>100</small></th>
-                            <th>Grade</th>
-                            <th>Position</th>
+                            <th class="name">Class</th>
+                            <th>Anthurium</th>
+                            <th>Begonia</th>
+                            <th>Calla Lily</th>
                           </tr>
                         </thead>
-                        <tbody data-grid-body></tbody>
+                        <tbody>
+                          <tr><td class="name"><b>JSS 1</b></td><td>✓</td><td>✓</td><td>✓</td></tr>
+                          <tr><td class="name"><b>JSS 2</b></td><td>✓</td><td>✓</td><td>✓</td></tr>
+                          <tr><td class="name"><b>JSS 3</b></td><td>✓</td><td>✓</td><td>✓</td></tr>
+                          <tr><td class="name"><b>SS 1</b></td><td>✓</td><td>✓</td><td>✓</td></tr>
+                          <tr><td class="name"><b>SS 2</b></td><td>✓</td><td>✓</td><td>·</td></tr>
+                          <tr><td class="name"><b>SS 3</b></td><td>✓</td><td>✓</td><td>·</td></tr>
+                        </tbody>
                       </table>
                     </div>
                     <div class="sheet-foot">
-                      <span>Type <b>ABS</b> for a student who was absent</span>
-                      <span>Empty means not entered yet</span>
-                      <span class="hint" data-grid-status>Positions update as you type</span>
+                      <span>This creates <b>16 classes</b>: JSS 1 Anthurium, JSS 1 Begonia and 14 more</span>
                     </div>
                   </div>
                   <div class="tour-cap">
-                    <b>Score entry</b>
-                    <span>The real calculation: this grid runs the same code as the product.</span>
+                    <b>Classes and arms</b>
+                    <span>Two answers make the whole list. Classes can differ, and every name can change later.</span>
                   </div>
                 </article>
 
-                <!-- card 2: the report card -->
+                <!-- card 2: checking an import -->
                 <article class="tour-card">
-                  <div class="card-doc" data-stats>
+                  <div class="card-doc">
                     <div class="doc-head">
                       <span class="doc-logo">R</span>
                       <div>
                         <h4 data-placeholder>Royal Heights College <span class="sample">Sample</span></h4>
-                        <p>Terminal report · Second term, 2025/2026</p>
+                        <p>Import · our-students.xlsx · 412 rows</p>
                       </div>
                     </div>
                     <div class="doc-meta">
-                      <div><span>Student</span><b>Adaeze Nwosu</b></div>
-                      <div><span>Class</span><b>JSS 2 Gold</b></div>
-                      <div><span>Position</span><b>2nd of <span data-count="34" data-delay="500">0</span></b></div>
-                      <div><span>Average</span><b data-count="78.4" data-decimals="1" data-delay="500">0</b></div>
+                      <div><span>Ready</span><b>404</b></div>
+                      <div><span>To fix</span><b>6</b></div>
+                      <div><span>Duplicates</span><b>2</b></div>
+                      <div><span>Columns matched</span><b>9 of 9</b></div>
                     </div>
                     <table class="doc">
                       <thead>
                         <tr>
-                          <th>Subject</th>
-                          <th>CA</th>
-                          <th>Exam</th>
-                          <th>Total</th>
-                          <th>Grade</th>
-                          <th>Position</th>
+                          <th>Row</th>
+                          <th>Student</th>
+                          <th>What to fix</th>
                         </tr>
                       </thead>
                       <tbody>
-                        <tr><td>Mathematics</td><td>34</td><td>48</td><td>82</td><td>A</td><td>2nd</td></tr>
-                        <tr><td>English Language</td><td>31</td><td>45</td><td>76</td><td>B</td><td>5th</td></tr>
-                        <tr><td>Basic Science</td><td>36</td><td>50</td><td>86</td><td>A</td><td>1st</td></tr>
-                        <tr><td>Social Studies</td><td>28</td><td>41</td><td>69</td><td>C</td><td>9th</td></tr>
+                        <tr><td>14</td><td>Adaeze Nwosu</td><td>Class JS1 not found. Did you mean JSS 1?</td></tr>
+                        <tr><td>27</td><td>Tunde Bello</td><td>Dates are read day first. Did you mean 14/03/2014?</td></tr>
+                        <tr><td>88</td><td>Fatima Yusuf</td><td>Add the gender: Male or Female</td></tr>
                       </tbody>
                     </table>
                     <div class="doc-foot">
-                      <div><span>Class teacher</span><b>A steady term. Keep it up.</b></div>
-                      <div>
-                        <span>Attendance</span>
-                        <b><span data-count="58" data-delay="900">0</span> / 60</b>
-                      </div>
+                      <div><span>Fix here</span><b>Tap a row, change the cell</b></div>
+                      <div><span>Or in Excel</span><b>Download the 6 rows to fix</b></div>
                     </div>
                   </div>
                   <div class="tour-cap">
-                    <b>Report card</b>
-                    <span>Your header, your grades, printed in a batch or downloaded singly.</span>
+                    <b>Import your list</b>
+                    <span>Excel, CSV or a Word table. Nothing is saved until every row you keep is right.</span>
                   </div>
                 </article>
 
-                <!-- card 3: the parent's phone -->
+                <!-- card 3: students on a phone -->
                 <article class="tour-card">
                   <div>
                     <div class="screen-top">
-                      <span class="t">Parent portal</span>
+                      <span class="t">Students</span>
                       <span class="s">on a phone</span>
                     </div>
                     <div class="phone-frame">
                       <div class="phone-head">
-                        <span class="doc-logo" style="width: 22px; height: 22px; font-size: 11px">A</span>
-                        Adaeze · JSS 2 Gold
+                        <span class="doc-logo" style="width: 22px; height: 22px; font-size: 11px">G</span>
+                        Greenfield College
                       </div>
                       <div class="phone-body">
-                        <div class="phone-average">78.4</div>
-                        <div class="phone-sub">Term average · 2nd of 34</div>
-                        <div class="phone-row"><span class="grow">Mathematics</span><span class="grade-badge" style="color: var(--success); border-color: var(--success-border); background: var(--success-bg)">A</span><b>82</b></div>
-                        <div class="phone-row"><span class="grow">English Language</span><span class="grade-badge" style="color: var(--success); border-color: var(--success-border); background: var(--success-bg)">B</span><b>76</b></div>
-                        <div class="phone-row"><span class="grow">Basic Science</span><span class="grade-badge" style="color: var(--success); border-color: var(--success-border); background: var(--success-bg)">A</span><b>86</b></div>
-                        <div class="phone-row"><span class="grow">Social Studies</span><span class="grade-badge" style="color: var(--warning); border-color: var(--warning-border); background: var(--warning-bg)">C</span><b>69</b></div>
-                        <div class="phone-cta">Download report card</div>
+                        <div class="phone-average">482</div>
+                        <div class="phone-sub">Active students · 18 classes</div>
+                        <div class="phone-row"><span class="grow">Adaeze Nwosu</span><span class="grade-badge" style="color: var(--success); border-color: var(--success-border); background: var(--success-bg)">JSS1 ANT</span></div>
+                        <div class="phone-row"><span class="grow">Chinedu Okafor</span><span class="grade-badge" style="color: var(--success); border-color: var(--success-border); background: var(--success-bg)">JSS2 BEG</span></div>
+                        <div class="phone-row"><span class="grow">Ọlá Adéṣínà</span><span class="grade-badge" style="color: var(--success); border-color: var(--success-border); background: var(--success-bg)">SS1 ANT</span></div>
+                        <div class="phone-row"><span class="grow">Fatima Yusuf</span><span class="grade-badge" style="color: var(--warning); border-color: var(--warning-border); background: var(--warning-bg)">No guardian</span></div>
+                        <div class="phone-cta">Add a student</div>
                       </div>
                     </div>
                   </div>
                   <div class="tour-cap">
-                    <b>Parent portal</b>
-                    <span>One sign-in, every child in the family, on the phone they already have.</span>
+                    <b>Students</b>
+                    <span>Search, filter, move a class at once, and export when you need a copy.</span>
                   </div>
                 </article>
               </div>
@@ -408,9 +392,9 @@ export const SITE_BODY = String.raw`<!-- First visit only. After that this eleme
       <!-- ============ how a term runs ============ -->
       <section class="wrap sec" id="term">
         <div class="ehead">
-          <span class="lbl"><i class="d"></i>How a term runs</span>
-          <h2 class="lm"><span>From an empty session to a published result.</span></h2>
-          <p class="fu">Set the session up once. Every term after that is the last four steps.</p>
+          <span class="lbl"><i class="d"></i>Getting started</span>
+          <h2 class="lm"><span>From sign-up to a full register in an afternoon.</span></h2>
+          <p class="fu">A checklist on your home screen walks you through it. Do the steps in any order, and stop whenever you like.</p>
         </div>
 
         <div class="setup">
@@ -418,87 +402,83 @@ export const SITE_BODY = String.raw`<!-- First visit only. After that this eleme
             <div class="sitem fu">
               <span class="sn">01</span>
               <div>
-                <h3>We set your school up</h3>
+                <h3>Create your school</h3>
                 <p>
-                  Send us your classes, arms, subjects and staff list. We create the school and the first admin account,
-                  then hand it over.
+                  Your school’s details, your account, a code to your email, and your address. Four short screens, no card.
                 </p>
               </div>
             </div>
             <div class="sitem fu" style="--d: 80ms">
               <span class="sn">02</span>
               <div>
-                <h3>Your admin adds the students</h3>
+                <h3>Set your calendar</h3>
                 <p>
-                  Students, their arms and their parents. Parents are invited by email, or given a printed access code if
-                  they have none.
+                  The session and its terms come filled in from the Lagos calendar. Change the dates, the names, or use two terms.
                 </p>
               </div>
             </div>
             <div class="sitem fu" style="--d: 160ms">
               <span class="sn">03</span>
               <div>
-                <h3>Teachers enter their scores</h3>
+                <h3>Add classes and subjects</h3>
                 <p>
-                  Each teacher sees only the subjects and arms assigned to them. They mark a sheet complete when it is
-                  done.
+                  Two answers make your classes and arms. The 2025 curriculum is ticked for them; untick what you don’t teach.
                 </p>
               </div>
             </div>
             <div class="sitem fu" style="--d: 240ms">
               <span class="sn">04</span>
               <div>
-                <h3>The school reviews and publishes</h3>
+                <h3>Bring in your students</h3>
                 <p>
-                  The proprietor sees which sheets are still outstanding, then publishes a class or a single student.
-                  Parents get the result the moment you do.
+                  Import your list or add them one by one. Invite an admin to share the work.
                 </p>
               </div>
             </div>
           </div>
 
-          <!-- data-stats: the bars fill and the counts run when this panel comes into view. -->
+          <!-- data-stats: the bars fill when this panel comes into view. -->
           <div class="setup-vis fu" style="--d: 120ms" data-stats>
             <img
               src="/photos/teacher-marking-laptop-960.webp"
               srcset="/photos/teacher-marking-laptop-480.webp 480w, /photos/teacher-marking-laptop-960.webp 960w"
               sizes="(max-width: 940px) 100vw, 46vw"
-              alt="A teacher marking work beside a laptop"
+              alt="A school administrator working at a laptop"
               width="960"
               height="640"
               loading="lazy"
             />
             <div class="screen-top" style="border-top: 1px solid var(--rule)">
-              <span class="t">Second term · entry status</span>
-              <span class="s">JSS 2 Gold</span>
+              <span class="t">Finish setting up</span>
+              <span class="s">4 of 6 done</span>
             </div>
             <div class="rows">
               <div class="row" style="--d: 0ms">
-                <span class="grow">Mathematics<span class="sub">Mr Okafor</span></span>
+                <span class="grow">Academic calendar<span class="sub">2026/2027, three terms</span></span>
                 <span class="bar"><i style="--w: 100%; --d: 120ms"></i></span>
-                <span class="pill ok" style="--pd: 900ms">Complete</span>
+                <span class="pill ok" style="--pd: 900ms">Done</span>
               </div>
               <div class="row" style="--d: 90ms">
-                <span class="grow">English Language<span class="sub">Mrs Bello</span></span>
+                <span class="grow">Classes and arms<span class="sub">18 classes</span></span>
                 <span class="bar"><i style="--w: 100%; --d: 260ms"></i></span>
-                <span class="pill ok" style="--pd: 1040ms">Complete</span>
+                <span class="pill ok" style="--pd: 1040ms">Done</span>
               </div>
               <div class="row" style="--d: 180ms">
-                <span class="grow">Basic Science<span class="sub">Mr Adeyemi</span></span>
+                <span class="grow">Students<span class="sub">From our-students.xlsx</span></span>
                 <span class="bar"><i style="--w: 72%; --d: 400ms"></i></span>
-                <span class="pill mid" style="--pd: 1180ms"><span data-count="24" data-delay="400">0</span> of 34</span>
+                <span class="pill mid" style="--pd: 1180ms"><span data-count="296" data-delay="400">0</span> of 412</span>
               </div>
               <div class="row" style="--d: 270ms">
-                <span class="grow">Social Studies<span class="sub">Miss Eze</span></span>
+                <span class="grow">Invite an admin<span class="sub">Optional</span></span>
                 <span class="bar"><i style="--w: 12%; --d: 540ms"></i></span>
-                <span class="pill low" style="--pd: 1320ms">Not started</span>
+                <span class="pill low" style="--pd: 1320ms">Not yet</span>
               </div>
             </div>
             <div class="setup-note">
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path class="tick" d="M20 6L9 17l-5-5" stroke-linecap="round" stroke-linejoin="round" />
               </svg>
-              Two of four sheets complete. Publishing waits for you.
+              None of it stops you using Brillianda in the meantime.
             </div>
           </div>
         </div>
@@ -511,8 +491,8 @@ export const SITE_BODY = String.raw`<!-- First visit only. After that this eleme
             <span class="lbl"><i class="d"></i>Next, not now</span>
             <h2 class="lm"><span>Coming soon, right after the core.</span></h2>
             <p class="fu">
-              These are being built next. They are not in the plans below and you are not paying for them — when they
-              arrive, we will tell you what changes.
+              These are being built next, on the register you set up now. They are not in the plans below and you are not
+              paying for them. When they arrive, we will tell you what changes.
             </p>
           </div>
 
@@ -520,20 +500,29 @@ export const SITE_BODY = String.raw`<!-- First visit only. After that this eleme
             <article class="soon-item fu">
               <span class="soon-ic">
                 <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                  <rect x="3" y="5" width="18" height="16" rx="2" />
-                  <path d="M3 10h18M8 3v4M16 3v4" stroke-linecap="round" />
+                  <rect x="5" y="3" width="14" height="18" rx="2" /><path d="M9 8h6M9 12h6M9 16h3" stroke-linecap="round" />
                 </svg>
               </span>
               <div>
-                <h3>Attendance <span class="soon-tag">Coming soon</span></h3>
-                <p>Daily registers that feed the attendance figure on the report card instead of being typed in.</p>
+                <h3>Results and report cards <span class="soon-tag">Coming soon</span></h3>
+                <p>Scores entered by teachers, totals, grades and positions worked out, and report cards printed from the same records.</p>
               </div>
             </article>
             <article class="soon-item fu" style="--d: 80ms">
               <span class="soon-ic">
                 <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                  <path d="M3 7h18v12H3z" />
-                  <path d="M7 7V5a2 2 0 012-2h6a2 2 0 012 2v2M3 12h18" stroke-linecap="round" />
+                  <rect x="3" y="5" width="18" height="16" rx="2" /><path d="M3 10h18M8 3v4M16 3v4" stroke-linecap="round" />
+                </svg>
+              </span>
+              <div>
+                <h3>Attendance <span class="soon-tag">Coming soon</span></h3>
+                <p>A daily register for each class, kept on the same students and classes.</p>
+              </div>
+            </article>
+            <article class="soon-item fu" style="--d: 160ms">
+              <span class="soon-ic">
+                <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                  <path d="M3 7h18v12H3z" /><path d="M7 7V5a2 2 0 012-2h6a2 2 0 012 2v2M3 12h18" stroke-linecap="round" />
                 </svg>
               </span>
               <div>
@@ -541,28 +530,15 @@ export const SITE_BODY = String.raw`<!-- First visit only. After that this eleme
                 <p>Invoices per term, what has been paid and what is outstanding, beside the student’s record.</p>
               </div>
             </article>
-            <article class="soon-item fu" style="--d: 160ms">
-              <span class="soon-ic">
-                <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                  <path d="M4 19V5a2 2 0 012-2h9l5 5v11a2 2 0 01-2 2H6a2 2 0 01-2-2z" stroke-linejoin="round" />
-                  <path d="M9 13h6M9 17h4" stroke-linecap="round" />
-                </svg>
-              </span>
-              <div>
-                <h3>Timetable <span class="soon-tag">Coming soon</span></h3>
-                <p>Periods per class and per teacher, visible to the staff room and to parents.</p>
-              </div>
-            </article>
             <article class="soon-item fu" style="--d: 240ms">
               <span class="soon-ic">
                 <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                  <path d="M4 5h16v12H8l-4 4z" stroke-linejoin="round" />
-                  <path d="M8 9h8M8 13h5" stroke-linecap="round" />
+                  <rect x="7" y="2.5" width="10" height="19" rx="2.5" /><path d="M11 18.5h2" stroke-linecap="round" />
                 </svg>
               </span>
               <div>
-                <h3>Messages to parents <span class="soon-tag">Coming soon</span></h3>
-                <p>Announcements and term notices sent from the school, read in the same portal as the results.</p>
+                <h3>Teacher and parent sign-in <span class="soon-tag">Coming soon</span></h3>
+                <p>Teachers see their own classes; parents see their own children, through the guardians already on each record.</p>
               </div>
             </article>
           </div>
@@ -570,8 +546,8 @@ export const SITE_BODY = String.raw`<!-- First visit only. After that this eleme
           <div class="soon-note fu">
             <p>
               <strong>Why we say this out loud.</strong> Plenty of school software is sold on a feature list that is
-              mostly future. The six things above the fold are working now; these four are not. When you ask us in a
-              demo, that is the answer you will get.
+              mostly future. The six things above are working now; these four are not. When you ask us, that is the
+              answer you will get.
             </p>
           </div>
         </div>
@@ -589,21 +565,20 @@ export const SITE_BODY = String.raw`<!-- First visit only. After that this eleme
             <h3>One school cannot see another</h3>
             <p>
               Every record carries the school it belongs to, and the system refuses any request for a record that is not
-              yours. That rule is enforced in code, not left to care.
+              yours. That rule is enforced in the database, not left to care.
             </p>
           </article>
           <article class="tbox fu" style="--d: 90ms">
-            <h3>Only what the role needs</h3>
+            <h3>Only the people you invite</h3>
             <p>
-              A teacher reaches the subjects assigned to them. A parent reaches their own children. Nobody browses the
-              whole school by accident.
+              Your school’s owner invites its admins, and only they can sign in at your address. Nobody browses the school
+              by accident.
             </p>
           </article>
           <article class="tbox fu" style="--d: 180ms">
             <h3>Take it with you</h3>
             <p>
-              Your students, scores and report cards can be exported at any time. If you ever leave, you leave with your
-              records.
+              Export your students to a spreadsheet at any time. If you ever leave, you leave with your records.
             </p>
           </article>
         </div>
@@ -631,16 +606,16 @@ export const SITE_BODY = String.raw`<!-- First visit only. After that this eleme
 
           <div class="stories-copy" data-voices>
             <div class="v-slide" data-placeholder>
-              <blockquote>“The maths was done before I got home. That was the whole difference.”</blockquote>
+              <blockquote>“We imported four hundred students before break was over, and it told us exactly which six rows were wrong.”</blockquote>
               <div class="v-who"><b>Mrs A. Bello</b><span>Vice Principal · sample quote, not a real school</span></div>
             </div>
             <div class="v-slide" data-placeholder hidden>
-              <blockquote>“Parents stopped calling the office to ask when results were coming.”</blockquote>
+              <blockquote>“For the first time, there is one list of students, and everyone is looking at the same one.”</blockquote>
               <div class="v-who"><b>Mr T. Okafor</b><span>Proprietor · sample quote, not a real school</span></div>
             </div>
             <div class="v-slide" data-placeholder hidden>
-              <blockquote>“I enter my scores on my phone during break. It saves by itself.”</blockquote>
-              <div class="v-who"><b>Miss C. Eze</b><span>Class teacher · sample quote, not a real school</span></div>
+              <blockquote>“I moved a whole arm to its new class from my phone, in the staff room.”</blockquote>
+              <div class="v-who"><b>Miss C. Eze</b><span>School admin · sample quote, not a real school</span></div>
             </div>
 
             <div class="v-nav">
@@ -680,18 +655,18 @@ export const SITE_BODY = String.raw`<!-- First visit only. After that this eleme
             <ul>
               <li>
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5" stroke-linecap="round" stroke-linejoin="round" /></svg>
-                Score entry, grades and positions
+                Classes, subjects and students
               </li>
               <li>
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5" stroke-linecap="round" stroke-linejoin="round" /></svg>
-                Report cards and the parent portal
+                Import from Excel or Word
               </li>
               <li>
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5" stroke-linecap="round" stroke-linejoin="round" /></svg>
                 Email support
               </li>
             </ul>
-            <a class="btn btn-line" href="#start"><span class="fill"></span><span>Request a trial</span></a>
+            <a class="btn btn-line" href="/signup"><span class="fill"></span><span>Create your school</span></a>
           </article>
 
           <article class="plan best fu" style="--d: 90ms">
@@ -707,14 +682,14 @@ export const SITE_BODY = String.raw`<!-- First visit only. After that this eleme
               </li>
               <li>
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5" stroke-linecap="round" stroke-linejoin="round" /></svg>
-                We set the session up with you
+                Help with your first import
               </li>
               <li>
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5" stroke-linecap="round" stroke-linejoin="round" /></svg>
-                Staff training session each term
+                Up to five admins
               </li>
             </ul>
-            <a class="btn btn-solid" href="#start"><span class="fill"></span><span>Request a trial</span></a>
+            <a class="btn btn-solid" href="/signup"><span class="fill"></span><span>Create your school</span></a>
           </article>
 
           <article class="plan fu" style="--d: 180ms">
@@ -757,62 +732,57 @@ export const SITE_BODY = String.raw`<!-- First visit only. After that this eleme
           <div class="acc fu">
             <details>
               <summary>
-                Can we keep our own grading scale?
+                Can we keep our own class and arm names?
                 <span class="ico"
                   ><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14" stroke-linecap="round" /></svg
                 ></span>
               </summary>
               <div class="ans">
-                Yes. You set the grade letters and the mark each one starts at, and the CA/exam split. It applies to the
-                whole session, so a term already published is not disturbed.
+                Yes. Start from Nigerian, Basic, British or American names, then rename anything. Arms can be letters, colours, flowers, gems or your own list, and JSS 1 can have four arms while SS 3 has two.
               </div>
             </details>
             <details>
               <summary>
-                What happens when a teacher has no data?
+                We already have our students in Excel. Do we type them again?
                 <span class="ico"
                   ><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14" stroke-linecap="round" /></svg
                 ></span>
               </summary>
               <div class="ans">
-                Scores save on their own as they are typed. If the connection drops mid-sheet, the entry is kept and sent
-                again when the line comes back, and the teacher can press save at any time.
+                No. Upload the file as it is. Brillianda matches your columns, even headings like Surname, Sex and Adm No, checks every row, and shows you what to fix before anything is saved.
               </div>
             </details>
             <details>
               <summary>
-                Can a parent see another family’s child?
+                What about the new 2025 subjects?
                 <span class="ico"
                   ><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14" stroke-linecap="round" /></svg
                 ></span>
               </summary>
               <div class="ans">
-                No. A parent account is linked to specific students, and the system will not return a record for any
-                other child, in your school or in anybody else’s.
+                The 2025 curriculum is in the list, ticked for your classes. Older subjects such as Civic Education stay available, so SS 2 and SS 3 can keep them while SS 1 moves to the new list.
               </div>
             </details>
             <details>
               <summary>
-                What if a parent has no email address?
+                I run two schools. Do I need two accounts?
                 <span class="ico"
                   ><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14" stroke-linecap="round" /></svg
                 ></span>
               </summary>
               <div class="ans">
-                The school prints an access code for that parent. They use it once to set up their sign-in, and after
-                that the code is spent.
+                No. One email can own or work in more than one school, and signing in shows a list of your schools to choose from.
               </div>
             </details>
             <details>
               <summary>
-                A score was published with a mistake. Now what?
+                A student left. Do we delete them?
                 <span class="ico"
                   ><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14" stroke-linecap="round" /></svg
                 ></span>
               </summary>
               <div class="ans">
-                The teacher asks for the sheet to be unlocked, the school approves it, the correction is made and the
-                result republished. The change, and who made it, is kept on the record.
+                No. Change their status to withdrawn, transferred or graduated, and the record stays. Delete is only for a student added by mistake.
               </div>
             </details>
             <details>
@@ -823,8 +793,7 @@ export const SITE_BODY = String.raw`<!-- First visit only. After that this eleme
                 ></span>
               </summary>
               <div class="ans">
-                No. The screens are deliberately light and each score is sent on its own, so a slow or unsteady
-                connection slows you down rather than stopping you.
+                No. The screens are deliberately light and work on an ordinary Android phone, so a slow connection slows you down rather than stopping you.
               </div>
             </details>
           </div>
@@ -835,19 +804,19 @@ export const SITE_BODY = String.raw`<!-- First visit only. After that this eleme
       <section class="start" id="start">
         <div class="wrap start-grid">
           <div>
-            <h2 class="lm"><span>Start with one class.</span></h2>
+            <h2 class="lm"><span>Prefer a hand to start?</span></h2>
             <p class="start-lede fu">
-              Tell us about your school and we will set it up and walk your staff through it. There is no card and no
-              commitment — try it on a single arm for a term.
+              Most schools create their own in a few minutes. If you would rather talk first, tell us about your school
+              and we will help you set it up and bring your student list across.
             </p>
             <ul class="start-points">
               <li class="fu">
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5" stroke-linecap="round" stroke-linejoin="round" /></svg>
-                We create the school and your first admin account
+                We help you import your student list
               </li>
               <li class="fu" style="--d: 70ms">
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5" stroke-linecap="round" stroke-linejoin="round" /></svg>
-                A session with your teachers, in person or on a call
+                A call with your admins, to walk through the setup
               </li>
               <li class="fu" style="--d: 140ms">
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5" stroke-linecap="round" stroke-linejoin="round" /></svg>
@@ -950,7 +919,7 @@ export const SITE_BODY = String.raw`<!-- First visit only. After that this eleme
         <div class="f-top">
           <div>
             <span class="mark"><i></i>Brillianda</span>
-            <p class="f-blurb">School records, results and report cards, built for Nigerian schools.</p>
+            <p class="f-blurb">The school register for Nigerian schools: classes, subjects and students, on any phone.</p>
             <div class="f-contact">
               <a href="mailto:hello@brillianda.com">
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
@@ -974,14 +943,14 @@ export const SITE_BODY = String.raw`<!-- First visit only. After that this eleme
               <ul>
                 <li><a href="#what">What it does</a></li>
                 <li><a href="#inside">A look inside</a></li>
-                <li><a href="#term">How a term runs</a></li>
+                <li><a href="#term">Getting started</a></li>
                 <li><a href="#pricing">Pricing</a></li>
               </ul>
             </div>
             <div>
               <h4>School</h4>
               <ul>
-                <li><a href="#start">Request a trial</a></li>
+                <li><a href="/signup">Create your school</a></li>
                 <li><a href="#faq">Questions</a></li>
                 <li><a href="#data">Your data</a></li>
                 <li><a href="/login" data-app-link>Sign in</a></li>

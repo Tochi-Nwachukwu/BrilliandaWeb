@@ -1,7 +1,6 @@
 // Wires the page together (from the old site's main.ts). Order matters only for the intro, which
 // must clear before the hero starts moving.
 
-import { initGrid } from "./grid";
 import { initCounters, initCursor, initNav, initParallax, initPinnedTour, initReveals, initStats, initVoices } from "./motion";
 import { initTheme } from "./theme";
 import { initTrialForm } from "./trialForm";
@@ -60,7 +59,6 @@ export function startSite(): void {
   const year = document.querySelector<HTMLElement>("[data-year]");
   if (year) year.textContent = String(new Date().getFullYear());
 
-  initGrid();
   initTrialForm();
   initVoices();
   initNav();

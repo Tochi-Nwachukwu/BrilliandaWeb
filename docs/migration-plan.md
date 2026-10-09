@@ -301,6 +301,12 @@ Everything else should match the look book. These change because the plan change
 - **Forms:** gain the plan's extra fields (first and last names, address, guardians) in the same style.
 - **Sample-account buttons** give way to fake demo schools until the backend is ready.
 - **The name:** Brillanda becomes Brillianda everywhere.
+- **The marketing site's words** (decided 9 October 2026): same design, sections and motion, copy
+  rewritten for v1. "Create your school" goes to the self-serve signup; the features, who signs in,
+  the tour of screens, getting started, coming soon (results, attendance, fees, teacher and parent
+  sign-in) and the questions describe what v1 does. The live mark-sheet demo is gone with the
+  results copy. The "talk to us" form stays for schools that want help. The sign-up and sign-in
+  panel says the same as the site.
 - **Signup step 2 has no phone** (decided 7 October 2026). The plan lists an optional owner
   phone, but step 1 already asks for the school's phone and nothing in v1 uses a second one.
   Owners can add theirs later in their profile.

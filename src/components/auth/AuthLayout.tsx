@@ -33,9 +33,9 @@ export function AuthWordmark({ className }: { className?: string }) {
 
 // What the product does, in the order it happens. No figures: nothing here is a statistic.
 const STEPS = [
-  { title: "Teachers enter scores", detail: "One subject at a time, from a phone or a laptop." },
-  { title: "Brillianda does the sums", detail: "Totals, grades and positions, worked out for you." },
-  { title: "Parents read the result", detail: "On their phone, once the school publishes." },
+  { title: "Your school gets its address", detail: "Four short steps, and it’s yours." },
+  { title: "Classes and subjects in minutes", detail: "Two answers make the whole class list." },
+  { title: "Every student, in one place", detail: "Import your list from Excel or Word." },
 ];
 
 /** Wide screens only. Everything on it is CSS and text, so it costs nothing to load. */
@@ -50,7 +50,7 @@ async function BrandPanel() {
           For Nigerian schools
         </p>
         <p className="mt-5 max-w-[15em] font-display text-[40px] font-medium leading-[1.1] tracking-tight">
-          The term’s results, without the long night of adding up.
+          Your whole school, set up in an afternoon.
         </p>
         <ol className="mt-12 space-y-3">
           {STEPS.map((step, index) => (

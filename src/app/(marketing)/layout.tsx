@@ -11,12 +11,12 @@ const display = Outfit({ subsets: ["latin"], weight: ["300", "400", "500"], vari
 const body = Instrument_Sans({ subsets: ["latin"], weight: ["400", "500"], variable: "--font-site-body", display: "swap" });
 
 export const metadata: Metadata = {
-  title: "Brillianda — Results, records and report cards for Nigerian schools",
+  title: "Brillianda — Classes, subjects and students for Nigerian schools",
   description:
-    "Brillianda is school records software for Nigerian secondary and primary schools. Teachers enter scores, the system computes totals, grades and positions, and parents read the result on a phone.",
+    "Brillianda is the school register for Nigerian schools: sign up in four steps, set up classes, arms and subjects, and bring in every student from Excel or Word, on any phone.",
   openGraph: {
-    title: "Brillianda — Results, records and report cards",
-    description: "One place for scores, report cards and the parent portal. Built for Nigerian schools, terms, arms and CA/Exam weighting.",
+    title: "Brillianda — Your whole school, set up in an afternoon",
+    description: "Classes, arms, subjects and students in one place, with your school's own address. Built for Nigerian schools.",
     type: "website",
   },
 };
