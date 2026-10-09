@@ -1,5 +1,5 @@
 // Shapes shared by every data function (docs/data-contract.md).
-import type { Band, CatalogueEntry, Department, LinkKind, SchoolDetails, SchoolLevel, Section, Term } from "@brillianda/core";
+import type { Band, CatalogueEntry, Department, LinkKind, SchoolDetails, SchoolLevel, Section, StudentGender, StudentStatus, Term } from "@brillianda/core";
 
 /** What every write returns: the result, or a message for a person and errors under each field. */
 export type ActionResult<T> =
@@ -82,3 +82,39 @@ export type Subject = { id: string; catalogueId: string | null; name: string; co
 /** A subject attached to a class level, compulsory or elective (senior electives may carry a department). */
 export type SubjectLink = { subjectId: string; levelId: string; kind: LinkKind; department: Department | null };
 export type SubjectsSetup = { subjects: Subject[]; links: SubjectLink[]; levels: ClassLevel[]; catalogue: CatalogueEntry[]; bands: Band[] };
+
+/** A class a student can sit in, labelled for pickers and lists ("JSS 1 Gold"). */
+export type ArmOption = { id: string; label: string; chip: string; levelId: string; levelName: string; levelPosition: number };
+
+/** A student as the list needs them. */
+export type StudentRow = {
+  id: string;
+  fullName: string;
+  admissionNo: string;
+  gender: StudentGender;
+  status: StudentStatus;
+  armId: string;
+  dateOfBirth: string;
+  guardianName: string | null;
+  guardianPhone: string | null;
+};
+
+export type StudentsList = { students: StudentRow[]; arms: ArmOption[]; nextAdmissionNo: string };
+
+/** One student's page: details, guardian (with siblings), classes over time and changes. */
+export type StudentDetail = StudentRow & {
+  firstName: string;
+  lastName: string;
+  otherNames: string;
+  admissionDate: string;
+  address: string;
+  stateOfOrigin: string;
+  guardian: { id: string; name: string; phone: string | null; email: string | null; siblings: { id: string; fullName: string; armLabel: string }[] } | null;
+  classHistory: { armLabel: string; from: string }[];
+  changes: ChangeEntry[];
+};
+
+/** A guardian already on file, found by phone, so siblings can share one record. */
+export type GuardianMatch = { id: string; name: string; phone: string; children: string[] };
+
+export type AdmissionSettings = { pattern: string; digits: number; next: number; preview: string };

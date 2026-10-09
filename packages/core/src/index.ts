@@ -13,3 +13,4 @@ export * from "./auth";
 export * from "./calendar";
 export * from "./classes";
 export * from "./subjects";
+export * from "./students";

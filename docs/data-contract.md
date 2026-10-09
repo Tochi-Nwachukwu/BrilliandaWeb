@@ -145,3 +145,22 @@ preview sentence are pure functions in `packages/core/src/classes.ts`, with test
 The catalogue copy is `src/data/fake/catalogue.ts` (57 entries: the plan's 2025 lists and the legacy
 subjects it names). The real one is platform data the backend seeds. The rules (bands, pre-ticks,
 default links, codes) are in `packages/core/src/subjects.ts`, with tests.
+
+### Students (batch 8)
+
+| Function | Kind | Input / output | Used by | Status |
+|---|---|---|---|---|
+| `listStudents` | read | `subdomain` → `StudentsList`: every student not deleted (`StudentRow`), the classes they can sit in (`ArmOption`), the next admission number | Students, add/edit | fake |
+| `getStudent` | read | `subdomain, id` → `StudentDetail`: details, guardian with siblings, class history, changes | student page | fake |
+| `getAdmissionSettings` | read | `subdomain` → pattern, digits, next number, preview | More › Admission numbers | fake |
+| `addStudent` | action | `studentSchema` → `ActionResult<{ id, admissionNo, fullName }>`; blank admission number takes the school's next (a per-school counter in the real one); duplicates refused | add | fake |
+| `updateStudent` | action | `studentId, studentSchema`; a new class is added to the class history | edit | fake |
+| `moveStudents` | action | `moveStudentsSchema` (ids, armId) → `{ moved }` | bulk move | fake |
+| `setStudentsStatus` | action | `statusChangeSchema` (ids, status) → `{ changed }`; active, suspended, withdrawn, transferred, graduated | bulk / student page | fake |
+| `deleteStudent` | action | `studentId`; soft delete, for mistakes only | student page | fake |
+| `findGuardian` | action | `phone` → `GuardianMatch \| null`, so siblings share a guardian | add/edit | fake |
+| `setAdmissionFormat` | action | `{ pattern, digits }` with `{YEAR}` and `{NUMBER}` | More › Admission numbers | fake |
+
+Export is done in the browser from the list (`toCsv` in core escapes cells starting with =, +, - or
+@). Search ignores accents (`matchesSearch`). The student photo the plan lists is not built yet: it
+needs file storage from the backend.

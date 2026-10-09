@@ -10,7 +10,7 @@ import { store } from "./store";
 const pause = () => new Promise((resolve) => setTimeout(resolve, 300));
 const SECTION_ORDER: Section[] = ["preschool", "primary", "junior", "senior"];
 
-const studentsIn = (armId: string) => store.students.filter((s) => s.armId === armId).length;
+const studentsIn = (armId: string) => store.students.filter((s) => s.armId === armId && !s.deletedAt).length;
 
 export async function getClassStructure(subdomain: string): Promise<ClassStructure | null> {
   if (!(await requireMember(subdomain))) return null;

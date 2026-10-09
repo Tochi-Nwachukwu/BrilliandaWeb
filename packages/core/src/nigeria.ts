@@ -19,3 +19,9 @@ export function normaliseNigerianPhone(input: string): string | null {
   const match = /^(?:\+?234|0)(\d{10})$/.exec(digits);
   return match ? `+234${match[1]}` : null;
 }
+
+/** "+2348030000001" → "0803 000 0001", the way people read and type Nigerian numbers. */
+export function displayNigerianPhone(stored: string): string {
+  const match = /^\+234(\d{3})(\d{3})(\d{4})$/.exec(stored);
+  return match ? `0${match[1]} ${match[2]} ${match[3]}` : stored;
+}

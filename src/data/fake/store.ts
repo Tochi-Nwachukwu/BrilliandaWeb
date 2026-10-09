@@ -2,7 +2,7 @@
 // replaces it (docs/data-contract.md). It resets when the dev server restarts. Kept on globalThis
 // so a hot reload in development doesn't wipe it.
 import "server-only";
-import { armCodes, ARM_PRESETS, buildLadder, defaultLinks, defaultTerms, preTicked, type LinkKind, type Department, type SchoolDetails, type SchoolLevel, type Section, type Term } from "@brillianda/core";
+import { armCodes, ARM_PRESETS, buildLadder, defaultLinks, defaultTerms, preTicked, type LinkKind, type StudentGender, type StudentStatus, type Department, type SchoolDetails, type SchoolLevel, type Section, type Term } from "@brillianda/core";
 import type { SchoolSummary } from "../types";
 import { CATALOGUE } from "./catalogue";
 
@@ -17,14 +17,18 @@ type FakeStore = {
   calendars: Map<string, { confirmed: boolean; startYear: number; terms: Term[] }>;
   checklistHidden: Set<string>;
   /** at <= 0 means "that many minutes before the first read" (see fake/home.ts). */
-  changes: { id: string; subdomain: string; at: number; who: string; what: string }[];
+  changes: { id: string; subdomain: string; at: number; who: string; what: string; studentId?: string }[];
   /** What signup collected about each school that its pages don't show. */
   profiles: Map<string, { levelsOffered: SchoolLevel[]; state: string; phone: string }>;
   levels: { id: string; subdomain: string; key: string | null; name: string; short: string; section: Section; position: number; archived: boolean }[];
   armNames: { id: string; subdomain: string; name: string; code: string; position: number }[];
   arms: { id: string; subdomain: string; levelId: string; armNameId: string; department: Department | null; archived: boolean }[];
-  /** Filled in by batch 8 (students). Only what classes need for now. */
-  students: { id: string; subdomain: string; armId: string; status: string }[];
+  students: FakeStudent[];
+  guardians: { id: string; subdomain: string; name: string; phone: string | null; email: string | null }[];
+  /** Each student's classes over time, newest last. */
+  enrolments: { studentId: string; armId: string; from: string }[];
+  /** Admission number format and the next running number (plan: a per-school counter). */
+  admission: Map<string, { pattern: string; digits: number; next: number }>;
   subjects: { id: string; subdomain: string; catalogueId: string | null; name: string; code: string; position: number }[];
   subjectLinks: { subdomain: string; subjectId: string; levelId: string; kind: LinkKind; department: Department | null }[];
 };
@@ -35,6 +39,80 @@ function seedGreenfieldSubjects(levels: { id: string; key: string | null; sectio
   const subjects = entries.map((e, i) => ({ id: `gs-${e.id}`, subdomain: "greenfield", catalogueId: e.id, name: e.name, code: e.code, position: i }));
   const subjectLinks = defaultLinks(entries, levels).map((l) => ({ subdomain: "greenfield", subjectId: `gs-${l.entryId}`, levelId: l.levelId, kind: l.kind, department: l.department }));
   return { subjects, subjectLinks };
+}
+
+export type FakeStudent = {
+  id: string;
+  subdomain: string;
+  armId: string;
+  status: StudentStatus;
+  firstName: string;
+  lastName: string;
+  otherNames: string;
+  gender: StudentGender;
+  dateOfBirth: string;
+  admissionNo: string;
+  admissionDate: string;
+  address: string;
+  stateOfOrigin: string;
+  guardianId: string | null;
+  createdAt: number;
+  /** Delete is only for mistakes, and soft (plan). */
+  deletedAt: number | null;
+  /** Set by an import, so a whole batch can be undone (batch 9). */
+  importBatchId: string | null;
+  updatedAt: number;
+};
+
+const FIRST_F = ["Chiamaka", "Adaeze", "Fatima", "Ngozi", "Ọlá", "Zainab", "Ifeoma", "Aisha", "Temitọpẹ", "Halima", "Kemi", "Amarachi"];
+const FIRST_M = ["Tunde", "Chinedu", "Ibrahim", "Emeka", "Ṣẹgun", "Musa", "Obinna", "Yusuf", "Kelechi", "Babatunde", "Sani", "Uche"];
+const LAST = ["Okafor", "Bello", "Adéṣínà", "Eze", "Abubakar", "Ogunleye", "Nwosu", "Danjuma", "Afolabi", "Umeh", "Okonkwo", "Lawal", "Ibekwe", "Yusuf"];
+
+/** Greenfield's students: four or five in each of its 18 classes, siblings sharing a guardian. */
+function seedGreenfieldStudents(arms: { id: string; levelId: string }[]) {
+  const guardians: FakeStore["guardians"] = [];
+  const students: FakeStudent[] = [];
+  const enrolments: FakeStore["enrolments"] = [];
+  let n = 0;
+  arms.forEach((arm, armIndex) => {
+    const count = 4 + (armIndex % 2);
+    for (let k = 0; k < count; k++, n++) {
+      const female = n % 2 === 0;
+      const last = LAST[n % LAST.length]!;
+      // Every fourteenth student shares a family (and so a guardian) with one in an older class.
+      const familyKey = last;
+      let guardian = guardians.find((g) => g.name.endsWith(last) && n % 7 === 3);
+      if (!guardian) {
+        guardian = { id: `gg${n + 1}`, subdomain: "greenfield", name: `${n % 3 ? "Mrs" : "Mr"} ${familyKey}`, phone: `+23480300${String(10000 + n).slice(-5)}`, email: n % 4 ? null : `${last.toLowerCase().normalize("NFKD").replace(/[^a-z]/g, "")}${n}@example.com` };
+        guardians.push(guardian);
+      }
+      const level = Number(arm.levelId.slice(2));
+      const year = 2026 - (level - 1);
+      const id = `st${n + 1}`;
+      students.push({
+        id,
+        subdomain: "greenfield",
+        armId: arm.id,
+        status: n === 7 ? "suspended" : n === 23 ? "transferred" : "active",
+        firstName: (female ? FIRST_F : FIRST_M)[n % 12]!,
+        lastName: last,
+        otherNames: n % 5 === 0 ? (female ? "Grace" : "David") : "",
+        gender: female ? "FEMALE" : "MALE",
+        dateOfBirth: `${2015 - level}-${String((n % 12) + 1).padStart(2, "0")}-${String((n % 27) + 1).padStart(2, "0")}`,
+        admissionNo: `GC/${year}/${String(n + 1).padStart(4, "0")}`,
+        admissionDate: `${year}-09-14`,
+        address: n % 3 ? "" : `${(n % 40) + 1} Allen Avenue, Ikeja`,
+        stateOfOrigin: ["Lagos", "Enugu", "Kano", "Oyo", "Rivers", "Anambra"][n % 6]!,
+        guardianId: guardian.id,
+        createdAt: 0,
+        updatedAt: 0,
+        deletedAt: null,
+        importBatchId: null,
+      });
+      enrolments.push({ studentId: id, armId: arm.id, from: `${year}-09-14` });
+    }
+  });
+  return { students, guardians, enrolments, next: n + 1 };
 }
 
 /** Greenfield's classes: JSS 1 to SS 3, three colour arms each. */
@@ -66,6 +144,7 @@ export type FakeUser = { id: string; fullName: string; email: string; password: 
 function seed(): FakeStore {
   const greenfield = seedGreenfieldClasses();
   const greenfieldSubjects = seedGreenfieldSubjects(greenfield.levels);
+  const greenfieldStudents = seedGreenfieldStudents(greenfield.arms);
   return {
     schools: [
       { subdomain: "greenfield", name: "Greenfield College", status: "active", brandColor: "#4A3AA7", logoUrl: null },
@@ -106,7 +185,10 @@ function seed(): FakeStore {
     levels: greenfield.levels,
     armNames: greenfield.armNames,
     arms: greenfield.arms,
-    students: [],
+    students: greenfieldStudents.students,
+    guardians: greenfieldStudents.guardians,
+    enrolments: greenfieldStudents.enrolments,
+    admission: new Map([["greenfield", { pattern: "GC/{YEAR}/{NUMBER}", digits: 4, next: greenfieldStudents.next }]]),
     subjects: greenfieldSubjects.subjects,
     subjectLinks: greenfieldSubjects.subjectLinks,
     changes: [

@@ -241,6 +241,13 @@ one level at a time with Off / Compulsory / Elective on phone. The plan's gate i
 
 **Done when:** a school can add, find, edit, move and export students on a phone, on fake data.
 
+**Done (9 October 2026).** The list uses the batch 2 patterns (cards and Select on phone, a sortable
+table with a column picker on laptop, Filter, the selection bar), a page of 50 at a time with
+"Show more". Add and edit share one form with a sticky Save on phone and "Save and add another";
+a guardian phone already on file offers to link that guardian. The student page shows details,
+guardian and siblings, classes over time and changes. Admission numbers have their own page under
+More. Not yet: the photo (needs file storage from the backend). The plan's gate is a browser test.
+
 ### Batch 9: Import (Phase 4)
 
 - Today's import screens, moved, plus:

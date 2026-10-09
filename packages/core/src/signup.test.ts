@@ -72,3 +72,11 @@ describe("fieldErrorsOf", () => {
     expect(Object.keys(fieldErrorsOf(owner.error!)).sort()).toEqual(["email", "fullName", "password"]);
   });
 });
+
+describe("displayNigerianPhone", () => {
+  it("shows a stored number the way people write it", async () => {
+    const { displayNigerianPhone } = await import("./nigeria");
+    expect(displayNigerianPhone("+2348030000001")).toBe("0803 000 0001");
+    expect(displayNigerianPhone("not a phone")).toBe("not a phone");
+  });
+});

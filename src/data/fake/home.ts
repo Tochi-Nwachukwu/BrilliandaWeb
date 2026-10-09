@@ -53,7 +53,7 @@ export async function getSetupProgress(subdomain: string): Promise<SetupProgress
       { id: "classes", done: store.levels.some((l) => l.subdomain === subdomain) },
       { id: "arms", done: store.arms.some((a) => a.subdomain === subdomain) },
       { id: "subjects", done: store.subjectLinks.some((l) => l.subdomain === subdomain) },
-      { id: "students", done: false },
+      { id: "students", done: store.students.some((st) => st.subdomain === subdomain && !st.deletedAt) },
       { id: "admins", done: invited || teamSize(subdomain) > 1 },
     ],
   };
@@ -76,7 +76,7 @@ export async function getHomeSummary(subdomain: string): Promise<HomeSummary | n
     .map(({ id, at, who, what }) => ({ id, at, who, what }));
   const arms = store.arms.filter((a) => a.subdomain === subdomain && !a.archived);
   return {
-    students: store.students.filter((st) => st.subdomain === subdomain).length,
+    students: store.students.filter((st) => st.subdomain === subdomain && !st.deletedAt && st.status === "active").length,
     // A class is a level and an arm (plan: "JSS 1 to SS 3, three arms" makes 18 classes).
     classes: arms.length,
     arms: store.armNames.filter((a) => a.subdomain === subdomain).length,

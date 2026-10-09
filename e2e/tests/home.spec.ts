@@ -20,14 +20,15 @@ test("Home greets you and shows recent changes", async ({ page }) => {
   // Other tests keep changing Greenfield, so check the card has entries rather than a particular one.
   await expect(page.getByRole("heading", { name: "Recent changes" })).toBeVisible();
   await expect(page.getByText(/ago$|just now$/).first()).toBeVisible();
-  await expect(page.getByRole("heading", { name: "Finish setting up Greenfield College" })).toBeVisible();
-  // The calendar is set, so that step is ticked off.
-  await expect(page.getByText("Set your academic calendar (done)")).toBeAttached();
+  // Greenfield has finished every setup step, so the checklist has gone for good.
+  await expect(page.getByRole("heading", { name: /^Finish setting up/ })).toHaveCount(0);
+  await expect(page.getByText(/is set up:/)).toBeVisible();
 });
 
 test("an admin's checklist leaves out inviting admins", async ({ page }) => {
-  await signIn(page, "greenfield", "admin@greenfield.ng");
-  await expect(page.getByRole("heading", { name: "Finish setting up Greenfield College" })).toBeVisible();
+  // admin@greenfield.ng is also an admin at Surebloom, which hasn't finished setting up.
+  await signIn(page, "surebloom", "admin@greenfield.ng");
+  await expect(page.getByRole("heading", { name: "Finish setting up Surebloom School" })).toBeVisible();
   await expect(page.getByText("Invite an admin")).toHaveCount(0);
 });
 
