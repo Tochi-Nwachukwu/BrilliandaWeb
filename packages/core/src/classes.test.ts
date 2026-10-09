@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   ARM_PRESETS,
+  armLayoutSchema,
   armChip,
   armCode,
   armCodes,
@@ -108,5 +109,31 @@ describe("the setup", () => {
 
   it("says so for a single class", () => {
     expect(previewSentence(["JSS 1"])).toBe("This creates 1 class: JSS 1.");
+  });
+});
+
+describe("armLayoutSchema", () => {
+  const base = {
+    names: [
+      { key: "a", name: "Blue", code: "blu" },
+      { key: "new-1", name: "Purple", code: "PUR" },
+    ],
+    levels: [
+      { levelId: "jss1", arms: ["a", "new-1"] },
+      { levelId: "ss1", arms: ["a"] },
+    ],
+  };
+  it("accepts a layout and upper-cases codes", () => {
+    const parsed = armLayoutSchema.parse(base);
+    expect(parsed.names[0]!.code).toBe("BLU");
+  });
+  it("refuses two arms with one name or one code", () => {
+    const result = armLayoutSchema.safeParse({ ...base, names: [base.names[0]!, { key: "b", name: "blue", code: "BLU" }] });
+    expect(result.success).toBe(false);
+    expect(result.error?.issues.map((i) => i.path.join("."))).toEqual(expect.arrayContaining(["names.1.name", "names.1.code"]));
+  });
+  it("needs an arm in every class, from the list", () => {
+    expect(armLayoutSchema.safeParse({ ...base, levels: [{ levelId: "jss1", arms: [] }] }).error?.issues[0]?.message).toBe("Every class needs at least one arm");
+    expect(armLayoutSchema.safeParse({ ...base, levels: [{ levelId: "jss1", arms: ["gone"] }] }).success).toBe(false);
   });
 });

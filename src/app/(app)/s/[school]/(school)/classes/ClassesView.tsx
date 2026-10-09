@@ -44,7 +44,9 @@ type Open =
 /** The school's classes after setup, by section, with everything the plan lets you change. */
 export function ClassesView({ structure, actions }: { structure: ClassStructure; actions: ClassActions }) {
   const router = useRouter();
-  const studentsBase = usePathname().replace(/\/classes$/, "/students");
+  const pathname = usePathname();
+  const studentsBase = pathname.replace(/\/classes$/, "/students");
+  const armsHref = `${pathname.replace(/\/classes$/, "")}/classes/arms`;
   const [open, setOpen] = useState<Open>(null);
   const [busy, startTransition] = useTransition();
   const names = new Map(structure.armNames.map((a) => [a.id, a]));
@@ -69,10 +71,15 @@ export function ClassesView({ structure, actions }: { structure: ClassStructure;
       <PageHeader
         title="Classes"
         actions={
-          <Button onClick={() => setOpen({ kind: "add-level" })}>
-            <Icon name="plus" className="h-4 w-4" />
-            Add a class
-          </Button>
+          <div className="flex flex-wrap gap-2">
+            <Link href={armsHref} className="inline-flex min-h-[44px] items-center gap-2 rounded-full bg-raise px-5 text-sm font-medium shadow-raised hover:bg-hover focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-accent">
+              Edit arms
+            </Link>
+            <Button onClick={() => setOpen({ kind: "add-level" })}>
+              <Icon name="plus" className="h-4 w-4" />
+              Add a class
+            </Button>
+          </div>
         }
       >
         {plural(live.length, "class", "classes")} in {plural(structure.levels.length, "level")}, {plural(students, "student")}. Tap a class or an arm to change it.
@@ -147,7 +154,16 @@ export function ClassesView({ structure, actions }: { structure: ClassStructure;
         })}
       </div>
 
-      <Card className="mt-4" title="Arm names" description="Each name lives once for the whole school, so renaming one renames it in every class.">
+      <Card
+        className="mt-4"
+        title="Arm names"
+        description="Each name lives once for the whole school, so renaming one renames it in every class. Tap one to rename it, or edit them all at once."
+        action={
+          <Link href={armsHref} className="rounded text-sm font-medium text-accent underline underline-offset-2 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-accent">
+            Edit arms
+          </Link>
+        }
+      >
         <ul className="flex flex-wrap gap-2">
           {structure.armNames.map((armName) => (
             <li key={armName.id}>
@@ -189,6 +205,10 @@ export function ClassesView({ structure, actions }: { structure: ClassStructure;
           importHref={`${studentsBase}/import?arm=${open.arm.id}`}
           busy={busy}
           onClose={() => setOpen(null)}
+          rename={() => {
+            const armName = names.get(open.arm.armNameId);
+            if (armName) setOpen({ kind: "arm-name", armName });
+          }}
           setDepartment={(d) => run(() => actions.setArmDepartment(open.arm.id, d), d ? `Department set to ${DEPARTMENT_LABEL[d as keyof typeof DEPARTMENT_LABEL]}` : "Department cleared", () => setOpen(null))}
           archive={() => run(() => actions.setArmArchived(open.arm.id, !open.arm.archived), open.arm.archived ? "Brought back" : "Archived", () => setOpen(null))}
           remove={() => run(() => actions.removeArm(open.arm.id), "Arm removed", () => setOpen(null))}
@@ -309,6 +329,7 @@ function ArmDialog({
   importHref,
   busy,
   onClose,
+  rename,
   setDepartment,
   archive,
   remove,
@@ -320,14 +341,21 @@ function ArmDialog({
   importHref: string;
   busy: boolean;
   onClose: () => void;
+  rename: () => void;
   setDepartment: (department: string | null) => void;
   archive: () => void;
   remove: () => void;
 }) {
   const label = onlyArm ? level.name : `${level.name} ${name?.name ?? ""}`;
   return (
-    <ResponsiveDialog open onClose={onClose} title={label} description={`${plural(arm.studentCount, "student")}. Code ${name?.code ?? ""}; rename arms under “Arm names”.`}>
+    <ResponsiveDialog open onClose={onClose} title={label} description={`${plural(arm.studentCount, "student")}. Arm ${name?.name ?? ""}, code ${name?.code ?? ""}.`}>
       <div className="grid gap-5">
+        <div className="flex flex-wrap items-center justify-between gap-2 rounded-2xl bg-sunken px-4 py-3 text-sm">
+          <span className="text-text-secondary">Renaming {name?.name ?? "this arm"} renames it in every class.</span>
+          <Button size="sm" variant="secondary" disabled={busy} onClick={rename}>
+            Rename
+          </Button>
+        </div>
         <Link href={importHref} className="inline-flex min-h-[42px] items-center justify-center gap-2 rounded-full bg-raise px-5 text-sm font-medium shadow-raised hover:bg-hover focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-accent">
           Import students into {label}
         </Link>

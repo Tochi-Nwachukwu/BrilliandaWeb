@@ -2,7 +2,7 @@
 
 // Classes and arms (plan: "Quick setup", "Editing after setup"; docs/data-contract.md). Owners and
 // admins. About `school`: see actions/auth.ts — the real actions take it from the request's host.
-import { armNameSchema, classSetupSchema, DEPARTMENTS, levelNameSchema, newLevelSchema, type Department } from "@brillianda/core/classes";
+import { armLayoutSchema, armNameSchema, classSetupSchema, DEPARTMENTS, levelNameSchema, newLevelSchema, type Department } from "@brillianda/core/classes";
 import { fieldErrorsOf } from "@brillianda/core/signup";
 import { revalidatePath } from "next/cache";
 import * as impl from "../fake/classes";
@@ -71,4 +71,11 @@ export async function setArmArchived(school: string, armId: string, archived: bo
 /** Refused while it has students, or when it is its class's only arm. */
 export async function removeArm(school: string, armId: string): Promise<ActionResult<null>> {
   return done(school, await impl.removeArm(school, String(armId)));
+}
+
+/** Every arm at once (Classes › Edit arms): names, order, and which classes have each. */
+export async function saveArmLayout(school: string, input: unknown): Promise<ActionResult<{ summary: string }>> {
+  const parsed = armLayoutSchema.safeParse(input);
+  if (!parsed.success) return { ok: false, error: CHECK, fieldErrors: fieldErrorsOf(parsed.error) };
+  return done(school, await impl.saveArmLayout(school, parsed.data));
 }

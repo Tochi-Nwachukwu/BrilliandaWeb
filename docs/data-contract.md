@@ -131,6 +131,8 @@ Actions inside this app — see their `docs/decisions.md`. What that means for u
 The ladder, naming schemes, default range from the levels offered, arm presets, codes and the
 preview sentence are pure functions in `packages/core/src/classes.ts`, with tests.
 
+**Edit arms (added 9 October 2026):** `saveArmLayout` (action): `{ names: [{ key, name, code }], levels: [{ levelId, arms: keys[] }] }` (checked by `armLayoutSchema` in core; `key` is an arm name id, or `new-…` for a new one) → `{ summary }`. All arm names in order, and which classes in use have each. Checked as a whole before anything changes: an arm with students is never removed, every class keeps an arm, names and codes stay unique. An archived arm that is ticked again comes back. Used by Classes › Edit arms.
+
 ### Subjects (batch 7)
 
 | Function | Kind | Input / output | Used by | Status |

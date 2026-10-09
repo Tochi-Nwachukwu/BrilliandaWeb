@@ -229,3 +229,34 @@ export const armNameSchema = z.object({
     .max(4, "Use at most 4 characters")
     .transform((c) => c.toUpperCase()),
 });
+
+/**
+ * Every arm at once (Classes › Edit arms): the school's arm names in order, and which classes have
+ * each. `key` is an arm name's id, or any new key (e.g. "new-1") for one added in the editor.
+ * `levels` lists every class that is in use, each with the keys of the arms it should have.
+ */
+export const armLayoutSchema = z
+  .object({
+    names: z
+      .array(z.object({ key: z.string().min(1), ...armNameSchema.shape }))
+      .min(1, "Keep at least one arm")
+      .max(26, "Use at most 26 arms"),
+    levels: z.array(z.object({ levelId: z.string().min(1), arms: z.array(z.string()) })),
+  })
+  .superRefine((layout, ctx) => {
+    const seenName = new Map<string, number>();
+    const seenCode = new Map<string, number>();
+    layout.names.forEach((arm, i) => {
+      const name = arm.name.toLowerCase();
+      if (seenName.has(name)) ctx.addIssue({ code: "custom", path: ["names", i, "name"], message: "Two arms can’t share a name" });
+      else seenName.set(name, i);
+      if (seenCode.has(arm.code)) ctx.addIssue({ code: "custom", path: ["names", i, "code"], message: "Two arms can’t share a code" });
+      else seenCode.set(arm.code, i);
+    });
+    const keys = new Set(layout.names.map((n) => n.key));
+    layout.levels.forEach((level, i) => {
+      if (!level.arms.length) ctx.addIssue({ code: "custom", path: ["levels", i, "arms"], message: "Every class needs at least one arm" });
+      if (level.arms.some((key) => !keys.has(key))) ctx.addIssue({ code: "custom", path: ["levels", i, "arms"], message: "That arm isn’t in the list" });
+    });
+  });
+export type ArmLayout = z.infer<typeof armLayoutSchema>;

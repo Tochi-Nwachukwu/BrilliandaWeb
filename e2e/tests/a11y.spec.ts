@@ -48,6 +48,7 @@ for (const url of PUBLIC) {
 const SCHOOL = [
   "",
   "/classes",
+  "/classes/arms",
   "/subjects",
   "/students",
   "/students/new",

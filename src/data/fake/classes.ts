@@ -1,7 +1,7 @@
 // FAKE: classes and arms on sample data. The backend replaces this with the class_levels,
 // arm_names and arms tables (plan: "The class ladder", "Arms", "Editing after setup").
 import "server-only";
-import { DEPARTMENT_LABEL, SECTION_LABEL, type ClassSetupInput, type Department, type Section } from "@brillianda/core/classes";
+import { DEPARTMENT_LABEL, SECTION_LABEL, type ArmLayout, type ClassSetupInput, type Department, type Section } from "@brillianda/core/classes";
 import type { ActionResult, ClassStructure } from "../types";
 import { requireMember } from "./auth";
 import { recordChange } from "./changes";
@@ -197,4 +197,89 @@ export async function removeArm(subdomain: string, armId: string): Promise<Actio
   store.arms = store.arms.filter((a) => a.id !== armId);
   recordChange(subdomain, who.fullName, `Removed ${label}`);
   return { ok: true, data: null };
+}
+
+/**
+ * Every arm at once (Classes › Edit arms): names, order, and which classes have each. Checked as a
+ * whole before anything changes, so a refused save leaves the school as it was. An arm that has
+ * students is never removed; an archived arm that is ticked again comes back.
+ */
+export async function saveArmLayout(subdomain: string, layout: ArmLayout): Promise<ActionResult<{ summary: string }>> {
+  await pause();
+  const who = await member(subdomain);
+  if ("error" in who) return fail(who.error);
+
+  const names = store.armNames.filter((a) => a.subdomain === subdomain);
+  const levels = store.levels.filter((l) => l.subdomain === subdomain);
+  const live = levels.filter((l) => !l.archived);
+  const arms = store.arms.filter((a) => a.subdomain === subdomain);
+  const labelOf = (arm: (typeof arms)[number]) => `${levelOf(subdomain, arm.levelId)?.name ?? ""} ${nameOf(subdomain, arm.armNameId)?.name ?? ""}`.trim();
+  const plural = (n: number, one: string, many = `${one}s`) => `${n} ${n === 1 ? one : many}`;
+
+  if (live.some((l) => !layout.levels.some((x) => x.levelId === l.id)) || layout.levels.some((x) => !live.some((l) => l.id === x.levelId)))
+    return fail("Your classes changed while you were editing. Reload the page and try again.");
+  if (layout.names.some((n) => !n.key.startsWith("new-") && !names.some((a) => a.id === n.key)))
+    return fail("An arm was changed while you were editing. Reload the page and try again.");
+
+  // Arm names that are dropped from the list.
+  const dropped = names.filter((a) => !layout.names.some((n) => n.key === a.id));
+  for (const name of dropped) {
+    const used = arms.filter((a) => a.armNameId === name.id);
+    const full = used.find((a) => studentsIn(a.id) > 0);
+    if (full) return fail(`${labelOf(full)} has ${plural(studentsIn(full.id), "student")}. Move them before deleting ${name.name}.`, { [`names`]: [`${name.name} still has students`] });
+    const archivedLevel = used.map((a) => levelOf(subdomain, a.levelId)).find((l) => l?.archived);
+    if (archivedLevel) return fail(`${name.name} is still used by ${archivedLevel.name}, which is archived. Bring the class back to change its arms.`);
+  }
+
+  // Arms taken out of a class.
+  const removals: typeof arms = [];
+  const comebacks: typeof arms = [];
+  const additions: { levelId: string; key: string }[] = [];
+  for (const { levelId, arms: wanted } of layout.levels) {
+    for (const arm of arms.filter((a) => a.levelId === levelId)) {
+      const keep = wanted.includes(arm.armNameId);
+      if (!keep && !arm.archived) {
+        const students = studentsIn(arm.id);
+        if (students) return fail(`${labelOf(arm)} has ${plural(students, "student")}. Move them first, or archive it from the class instead.`);
+        removals.push(arm);
+      }
+      if (keep && arm.archived) comebacks.push(arm);
+    }
+    for (const key of wanted) if (!arms.some((a) => a.levelId === levelId && a.armNameId === key)) additions.push({ levelId, key });
+  }
+
+  // Everything checks out: apply it.
+  const ids = new Map<string, string>();
+  const renamed: string[] = [];
+  const created: string[] = [];
+  layout.names.forEach((entry, position) => {
+    const existing = names.find((a) => a.id === entry.key);
+    if (existing) {
+      if (existing.name !== entry.name) renamed.push(`${existing.name} to ${entry.name}`);
+      Object.assign(existing, { name: entry.name, code: entry.code, position });
+      ids.set(entry.key, existing.id);
+    } else {
+      const id = crypto.randomUUID();
+      store.armNames.push({ id, subdomain, name: entry.name, code: entry.code, position });
+      ids.set(entry.key, id);
+      created.push(entry.name);
+    }
+  });
+  const removed = new Set(removals.map((a) => a.id));
+  store.arms = store.arms.filter((a) => !removed.has(a.id) && !dropped.some((d) => d.id === a.armNameId));
+  for (const arm of comebacks) arm.archived = false;
+  for (const { levelId, key } of additions) store.arms.push({ id: crypto.randomUUID(), subdomain, levelId, armNameId: ids.get(key)!, department: null, archived: false });
+  const droppedIds = new Set(dropped.map((d) => d.id));
+  store.armNames = store.armNames.filter((a) => !droppedIds.has(a.id));
+
+  const parts = [
+    created.length && `new ${created.length === 1 ? "arm" : "arms"} ${created.join(", ")}`,
+    renamed.length && `renamed ${renamed.join(", ")}`,
+    dropped.length && `deleted ${dropped.map((d) => d.name).join(", ")}`,
+    additions.length + comebacks.length && `${plural(additions.length + comebacks.length, "class", "classes")} added`,
+    removals.length && `${plural(removals.length, "class", "classes")} removed`,
+  ].filter(Boolean) as string[];
+  const summary = parts.length ? `${parts.join("; ")}` : "no changes";
+  if (parts.length) recordChange(subdomain, who.fullName, `Edited the arms: ${summary}`);
+  return { ok: true, data: { summary } };
 }

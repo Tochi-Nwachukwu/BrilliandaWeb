@@ -134,6 +134,18 @@ function seedGreenfieldClasses() {
   return { levels, armNames, arms };
 }
 
+/** A small school for the arms editor test: JSS 1 to 3 in Blue and Gold, one student in JSS 1 Blue. */
+function seedArmsTestSchool(subdomain: string, student: FakeStudent) {
+  const levels = buildLadder("jss1", "jss3", "nigerian").map((l, i) => ({ id: `${subdomain}-l${i + 1}`, subdomain, key: l.key, name: l.name, short: l.short, section: l.section, position: i, archived: false }));
+  const armNames = [
+    { id: `${subdomain}-n1`, subdomain, name: "Blue", code: "BLU", position: 0 },
+    { id: `${subdomain}-n2`, subdomain, name: "Gold", code: "GOL", position: 1 },
+  ];
+  const arms = levels.flatMap((level) => armNames.map((armName) => ({ id: `${level.id}-${armName.id}`, subdomain, levelId: level.id, armNameId: armName.id, department: null, archived: false })));
+  const pupil: FakeStudent = { ...student, id: `${subdomain}-st1`, subdomain, armId: arms[0]!.id, guardianId: null, admissionNo: "T/0001", importBatchId: null };
+  return { levels, armNames, arms, students: [pupil] };
+}
+
 /** createdAt 0 means "sent just now"; filled in the first time it is read (see fake/auth.ts). */
 export type FakeInvite = { id: string; token: string; subdomain: string; fullName: string; email: string; createdAt: number; usedAt?: number };
 /** Password reset and email sign-in links. */
@@ -154,6 +166,8 @@ function seed(): FakeStore {
   const greenfield = seedGreenfieldClasses();
   const greenfieldSubjects = seedGreenfieldSubjects(greenfield.levels);
   const greenfieldStudents = seedGreenfieldStudents(greenfield.arms);
+  // One per screen size, so the two runs of the arms editor test never edit the same school.
+  const armsTests = ["elmwood", "willowbank"].map((school) => seedArmsTestSchool(school, greenfieldStudents.students[0]!));
   return {
     schools: [
       { subdomain: "greenfield", name: "Greenfield College", status: "active", brandColor: "#4A3AA7", logoUrl: null },
@@ -167,6 +181,8 @@ function seed(): FakeStore {
       // Fresh from signup (default colour, no logo), for the branding test, one per screen size.
       { subdomain: "oakridge", name: "Oakridge Academy", status: "active", brandColor: "#4A3AA7", logoUrl: null },
       { subdomain: "pinecrest", name: "Pinecrest School", status: "active", brandColor: "#4A3AA7", logoUrl: null },
+      { subdomain: "elmwood", name: "Elmwood College", status: "active", brandColor: "#0E6E8C", logoUrl: null },
+      { subdomain: "willowbank", name: "Willowbank College", status: "active", brandColor: "#7A1F35", logoUrl: null },
     ],
     trialRequests: [],
     signupDrafts: new Map(),
@@ -180,6 +196,8 @@ function seed(): FakeStore {
       { id: "u7", fullName: "Halima Musa", email: "owner@cedarwood.ng", password: "brillianda", schools: [{ subdomain: "cedarwood", role: "owner" }] },
       { id: "u8", fullName: "Ifeoma Okeke", email: "owner@oakridge.ng", password: "brillianda", schools: [{ subdomain: "oakridge", role: "owner" }] },
       { id: "u9", fullName: "Musa Danjuma", email: "owner@pinecrest.ng", password: "brillianda", schools: [{ subdomain: "pinecrest", role: "owner" }] },
+      { id: "u10", fullName: "Grace Etim", email: "owner@elmwood.ng", password: "brillianda", schools: [{ subdomain: "elmwood", role: "owner" }] },
+      { id: "u11", fullName: "Sola Ajayi", email: "owner@willowbank.ng", password: "brillianda", schools: [{ subdomain: "willowbank", role: "owner" }] },
     ],
     sessions: new Map(),
     invites: [
@@ -199,11 +217,13 @@ function seed(): FakeStore {
       ["cedarwood", { levelsOffered: ["SECONDARY"], state: "Kano", phone: "+2348030000006" }],
       ["oakridge", { levelsOffered: ["PRIMARY"], state: "Ogun", phone: "+2348030000007" }],
       ["pinecrest", { levelsOffered: ["SECONDARY"], state: "Kaduna", phone: "+2348030000008" }],
+      ["elmwood", { levelsOffered: ["SECONDARY"], state: "Cross River", phone: "+2348030000009" }],
+      ["willowbank", { levelsOffered: ["SECONDARY"], state: "Kwara", phone: "+2348030000010" }],
     ]),
-    levels: greenfield.levels,
-    armNames: greenfield.armNames,
-    arms: greenfield.arms,
-    students: greenfieldStudents.students,
+    levels: [...greenfield.levels, ...armsTests.flatMap((t) => t.levels)],
+    armNames: [...greenfield.armNames, ...armsTests.flatMap((t) => t.armNames)],
+    arms: [...greenfield.arms, ...armsTests.flatMap((t) => t.arms)],
+    students: [...greenfieldStudents.students, ...armsTests.flatMap((t) => t.students)],
     guardians: greenfieldStudents.guardians,
     enrolments: greenfieldStudents.enrolments,
     importMappings: new Map(),
