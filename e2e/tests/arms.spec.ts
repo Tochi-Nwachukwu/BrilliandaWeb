@@ -14,7 +14,7 @@ async function signIn(page: Page, school: string) {
 
 const card = (page: Page, name: string) => page.getByRole("listitem", { name, exact: true });
 
-test("rename, add, reorder and choose classes for arms, then save once", async ({ page }, testInfo) => {
+test("rename, add, reorder and choose classes for arms, then save once", { tag: "@both" }, async ({ page }, testInfo) => {
   test.setTimeout(90_000);
   const school = testInfo.project.name === "phone" ? "elmwood" : "willowbank";
   await signIn(page, school);

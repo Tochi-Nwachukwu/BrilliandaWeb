@@ -23,7 +23,7 @@ test("a school with classes sees them by section", async ({ page }) => {
 });
 
 test.describe.serial("the quick setup", () => {
-  test("JSS 1 to SS 3 with three flower arms makes 18 classes (the plan's gate)", async ({ page }, testInfo) => {
+  test("JSS 1 to SS 3 with three flower arms makes 18 classes (the plan's gate)", { tag: "@both" }, async ({ page }, testInfo) => {
     const { school, email } = fresh(testInfo.project.name);
     await signIn(page, school, email);
     await open(page, `/s/${school}/classes`);

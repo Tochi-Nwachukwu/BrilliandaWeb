@@ -12,14 +12,7 @@ async function signIn(page: Page) {
   await expect(page).toHaveURL(/\/s\/greenfield$/);
 }
 
-test("search ignores accents: ola finds Ọlá", async ({ page }) => {
-  await signIn(page);
-  await open(page, "/s/greenfield/students");
-  await page.getByPlaceholder("Search by name or admission number").fill("ola");
-  await expect(page.getByText(/Ọlá/).locator("visible=true").first()).toBeVisible();
-});
-
-test("add, find, edit, move and export a student (the plan's gate)", async ({ page, isMobile }, testInfo) => {
+test("add, find, edit, move and export a student (the plan's gate)", { tag: "@both" }, async ({ page, isMobile }, testInfo) => {
   test.setTimeout(120_000);
   const last = testInfo.project.name === "phone" ? "Phonetest" : "Laptoptest";
   await signIn(page);

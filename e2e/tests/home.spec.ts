@@ -14,7 +14,7 @@ async function signIn(page: Page, school: string, email: string) {
   await expect(page).toHaveURL(new RegExp(`/s/${school}$`));
 }
 
-test("Home greets you and shows recent changes", async ({ page }) => {
+test("Home greets you and shows recent changes", { tag: "@both" }, async ({ page }) => {
   await signIn(page, "greenfield", "owner@greenfield.ng");
   await expect(page.getByRole("heading", { level: 1 })).toContainText(/Good (morning|afternoon|evening), Amaka/);
   // Other tests keep changing Greenfield, so check the card has entries rather than a particular one.

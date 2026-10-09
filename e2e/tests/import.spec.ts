@@ -57,7 +57,7 @@ function plantedList(tag: string): string {
   return lines.join("\n");
 }
 
-test("a 1,000-row list with planted mistakes is fixed and imported (the plan's gate)", async ({ page }, testInfo) => {
+test("a 1,000-row list with planted mistakes is fixed and imported (the plan's gate)", { tag: "@both" }, async ({ page }, testInfo) => {
   test.setTimeout(180_000);
   const tag = testInfo.project.name === "phone" ? "Ph" : "Lp";
   await signIn(page);

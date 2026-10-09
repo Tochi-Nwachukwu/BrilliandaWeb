@@ -7,7 +7,7 @@ test.beforeEach(async ({ page }) => {
   await page.addInitScript(() => localStorage.setItem("brillianda-seen", "1"));
 });
 
-test("the home page describes v1 and leads to signup", async ({ page }) => {
+test("the home page describes v1 and leads to signup", { tag: "@both" }, async ({ page }) => {
   await page.goto("/");
   await expect(page).toHaveTitle(/Brillianda — Classes, subjects and students/);
   await expect(page.getByRole("heading", { level: 1 })).toContainText("Your whole school");

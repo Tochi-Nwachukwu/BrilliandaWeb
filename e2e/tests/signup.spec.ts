@@ -3,7 +3,7 @@ import { expect, test } from "@playwright/test";
 
 // The four signup screens on fake data (batch 3). Runs at phone and laptop size.
 
-test("a school can sign up from start to finish", async ({ page }, testInfo) => {
+test("a school can sign up from start to finish", { tag: "@both" }, async ({ page }, testInfo) => {
   test.setTimeout(90_000);
   // The fake keeps every school it creates until the dev server restarts, so use a new name.
   const address = `brightstar-${testInfo.project.name}-${Date.now() % 100000}`;

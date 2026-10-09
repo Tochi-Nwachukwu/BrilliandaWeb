@@ -39,7 +39,7 @@ async function signIn(page: Page) {
 const PUBLIC = ["/", "/login", "/signup", "/s/greenfield/login", "/s/greenfield/forgot-password", "/s/greenfield/magic-link"];
 
 for (const url of PUBLIC) {
-  test(`public screen ${url} passes the accessibility scan`, async ({ page }) => {
+  test(`public screen ${url} passes the accessibility scan`, { tag: "@both" }, async ({ page }) => {
     await page.addInitScript(() => localStorage.setItem("brillianda-seen", "1"));
     await scan(page, url);
   });
@@ -61,7 +61,7 @@ const SCHOOL = [
   "/more/history",
 ];
 
-test("every screen inside a school passes the accessibility scan", async ({ page }) => {
+test("every screen inside a school passes the accessibility scan", { tag: "@both" }, async ({ page }) => {
   test.setTimeout(180_000);
   await signIn(page);
   for (const path of SCHOOL) await test.step(path || "home", () => scan(page, `/s/greenfield${path}`));

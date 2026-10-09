@@ -3,7 +3,7 @@ import { expect, test } from "@playwright/test";
 
 // The shared frame, on the dev playground (batch 2). Runs at phone and laptop size.
 
-test("the current tab is marked and the tabs move between pages", async ({ page }) => {
+test("the current tab is marked and the tabs move between pages", { tag: "@both" }, async ({ page }) => {
   await open(page, "/dev");
   const nav = page.getByRole("navigation", { name: "Main" }).locator("visible=true");
   await expect(nav.getByRole("link", { name: "Home" })).toHaveAttribute("aria-current", "page");
@@ -12,7 +12,7 @@ test("the current tab is marked and the tabs move between pages", async ({ page 
   await expect(page.getByRole("heading", { name: "Students", level: 1 })).toBeVisible();
 });
 
-test("Ctrl+K opens the command palette and goes to a page", async ({ page, isMobile }) => {
+test("Ctrl+K opens the command palette and goes to a page", { tag: "@both" }, async ({ page, isMobile }) => {
   test.skip(isMobile, "Keyboard shortcut");
   await open(page, "/dev");
   const input = page.getByPlaceholder("Go to a page or find something");
@@ -39,7 +39,7 @@ test("the look is remembered after a reload", async ({ page }) => {
   await expect(page.locator("html")).toHaveAttribute("data-theme", "neutral");
 });
 
-test("selecting students shows the action bar", async ({ page, isMobile }) => {
+test("selecting students shows the action bar", { tag: "@both" }, async ({ page, isMobile }) => {
   await open(page, "/dev/students");
   if (isMobile) {
     await page.getByRole("button", { name: "Select", exact: true }).click();

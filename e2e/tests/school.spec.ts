@@ -14,7 +14,7 @@ async function signIn(page: Page, school: string, email: string, password = "bri
   await expect(page).toHaveURL(new RegExp(`/s/${school}$`));
 }
 
-test("two schools wear their own name and colour", async ({ page }) => {
+test("two schools wear their own name and colour", { tag: "@both" }, async ({ page }) => {
   await page.goto("/s/greenfield/login");
   await expect(page.getByText("Greenfield College").locator("visible=true").first()).toBeVisible();
   expect(await primary(page)).toBe("#4A3AA7");
@@ -31,7 +31,7 @@ test("an unknown address and a paused school say so", async ({ page }) => {
   await expect(page.getByRole("heading", { name: "This school’s account is paused" })).toBeVisible();
 });
 
-test("signing in, out, and the wrong password", async ({ page }) => {
+test("signing in, out, and the wrong password", { tag: "@both" }, async ({ page }) => {
   await page.goto("/s/greenfield");
   await expect(page).toHaveURL(/\/s\/greenfield\/login$/);
 

@@ -36,7 +36,7 @@ test("each class level's subjects can be set on a phone (the plan's gate)", asyn
   }
 });
 
-test("the laptop grid cycles compulsory, elective, off", async ({ page, isMobile }) => {
+test("the laptop grid cycles compulsory, elective, off", { tag: "@both" }, async ({ page, isMobile }) => {
   test.skip(isMobile, "The laptop layout");
   await signIn(page, "greenfield", "admin@greenfield.ng");
   await open(page, "/s/greenfield/subjects");
@@ -50,7 +50,7 @@ test("the laptop grid cycles compulsory, elective, off", async ({ page, isMobile
   await expect(cell).toHaveAccessibleName("Mathematics in JSS 1: Compulsory");
 });
 
-test("a subject can be renamed and stays linked to the catalogue", async ({ page, isMobile }) => {
+test("a subject can be renamed and stays linked to the catalogue", { tag: "@both" }, async ({ page, isMobile }) => {
   await signIn(page, "greenfield", "owner@greenfield.ng");
   await open(page, "/s/greenfield/subjects");
   // Each screen size renames its own subject, so the two runs never trip over each other.

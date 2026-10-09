@@ -3,6 +3,9 @@ import { expect, test, type Page } from "@playwright/test";
 // The plan's speed budget (Phase 5): under 2.5 s to show the main content, and under 170 KB of
 // JavaScript (compressed, as it travels) on a first load. Checked on the pages people land on.
 
+// One page at a time (and after every other test, see playwright.config.ts), so the timing is the page's.
+test.describe.configure({ mode: "serial" });
+
 const JS_BUDGET_KB = 170;
 const LCP_BUDGET_MS = 2500;
 
@@ -37,7 +40,7 @@ for (const [name, url] of [
   ["signup", "/signup"],
   ["a school's sign-in", "/s/greenfield/login"],
 ] as const) {
-  test(`${name} stays within the speed budget`, async ({ page }, testInfo) => {
+  test(`${name} stays within the speed budget`, { tag: "@both" }, async ({ page }, testInfo) => {
     await page.addInitScript(() => localStorage.setItem("brillianda-seen", "1"));
     const { jsKb, lcp } = await measure(page, url);
     testInfo.annotations.push({ type: "budget", description: `${url}: ${jsKb} KB of JavaScript, shown in ${lcp} ms` });

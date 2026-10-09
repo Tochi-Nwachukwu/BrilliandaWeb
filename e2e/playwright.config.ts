@@ -20,9 +20,16 @@ export default defineConfig({
     launchOptions,
     trace: "retain-on-failure",
   },
+  // Every test runs on a phone. The laptop run takes only those tagged @both: the plan's main
+  // flows and the checks where layout matters (accessibility, speed, navigation, the laptop grid).
+  // Rules that don't depend on the screen (wrong passwords, filters, validation) run once.
   projects: [
-    { name: "phone", use: { browserName: "chromium", viewport: { width: 360, height: 800 }, isMobile: true, hasTouch: true } },
-    { name: "laptop", use: { browserName: "chromium", viewport: { width: 1280, height: 800 } } },
+    { name: "phone", testIgnore: /budget.spec/, use: { browserName: "chromium", viewport: { width: 360, height: 800 }, isMobile: true, hasTouch: true } },
+    { name: "laptop", testIgnore: /budget.spec/, grep: /@both/, use: { browserName: "chromium", viewport: { width: 1280, height: 800 } } },
+    // The speed budget runs last, alone, once the rest are done: timed on a busy machine it measures
+    // the machine, not the page.
+    { name: "speed-phone", testMatch: /budget.spec/, dependencies: ["phone", "laptop"], use: { browserName: "chromium", viewport: { width: 360, height: 800 }, isMobile: true, hasTouch: true } },
+    { name: "speed-laptop", testMatch: /budget.spec/, dependencies: ["speed-phone"], use: { browserName: "chromium", viewport: { width: 1280, height: 800 } } },
   ],
   // A production build, not the dev server: pages are ready at once, as they are for users, so
   // the tests check the app rather than the compiler. Port 3100 keeps clear of `pnpm dev`, and

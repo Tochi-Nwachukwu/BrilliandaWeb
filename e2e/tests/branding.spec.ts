@@ -15,7 +15,7 @@ async function signIn(page: Page, school: string, email: string) {
   await expect(page).toHaveURL(new RegExp(`/s/${school}$`));
 }
 
-test("an owner sets the school's name, colour and logo", async ({ page }, testInfo) => {
+test("an owner sets the school's name, colour and logo", { tag: "@both" }, async ({ page }, testInfo) => {
   test.setTimeout(90_000);
   const school = testInfo.project.name === "phone" ? "oakridge" : "pinecrest";
   await signIn(page, school, `owner@${school}.ng`);
