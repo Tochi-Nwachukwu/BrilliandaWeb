@@ -38,7 +38,7 @@ test.describe.serial("a school without a calendar", () => {
   test("the checklist leads to the calendar, and saving ticks it off", async ({ page }, testInfo) => {
     const { school, email } = fresh(testInfo.project.name);
     await signIn(page, school, email);
-    await expect(page.getByText("0 of 6 done", { exact: false })).toBeVisible();
+    await expect(page.getByText("0 of 7 done", { exact: false })).toBeVisible();
     await page.getByRole("link", { name: "Set your calendar" }).click();
 
     await expect(page).toHaveURL(/\/more\/sessions$/);
@@ -57,7 +57,7 @@ test.describe.serial("a school without a calendar", () => {
     await expect(page.getByText("calendar saved", { exact: false })).toBeVisible();
 
     await open(page, `/s/${school}`);
-    await expect(page.getByText("1 of 6 done", { exact: false })).toBeVisible();
+    await expect(page.getByText("1 of 7 done", { exact: false })).toBeVisible();
     await expect(page.getByText("Set your academic calendar (done)")).toBeAttached();
   });
 

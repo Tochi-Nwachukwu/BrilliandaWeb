@@ -56,6 +56,7 @@ const SCHOOL = [
   "/more/admins",
   "/more/sessions",
   "/more/admission-numbers",
+  "/more/branding",
 ];
 
 test("every screen inside a school passes the accessibility scan", async ({ page }) => {

@@ -14,6 +14,7 @@ import type { ActionResult, SetupItemId, SetupProgress } from "@/data/types";
 // says what it unlocks. It can be hidden, and it goes for good once everything is done.
 
 const ITEMS: Record<SetupItemId, { title: string; unlocks: string; path: string; action: string; optional?: boolean }> = {
+  branding: { title: "Add your logo and colour", unlocks: "Your sign-in page, header and app icon look like your school.", path: "more/branding", action: "Add", optional: true },
   calendar: { title: "Set your academic calendar", unlocks: "Your session and its terms, so every record sits in the right term.", path: "more/sessions", action: "Set dates" },
   classes: { title: "Add your classes", unlocks: "JSS 1 to SS 3, or whatever your school runs, in one step.", path: "classes", action: "Add classes" },
   arms: { title: "Split classes into arms", unlocks: "Students sit in an arm, like JSS 1 Gold.", path: "classes", action: "Add arms" },
@@ -37,8 +38,8 @@ export function SetupChecklist({
 }) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
-  // Only the owner invites admins, so admins don't see that step.
-  const items = setup.items.filter((item) => isOwner || item.id !== "admins");
+  // Only the owner invites admins and sets the branding, so admins don't see those steps.
+  const items = setup.items.filter((item) => isOwner || (item.id !== "admins" && item.id !== "branding"));
   const done = items.filter((item) => item.done).length;
   if (done === items.length) return null;
 
@@ -60,7 +61,8 @@ export function SetupChecklist({
     );
   }
 
-  const next = items.find((item) => !item.done)?.id;
+  // The highlighted step is the first required one; optional steps never jump the queue.
+  const next = (items.find((item) => !item.done && !ITEMS[item.id].optional) ?? items.find((item) => !item.done))?.id;
   return (
     <section aria-labelledby="setup-title" className="animate-pop rounded-3xl bg-surface p-5 shadow-raised sm:p-6">
       <div className="flex items-start justify-between gap-3">

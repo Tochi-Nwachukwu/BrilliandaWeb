@@ -41,9 +41,11 @@ export default async function SchoolHome({ params }: PageProps<"/s/[school]">) {
   const now = new Date();
   const base = `/s/${school.subdomain}`;
   const isOwner = me.role === "owner";
-  const steps = setup.items.filter((item) => isOwner || item.id !== "admins");
+  const steps = setup.items.filter((item) => isOwner || (item.id !== "admins" && item.id !== "branding"));
   const stepsDone = steps.filter((item) => item.done).length;
-  const nextStep = steps.find((item) => !item.done);
+  // Required steps first, as in the checklist; the optional ones (branding, admins) come after.
+  const optional = (id: string) => id === "admins" || id === "branding";
+  const nextStep = steps.find((item) => !item.done && !optional(item.id)) ?? steps.find((item) => !item.done);
   const kicker = session.confirmed ? `${formatDay(now)}. ${whereWeAre(session, termPosition(session.terms, todayInLagos(now)))}` : formatDay(now);
 
   return (
@@ -54,7 +56,7 @@ export default async function SchoolHome({ params }: PageProps<"/s/[school]">) {
         actions={
           nextStep && (
             <Link
-              href={nextStep.id === "calendar" ? `${base}/more/sessions` : nextStep.id === "admins" ? `${base}/more/admins` : `${base}/${nextStep.id === "arms" ? "classes" : nextStep.id}`}
+              href={nextStep.id === "calendar" ? `${base}/more/sessions` : nextStep.id === "admins" || nextStep.id === "branding" ? `${base}/more/${nextStep.id}` : `${base}/${nextStep.id === "arms" ? "classes" : nextStep.id}`}
               className="inline-flex min-h-[42px] items-center rounded-full bg-primary px-5 text-sm font-medium text-primary-text transition-transform hover:-translate-y-px focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2"
             >
               {nextStep.id === "calendar" ? "Set your calendar" : "Continue setup"}

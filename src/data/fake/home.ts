@@ -50,6 +50,7 @@ export async function getSetupProgress(subdomain: string): Promise<SetupProgress
   return {
     hidden: store.checklistHidden.has(subdomain),
     items: [
+      { id: "branding", done: store.brandingSaved.has(subdomain) },
       { id: "calendar", done: calendarOf(subdomain).confirmed },
       { id: "classes", done: store.levels.some((l) => l.subdomain === subdomain) },
       { id: "arms", done: store.arms.some((a) => a.subdomain === subdomain) },

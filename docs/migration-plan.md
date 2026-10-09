@@ -300,6 +300,14 @@ as workspaces. Mentions of `apps/web` and `legacy/` earlier in this plan describ
   were darkened. Axe can't see behind text on the hero photo, so those two elements are checked by
   eye instead (noted in the test).
 
+**After batch 10 (9 October 2026): the plan's v1 items still missing on the front end.**
+
+- Branding: More › Branding sets the school's name and colour (ten suggestions or any colour,
+  with a live preview and an automatic darker shade when text on the colour would be hard to
+  read) and its logo (PNG, JPG or WebP, shrunk to 512 px and re-encoded in the browser; SVG
+  refused). Owner only. The logo shows in the header and sign-in page and becomes the app icon.
+  An optional checklist step, which never jumps ahead of the required ones.
+
 ## What isn't in v1 (kept for later)
 
 Built today but "after v1" in the plan. Their code stays in `legacy/` and moves across, looking

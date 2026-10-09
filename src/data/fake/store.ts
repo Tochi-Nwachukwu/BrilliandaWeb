@@ -20,6 +20,8 @@ type FakeStore = {
   links: Map<string, FakeLink>;
   calendars: Map<string, { confirmed: boolean; startYear: number; terms: Term[] }>;
   checklistHidden: Set<string>;
+  /** Schools whose owner has saved More › Branding (ticks the checklist item). */
+  brandingSaved: Set<string>;
   /** at <= 0 means "that many minutes before the first read" (see fake/home.ts). */
   changes: { id: string; subdomain: string; at: number; who: string; what: string; studentId?: string }[];
   /** What signup collected about each school that its pages don't show. */
@@ -162,6 +164,9 @@ function seed(): FakeStore {
       // Empty schools the browser tests set up from scratch (one per screen size).
       { subdomain: "brookfield", name: "Brookfield College", status: "active", brandColor: "#7A3E9D", logoUrl: null },
       { subdomain: "cedarwood", name: "Cedarwood High School", status: "active", brandColor: "#2F5D8A", logoUrl: null },
+      // Fresh from signup (default colour, no logo), for the branding test, one per screen size.
+      { subdomain: "oakridge", name: "Oakridge Academy", status: "active", brandColor: "#4A3AA7", logoUrl: null },
+      { subdomain: "pinecrest", name: "Pinecrest School", status: "active", brandColor: "#4A3AA7", logoUrl: null },
     ],
     trialRequests: [],
     signupDrafts: new Map(),
@@ -173,6 +178,8 @@ function seed(): FakeStore {
       { id: "u5", fullName: "Funke Ade", email: "owner@kingsway.ng", password: "brillianda", schools: [{ subdomain: "kingsway", role: "owner" }] },
       { id: "u6", fullName: "Emeka Nwosu", email: "owner@brookfield.ng", password: "brillianda", schools: [{ subdomain: "brookfield", role: "owner" }] },
       { id: "u7", fullName: "Halima Musa", email: "owner@cedarwood.ng", password: "brillianda", schools: [{ subdomain: "cedarwood", role: "owner" }] },
+      { id: "u8", fullName: "Ifeoma Okeke", email: "owner@oakridge.ng", password: "brillianda", schools: [{ subdomain: "oakridge", role: "owner" }] },
+      { id: "u9", fullName: "Musa Danjuma", email: "owner@pinecrest.ng", password: "brillianda", schools: [{ subdomain: "pinecrest", role: "owner" }] },
     ],
     sessions: new Map(),
     invites: [
@@ -181,6 +188,8 @@ function seed(): FakeStore {
     links: new Map(),
     calendars: new Map([["greenfield", { confirmed: true, startYear: 2026, terms: defaultTerms(2026) }]]),
     checklistHidden: new Set(),
+    // The sample schools come with their colours chosen; the test schools are as fresh from signup.
+    brandingSaved: new Set(["greenfield", "surebloom", "closedschool"]),
     profiles: new Map([
       ["greenfield", { levelsOffered: ["SECONDARY"], state: "Lagos", phone: "+2348030000001" }],
       ["surebloom", { levelsOffered: ["PRIMARY", "SECONDARY"], state: "Oyo", phone: "+2348030000002" }],
@@ -188,6 +197,8 @@ function seed(): FakeStore {
       ["kingsway", { levelsOffered: ["NURSERY", "PRIMARY"], state: "Rivers", phone: "+2348030000004" }],
       ["brookfield", { levelsOffered: ["SECONDARY"], state: "Enugu", phone: "+2348030000005" }],
       ["cedarwood", { levelsOffered: ["SECONDARY"], state: "Kano", phone: "+2348030000006" }],
+      ["oakridge", { levelsOffered: ["PRIMARY"], state: "Ogun", phone: "+2348030000007" }],
+      ["pinecrest", { levelsOffered: ["SECONDARY"], state: "Kaduna", phone: "+2348030000008" }],
     ]),
     levels: greenfield.levels,
     armNames: greenfield.armNames,

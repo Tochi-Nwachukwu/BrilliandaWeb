@@ -180,6 +180,21 @@ counts as the sheet) and builds the Excel templates with Class, Arm, Gender and 
 (`src/lib/import`). Word import goes beyond the plan, which lists CSV and Excel. All the matching
 and validation rules are pure functions in `packages/core/src/studentImport.ts`, with tests.
 
+### Branding (after batch 10)
+
+| Function | Kind | Input / output | Used by | Status |
+|---|---|---|---|---|
+| `getSchoolBySubdomain` | read | (as before) `SchoolSummary` with `name`, `brandColor`, `logoUrl` | every school page, Branding | fake |
+| `updateBranding` | action | `{ name, brandColor }` (checked by `brandingSchema` in core) → `SchoolSummary`. Owner only | More › Branding | fake |
+| `uploadLogo` | action | `FormData` with one file, `logo`: PNG or JPEG, at most 512 px and 300 KB (the browser shrinks and re-encodes it first) → `SchoolSummary`. Owner only | More › Branding | fake |
+| `removeLogo` | action | nothing → `SchoolSummary`. Owner only | More › Branding | fake |
+
+The fake keeps the logo in memory as a `data:` URL. The real one stores the file in private
+storage and returns a short-lived signed URL as `logoUrl` (plan: uploads), and should re-check
+the type and size itself. A Content Security Policy then needs that host in `img-src`. Each change
+is recorded in the change history. The setup checklist has a new optional first item,
+`branding`, done once the owner has saved this screen.
+
 ### Installable app (batch 10)
 
 No new functions. `src/app/(app)/s/[school]/manifest.webmanifest` and `app-icon/[size]` read

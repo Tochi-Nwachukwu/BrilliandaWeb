@@ -65,7 +65,7 @@ export type SampleEmail = { sampleLinks?: { label: string; href: string }[] };
 export type SessionSetup = { startYear: number; name: string; terms: Term[]; confirmed: boolean };
 
 /** The plan's setup checklist, in its order. */
-export type SetupItemId = "calendar" | "classes" | "arms" | "subjects" | "students" | "admins";
+export type SetupItemId = "branding" | "calendar" | "classes" | "arms" | "subjects" | "students" | "admins";
 export type SetupProgress = { items: { id: SetupItemId; done: boolean }[]; hidden: boolean };
 
 /** One line of the school's record of changes. */
