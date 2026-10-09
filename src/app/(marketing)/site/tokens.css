@@ -15,7 +15,7 @@
   --edge: #dcd8d1;
   --ink: #16171a;
   --ink-2: #5c5f66;
-  --ink-3: #95989e;
+  --ink-3: #696c73; /* small print: 4.5:1 on the page, cards and sunken panels */
   --dark: #0e0f11;
   --dark-2: #191a1d;
   --on-dark: #faf9f7;
@@ -24,7 +24,7 @@
   --success: #3f7a57;
   --success-bg: #edf4f0;
   --success-border: #ccdfd4;
-  --warning: #a9760c;
+  --warning: #8a5f06;
   --warning-bg: #faf3e3;
   --warning-border: #ecdcb4;
   --danger: #b3423b;
@@ -68,7 +68,7 @@
     --rule-2: #3a3d42;
     --ink: #efefee;
     --ink-2: #a2a5ab;
-    --ink-3: #70737a;
+    --ink-3: #8a8d94;
     --dark: #0a0b0c;
     --dark-2: #141518;
     --accent: #d3a356;
@@ -100,7 +100,7 @@
   --rule-2: #3a3d42;
   --ink: #efefee;
   --ink-2: #a2a5ab;
-  --ink-3: #70737a;
+  --ink-3: #8a8d94;
   --dark: #0a0b0c;
   --dark-2: #141518;
   --accent: #d3a356;

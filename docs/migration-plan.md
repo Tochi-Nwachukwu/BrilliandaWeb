@@ -291,8 +291,14 @@ as workspaces. Mentions of `apps/web` and `legacy/` earlier in this plan describ
   1.3 s locally. Getting there: per-file imports instead of the package barrels, zod loaded on the
   first submit on the public screens, and the hero and auth card sliding in instead of fading from
   nothing.
-- Still open: the WCAG 2.2 AA check needs `@axe-core/playwright`, a new dependency, so it waits
-  for a yes.
+- Accessibility (added the same day, `@axe-core/playwright`): `e2e/tests/a11y.spec.ts` scans 16
+  screens at both sizes against WCAG 2.2 AA on every push. The first run found only colour
+  contrast and one list: the faintest grey text (hints, dates, the phone tab bar) went from about
+  3:1 to 4.5:1 (secondary text darkened one step to keep three levels), the pastel cards lost a
+  70-85% fade on their labels, the student profile's details list was rebuilt so screen readers
+  pair each label and value, and the marketing site's small grey print, footer and amber badge
+  were darkened. Axe can't see behind text on the hero photo, so those two elements are checked by
+  eye instead (noted in the test).
 
 ## What isn't in v1 (kept for later)
 

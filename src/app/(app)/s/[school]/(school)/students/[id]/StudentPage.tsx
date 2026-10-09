@@ -17,9 +17,10 @@ import { formatDate, timeAgo } from "@/lib/time";
 import type { ActionResult, ArmOption, StudentDetail } from "@/data/types";
 import { STATUS_TONE, StatusDialog } from "../StudentsView";
 
-function Fact({ label, children }: { label: string; children: ReactNode }) {
+function Fact({ label, children, wide }: { label: string; children: ReactNode; wide?: boolean }) {
+  // A <div> per pair is the one wrapper a <dl> allows, so screen readers still pair each label and value.
   return (
-    <div className="grid gap-0.5">
+    <div className={wide ? "col-span-2 grid gap-0.5" : "grid gap-0.5"}>
       <dt className="text-[12.5px] text-text-secondary">{label}</dt>
       <dd className="font-medium">{children || <span className="font-normal text-text-muted">Not given</span>}</dd>
     </div>
@@ -83,9 +84,7 @@ export function StudentPage({
             <Fact label="Date of birth">{student.dateOfBirth && formatDate(student.dateOfBirth)}</Fact>
             <Fact label="Admission date">{student.admissionDate && formatDate(student.admissionDate)}</Fact>
             <Fact label="State of origin">{student.stateOfOrigin}</Fact>
-            <div className="col-span-2">
-              <Fact label="Address">{student.address}</Fact>
-            </div>
+            <Fact label="Address" wide>{student.address}</Fact>
           </dl>
         </Card>
 
@@ -95,9 +94,7 @@ export function StudentPage({
               <dl className="grid grid-cols-2 gap-4">
                 <Fact label="Name">{student.guardian.name}</Fact>
                 <Fact label="Phone">{student.guardian.phone && <a href={`tel:${student.guardian.phone}`} className="text-accent hover:underline">{displayNigerianPhone(student.guardian.phone)}</a>}</Fact>
-                <div className="col-span-2">
-                  <Fact label="Email">{student.guardian.email}</Fact>
-                </div>
+                <Fact label="Email" wide>{student.guardian.email}</Fact>
               </dl>
               {student.guardian.siblings.length > 0 && (
                 <div>

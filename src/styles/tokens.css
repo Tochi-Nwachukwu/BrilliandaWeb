@@ -18,8 +18,8 @@
 
   /* Text */
   --color-text-primary: #231E36;
-  --color-text-secondary: #6E6883;
-  --color-text-muted: #9993AE; /* decoration only: never an error or an instruction */
+  --color-text-secondary: #5A5470;
+  --color-text-muted: #6E6883; /* the faintest text; still 4.5:1 on every background (WCAG AA) */
 
   /* Primary action: deep ink */
   --color-primary: #231E36;
@@ -135,8 +135,8 @@
   --color-border-strong: #D6D6D4;
   --color-edge: #E3E3E1;
   --color-text-primary: #0B0B0C;
-  --color-text-secondary: #66666A;
-  --color-text-muted: #A0A0A4;
+  --color-text-secondary: #545458;
+  --color-text-muted: #6A6A6E;
   --color-primary: #0B0B0C;
   --color-primary-hover: #000000;
   --color-accent: #0B0B0C;

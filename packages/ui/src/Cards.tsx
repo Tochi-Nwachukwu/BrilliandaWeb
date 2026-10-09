@@ -37,7 +37,7 @@ export function StatCard({ href, icon, label, value, note, level, index = 0 }: {
         {note && <span className="truncate rounded-full bg-[color-mix(in_oklab,var(--color-surface)_72%,transparent)] px-2.5 py-1 text-xs font-semibold">{note}</span>}
       </span>
       <span>
-        <span className="block text-[13.5px] opacity-85">{label}</span>
+        <span className="block text-[13.5px]">{label}</span>
         <span className="mt-0.5 block text-[34px] font-medium leading-none tracking-[-0.03em] tabular-nums">{value}</span>
       </span>
     </Link>

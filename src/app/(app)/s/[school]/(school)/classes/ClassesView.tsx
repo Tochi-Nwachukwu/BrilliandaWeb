@@ -131,8 +131,8 @@ export function ClassesView({ structure, actions }: { structure: ClassStructure;
                                 {/* "JSS1 GOL" on a phone, "Gold" on a laptop (plan: short codes for tight screens). */}
                                 <span className="md:hidden">{armChip(level.short, name?.code ?? "", liveArms)}</span>
                                 <span className="hidden md:inline">{liveArms > 1 || arm.archived ? name?.name : "One arm"}</span>
-                                {arm.department && <span className="opacity-70">· {DEPARTMENT_LABEL[arm.department]}</span>}
-                                {arm.studentCount > 0 && <span className="opacity-70">· {arm.studentCount}</span>}
+                                {arm.department && <span className="font-normal">· {DEPARTMENT_LABEL[arm.department]}</span>}
+                                {arm.studentCount > 0 && <span className="font-normal">· {arm.studentCount}</span>}
                               </button>
                             </li>
                           );
