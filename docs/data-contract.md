@@ -99,3 +99,34 @@ Sample accounts: `owner@greenfield.ng`, `admin@greenfield.ng` (also an admin at 
 - Fake: classes, arms, subjects and students are always 0 until batches 6 to 9 add their fakes.
   Calendar-less sample schools for trying the checklist: `royalheights` (`owner@royalheights.ng`)
   and `kingsway` (`owner@kingsway.ng`).
+
+## The backend so far (read 8 October 2026, brillianda-backend `8287ba2`)
+
+The backend team built a **separate API** (Hono, `openapi.json` is the contract), not Server
+Actions inside this app — see their `docs/decisions.md`. What that means for us:
+
+- Our data functions stay the seam. When an endpoint is ready, the matching fake is replaced by a
+  call to the API through a generated client (`openapi-typescript` + `openapi-fetch`), and its
+  `{ error: { code, message, details[] } }` errors are turned into our `ActionResult`
+  (`validation_failed` details become `fieldErrors`).
+- Their `docs/frontend-integration.md` puts `proxy.ts` in this repo: it forwards `/api/*` on each
+  school's host to the API with a shared secret and maps the subdomain to `/s/[school]`. We add it
+  when the first real endpoint is wired.
+- Ready now: `GET /v1/school` (`PublicSchool`: id, name, subdomain, brandColor or null, logoUrl or
+  null), `GET /v1/me` (user, membership.role owner/admin, school), `POST /v1/auth/logout`.
+  Signup and sign-in are their next phase; calendar, classes, subjects and students after.
+- Shapes already agree: roles `owner`/`admin`; schools keep levels offered, state, phone, brand
+  colour; the address rule (3 to 30 characters, starts with a letter, no `--`) is the same.
+  Their brand colour can be null: we fall back to our violet.
+
+### Classes and arms (batch 6)
+
+| Function | Kind | Input / output | Used by | Status |
+|---|---|---|---|---|
+| `getClassStructure` | read | `subdomain` → `ClassStructure`: levels (ordered, with section), arm names (once per school, with codes), arms (level × arm name, department, archived, student count), and the levels offered at signup | Classes, Home | fake |
+| `setupClasses` | action | `school, classSetupSchema` (levels, arms with codes, arms per level) → `ActionResult<null>`; only while the school has no classes | quick setup | fake |
+| `renameLevel` · `addLevel` · `removeLevel` · `setLevelArchived` | action | `levelNameSchema` / `newLevelSchema`; removing is refused while any of its arms has students | Classes | fake |
+| `addArm` · `renameArmName` · `setArmDepartment` · `setArmArchived` · `removeArm` | action | an existing arm name or `armNameSchema`; a rename applies in every class; departments are for senior arms; removing is refused with students or for a class's only arm | Classes | fake |
+
+The ladder, naming schemes, default range from the levels offered, arm presets, codes and the
+preview sentence are pure functions in `packages/core/src/classes.ts`, with tests.

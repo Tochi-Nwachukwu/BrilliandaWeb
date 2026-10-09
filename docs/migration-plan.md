@@ -212,6 +212,10 @@ production returns "not found"). Notes:
 
 **Done when (plan's gate, front-end side):** JSS 1 to SS 3 with three flower-named arms produces 18 classes on a phone.
 
+**Done (9 October 2026).** The quick setup is two steps (classes, then arms) on the Classes tab
+until a school has classes; then the tab shows them by section in the old Classes page's style.
+Phone chips read "JSS1 GOL", the laptop shows full names. The plan's gate is a browser test.
+
 ### Batch 7: Subjects (Phase 3)
 
 - Screens for picking from the catalogue (NERDC 2025 and legacy tags), custom subjects, short

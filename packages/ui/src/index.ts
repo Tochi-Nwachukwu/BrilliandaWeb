@@ -19,6 +19,7 @@ export * from "./PasswordField";
 export * from "./ResponsiveDialog";
 export * from "./Ring";
 export * from "./Spinner";
+export * from "./Stepper";
 export * from "./Tabs";
 export * from "./TextField";
 export * from "./Toast";

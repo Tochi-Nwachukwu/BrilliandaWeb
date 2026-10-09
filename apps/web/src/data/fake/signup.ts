@@ -141,6 +141,7 @@ export async function createSchool(subdomain: string): Promise<ActionResult<{ su
   }
   user.schools.push({ subdomain: check.subdomain, role: "owner" });
   // Suggested dates for the session they said they start in; confirmed from the checklist.
+  store.profiles.set(check.subdomain, { levelsOffered: draft.school.levels, state: draft.school.state, phone: draft.school.phone });
   store.calendars.set(check.subdomain, { confirmed: false, startYear: draft.school.sessionStartYear, terms: defaultTerms(draft.school.sessionStartYear) });
   recordChange(check.subdomain, user.fullName, "Created the school");
 

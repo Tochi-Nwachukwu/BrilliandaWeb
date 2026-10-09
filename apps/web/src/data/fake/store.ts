@@ -2,7 +2,7 @@
 // replaces it (docs/data-contract.md). It resets when the dev server restarts. Kept on globalThis
 // so a hot reload in development doesn't wipe it.
 import "server-only";
-import { defaultTerms, type SchoolDetails, type Term } from "@brillianda/core";
+import { armCodes, ARM_PRESETS, buildLadder, defaultTerms, type Department, type SchoolDetails, type SchoolLevel, type Section, type Term } from "@brillianda/core";
 import type { SchoolSummary } from "../types";
 
 type FakeStore = {
@@ -17,7 +17,24 @@ type FakeStore = {
   checklistHidden: Set<string>;
   /** at <= 0 means "that many minutes before the first read" (see fake/home.ts). */
   changes: { id: string; subdomain: string; at: number; who: string; what: string }[];
+  /** What signup collected about each school that its pages don't show. */
+  profiles: Map<string, { levelsOffered: SchoolLevel[]; state: string; phone: string }>;
+  levels: { id: string; subdomain: string; key: string | null; name: string; short: string; section: Section; position: number; archived: boolean }[];
+  armNames: { id: string; subdomain: string; name: string; code: string; position: number }[];
+  arms: { id: string; subdomain: string; levelId: string; armNameId: string; department: Department | null; archived: boolean }[];
+  /** Filled in by batch 8 (students). Only what classes need for now. */
+  students: { id: string; subdomain: string; armId: string; status: string }[];
 };
+
+/** Greenfield's classes: JSS 1 to SS 3, three colour arms each. */
+function seedGreenfieldClasses() {
+  const levels = buildLadder("jss1", "ss3", "nigerian").map((l, i) => ({ id: `gl${i + 1}`, subdomain: "greenfield", key: l.key, name: l.name, short: l.short, section: l.section, position: i, archived: false }));
+  const names = ARM_PRESETS.colours.names.slice(0, 3);
+  const codes = armCodes([...names]);
+  const armNames = names.map((name, i) => ({ id: `gn${i + 1}`, subdomain: "greenfield", name, code: codes[i]!, position: i }));
+  const arms = levels.flatMap((level) => armNames.map((armName) => ({ id: `ga-${level.id}-${armName.id}`, subdomain: "greenfield", levelId: level.id, armNameId: armName.id, department: null, archived: false })));
+  return { levels, armNames, arms };
+}
 
 /** createdAt 0 means "sent just now"; filled in the first time it is read (see fake/auth.ts). */
 export type FakeInvite = { id: string; token: string; subdomain: string; fullName: string; email: string; createdAt: number; usedAt?: number };
@@ -36,6 +53,7 @@ export type FakeSignupDraft = {
 export type FakeUser = { id: string; fullName: string; email: string; password: string; phone?: string; schools: { subdomain: string; role: "owner" | "admin" }[] };
 
 function seed(): FakeStore {
+  const greenfield = seedGreenfieldClasses();
   return {
     schools: [
       { subdomain: "greenfield", name: "Greenfield College", status: "active", brandColor: "#4A3AA7", logoUrl: null },
@@ -43,6 +61,9 @@ function seed(): FakeStore {
       { subdomain: "closedschool", name: "Closed School", status: "suspended", brandColor: "#4A3AA7", logoUrl: null },
       { subdomain: "royalheights", name: "Royal Heights College", status: "active", brandColor: "#9A3B2E", logoUrl: null },
       { subdomain: "kingsway", name: "Kingsway Academy", status: "active", brandColor: "#0E6E8C", logoUrl: null },
+      // Empty schools the browser tests set up from scratch (one per screen size).
+      { subdomain: "brookfield", name: "Brookfield College", status: "active", brandColor: "#7A3E9D", logoUrl: null },
+      { subdomain: "cedarwood", name: "Cedarwood High School", status: "active", brandColor: "#2F5D8A", logoUrl: null },
     ],
     trialRequests: [],
     signupDrafts: new Map(),
@@ -52,6 +73,8 @@ function seed(): FakeStore {
       { id: "u3", fullName: "Ngozi Eze", email: "owner@surebloom.ng", password: "brillianda", schools: [{ subdomain: "surebloom", role: "owner" }] },
       { id: "u4", fullName: "Bayo Adeyemi", email: "owner@royalheights.ng", password: "brillianda", schools: [{ subdomain: "royalheights", role: "owner" }] },
       { id: "u5", fullName: "Funke Ade", email: "owner@kingsway.ng", password: "brillianda", schools: [{ subdomain: "kingsway", role: "owner" }] },
+      { id: "u6", fullName: "Emeka Nwosu", email: "owner@brookfield.ng", password: "brillianda", schools: [{ subdomain: "brookfield", role: "owner" }] },
+      { id: "u7", fullName: "Halima Musa", email: "owner@cedarwood.ng", password: "brillianda", schools: [{ subdomain: "cedarwood", role: "owner" }] },
     ],
     sessions: new Map(),
     invites: [
@@ -60,6 +83,18 @@ function seed(): FakeStore {
     links: new Map(),
     calendars: new Map([["greenfield", { confirmed: true, startYear: 2026, terms: defaultTerms(2026) }]]),
     checklistHidden: new Set(),
+    profiles: new Map([
+      ["greenfield", { levelsOffered: ["SECONDARY"], state: "Lagos", phone: "+2348030000001" }],
+      ["surebloom", { levelsOffered: ["PRIMARY", "SECONDARY"], state: "Oyo", phone: "+2348030000002" }],
+      ["royalheights", { levelsOffered: ["SECONDARY"], state: "Abuja", phone: "+2348030000003" }],
+      ["kingsway", { levelsOffered: ["NURSERY", "PRIMARY"], state: "Rivers", phone: "+2348030000004" }],
+      ["brookfield", { levelsOffered: ["SECONDARY"], state: "Enugu", phone: "+2348030000005" }],
+      ["cedarwood", { levelsOffered: ["SECONDARY"], state: "Kano", phone: "+2348030000006" }],
+    ]),
+    levels: greenfield.levels,
+    armNames: greenfield.armNames,
+    arms: greenfield.arms,
+    students: [],
     changes: [
       { id: "c1", subdomain: "greenfield", at: -60 * 24 * 9, who: "Amaka Obi", what: "Created the school" },
       { id: "c2", subdomain: "greenfield", at: -60 * 24 * 9 + 12, who: "Amaka Obi", what: "Set the 2026/2027 calendar" },

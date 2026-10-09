@@ -1,5 +1,5 @@
 // Shapes shared by every data function (docs/data-contract.md).
-import type { SchoolDetails, Term } from "@brillianda/core";
+import type { Department, SchoolDetails, SchoolLevel, Section, Term } from "@brillianda/core";
 
 /** What every write returns: the result, or a message for a person and errors under each field. */
 export type ActionResult<T> =
@@ -68,3 +68,11 @@ export type ChangeEntry = { id: string; at: number; who: string; what: string };
 
 /** The counts and recent changes on Home. */
 export type HomeSummary = { students: number; classes: number; arms: number; subjects: number; admins: number; recent: ChangeEntry[] };
+
+/** A class level on the school's ladder, e.g. JSS 1. */
+export type ClassLevel = { id: string; key: string | null; name: string; short: string; section: Section; position: number; archived: boolean };
+/** An arm name, kept once per school: renaming it renames it in every class. */
+export type ArmName = { id: string; name: string; code: string };
+/** One class: a level and an arm, e.g. JSS 1 Gold. */
+export type ClassArm = { id: string; levelId: string; armNameId: string; department: Department | null; archived: boolean; studentCount: number };
+export type ClassStructure = { levels: ClassLevel[]; armNames: ArmName[]; arms: ClassArm[]; levelsOffered: SchoolLevel[] };

@@ -50,9 +50,8 @@ export async function getSetupProgress(subdomain: string): Promise<SetupProgress
     hidden: store.checklistHidden.has(subdomain),
     items: [
       { id: "calendar", done: calendarOf(subdomain).confirmed },
-      // Classes, arms, subjects and students arrive with batches 6 to 9.
-      { id: "classes", done: false },
-      { id: "arms", done: false },
+      { id: "classes", done: store.levels.some((l) => l.subdomain === subdomain) },
+      { id: "arms", done: store.arms.some((a) => a.subdomain === subdomain) },
       { id: "subjects", done: false },
       { id: "students", done: false },
       { id: "admins", done: invited || teamSize(subdomain) > 1 },
@@ -75,5 +74,14 @@ export async function getHomeSummary(subdomain: string): Promise<HomeSummary | n
     .sort((a, b) => b.at - a.at)
     .slice(0, 6)
     .map(({ id, at, who, what }) => ({ id, at, who, what }));
-  return { students: 0, classes: 0, arms: 0, subjects: 0, admins: teamSize(subdomain), recent };
+  const arms = store.arms.filter((a) => a.subdomain === subdomain && !a.archived);
+  return {
+    students: store.students.filter((st) => st.subdomain === subdomain).length,
+    // A class is a level and an arm (plan: "JSS 1 to SS 3, three arms" makes 18 classes).
+    classes: arms.length,
+    arms: store.armNames.filter((a) => a.subdomain === subdomain).length,
+    subjects: 0,
+    admins: teamSize(subdomain),
+    recent,
+  };
 }
