@@ -1,8 +1,8 @@
 # Data contract: where the front end meets the backend
 
 The plan has no separate API: pages read in Server Components and save through Server Actions. So
-the front end and the backend meet at **typed functions in `apps/web/src/data`**. Screens call only
-these. Each one ships with a **fake implementation** in `apps/web/src/data/fake`, on sample data, so
+the front end and the backend meet at **typed functions in `src/data`**. Screens call only
+these. Each one ships with a **fake implementation** in `src/data/fake`, on sample data, so
 every screen works before the backend does. The backend teammate replaces each fake with the real
 thing; the screens don't change.
 

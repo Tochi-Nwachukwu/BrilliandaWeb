@@ -43,7 +43,7 @@ export function mix(a: string, b: string, amount: number): string {
   return rgbToHex([0, 1, 2].map((i) => x[i]! + (y[i]! - x[i]!) * amount) as Rgb);
 }
 
-// Our Pastel tokens the brand sits on (apps/web/src/styles/tokens.css).
+// Our Pastel tokens the brand sits on (src/styles/tokens.css).
 export const PAGE_BG = "#F4F2FA";
 export const SURFACE = "#FFFFFF";
 export const INK = "#231E36";

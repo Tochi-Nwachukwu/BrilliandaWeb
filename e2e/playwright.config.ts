@@ -28,7 +28,8 @@ export default defineConfig({
   // the tests check the app rather than the compiler. Port 3100 keeps clear of `pnpm dev`, and
   // BRILLIANDA_PLAYGROUND=1 keeps the /dev playground in this build only.
   webServer: {
-    command: "pnpm --filter web build && pnpm --filter web exec next start -p 3100",
+    command: "pnpm build && pnpm exec next start -p 3100",
+    cwd: "..",
     url: "http://localhost:3100",
     env: { BRILLIANDA_PLAYGROUND: "1" },
     reuseExistingServer: false,

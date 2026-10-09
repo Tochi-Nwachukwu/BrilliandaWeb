@@ -11,7 +11,7 @@ on a phone as easily as on a laptop.
 - **Earlier decisions:** [DECISIONS.md](DECISIONS.md)
 
 This repo is the front end. The backend (database, row-level security, login) is built separately
-and plugs in behind `apps/web/src/data`. Until then, every screen runs on clearly marked fake data.
+and plugs in behind `src/data`. Until then, every screen runs on clearly marked fake data.
 
 ## Run it
 
@@ -25,7 +25,7 @@ pnpm dev             # http://localhost:3000
 | Command | What it does |
 |---|---|
 | `pnpm test` | Unit tests (packages) |
-| `pnpm typecheck` | Type-check every package |
+| `pnpm typecheck` | Type-check the app and every package |
 | `pnpm lint` | Lint |
 | `pnpm build` | Production build |
 | `pnpm e2e` | Playwright flows at 360 and 1280 px |
@@ -33,14 +33,21 @@ pnpm dev             # http://localhost:3000
 ## Layout
 
 ```
-apps/web/          Next.js 16 app: the marketing site on brillianda.com, the school app on subdomains
-  src/app/         pages: (marketing)/ for the apex, s/[school]/ for each school
-  src/data/        the data layer: typed functions with fake implementations (fake/)
+src/               the Next.js 16 app (the repo root is the app): the marketing site and every school
+  app/             pages: (marketing)/ for brillianda.com, (app)/ for signup, sign-in and s/[school]/
+  data/            the data layer: typed functions with fake implementations (fake/)
 packages/core/     pure TypeScript: schemas, generators, admission numbers, spreadsheet rules
 packages/ui/       our components and the four responsive patterns
 packages/config/   shared TypeScript settings
 e2e/               Playwright flows
 design/            prototypes and drafts
 docs/              the plan, the migration plan, the data contract, the look book
-legacy/            the previous Vite app, kept running for comparison until every screen has moved
 ```
+
+## Deploying
+
+The repo root is a plain Next.js app, so importing it into Vercel needs no settings: the default
+Root Directory and the detected Next.js preset are right. Shared code in `packages/` is built
+with it.
+
+The previous Vite app is not in this repo any more; it is kept at the `vite-final` tag.

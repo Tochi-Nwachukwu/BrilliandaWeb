@@ -10,6 +10,7 @@ coverage/
 
 # Next.js and Turborepo
 .next/
+next-env.d.ts
 out/
 .turbo/
 *.tsbuildinfo

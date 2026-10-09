@@ -1,5 +1,6 @@
 {
   "name": "brillianda",
+  "version": "0.1.0",
   "private": true,
   "description": "Brillianda: school registry for Nigerian schools (front end). See docs/plan.md.",
   "packageManager": "pnpm@10.34.6",
@@ -7,14 +8,31 @@
     "node": ">=20.19"
   },
   "scripts": {
-    "dev": "turbo run dev --filter=web",
-    "build": "turbo run build",
-    "typecheck": "turbo run typecheck",
-    "lint": "turbo run lint",
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint",
+    "typecheck": "next typegen && tsc --noEmit && turbo run typecheck",
     "test": "turbo run test",
     "e2e": "pnpm --filter e2e e2e"
   },
+  "dependencies": {
+    "@brillianda/core": "workspace:*",
+    "@brillianda/ui": "workspace:*",
+    "next": "16.4.0",
+    "react": "19.3.0",
+    "react-dom": "19.3.0",
+    "server-only": "^0.0.1"
+  },
   "devDependencies": {
-    "turbo": "^2.11.7"
+    "@tailwindcss/turbopack": "^4",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "eslint": "^9",
+    "eslint-config-next": "16.4.0",
+    "tailwindcss": "^4",
+    "turbo": "^2.11.7",
+    "typescript": "^5.9.3"
   }
 }

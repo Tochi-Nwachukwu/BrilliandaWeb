@@ -258,6 +258,11 @@ one level at a time with Off / Compulsory / Elective on phone. The plan's gate i
 - Accessibility pass (WCAG 2.2 AA), Playwright flows for every screen at both sizes.
 - Retire `legacy/` once every screen is moved.
 
+**Done early (9 October 2026), so a plain Vercel import is one Next.js project with no settings:**
+`legacy/` is gone from the repo (the old code is at the `vite-final` tag and in the brillanda-v1
+folder), and the Next.js app moved from `apps/web` to the repo root. `packages/` and `e2e/` stay
+as workspaces. Mentions of `apps/web` and `legacy/` earlier in this plan describe how it was then.
+
 **Done when:** the speed and accessibility checks pass in CI.
 
 ## What isn't in v1 (kept for later)
