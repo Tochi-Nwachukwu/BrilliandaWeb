@@ -2,8 +2,9 @@
 // replaces it (docs/data-contract.md). It resets when the dev server restarts. Kept on globalThis
 // so a hot reload in development doesn't wipe it.
 import "server-only";
-import { armCodes, ARM_PRESETS, buildLadder, defaultTerms, type Department, type SchoolDetails, type SchoolLevel, type Section, type Term } from "@brillianda/core";
+import { armCodes, ARM_PRESETS, buildLadder, defaultLinks, defaultTerms, preTicked, type LinkKind, type Department, type SchoolDetails, type SchoolLevel, type Section, type Term } from "@brillianda/core";
 import type { SchoolSummary } from "../types";
+import { CATALOGUE } from "./catalogue";
 
 type FakeStore = {
   schools: SchoolSummary[];
@@ -24,7 +25,17 @@ type FakeStore = {
   arms: { id: string; subdomain: string; levelId: string; armNameId: string; department: Department | null; archived: boolean }[];
   /** Filled in by batch 8 (students). Only what classes need for now. */
   students: { id: string; subdomain: string; armId: string; status: string }[];
+  subjects: { id: string; subdomain: string; catalogueId: string | null; name: string; code: string; position: number }[];
+  subjectLinks: { subdomain: string; subjectId: string; levelId: string; kind: LinkKind; department: Department | null }[];
 };
+
+/** Greenfield's subjects: the 2025 junior and senior lists, attached by default. */
+function seedGreenfieldSubjects(levels: { id: string; key: string | null; section: Section }[]) {
+  const entries = CATALOGUE.filter((e) => preTicked(CATALOGUE, ["junior", "senior"]).includes(e.id));
+  const subjects = entries.map((e, i) => ({ id: `gs-${e.id}`, subdomain: "greenfield", catalogueId: e.id, name: e.name, code: e.code, position: i }));
+  const subjectLinks = defaultLinks(entries, levels).map((l) => ({ subdomain: "greenfield", subjectId: `gs-${l.entryId}`, levelId: l.levelId, kind: l.kind, department: l.department }));
+  return { subjects, subjectLinks };
+}
 
 /** Greenfield's classes: JSS 1 to SS 3, three colour arms each. */
 function seedGreenfieldClasses() {
@@ -54,6 +65,7 @@ export type FakeUser = { id: string; fullName: string; email: string; password: 
 
 function seed(): FakeStore {
   const greenfield = seedGreenfieldClasses();
+  const greenfieldSubjects = seedGreenfieldSubjects(greenfield.levels);
   return {
     schools: [
       { subdomain: "greenfield", name: "Greenfield College", status: "active", brandColor: "#4A3AA7", logoUrl: null },
@@ -95,6 +107,8 @@ function seed(): FakeStore {
     armNames: greenfield.armNames,
     arms: greenfield.arms,
     students: [],
+    subjects: greenfieldSubjects.subjects,
+    subjectLinks: greenfieldSubjects.subjectLinks,
     changes: [
       { id: "c1", subdomain: "greenfield", at: -60 * 24 * 9, who: "Amaka Obi", what: "Created the school" },
       { id: "c2", subdomain: "greenfield", at: -60 * 24 * 9 + 12, who: "Amaka Obi", what: "Set the 2026/2027 calendar" },

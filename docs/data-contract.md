@@ -130,3 +130,18 @@ Actions inside this app — see their `docs/decisions.md`. What that means for u
 
 The ladder, naming schemes, default range from the levels offered, arm presets, codes and the
 preview sentence are pure functions in `packages/core/src/classes.ts`, with tests.
+
+### Subjects (batch 7)
+
+| Function | Kind | Input / output | Used by | Status |
+|---|---|---|---|---|
+| `getSubjectsSetup` | read | `subdomain` → `SubjectsSetup`: the school's subjects (catalogue-linked or custom), their links to class levels (compulsory or elective, department), its levels, the NERDC bands it runs, and the catalogue | Subjects, Home | fake |
+| `addSubjects` | action | `school, addSubjectsSchema` (catalogue ids, own subjects with codes) → `ActionResult<{ added }>`; catalogue subjects attach to their default levels | Subjects | fake |
+| `renameSubject` | action | `subjectNameSchema`; stays linked to its catalogue entry | Subjects | fake |
+| `removeSubject` | action | `subjectId` → `ActionResult<null>` | Subjects | fake |
+| `setSubjectLink` | action | `subjectId, levelId, "compulsory" \| "elective" \| null` | Subjects grid / phone toggles | fake |
+| `setSubjectDepartment` | action | `subjectId, department \| null` for its senior electives | Subjects | fake |
+
+The catalogue copy is `src/data/fake/catalogue.ts` (57 entries: the plan's 2025 lists and the legacy
+subjects it names). The real one is platform data the backend seeds. The rules (bands, pre-ticks,
+default links, codes) are in `packages/core/src/subjects.ts`, with tests.

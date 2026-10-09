@@ -224,6 +224,11 @@ Phone chips read "JSS1 GOL", the laptop shows full names. The plan's gate is a b
 
 **Done when:** every class level in a fake demo school can have its subjects set on a phone.
 
+**Done (9 October 2026).** The first visit to Subjects shows the catalogue with the 2025 list
+ticked for the school's classes (legacy subjects on their own tab, own subjects added by name).
+After that: a grid of subjects against class levels on laptop (tap: compulsory, elective, off), and
+one level at a time with Off / Compulsory / Elective on phone. The plan's gate is a browser test.
+
 ### Batch 8: Students (Phase 4)
 
 - Today's Students list, enrol form and student page, moved.
