@@ -6,7 +6,7 @@ real partner schools taken with consent, or confirm model releases for images sh
 
 | File | Photographer | Source | Licence |
 |---|---|---|---|
-| classroom-students-uniform.jpg | Tosin Olowoleni | https://www.pexels.com/photo/african-students-focused-on-classroom-studies-34162714/ | Pexels License |
+| classroom-students-uniform.jpg | Gemini AI / Doug Linstedt base | Modernized classroom setting with contemporary desks, bright walls, and whiteboard | Commercial Free |
 | classroom-lagos.jpg | Doug Linstedt | https://unsplash.com/photos/children-sitting-on-chairs-inside-classroom-jEEYZsaxbH4 (Lagos, Nigeria) | Unsplash License |
 | teacher-marking-laptop.jpg | Katerina Holmes | https://www.pexels.com/photo/black-woman-typing-on-laptop-and-writing-5905849/ | Pexels License |
 | student-at-desk.jpg | Şeyhmus Kino | https://www.pexels.com/photo/young-african-students-in-classroom-setting-28593054/ | Pexels License |

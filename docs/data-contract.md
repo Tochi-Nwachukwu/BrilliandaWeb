@@ -55,6 +55,12 @@ Each batch adds its functions here. **Status:** `fake` (front end only) or `real
 
 ### Signing in and the team (batch 4)
 
+**Links in emails (12 October 2026):** the backend builds `/auth/magic?token=`, `/reset-password?token=`
+and `/invite?token=` on each school's address. Those paths forward to our pages
+(`/magic/<token>`, `/reset-password/<token>`, `/invite/<token>`), and the fakes now build the same
+links. Signup ends at `/auth/handover?token=` on the new address (the API's `handoverUrl`).
+What we've asked the backend for is in `docs/backend-asks.md`.
+
 About the `school` argument on these actions: in development pages live at `/s/<school>/…`, so the
 page passes the school it is on. The real actions must take the school from the request's host
 (`proxy.ts`) and ignore this argument, then check the person belongs to that school.
@@ -71,6 +77,7 @@ page passes the school it is on. The real actions must take the school from the 
 | `resetPassword` | action | `school, token, newPasswordSchema` → `ActionResult<null>`; ends every other session | reset password | fake |
 | `sendMagicLink` | action | `school, emailOnlySchema` → `ActionResult<SampleEmail>`; same answer either way; works once, 1 hour | email sign-in link | fake |
 | `signInWithLink` | action | `school, token` → `ActionResult<null>`; called by a button press, so link scanners can't spend it | email sign-in link | fake |
+| `completeHandover` | action | `school, token` → `ActionResult<null>`; the one-time pass from the end of signup (60 seconds, used once) becomes a session on the school's own address. Real: `POST /v1/auth/handover` | `/s/<school>/auth/handover?token=` | fake |
 | `findMySchool` | action | `emailOnlySchema` → `ActionResult<SampleEmail>`; emails a link to each school; never says whether the email exists | `/login` | fake |
 | `acceptInvite` | action | `school, token, { password, confirmation } or { password, hasAccount: true }` → `ActionResult<null>`; signs in | accept invite | fake |
 | `inviteAdmin` | action | `school, inviteAdminSchema` → `ActionResult<SampleEmail & { resent }>`; owner only; re-inviting the same email resends | Admins | fake |

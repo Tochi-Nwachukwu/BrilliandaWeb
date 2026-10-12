@@ -16,6 +16,8 @@ type FakeStore = {
   signupDrafts: Map<string, FakeSignupDraft>;
   users: FakeUser[];
   sessions: Map<string, { userId: string }>;
+  /** One-time passes from signup to the new school's address (60 seconds, used once). */
+  handovers: Map<string, { userId: string; subdomain: string; createdAt: number }>;
   invites: FakeInvite[];
   links: Map<string, FakeLink>;
   calendars: Map<string, { confirmed: boolean; startYear: number; terms: Term[] }>;
@@ -200,6 +202,7 @@ function seed(): FakeStore {
       { id: "u11", fullName: "Sola Ajayi", email: "owner@willowbank.ng", password: "brillianda", schools: [{ subdomain: "willowbank", role: "owner" }] },
     ],
     sessions: new Map(),
+    handovers: new Map(),
     invites: [
       { id: "i1", token: "demo-invite", subdomain: "greenfield", fullName: "Chidi Okeke", email: "chidi@greenfield.ng", createdAt: 0 },
     ],

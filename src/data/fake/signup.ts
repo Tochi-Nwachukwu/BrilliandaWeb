@@ -12,7 +12,6 @@ import { recordChange } from "./changes";
 import { store, type FakeSignupDraft } from "./store";
 
 const COOKIE = "brillianda_signup";
-const SESSION_COOKIE = "brillianda_session";
 
 async function draftId(create: boolean): Promise<string | null> {
   const jar = await cookies();
@@ -138,12 +137,12 @@ export async function createSchool(subdomain: string): Promise<ActionResult<{ su
   store.calendars.set(check.subdomain, { confirmed: false, startYear: draft.school.sessionStartYear, terms: defaultTerms(draft.school.sessionStartYear) });
   recordChange(check.subdomain, user.fullName, "Created the school");
 
-  // Signed straight in. For real this is a one-time token exchanged on the new subdomain.
+  // Signed in on the new address, not here: a sign-in on brillianda.com doesn't carry over to
+  // <school>.brillianda.com, so a one-time pass does (the real API's handoverUrl).
   const token = crypto.randomUUID();
-  store.sessions.set(token, { userId: user.id });
-  jar.set({ name: SESSION_COOKIE, value: token, httpOnly: true, sameSite: "lax", path: "/" });
+  store.handovers.set(token, { userId: user.id, subdomain: check.subdomain, createdAt: Date.now() });
   store.signupDrafts.delete(id!);
   jar.delete(COOKIE);
 
-  return { ok: true, data: { subdomain: check.subdomain, url: `/s/${check.subdomain}` } };
+  return { ok: true, data: { subdomain: check.subdomain, url: `/s/${check.subdomain}/auth/handover?token=${token}` } };
 }

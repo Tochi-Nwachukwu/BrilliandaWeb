@@ -119,7 +119,7 @@ export const SITE_BODY = String.raw`<!-- First visit only. After that this eleme
               /photos/classroom-students-uniform-1600.webp 1600w
             "
             sizes="100vw"
-            alt="Secondary school students in uniform during a lesson"
+            alt="Pupils in uniform at modern desks in a bright classroom"
             width="1600"
             height="1067"
             loading="lazy"

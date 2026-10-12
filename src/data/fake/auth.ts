@@ -66,7 +66,8 @@ export async function signOut(): Promise<void> {
 function makeLink(kind: "reset" | "magic", user: FakeUser, subdomain: string): string {
   const token = crypto.randomUUID();
   store.links.set(token, { kind, userId: user.id, subdomain, createdAt: Date.now() });
-  return kind === "reset" ? `/s/${subdomain}/reset-password/${token}` : `/s/${subdomain}/magic/${token}`;
+  // The backend's link format (their docs/frontend-integration.md): the token in the query.
+  return kind === "reset" ? `/s/${subdomain}/reset-password?token=${token}` : `/s/${subdomain}/auth/magic?token=${token}`;
 }
 
 /** Always answers the same way, so it can't be used to find out who has an account. */
@@ -196,7 +197,7 @@ export async function inviteAdmin(subdomain: string, fullName: string, email: st
     store.invites.push({ id: crypto.randomUUID(), token, subdomain, fullName, email, createdAt: Date.now() });
   }
   recordChange(subdomain, owner.fullName, pending ? `Sent ${fullName} a fresh invite` : `Invited ${fullName} as an admin`);
-  return { ok: true, data: { resent: !!pending, sampleLinks: [{ label: "Open the invite link", href: `/s/${subdomain}/invite/${token}` }] } };
+  return { ok: true, data: { resent: !!pending, sampleLinks: [{ label: "Open the invite link", href: `/s/${subdomain}/invite?token=${token}` }] } };
 }
 
 export async function cancelInvite(subdomain: string, inviteId: string): Promise<ActionResult<null>> {
@@ -214,5 +215,19 @@ export async function removeAdmin(subdomain: string, userId: string): Promise<Ac
   if (!user || roleIn(user, subdomain) !== "admin") return { ok: false, error: "Only admins can be removed. Ownership moves in a later version." };
   user.schools = user.schools.filter((s) => s.subdomain !== subdomain);
   recordChange(subdomain, owner.fullName, `Removed ${user.fullName} as an admin`);
+  return { ok: true, data: null };
+}
+
+export const HANDOVER_SECONDS = 60;
+
+/** End of signup: the new school's address trades a one-time pass (made by createSchool) for a session. */
+export async function exchangeHandover(subdomain: string, token: string): Promise<ActionResult<null>> {
+  const pass = store.handovers.get(token);
+  store.handovers.delete(token);
+  const user = pass && store.users.find((u) => u.id === pass.userId);
+  if (!pass || !user || pass.subdomain !== subdomain || Date.now() - pass.createdAt > HANDOVER_SECONDS * 1000) {
+    return { ok: false, error: "This link has expired. Sign in with the email and password you just chose." };
+  }
+  await startSession(user);
   return { ok: true, data: null };
 }

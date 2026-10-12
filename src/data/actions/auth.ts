@@ -51,6 +51,11 @@ export async function signInWithLink(school: string, token: string): Promise<Act
   return impl.signInWithLink(school, String(token));
 }
 
+/** The new school's address after signup: trades the one-time pass for a session there. */
+export async function completeHandover(school: string, token: string): Promise<ActionResult<null>> {
+  return impl.exchangeHandover(school, String(token));
+}
+
 /** brillianda.com/login: emails links to each of the person's schools. Never says whether the email has an account. */
 export async function findMySchool(input: unknown): Promise<ActionResult<SampleEmail>> {
   const parsed = emailOnlySchema.safeParse(input);
