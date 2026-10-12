@@ -50,4 +50,9 @@ The repo root is a plain Next.js app, so importing it into Vercel needs no setti
 Root Directory and the detected Next.js preset are right. Shared code in `packages/` is built
 with it.
 
+School addresses: add `brillianda.com` and the wildcard `*.brillianda.com` to the Vercel
+project's domains; `src/proxy.ts` does the rest. Nothing else needs setting until the backend
+is connected, then `API_URL` and `API_PROXY_SECRET` (the API's `PROXY_SHARED_SECRET`). `ROOT_DOMAIN`
+only if schools live somewhere other than `brillianda.com`, such as a staging domain.
+
 The previous Vite app is not in this repo any more; it is kept at the `vite-final` tag.

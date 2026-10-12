@@ -51,9 +51,11 @@ and in the brillanda-v1 folder, for reference only.
 - **Next.js 16 differs from older versions.** Read `node_modules/next/dist/docs/` before
   writing Next-specific code (routing, caching, fonts, Server Actions).
 - `cacheComponents` is on: request-time data needs a Suspense boundary; read the caching docs.
-- `proxy.ts` (renamed middleware) will map `surebloom.brillianda.com` to `/s/surebloom` and forward
-  `/api/*` to the backend API (their docs/frontend-integration.md). Until it exists, open
-  `/s/<school>/…` directly in development.
+- `src/proxy.ts` (renamed middleware) maps `surebloom.brillianda.com/…` to `/s/surebloom/…` and forwards
+  `/api/*` to the backend API (their docs/frontend-integration.md). The rules are in
+  `packages/core/src/hosts.ts`, with tests. In development open `http://greenfield.localhost:3000`
+  (Chrome needs no setup), or `/s/<school>/…` on plain localhost, which still works. In-app links
+  still use `/s/<school>/…`; on a school's own address those work too, for that school only.
 - Tailwind v4 runs through `@tailwindcss/turbopack`; theme tokens are in CSS (`@theme`), not a JS config.
   Workspace packages need an `@source` line so their classes are found.
 - Screens use `AppShell` from `src/components/shell`. The look (Pastel or Neutral) lives in

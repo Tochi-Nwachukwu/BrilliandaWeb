@@ -110,8 +110,13 @@ Actions inside this app — see their `docs/decisions.md`. What that means for u
   `{ error: { code, message, details[] } }` errors are turned into our `ActionResult`
   (`validation_failed` details become `fieldErrors`).
 - Their `docs/frontend-integration.md` puts `proxy.ts` in this repo: it forwards `/api/*` on each
-  school's host to the API with a shared secret and maps the subdomain to `/s/[school]`. We add it
-  when the first real endpoint is wired.
+  school's host to the API with a shared secret and maps the subdomain to `/s/[school]`. **Built
+  (12 October 2026):** `src/proxy.ts`, rules in `packages/core/src/hosts.ts`. It sets
+  `x-forwarded-host`, `x-forwarded-proto`, `x-forwarded-for` and `x-brillianda-proxy-secret` on API
+  calls, strips any of those a browser sends, and sets `x-brillianda-school` (the school whose
+  address the request came in on) for our own server code; the real data functions should read
+  the school from there instead of the `school` argument. Until `API_URL` and `API_PROXY_SECRET`
+  are set, `/api/*` answers 503 `api_unavailable`.
 - Ready now: `GET /v1/school` (`PublicSchool`: id, name, subdomain, brandColor or null, logoUrl or
   null), `GET /v1/me` (user, membership.role owner/admin, school), `POST /v1/auth/logout`.
   Signup and sign-in are their next phase; calendar, classes, subjects and students after.
