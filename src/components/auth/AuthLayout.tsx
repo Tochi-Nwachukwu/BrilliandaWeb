@@ -38,46 +38,55 @@ const STEPS = [
   { title: "Every student, in one place", detail: "Import your list from Excel or Word." },
 ];
 
-/** Wide screens only. Everything on it is CSS and text, so it costs nothing to load. */
+/** Where each card floats over the photo, and how its drift is timed. Scattered, not a staircase. */
+const FLOAT = [
+  { at: "left-0 top-[4%]", motion: "[animation-duration:7s]" },
+  { at: "right-0 top-[38%]", motion: "[animation-delay:-2.4s] [animation-duration:8s]" },
+  { at: "left-[6%] bottom-[2%]", motion: "[animation-delay:-4.6s] [animation-duration:9s]" },
+];
+
+/**
+ * Wide screens only. The school courtyard photo, faded into the panel colour, with the three steps
+ * floating over it. A CSS background, so phones (which never show the panel) never download it.
+ */
 async function BrandPanel() {
   return (
-    <aside className="sticky top-0 hidden h-dvh flex-col justify-between overflow-y-auto bg-panel p-12 text-primary-text lg:flex">
+    <aside className="sticky top-0 isolate hidden h-dvh flex-col overflow-hidden bg-panel p-12 text-primary-text lg:flex">
+      <div aria-hidden className="absolute inset-0 -z-20 bg-cover bg-center opacity-45" style={{ backgroundImage: "url(/photos/school-courtyard-736.webp)" }} />
+      {/* Darker at the top and bottom, where the words are. */}
+      <div aria-hidden className="absolute inset-0 -z-10 bg-[linear-gradient(180deg,color-mix(in_oklab,var(--color-panel)_70%,transparent),transparent_30%,transparent_55%,color-mix(in_oklab,var(--color-panel)_92%,transparent)_85%)]" />
+
       <AuthWordmark className="self-start focus-visible:ring-offset-panel" />
+
+      <ol className="relative my-8 min-h-[300px] flex-1">
+        {STEPS.map((step, index) => (
+          <li
+            key={step.title}
+            className={cx(
+              "absolute flex w-[min(21rem,82%)] animate-[bob_7s_ease-in-out_infinite] items-center gap-4 rounded-2xl border border-white/15 bg-[color-mix(in_oklab,var(--color-panel)_62%,transparent)] p-4 shadow-[0_24px_48px_-24px_rgba(0,0,0,0.6)] backdrop-blur-md",
+              FLOAT[index]!.at,
+              FLOAT[index]!.motion,
+            )}
+          >
+            <span aria-hidden className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-white/20 font-display text-base font-medium text-panel-accent">
+              {index + 1}
+            </span>
+            <span>
+              <span className="block text-sm font-medium">{step.title}</span>
+              <span className="mt-0.5 block text-sm text-[color-mix(in_oklab,var(--color-primary-text)_80%,transparent)]">{step.detail}</span>
+            </span>
+          </li>
+        ))}
+      </ol>
 
       <div>
         <p className="flex items-center gap-2 text-xs font-medium uppercase tracking-[0.14em] text-panel-accent">
           <span aria-hidden className="h-1.5 w-1.5 rounded-full bg-panel-accent" />
           For Nigerian schools
         </p>
-        <p className="mt-5 max-w-[15em] font-display text-[40px] font-medium leading-[1.1] tracking-tight">
-          Your whole school, set up in an afternoon.
-        </p>
-        <ol className="mt-12 space-y-3">
-          {STEPS.map((step, index) => (
-            <li
-              key={step.title}
-              className={cx(
-                "flex max-w-[22rem] items-center gap-4 rounded-xl border border-panel-edge bg-panel-raised p-4",
-                index === 1 && "ml-10",
-                index === 2 && "ml-20",
-              )}
-            >
-              <span
-                aria-hidden
-                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-panel-edge font-display text-base font-medium text-panel-accent"
-              >
-                {index + 1}
-              </span>
-              <span>
-                <span className="block text-sm font-medium">{step.title}</span>
-                <span className="mt-0.5 block text-sm text-panel-muted">{step.detail}</span>
-              </span>
-            </li>
-          ))}
-        </ol>
+        <p className="mt-4 max-w-[15em] font-display text-[40px] font-medium leading-[1.1] tracking-tight">Your whole school, set up in an afternoon.</p>
+        <p className="mt-8 text-sm text-[color-mix(in_oklab,var(--color-primary-text)_78%,transparent)]">© {await currentYear()} Brillianda</p>
       </div>
-
-      <p className="text-sm text-panel-muted">© {await currentYear()} Brillianda</p>
     </aside>
   );
 }
@@ -120,7 +129,7 @@ export function AuthLayout({
   school?: AuthSchool;
 }) {
   return (
-    <div className="min-h-dvh lg:grid lg:grid-cols-[5fr_7fr]">
+    <div className="min-h-dvh lg:grid lg:grid-cols-[6fr_7fr]">
       {school ? <SchoolPanel school={school} /> : <BrandPanel />}
       <main className="flex min-h-dvh flex-col items-center justify-center px-4 py-12 lg:px-16">
         <div className="w-full max-w-[400px] animate-lift">
