@@ -41,9 +41,9 @@ export default function MarketingLayout({ children }: LayoutProps<"/">) {
         <link
           rel="preload"
           as="image"
-          href="/photos/classroom-lagos-960.webp"
-          imageSrcSet="/photos/classroom-lagos-480.webp 480w, /photos/classroom-lagos-960.webp 960w, /photos/classroom-lagos-1600.webp 1600w"
-          imageSizes="100vw"
+          href="/photos/students-sky-1600.webp"
+          imageSrcSet="/photos/students-sky-480.webp 480w, /photos/students-sky-960.webp 960w, /photos/students-sky-1600.webp 1600w, /photos/students-sky-2400.webp 2400w"
+          imageSizes="(max-aspect-ratio: 16/9) 200vh, 100vw"
         />
       </head>
       <body className="is-loading">{children}</body>

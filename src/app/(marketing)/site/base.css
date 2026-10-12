@@ -419,11 +419,23 @@ a {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  /* Keeps the three faces in frame when a tall phone screen crops the sides. */
+  object-position: 52% 38%;
 }
 .hero-veil {
   position: absolute;
   inset: 0;
-  background: linear-gradient(180deg, rgba(10, 11, 12, 0.58), rgba(10, 11, 12, 0.32) 45%, rgba(10, 11, 12, 0.84));
+  /* The photo is bright (white shirts, blue sky), so the words sit on a darker lower band, and on
+     wide screens a darker left side, while the faces stay bright. */
+  background:
+    linear-gradient(90deg, rgba(10, 11, 12, 0.5), rgba(10, 11, 12, 0) 62%),
+    linear-gradient(180deg, rgba(10, 11, 12, 0.5), rgba(10, 11, 12, 0.18) 32%, rgba(10, 11, 12, 0.72) 62%, rgba(10, 11, 12, 0.9));
+}
+@media (max-width: 700px) {
+  /* On a phone the words cover most of the picture, so the lower band starts higher. */
+  .hero-veil {
+    background: linear-gradient(180deg, rgba(10, 11, 12, 0.45), rgba(10, 11, 12, 0.2) 25%, rgba(10, 11, 12, 0.78) 52%, rgba(10, 11, 12, 0.92));
+  }
 }
 .hero-in {
   position: relative;

@@ -38,7 +38,18 @@ export function HistoryView({ school, log, filter, now }: { school: string; log:
     const text = params.toString();
     return text ? `?${text}` : "";
   };
-  const go = (patch: Record<string, string | number | undefined>) => startTransition(() => router.replace(`${base}${query(patch)}`, { scroll: false }));
+  // Starts from the address as it is now, not from `filter`: right after "Clear filters" the page
+  // hasn't caught up yet, and a search typed then would bring the cleared filters back.
+  const go = (patch: Record<string, string | number | undefined>) => {
+    const params = new URLSearchParams(window.location.search);
+    params.delete("show");
+    for (const [key, value] of Object.entries(patch)) {
+      if (value === undefined || value === "") params.delete(key);
+      else params.set(key, String(value));
+    }
+    const text = params.toString();
+    startTransition(() => router.replace(`${base}${text ? `?${text}` : ""}`, { scroll: false }));
+  };
 
   // Search as you type, a moment after the typing stops.
   useEffect(() => {

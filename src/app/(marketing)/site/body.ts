@@ -35,16 +35,17 @@ export const SITE_BODY = String.raw`<!-- First visit only. After that this eleme
         <div class="hero-media">
           <div class="inner">
             <img
-              src="/photos/classroom-lagos-960.webp"
+              src="/photos/students-sky-1600.webp"
               srcset="
-                /photos/classroom-lagos-480.webp   480w,
-                /photos/classroom-lagos-960.webp   960w,
-                /photos/classroom-lagos-1600.webp 1600w
+                /photos/students-sky-480.webp   480w,
+                /photos/students-sky-960.webp   960w,
+                /photos/students-sky-1600.webp 1600w,
+                /photos/students-sky-2400.webp 2400w
               "
-              sizes="100vw"
-              alt="Students at their desks in a Nigerian classroom"
+              sizes="(max-aspect-ratio: 16/9) 200vh, 100vw"
+              alt="Three smiling students in school uniform, one holding a camcorder, under a blue sky"
               width="1600"
-              height="1067"
+              height="893"
               fetchpriority="high"
             />
           </div>

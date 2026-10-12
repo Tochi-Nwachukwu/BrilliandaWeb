@@ -329,6 +329,12 @@ the same, when their phase comes:
 
 ## Where the look will change, on purpose
 
+- **Hero photo (12 October 2026, user decision):** the marketing hero now uses the generated image of
+  three students under a blue sky (`brillanda-v1/design/images/Gemini_Generated_Image_…jpg`, as
+  `public/photos/students-sky-*.webp`). This replaces decision D-10's "real photographs only" for
+  the hero, which the old image notes cite as the reason it was first left out. The veil is darker
+  low down and on the left so the words read over the white shirts.
+
 Everything else should match the look book. These change because the plan changes them:
 
 - **Home:** today it leads with results progress. v1 has no results, so Home shows the setup
