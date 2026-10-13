@@ -950,9 +950,13 @@ table.doc td {
 /* ---------- how a term runs ---------- */
 .setup {
   display: grid;
-  grid-template-columns: 1fr 1.02fr;
-  gap: 56px;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr);
+  gap: clamp(40px, 6vw, 88px);
   align-items: center;
+}
+/* The last step closes with a rule, like the ones between steps. */
+.setup > div:first-child {
+  border-bottom: 1px solid var(--rule);
 }
 .sitem {
   display: flex;
@@ -986,6 +990,16 @@ table.doc td {
   background: var(--surface);
   box-shadow: var(--shadow-card);
 }
+/* The photo keeps its own shape (it was stretched to its height attribute), a little wider than
+   3:2 so the card stays level with the steps beside it. */
+.setup-vis img {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 16 / 10;
+  object-fit: cover;
+  object-position: 60% 45%;
+}
 .setup-note {
   display: flex;
   gap: 9px;
@@ -1001,7 +1015,19 @@ table.doc td {
 @media (max-width: 940px) {
   .setup {
     grid-template-columns: 1fr;
-    gap: 34px;
+    gap: 40px;
+  }
+}
+@media (max-width: 560px) {
+  .sitem {
+    gap: 14px;
+    padding: 18px 0;
+  }
+  .sitem h3 {
+    font-size: 17px;
+  }
+  .setup-note {
+    margin: 14px 16px 16px;
   }
 }
 
