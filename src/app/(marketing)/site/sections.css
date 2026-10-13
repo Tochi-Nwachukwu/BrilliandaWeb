@@ -955,8 +955,11 @@ table.doc td {
   align-items: center;
 }
 /* The last step closes with a rule, like the ones between steps. */
-.setup > div:first-child {
+.setup .steps {
   border-bottom: 1px solid var(--rule);
+}
+.setup .ehead {
+  margin-bottom: 40px;
 }
 .sitem {
   display: flex;

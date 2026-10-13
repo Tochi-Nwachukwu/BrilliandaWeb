@@ -392,14 +392,16 @@ export const SITE_BODY = String.raw`<!-- First visit only. After that this eleme
 
       <!-- ============ how a term runs ============ -->
       <section class="wrap sec" id="term">
-        <div class="ehead">
-          <span class="lbl"><i class="d"></i>Getting started</span>
-          <h2 class="lm"><span>From sign-up to a full register in an afternoon.</span></h2>
-          <p class="fu">A checklist on your home screen walks you through it. Do the steps in any order, and stop whenever you like.</p>
-        </div>
-
+        <!-- The heading sits in the left column with the steps, so that column and the card beside it
+             line up top and bottom. -->
         <div class="setup">
-          <div>
+          <div class="setup-copy">
+            <div class="ehead">
+              <span class="lbl"><i class="d"></i>Getting started</span>
+              <h2 class="lm"><span>From sign-up to a full register in an afternoon.</span></h2>
+              <p class="fu">A checklist on your home screen walks you through it. Do the steps in any order, and stop whenever you like.</p>
+            </div>
+            <div class="steps">
             <div class="sitem fu">
               <span class="sn">01</span>
               <div>
@@ -435,6 +437,7 @@ export const SITE_BODY = String.raw`<!-- First visit only. After that this eleme
                   Import your list or add them one by one. Invite an admin to share the work.
                 </p>
               </div>
+            </div>
             </div>
           </div>
 
