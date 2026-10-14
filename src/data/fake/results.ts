@@ -52,7 +52,7 @@ export function subjectsForArm(subdomain: string, armId: string) {
     .sort((a, b) => a.subject.position - b.subject.position);
 }
 
-function rowsOf(term: string, armId: string, subjectId: string) {
+export function rowsOf(term: string, armId: string, subjectId: string) {
   return studentsIn(armId).map((s) => {
     const scores: Record<string, { value: number; isAbsent: boolean }> = {};
     for (const sc of store.scores) if (sc.term === term && sc.armId === armId && sc.subjectId === subjectId && sc.studentId === s.id) scores[sc.componentId] = { value: sc.value, isAbsent: sc.isAbsent };
@@ -66,7 +66,7 @@ function rowsOf(term: string, armId: string, subjectId: string) {
   });
 }
 
-function statusOf(subdomain: string, term: string, armId: string, subjectId: string): { status: SheetStatus; complete: number; of: number } {
+export function statusOf(subdomain: string, term: string, armId: string, subjectId: string): { status: SheetStatus; complete: number; of: number } {
   const progress = sheetProgress(rowsOf(term, armId, subjectId), settingsOf(subdomain).components);
   if (store.completeSheets.some((c) => c.term === term && c.armId === armId && c.subjectId === subjectId)) return { status: "complete", ...progress };
   const any = store.scores.some((s) => s.term === term && s.armId === armId && s.subjectId === subjectId);
@@ -78,25 +78,31 @@ const openRequest = (term: string, armId: string, subjectId: string): UnlockRequ
   return r ? { id: r.id, by: r.by, reason: r.reason, at: r.at } : null;
 };
 
-/** Sample results for Greenfield's JSS 1 Blue: most subjects complete, Mathematics part-way, English Studies not started. */
-function seedResults() {
+/**
+ * Sample results for Greenfield: JSS 1 Blue mostly complete (Mathematics part-way, English Studies
+ * not started), and JSS 2 Blue with every subject complete, ready to publish.
+ */
+export function seedResults() {
   if (store.resultsSeeded) return;
   store.resultsSeeded = true;
   const term = resultsTermOf("greenfield");
   if (!term) return;
-  const armId = "ga-gl1-gn1";
-  const pupils = studentsIn(armId);
-  subjectsForArm("greenfield", armId).forEach(({ subject }, si) => {
-    if (subject.id === "gs-english-studies") return;
-    const partial = subject.id === "gs-mathematics";
-    pupils.forEach((p, pi) => {
-      if (partial && pi >= Math.ceil(pupils.length / 2)) return;
-      const base = 38 + ((si * 7 + pi * 11) % 50);
-      const parts = { ca1: Math.round((base / 100) * 20), ca2: Math.round(((base + 6) / 100) * 20), exam: Math.round((Math.min(base + 3, 100) / 100) * 60) };
-      for (const [componentId, value] of Object.entries(parts)) store.scores.push({ term: term.key, armId, subjectId: subject.id, studentId: p.id, componentId, value: Math.min(value, componentId === "exam" ? 60 : 20), isAbsent: false });
+  const fill = (armId: string, skip: (subjectId: string) => "none" | "half" | "all") => {
+    const pupils = studentsIn(armId);
+    subjectsForArm("greenfield", armId).forEach(({ subject }, si) => {
+      const how = skip(subject.id);
+      if (how === "none") return;
+      pupils.forEach((p, pi) => {
+        if (how === "half" && pi >= Math.ceil(pupils.length / 2)) return;
+        const base = 38 + ((si * 7 + pi * 11) % 50);
+        const parts = { ca1: Math.round((base / 100) * 20), ca2: Math.round(((base + 6) / 100) * 20), exam: Math.round((Math.min(base + 3, 100) / 100) * 60) };
+        for (const [componentId, value] of Object.entries(parts)) store.scores.push({ term: term.key, armId, subjectId: subject.id, studentId: p.id, componentId, value: Math.min(value, componentId === "exam" ? 60 : 20), isAbsent: false });
+      });
+      if (how === "all") store.completeSheets.push({ term: term.key, armId, subjectId: subject.id, by: "Sample teacher", at: Date.now() - 86_400_000 });
     });
-    if (!partial) store.completeSheets.push({ term: term.key, armId, subjectId: subject.id, by: "Sample teacher", at: Date.now() - 86_400_000 });
-  });
+  };
+  fill("ga-gl1-gn1", (id) => (id === "gs-english-studies" ? "none" : id === "gs-mathematics" ? "half" : "all"));
+  fill("ga-gl2-gn1", () => "all");
 }
 
 /** Who may work on a sheet: admins always; the subject's teacher for that arm. */

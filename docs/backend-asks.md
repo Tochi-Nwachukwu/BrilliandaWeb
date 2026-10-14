@@ -109,3 +109,13 @@ and the daily register"). When you build them, these are the shapes the screens 
   lock for the teacher; unlock requests with a reason, which admins approve or decline.
 - Electives: a student can be marked as not taking one, which removes them from that sheet.
 - Please compute totals with `packages/core/src/grading.ts` (same as the first app's F-32).
+
+## 8. Results: broadsheet, remarks, ratings, publishing (added 14 October 2026)
+
+- Remarks per student per term: the class teacher's (form teacher or admin) and the principal's
+  (admin), up to 300 characters.
+- Behaviour ratings: per-school settings (on or off, a list of traits); a 1 to 5 value per
+  student, trait and term.
+- Publishing per arm and term, only when every subject's sheet is complete; it can be taken
+  back. Parents see results only for published arms.
+- Report card data as `ReportCardData` in `src/data/types.ts`.

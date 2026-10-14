@@ -53,3 +53,13 @@ describe("sheets and class results", () => {
     expect(results.get("d")).toEqual({ average: null, subjects: 0, position: null });
   });
 });
+
+describe("rating settings", () => {
+  it("needs traits when on, and no repeats", async () => {
+    const { ratingSettingsSchema, DEFAULT_TRAITS } = await import("./results");
+    expect(ratingSettingsSchema.safeParse({ enabled: true, traits: DEFAULT_TRAITS }).success).toBe(true);
+    expect(ratingSettingsSchema.safeParse({ enabled: true, traits: [] }).success).toBe(false);
+    expect(ratingSettingsSchema.safeParse({ enabled: false, traits: [] }).success).toBe(true);
+    expect(ratingSettingsSchema.safeParse({ enabled: true, traits: ["Neatness", "neatness"] }).success).toBe(false);
+  });
+});

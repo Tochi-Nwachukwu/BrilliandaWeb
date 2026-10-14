@@ -33,7 +33,12 @@ async function Teacher({ params, children }: { params: Promise<{ school: string 
 
   const nav: NavItem[] = [
     { href: `${base}/teach`, label: "Today", icon: "home", exact: true },
-    ...(isFormTeacher ? [{ href: `${base}/teach/register`, label: "Register", icon: "check" } as NavItem] : []),
+    ...(isFormTeacher
+      ? ([
+          { href: `${base}/teach/register`, label: "Register", icon: "check" },
+          { href: `${base}/teach/class`, label: "My class", short: "Class", icon: "results" },
+        ] as NavItem[])
+      : []),
     { href: `${base}/teach/subjects`, label: "My subjects", short: "Subjects", icon: "subjects" },
   ];
 

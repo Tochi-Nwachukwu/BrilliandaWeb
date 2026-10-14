@@ -301,6 +301,18 @@ API should use too, so a total never depends on where it was worked out.
 | `requestUnlock` | action | `armId, subjectId, { reason }` (5 to 200 characters) | the teacher | fake |
 | `resolveUnlock` | action | `armId, subjectId, approve` → reopens (with or without a request), or declines one | owner, admin | fake |
 
+### Results: broadsheet, remarks, ratings, publishing, report cards (batch 15, after v1)
+
+| Function | Kind | Input / output | Who | Status |
+|---|---|---|---|---|
+| `getBroadsheet` | read | `armId` → `Broadsheet`: subjects with status; each student's cells (total and grade, `excluded`, or null), average, position (when shown); published | admins; the form teacher (read) | fake |
+| `getClassReports` | read | `armId` → remarks and ratings per student, and the school's rating traits | admins; the form teacher | fake |
+| `saveRemark` | action | `armId, studentId, kind` (`teacher` or `principal`), `{ text }` up to 300 characters; empty clears it | teacher remark: form teacher or admin; principal: admin | fake |
+| `saveRating` | action | `armId, studentId, { trait, value }` (1 to 5, or null) | form teacher or admin | fake |
+| `getRatingSettings`, `saveRatingSettings` | read, action | `{ enabled, traits }` (`ratingSettingsSchema`) | owner, admin | fake |
+| `setPublished` | action | `armId, publish`; publishing needs every subject complete | owner, admin | fake |
+| `getReportCard` | read | `studentId` → `ReportCardData` | admins; the student's form teacher (parents in batch 16, once published) | fake |
+
 ### Installable app (batch 10)
 
 The service worker (`public/sw.js`) and its page (`/offline`) live at the root of every school

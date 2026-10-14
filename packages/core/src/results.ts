@@ -123,3 +123,27 @@ export function classResults(
   for (const [id, position] of rankScores(ranked, mode)) out.get(id)!.position = position;
   return out;
 }
+
+// ——— Batch 15: remarks, behaviour ratings ———
+
+/** User decision (5 Oct 2026): ratings are optional, and each school chooses its traits. */
+export const DEFAULT_TRAITS = ["Punctuality", "Neatness", "Attentiveness", "Politeness", "Teamwork"];
+export const RATING_LABELS = ["Poor", "Fair", "Good", "Very good", "Excellent"] as const;
+
+export const ratingSettingsSchema = z
+  .object({
+    enabled: z.boolean(),
+    traits: z.array(z.string().trim().min(1, "Name this trait").max(30, "Use at most 30 characters")).max(12, "Use at most 12 traits"),
+  })
+  .superRefine((s, ctx) => {
+    if (s.enabled && s.traits.length === 0) ctx.addIssue({ code: "custom", path: ["traits"], message: "Add at least one trait, or turn ratings off" });
+    const seen = new Set<string>();
+    s.traits.forEach((t, i) => {
+      if (seen.has(t.toLowerCase())) ctx.addIssue({ code: "custom", path: ["traits", i], message: "Two traits can’t share a name" });
+      seen.add(t.toLowerCase());
+    });
+  });
+export type RatingSettings = z.infer<typeof ratingSettingsSchema>;
+
+export const remarkSchema = z.object({ text: z.string().trim().max(300, "Use at most 300 characters") });
+export const ratingSchema = z.object({ trait: z.string().min(1), value: z.number().int().min(1).max(5).nullable() });

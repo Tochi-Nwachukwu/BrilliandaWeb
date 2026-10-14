@@ -77,3 +77,54 @@ test("an admin changes the grading scale; parts stay fixed once scores are in", 
   await page.getByRole("button", { name: "Save settings" }).click();
   await expect(page.getByText("Results settings saved").locator("visible=true").first()).toBeVisible();
 });
+
+test("broadsheet, remarks and ratings, a report card, and publishing a class", { tag: "@both" }, async ({ page }, testInfo) => {
+  test.setTimeout(120_000);
+  await signIn(page, "owner@greenfield.ng");
+  await expect(page).toHaveURL(/\/s\/greenfield$/);
+
+  // JSS 1 Blue isn't finished, so it can't be published yet.
+  await open(page, "/s/greenfield/results/ga-gl1-gn1/broadsheet");
+  await expect(page.getByRole("table")).toBeVisible();
+  await expect(page.getByRole("button", { name: "Publish results" })).toBeDisabled();
+
+  // Remarks and a rating for the first student (each screen size writes its own words).
+  const words = testInfo.project.name === "phone" ? "A steady term from the phone." : "A steady term from the laptop.";
+  await open(page, "/s/greenfield/results/ga-gl1-gn1/remarks");
+  const first = page.getByRole("listitem").filter({ has: page.getByText("Class teacher’s remark") }).first();
+  const name = (await first.locator("b").first().textContent())!.trim();
+  await first.getByLabel("Class teacher’s remark").fill(words);
+  await first.getByLabel("Principal’s remark").click();
+  await expect(page.getByText("Saved.", { exact: false })).toBeVisible();
+  await first.locator('label[title="Very good"]').first().click();
+  await expect(first.getByLabel("4, Very good").first()).toBeChecked();
+
+  // The report card shows it, with attendance and the grade key.
+  await open(page, "/s/greenfield/results/ga-gl1-gn1/broadsheet");
+  await page.getByRole("link", { name }).click();
+  await expect(page.getByText(words)).toBeVisible();
+  await expect(page.getByText(/Present \d+ of \d+ school days/)).toBeVisible();
+  await expect(page.getByText(/Grades: A 70\+ Excellent/)).toBeVisible();
+  await expect(page.getByRole("button", { name: "Print or save as PDF" })).toBeVisible();
+
+  // JSS 2 Blue is complete: publish it, then take it back (phone only, so the runs don't race).
+  if (testInfo.project.name === "phone") {
+    await open(page, "/s/greenfield/results/ga-gl2-gn1");
+    await page.getByRole("button", { name: "Publish results" }).click();
+    await expect(page.getByText("JSS 2 Blue results published").locator("visible=true")).toBeVisible();
+    await expect(page.getByText("Published", { exact: true })).toBeVisible();
+    await page.getByRole("button", { name: "Take back results" }).click();
+    await expect(page.getByText("JSS 2 Blue results taken back").locator("visible=true")).toBeVisible();
+  }
+});
+
+test("a form teacher sees their class's broadsheet and writes the class teacher's remark only", async ({ page }) => {
+  await signIn(page, "teacher@greenfield.ng");
+  await expect(page).toHaveURL(/\/teach$/);
+  await open(page, "/s/greenfield/teach/class");
+  await expect(page.getByRole("heading", { name: "My class: JSS 1 Blue" })).toBeVisible();
+  await expect(page.getByRole("table")).toBeVisible();
+  await open(page, "/s/greenfield/teach/class?tab=remarks");
+  await expect(page.getByLabel("Class teacher’s remark").first()).toBeVisible();
+  await expect(page.getByLabel("Principal’s remark")).toHaveCount(0);
+});

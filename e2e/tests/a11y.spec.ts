@@ -64,19 +64,26 @@ const SCHOOL = [
   "/results",
   "/results/ga-gl1-gn1",
   "/results/ga-gl1-gn1/gs-mathematics",
+  "/results/ga-gl1-gn1/broadsheet",
+  "/results/ga-gl1-gn1/remarks",
+  "/results/ga-gl1-gn1/report/st1",
   "/more/results",
 ];
 
-test("every screen inside a school passes the accessibility scan", { tag: "@both" }, async ({ page }) => {
-  test.setTimeout(180_000);
-  await signIn(page);
-  for (const path of SCHOOL) await test.step(path || "home", () => scan(page, `/s/greenfield${path}`));
+// Split in three so they run side by side: one long scan of every screen outran the time limit.
+const GROUPS = {
+  "setup and students": [...SCHOOL.slice(0, 7), "/students/st1", "/students/st1/edit"],
+  "more and registers": SCHOOL.slice(7, 15),
+  results: SCHOOL.slice(15),
+};
 
-  // One sample student's profile and edit screen (st1 is Greenfield's first seeded student).
-  const href = "/s/greenfield/students/st1";
-  await test.step("student profile", () => scan(page, href));
-  await test.step("edit student", () => scan(page, `${href}/edit`));
-});
+for (const [group, paths] of Object.entries(GROUPS)) {
+  test(`school screens (${group}) pass the accessibility scan`, { tag: "@both" }, async ({ page }) => {
+    test.setTimeout(150_000);
+    await signIn(page);
+    for (const path of paths) await test.step(path || "home", () => scan(page, `/s/greenfield${path}`));
+  });
+}
 
 test("a teacher's screens pass the accessibility scan", { tag: "@both" }, async ({ page }) => {
   test.setTimeout(120_000);
@@ -85,7 +92,7 @@ test("a teacher's screens pass the accessibility scan", { tag: "@both" }, async 
   await page.getByLabel("Password", { exact: true }).fill("brillianda");
   await page.getByRole("button", { name: "Sign in", exact: true }).click();
   await expect(page).toHaveURL(/\/teach$/);
-  for (const path of ["/teach", "/teach/register", "/teach/subjects"]) await test.step(path, () => scan(page, `/s/greenfield${path}`));
+  for (const path of ["/teach", "/teach/register", "/teach/subjects", "/teach/class"]) await test.step(path, () => scan(page, `/s/greenfield${path}`));
 });
 
 test("a parent's screens pass the accessibility scan", { tag: "@both" }, async ({ page }) => {

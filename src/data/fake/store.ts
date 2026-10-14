@@ -44,6 +44,11 @@ type FakeStore = {
   exclusions: { term: string; armId: string; subjectId: string; studentId: string }[];
   unlockRequests: { id: string; term: string; armId: string; subjectId: string; by: string; reason: string; at: number; status: "open" | "approved" | "declined" }[];
   resultsSeeded: boolean;
+  /** Batch 15: behaviour ratings (off unless a school turns them on), remarks, ratings, published classes. */
+  ratingSettings: Map<string, { enabled: boolean; traits: string[] }>;
+  remarks: { term: string; studentId: string; kind: "teacher" | "principal"; text: string; by: string; at: number }[];
+  ratings: { term: string; studentId: string; trait: string; value: number }[];
+  publishedArms: { term: string; armId: string; by: string; at: number }[];
   /** Batch 12: a parent's account and the guardian record it belongs to (their children). */
   parentLinks: { userId: string; guardianId: string }[];
   /** Sample registers are made on first read, from that day's date (see fake/teaching.ts). */
@@ -297,6 +302,11 @@ function seed(): FakeStore {
     exclusions: [],
     unlockRequests: [],
     resultsSeeded: false,
+    // Greenfield rates behaviour, to show it; other schools start with ratings off.
+    ratingSettings: new Map([["greenfield", { enabled: true, traits: ["Punctuality", "Neatness", "Attentiveness", "Politeness", "Teamwork"] }]]),
+    remarks: [],
+    ratings: [],
+    publishedArms: [],
     parentLinks: [{ userId: "u14", guardianId: sampleGuardian.id }],
     registersSeeded: false,
     // The sample schools come with their colours chosen; the test schools are as fresh from signup.

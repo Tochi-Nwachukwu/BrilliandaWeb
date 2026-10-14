@@ -91,3 +91,19 @@
     transition-delay: 0ms !important;
   }
 }
+
+/* Printing a report card: only the card, on white, without the app around it. */
+@media print {
+  body:has(.report-card) * {
+    visibility: hidden;
+  }
+  body:has(.report-card) .report-card,
+  body:has(.report-card) .report-card * {
+    visibility: visible;
+  }
+  body:has(.report-card) .report-card {
+    position: absolute;
+    inset: 0 0 auto 0;
+    background: #fff;
+  }
+}

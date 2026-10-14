@@ -335,3 +335,53 @@ export type ResultsOverview = {
   arms: { armId: string; label: string; sheets: number; complete: number; inProgress: number }[];
   requests: (UnlockRequest & { armId: string; armLabel: string; subjectId: string; subjectName: string })[];
 };
+
+// ——— Results: broadsheet, remarks, ratings, publishing, report cards (batch 15) ———
+
+export type SubjectCell = { total: number; grade: string } | "excluded" | null;
+
+/** A class's broadsheet: every student against every subject, with average and position. */
+export type Broadsheet = {
+  term: ResultsTerm;
+  armId: string;
+  armLabel: string;
+  showPositions: boolean;
+  subjects: { id: string; name: string; code: string; status: SheetStatus }[];
+  rows: { studentId: string; fullName: string; admissionNo: string; cells: Record<string, SubjectCell>; average: number | null; position: number | null }[];
+  allComplete: boolean;
+  published: { by: string; at: number } | null;
+  /** Owners and admins can publish; the form teacher only reads. */
+  canPublish: boolean;
+};
+
+/** Remarks and ratings for a class, to fill in. */
+export type ClassReports = {
+  term: ResultsTerm;
+  armId: string;
+  armLabel: string;
+  ratings: { enabled: boolean; traits: string[] };
+  /** Admins write both remarks; the form teacher writes the class teacher's remark and ratings. */
+  canWritePrincipal: boolean;
+  rows: { studentId: string; fullName: string; teacherRemark: string; principalRemark: string; ratings: Record<string, number> }[];
+};
+
+/** One student's report card for a term. */
+export type ReportCardData = {
+  school: { name: string; logoUrl: string | null; brandColor: string };
+  term: ResultsTerm;
+  student: { id: string; fullName: string; admissionNo: string; armLabel: string };
+  components: { id: string; name: string; maxScore: number }[];
+  subjects: { name: string; scores: Record<string, { value: number; isAbsent: boolean } | null>; total: number | null; grade: string | null; remark: string | null }[];
+  average: number | null;
+  position: number | null;
+  of: number;
+  showPositions: boolean;
+  attendance: AttendanceSummary;
+  ratings: { trait: string; value: number | null }[];
+  teacherRemark: string | null;
+  principalRemark: string | null;
+  formTeacher: string | null;
+  nextTermBegins: string | null;
+  scale: { minScore: number; grade: string; remark: string; isPass: boolean }[];
+  published: boolean;
+};

@@ -373,6 +373,18 @@ parents see results.
   the teacher; they ask to unlock with a reason; admins unlock or decline. A Results tab for
   admins (each class's progress, requests waiting); Subjects moved into More.
 
+#### Batch 15: Broadsheet, remarks, ratings, publishing and report cards
+
+- **Done:** each class has three tabs for admins: Subjects (its sheets), Broadsheet (students
+  against subjects: total and grade, average, position when shown) and Remarks (class teacher's
+  and principal's remarks; behaviour ratings 1 to 5 when the school turns them on in Results
+  settings, with its own traits). Publish a class once every subject is complete, or take it
+  back. Report cards per student: parts, total, grade and remark per subject, average and
+  position, attendance from the register, ratings, remarks, next term's start and the grade
+  key; printing shows only the card (save as PDF from the browser). Form teachers get My class:
+  their class's broadsheet, report cards, the class teacher's remark and ratings (not the
+  principal's).
+
 ## What isn't in v1 (kept for later)
 
 Built today but "after v1" in the plan. Their code stays in `legacy/` and moves across, looking
