@@ -20,9 +20,7 @@ test("a school's own address shows its pages and keeps it signed in", { tag: "@b
   // The school's own app manifest.
   await page.goto(at("greenfield", "/manifest.webmanifest"));
   await expect(page.locator("body")).toContainText('"name":"Greenfield College"');
-});
 
-test("another school's pages and the API on a school's address", async ({ page }) => {
   // Another school's pages aren't served here.
   const other = await page.goto(at("greenfield", "/s/surebloom/login"));
   expect(other?.status()).toBe(404);

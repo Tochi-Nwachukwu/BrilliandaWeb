@@ -39,7 +39,9 @@ test("the whole history, narrowed by person, words and dates", async ({ page }) 
   await expect(page.getByText("Nothing matches")).toBeVisible();
 });
 
-test("one student's history, and the CSV download", async ({ page }) => {
+test("one student's history, and the CSV download (for the school's own people only)", async ({ page }) => {
+  // Before signing in, the download is refused.
+  expect((await page.request.get("/s/greenfield/more/history/export")).status()).toBe(403);
   await signIn(page);
   await open(page, "/s/greenfield/more/history?student=st1");
   await expect(page.getByText("Only changes to")).toBeVisible();
@@ -53,9 +55,4 @@ test("one student's history, and the CSV download", async ({ page }) => {
   expect(text.split("\r\n")[0]).toBe("When (Lagos time),Who,What,Student");
   expect(text).toContain("Created the school");
   expect(text).not.toContain("Joined as an admin");
-});
-
-test("the history is for the school's own people only", async ({ page }) => {
-  const csv = await page.request.get("/s/greenfield/more/history/export");
-  expect(csv.status()).toBe(403);
 });

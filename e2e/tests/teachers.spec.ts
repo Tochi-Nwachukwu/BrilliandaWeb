@@ -85,11 +85,8 @@ test("an admin invites a teacher, gives them a class and a subject, and they joi
   await zara.reload();
   await expect(zara.getByText("JSS 2 Gold").first()).toBeVisible();
   await expect(zara.getByText("English Studies")).toBeVisible();
-});
 
-test("admins see today's registers and a student's attendance", async ({ page }) => {
-  await signIn(page, "owner@greenfield.ng");
-  await expect(page).toHaveURL(/\/s\/greenfield$/);
+  // Admins open any class's register, and see a student's attendance.
   await open(page, "/s/greenfield/classes/register/ga-gl1-gn1");
   await expect(page.getByRole("heading", { name: "Register: JSS 1 Blue" })).toBeVisible();
   await expect(page.getByLabel("Day")).toBeVisible();

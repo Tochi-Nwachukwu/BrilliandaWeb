@@ -12,9 +12,6 @@ async function signIn(page: Page, school: string) {
   await expect(page).toHaveURL(new RegExp(`/s/${school}$`));
 }
 
-// Both tests edit the same school, so they run one after the other.
-test.describe.configure({ mode: "serial" });
-
 const card = (page: Page, name: string) => page.getByRole("listitem", { name, exact: true });
 
 test("rename, add, reorder and choose classes for arms, then save once", { tag: "@both" }, async ({ page }, testInfo) => {
@@ -24,6 +21,21 @@ test("rename, add, reorder and choose classes for arms, then save once", { tag: 
   await open(page, `/s/${school}/classes`);
   await page.getByRole("link", { name: "Edit arms" }).first().click();
   await expect(page).toHaveURL(/\/classes\/arms$/);
+
+  // Every class keeps at least one arm: take them all out of JSS 2 (no students there), then try to
+  // save. The editor streams in after the page is marked ready, so each click is retried until it takes.
+  for (const item of await page.getByRole("listitem").filter({ has: page.getByLabel("Arm name") }).all()) {
+    const jss2 = item.getByRole("button", { name: /JSS2/ });
+    await expect(async () => {
+      if ((await jss2.getAttribute("aria-pressed")) === "true") await jss2.click();
+      await expect(jss2).toHaveAttribute("aria-pressed", "false", { timeout: 1000 });
+    }).toPass();
+  }
+  await expect(page.getByText("JSS 2 has no arm. Every class needs at least one.")).toBeVisible();
+  await page.getByRole("button", { name: "Save arms" }).click();
+  await expect(page.getByText("Give JSS 2 at least one arm.")).toBeVisible();
+  // Nothing was saved: start the real edit from a fresh page.
+  await open(page, `/s/${school}/classes/arms`);
   await expect(page.getByText("2 arms, 6 classes in all")).toBeVisible();
 
   // The arm with a student can't be deleted, and its class can't be unticked.
@@ -62,22 +74,4 @@ test("rename, add, reorder and choose classes for arms, then save once", { tag: 
   await expect(arms("JSS 3")).toHaveCount(2);
   const chips = page.getByRole("button", { name: /^Purple PUR|^Blue BLU|^Yellow YEL/ });
   await expect(chips.first()).toHaveText(/Purple/);
-});
-
-test("every class keeps at least one arm", async ({ page }, testInfo) => {
-  const school = testInfo.project.name === "phone" ? "elmwood" : "willowbank";
-  await signIn(page, school);
-  await open(page, `/s/${school}/classes/arms`);
-  // Take every arm out of JSS 2 (none of them has students there).
-  // The editor streams in after the page is marked ready, so each click is retried until it takes.
-  for (const item of await page.getByRole("listitem").filter({ has: page.getByLabel("Arm name") }).all()) {
-    const jss2 = item.getByRole("button", { name: /JSS2/ });
-    await expect(async () => {
-      if ((await jss2.getAttribute("aria-pressed")) === "true") await jss2.click();
-      await expect(jss2).toHaveAttribute("aria-pressed", "false", { timeout: 1000 });
-    }).toPass();
-  }
-  await expect(page.getByText("JSS 2 has no arm. Every class needs at least one.")).toBeVisible();
-  await page.getByRole("button", { name: "Save arms" }).click();
-  await expect(page.getByText("Give JSS 2 at least one arm.")).toBeVisible();
 });
