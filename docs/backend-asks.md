@@ -5,6 +5,37 @@ From the front end, 12 October 2026, after reading the `revamp/v1-backend` branc
 find-school and invitation endpoints match our screens closely. Three things would let us connect
 them fully.
 
+## Where things stand (updated 14 October 2026)
+
+**Asks 1 to 3 are done.** Thank you: `sessionStart` on signup, `GET` and `DELETE /v1/members`,
+and the test address `https://api-rouge-nine-18.vercel.app`. We've kept them below for the record.
+
+**Covered by your 42 endpoints:** signup, sign-in (password, magic link, handover), password
+reset, find my school, invitations, members, the current session and its terms, the setup
+checklist, Home, and classes and arms.
+
+**Built on our side with no endpoint yet** (each one runs on fake data that we swap for your
+endpoint once it exists):
+
+| Area | Ask | Our function list |
+|---|---|---|
+| Subjects | 11 | `docs/data-contract.md`, "Subjects (batch 7)" |
+| Students, guardians, admission numbers | 11 | "Students (batch 8)" |
+| Importing students from a spreadsheet | 11 | "Import (batch 9)" |
+| Branding: school name, colour, logo upload | 11 | "Branding (after batch 10)" |
+| Change history and its CSV | 11 | "Change history (after batch 10)" |
+| Trial requests from the marketing site | 11 | the first table, `requestTrial` |
+| Teachers and the daily register | 4 | "Teachers and the daily register (batch 11)" |
+| Parents | 5 | "Parents (batch 12)" |
+| The team console | 6 | "The team console (batch 13)" |
+| Results: score entry | 7 | "Results: score entry (batch 14)" |
+| Broadsheet, remarks, ratings, publishing, report cards | 8 | batches 15 and 16 |
+| Closing a term | 9 | "Running the school year: closing a term (batch 17)" |
+| Promotion | 10 | "Promotion (batch 18)" |
+
+The rules behind most of these (checks, grading, positions, suggestions) are pure functions in
+`packages/core` with tests. Please reuse them, or match them, so the two sides agree.
+
 ## 1. Signup step 1: the school's first session
 
 **What we need:** `POST /v1/signup/school` to accept when the school's year starts, and
@@ -135,3 +166,56 @@ and the daily register"). When you build them, these are the shapes the screens 
 - Completing it in the session's last term: close that term, move students to the next class in
   the same arm name where it exists, mark the final class graduated, record class history, and
   start the next session. Please use `packages/core/src/promotion.ts` for the suggestions.
+
+## 11. Screens from v1 that have no endpoint yet (added 14 October 2026)
+
+These are v1 screens, built before the after-v1 groups above. The inputs and outputs of each
+function are in `docs/data-contract.md`, under the heading named.
+
+**Subjects** ("Subjects (batch 7)"):
+
+- The platform's subject catalogue (we keep a copy of 57 entries in `src/data/fake/catalogue.ts`;
+  the real one is platform data you seed).
+- A school's subjects: add from the catalogue or its own (with a code), rename, remove.
+- Link a subject to a class level as compulsory or elective, and set a department for senior
+  electives. Rules: `packages/core/src/subjects.ts`.
+
+**Students and guardians** ("Students (batch 8)"):
+
+- List, view, add, edit and soft-delete students; move several to another arm; change status
+  (active, suspended, withdrawn, transferred, graduated). Keep a class history per student.
+- Guardians shared between siblings: look one up by phone number when adding a student.
+- Admission numbers: a per-school format (`{YEAR}` and `{NUMBER}`, with a digit count) and a
+  per-school counter; a blank admission number takes the next one; duplicates refused.
+- Student photos need file storage (see Branding); not built on our side yet.
+
+**Import** ("Import (batch 9)"):
+
+- Check up to 5,000 rows on the server (rules: `packages/core/src/studentImport.ts`), then write
+  the ready rows under one batch id, updating or skipping duplicate admission numbers.
+- Undo a batch within 24 hours if none of its students was edited since.
+- Remember the school's column mapping, and list its last five imports. The browser reads the
+  file itself (Excel, CSV, Word), so the API only receives rows.
+
+**Branding** ("Branding (after batch 10)"), owner only:
+
+- Change the school's name and brand colour (`brandingSchema` in core).
+- Upload a logo (PNG or JPEG, at most 512 px and 300 KB; please re-check type and size) and
+  remove it. Store it privately and return a short-lived signed URL as `logoUrl`. Tell us the
+  storage host so we can allow it in our Content Security Policy.
+
+**Change history** ("Change history (after batch 10)"):
+
+- An append-only record of every write: who, what, when, and the student when there is one.
+- A list endpoint filtered on the server by person, search text, date range (Lagos days, both
+  ends included) and student, newest first. We'd also like a CSV export of the same filters (up
+  to 1,000 lines, cells escaped against spreadsheet formulas), or we can build it from the list.
+
+**Trial requests** (first table, `requestTrial`):
+
+- A public endpoint for the marketing site's trial form (rules: `validateTrialRequest` in core).
+  A filled honeypot field (`website`) should be accepted silently and dropped. The team console
+  lists these with a status (ask 6).
+
+**Invitation roles:** `POST /v1/invitations` takes a role, but only `admin` is accepted today. We
+need `teacher` (ask 4) and `parent` with a `guardianId` (ask 5).
