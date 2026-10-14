@@ -126,6 +126,7 @@ export async function createSchool(subdomain: string): Promise<ActionResult<{ su
   if (!check.available) return { ok: false, error: check.message, fieldErrors: { subdomain: [check.message] } };
 
   store.schools.push({ subdomain: check.subdomain, name: draft.school.schoolName, status: "active", brandColor: "#4A3AA7", logoUrl: null });
+  store.schoolMeta.set(check.subdomain, { createdAt: Date.now() });
   let user = store.users.find((u) => u.email === draft.owner!.email);
   if (!user) {
     user = { id: crypto.randomUUID(), fullName: draft.owner.fullName, email: draft.owner.email, password: draft.owner.password, schools: [] };

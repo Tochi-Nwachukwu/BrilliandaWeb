@@ -91,3 +91,12 @@ and the daily register"). When you build them, these are the shapes the screens 
   with an email who aren't invited yet; end a guardian's access.
 - What a parent sees per child: class, admission number, form teacher, attendance this term, and
   the last ten school days' marks. Not the register's notes.
+
+## 6. The team console (added 14 October 2026)
+
+- Team accounts separate from school accounts, signing in at `brillianda.com/console`.
+- Reading a school's summary writes an entry to that school's change history (your plan's
+  safeguard: staff access is logged and shown to the school). Summaries are counts and contacts,
+  never a student's own record.
+- Pausing and reactivating a school with a reason the school can see; trial requests stored
+  with a status (new, contacted, converted, declined) and a team note.

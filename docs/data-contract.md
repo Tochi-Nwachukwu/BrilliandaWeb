@@ -263,6 +263,24 @@ functions refuse them.
 `getStudent`'s guardian gains `parentAccess`. Invitations carry `role: "parent"` and the
 `guardianId` they link to.
 
+### The team console (batch 13, after v1)
+
+Team accounts are separate from school accounts (their own sign-in and cookie, scoped to
+`/console`). Every function below refuses anyone who isn't signed in as the team.
+
+| Function | Kind | Input / output | Used by | Status |
+|---|---|---|---|---|
+| `teamSignIn`, `teamSignOut` | action | `{ email, password }` | `/console/login` | fake |
+| `getTeamMember` | read | → `TeamMember` or null | console layout | fake |
+| `getConsoleOverview` | read | → `ConsoleOverview`: schools active, paused and new this week; students; trial requests waiting; newest schools; recent activity | Overview | fake |
+| `listConsoleSchools` | read | → `ConsoleSchool[]`: status, owner, students, classes, setup progress, joined | Schools | fake |
+| `getConsoleSchool` | read | `subdomain` → `ConsoleSchoolDetail`: contacts, counts, setup, last status change. **Writes to that school's change history** (at most once an hour per person) | School summary | fake |
+| `setSchoolStatus` | action | `subdomain`, `active` or `suspended`, `reason` (3 to 200 characters) → recorded in the school's history and the team log | School summary | fake |
+| `listTrialRequests` | read | → `TrialRequestRow[]`, newest first | Trial requests | fake |
+| `setTrialStatus` | action | `id`, `new`/`contacted`/`converted`/`declined`, `note` | Trial requests | fake |
+
+The trial form (`requestTrial`) now stores typed requests with a status.
+
 ### Installable app (batch 10)
 
 The service worker (`public/sw.js`) and its page (`/offline`) live at the root of every school

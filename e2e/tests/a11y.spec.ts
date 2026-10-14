@@ -93,3 +93,13 @@ test("a parent's screens pass the accessibility scan", { tag: "@both" }, async (
   await expect(page).toHaveURL(/\/family$/);
   await scan(page, "/s/greenfield/family");
 });
+
+test("the team console passes the accessibility scan", { tag: "@both" }, async ({ page }) => {
+  test.setTimeout(120_000);
+  await scan(page, "/console/login");
+  await page.getByLabel("Email").fill("team@brillianda.com");
+  await page.getByLabel("Password", { exact: true }).fill("brillianda");
+  await page.getByRole("button", { name: "Sign in", exact: true }).click();
+  await expect(page).toHaveURL(/\/console$/);
+  for (const path of ["/console", "/console/schools", "/console/schools/greenfield", "/console/trials"]) await test.step(path, () => scan(page, path));
+});

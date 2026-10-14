@@ -12,7 +12,13 @@ import { CATALOGUE } from "./catalogue";
 
 type FakeStore = {
   schools: SchoolSummary[];
-  trialRequests: Record<string, unknown>[];
+  trialRequests: FakeTrialRequest[];
+  /** Batch 13: the Brillianda team, their sessions, and what the console knows about each school. */
+  teamUsers: { id: string; fullName: string; email: string; password: string }[];
+  teamSessions: Map<string, { teamUserId: string }>;
+  schoolMeta: Map<string, { createdAt: number; statusNote?: { status: "active" | "suspended"; reason: string; by: string; at: number } }>;
+  /** What the team did, for the console's activity list. */
+  teamLog: { at: number; who: string; what: string; subdomain?: string }[];
   signupDrafts: Map<string, FakeSignupDraft>;
   users: FakeUser[];
   sessions: Map<string, { userId: string }>;
@@ -158,6 +164,23 @@ function seedArmsTestSchool(subdomain: string, student: FakeStudent) {
   return { levels, armNames, arms, students: [pupil] };
 }
 
+/** A trial request from the marketing site, and where the team is with it. `at` <= 0 is "minutes before the first read". */
+export type FakeTrialRequest = {
+  id: string;
+  at: number;
+  schoolName: string;
+  contactName: string;
+  role: string;
+  email: string;
+  phone: string;
+  studentCount: number;
+  state?: string;
+  interests: string[];
+  message?: string;
+  status: "new" | "contacted" | "converted" | "declined";
+  note?: string;
+};
+
 /** createdAt 0 means "sent just now"; filled in the first time it is read (see fake/auth.ts). */
 export type FakeInvite = { id: string; token: string; subdomain: string; fullName: string; email: string; createdAt: number; usedAt?: number; role?: "admin" | "teacher" | "parent"; /** Parent invites: the guardian record they become. */ guardianId?: string };
 /** Password reset and email sign-in links. */
@@ -198,8 +221,24 @@ function seed(): FakeStore {
       { subdomain: "pinecrest", name: "Pinecrest School", status: "active", brandColor: "#4A3AA7", logoUrl: null },
       { subdomain: "elmwood", name: "Elmwood College", status: "active", brandColor: "#0E6E8C", logoUrl: null },
       { subdomain: "willowbank", name: "Willowbank College", status: "active", brandColor: "#7A1F35", logoUrl: null },
+      // For the team console test: paused and brought back (batch 13).
+      { subdomain: "lakeside", name: "Lakeside Grammar School", status: "active", brandColor: "#2F5D8A", logoUrl: null },
     ],
-    trialRequests: [],
+    // Sample requests from the marketing site's trial form; minutes before the first read (see fake/console.ts).
+    trialRequests: [
+      { id: "tr1", at: -60 * 5, schoolName: "Bright Future Academy", contactName: "Uche Nnaji", role: "Proprietor", email: "uche@brightfuture.ng", phone: "08031234567", studentCount: 420, state: "Anambra", interests: ["Students", "Import"], status: "new" },
+      { id: "tr2", at: -60 * 30, schoolName: "Crescent Model School", contactName: "Aisha Garba", role: "Principal", email: "aisha@crescentmodel.ng", phone: "08059876543", studentCount: 260, state: "Kano", interests: ["Attendance"], message: "We want to start next term.", status: "new" },
+      { id: "tr3", at: -60 * 24 * 3, schoolName: "Riverside Comprehensive", contactName: "Tamuno Briggs", role: "Administrator", email: "tamuno@riverside.ng", phone: "08025551212", studentCount: 900, state: "Rivers", interests: ["Students"], status: "contacted", note: "Demo booked for Thursday." },
+    ],
+    teamUsers: [{ id: "t1", fullName: "Brillianda Support", email: "team@brillianda.com", password: "brillianda" }],
+    teamSessions: new Map(),
+    // When each sample school joined, in days before the first read; reasons for the paused one.
+    schoolMeta: new Map([
+      ["greenfield", { createdAt: -60 * 24 * 9 }],
+      ["surebloom", { createdAt: -60 * 24 * 2 }],
+      ["closedschool", { createdAt: -60 * 24 * 40, statusNote: { status: "suspended" as const, reason: "Asked to pause until fees are agreed.", by: "Brillianda Support", at: -60 * 24 * 5 } }],
+    ]),
+    teamLog: [],
     signupDrafts: new Map(),
     users: [
       { id: "u1", fullName: "Amaka Obi", email: "owner@greenfield.ng", password: "brillianda", schools: [{ subdomain: "greenfield", role: "owner" }] },
@@ -216,6 +255,7 @@ function seed(): FakeStore {
       { id: "u12", fullName: "Bisi Adebayo", email: "teacher@greenfield.ng", password: "brillianda", schools: [{ subdomain: "greenfield", role: "teacher" }] },
       { id: "u13", fullName: "Ifeanyi Okoro", email: "physics@greenfield.ng", password: "brillianda", schools: [{ subdomain: "greenfield", role: "teacher" }] },
       { id: "u14", fullName: sampleGuardian.name, email: "parent@greenfield.ng", password: "brillianda", schools: [{ subdomain: "greenfield", role: "parent" }] },
+      { id: "u16", fullName: "Folake Adeyemi", email: "owner@lakeside.ng", password: "brillianda", schools: [{ subdomain: "lakeside", role: "owner" }] },
       { id: "u15", fullName: "Kemi Lawal", email: "english@greenfield.ng", password: "brillianda", schools: [{ subdomain: "greenfield", role: "teacher" }] },
     ],
     sessions: new Map(),

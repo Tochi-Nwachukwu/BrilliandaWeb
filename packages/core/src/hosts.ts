@@ -41,7 +41,7 @@ function isShared(path: string): boolean {
 }
 
 /** Pages that live on the main site, never on a school's address. */
-const MAIN_SITE_ONLY = /^\/(signup|dev)(\/|$)/;
+const MAIN_SITE_ONLY = /^\/(signup|dev|console)(\/|$)/;
 
 export function routeFor({ host, path, search = "", roots }: { host: string; path: string; search?: string; roots: string[] }): Route {
   const school = schoolOfHost(host, roots);

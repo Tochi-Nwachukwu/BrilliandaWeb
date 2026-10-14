@@ -40,6 +40,8 @@ describe("routeFor", () => {
   it("sends signup and www to the main site", () => {
     expect(route("surebloom.brillianda.com", "/signup", "?x=1")).toEqual({ kind: "redirect", url: "https://brillianda.com/signup?x=1" });
     expect(route("www.brillianda.com", "/pricing")).toEqual({ kind: "redirect", url: "https://brillianda.com/pricing" });
+    // The team console is never served on a school's address.
+    expect(route("surebloom.brillianda.com", "/console/schools")).toEqual({ kind: "redirect", url: "https://brillianda.com/console/schools" });
     expect(route("surebloom.localhost:3000", "/signup")).toEqual({ kind: "redirect", url: "http://localhost:3000/signup" });
   });
   it("forwards /api to the backend, with the school", () => {

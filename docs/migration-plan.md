@@ -342,6 +342,18 @@ email, like admins.
   teachers) can't open admin screens; parents aren't staff for teacher data either.
 - **Next:** the team console (batch 13).
 
+### Batch 13: The Brillianda team console (14 October 2026)
+
+- **Done:** `brillianda.com/console`, with its own team accounts (school accounts can't sign in
+  there, and `proxy.ts` never serves it on a school's address). Overview: active and paused
+  schools, new this week, students, trial requests waiting, newest schools, recent activity.
+  Schools: search and filter; each school's summary shows contacts, counts, setup progress and
+  status, never a student's own record. Opening a school writes "viewed the school's summary"
+  to that school's change history (plan: staff access is logged and shown to the school). Pause
+  and reactivate need a reason, which the school sees; a paused school shows its paused page.
+  Trial requests from the website's form: new, contacted, signed up or declined, with a note.
+- With this, group 1 of the after-v1 list (new people using the app) has its front end.
+
 ## What isn't in v1 (kept for later)
 
 Built today but "after v1" in the plan. Their code stays in `legacy/` and moves across, looking

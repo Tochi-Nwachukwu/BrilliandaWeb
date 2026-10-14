@@ -224,3 +224,58 @@ export type ParentHome = { fullName: string; schoolDay: boolean; children: Paren
 
 /** A student's attendance this term (late counts as present). */
 export type AttendanceSummary = { term: string; days: number; present: number; late: number; absent: number } | null;
+
+// ——— The Brillianda team console (batch 13) ———
+
+export type TeamMember = { id: string; fullName: string; email: string };
+export type TrialStatus = "new" | "contacted" | "converted" | "declined";
+
+/** One school as the team sees it: counts and contacts, never a student's own record. */
+export type ConsoleSchool = {
+  subdomain: string;
+  name: string;
+  status: "active" | "suspended" | "archived";
+  createdAt: number | null;
+  owner: { fullName: string; email: string } | null;
+  students: number;
+  classes: number;
+  setupDone: number;
+  setupTotal: number;
+};
+
+export type ConsoleSchoolDetail = ConsoleSchool & {
+  state: string | null;
+  phone: string | null;
+  levelsOffered: string[];
+  admins: number;
+  teachers: number;
+  parents: number;
+  subjects: number;
+  setup: { label: string; done: boolean }[];
+  /** Why it was last paused or reactivated, by whom. */
+  statusNote: { status: "active" | "suspended"; reason: string; by: string; at: number } | null;
+};
+
+export type ConsoleOverview = {
+  schools: { active: number; suspended: number; newThisWeek: number };
+  students: number;
+  trialsWaiting: number;
+  recentSchools: ConsoleSchool[];
+  activity: { at: number; who: string; what: string; subdomain?: string }[];
+};
+
+export type TrialRequestRow = {
+  id: string;
+  at: number;
+  schoolName: string;
+  contactName: string;
+  role: string;
+  email: string;
+  phone: string;
+  studentCount: number;
+  state: string | null;
+  interests: string[];
+  message: string | null;
+  status: TrialStatus;
+  note: string | null;
+};

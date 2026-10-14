@@ -69,9 +69,13 @@ test("every class keeps at least one arm", async ({ page }, testInfo) => {
   await signIn(page, school);
   await open(page, `/s/${school}/classes/arms`);
   // Take every arm out of JSS 2 (none of them has students there).
+  // The editor streams in after the page is marked ready, so each click is retried until it takes.
   for (const item of await page.getByRole("listitem").filter({ has: page.getByLabel("Arm name") }).all()) {
     const jss2 = item.getByRole("button", { name: /JSS2/ });
-    if ((await jss2.getAttribute("aria-pressed")) === "true") await jss2.click();
+    await expect(async () => {
+      if ((await jss2.getAttribute("aria-pressed")) === "true") await jss2.click();
+      await expect(jss2).toHaveAttribute("aria-pressed", "false", { timeout: 1000 });
+    }).toPass();
   }
   await expect(page.getByText("JSS 2 has no arm. Every class needs at least one.")).toBeVisible();
   await page.getByRole("button", { name: "Save arms" }).click();
