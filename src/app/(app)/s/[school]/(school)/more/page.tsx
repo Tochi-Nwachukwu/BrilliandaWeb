@@ -10,6 +10,8 @@ const ITEMS: { path: string; icon: IconName; title: string; detail: string }[] =
   { path: "sessions", icon: "calendar", title: "Sessions and terms", detail: "Your school year, its terms and their dates" },
   { path: "admission-numbers", icon: "students", title: "Admission numbers", detail: "The format new students get, like GC/2026/0042" },
   { path: "history", icon: "activity", title: "Change history", detail: "Who changed what, and when" },
+  { path: "../subjects", icon: "subjects", title: "Subjects", detail: "What each class level takes" },
+  { path: "results", icon: "results", title: "Results settings", detail: "Score parts, grades and positions" },
   { path: "teachers", icon: "classes", title: "Teachers", detail: "Form classes, subjects, and who takes each register" },
   { path: "parents", icon: "students", title: "Parents", detail: "Invite guardians to follow their children’s attendance" },
   { path: "admins", icon: "staff", title: "Admins", detail: "Who helps run the school on Brillianda" },
@@ -25,7 +27,7 @@ export default async function MorePage({ params }: PageProps<"/s/[school]/more">
         {ITEMS.map((item) => (
           <li key={item.path}>
             <Link
-              href={`/s/${school}/more/${item.path}`}
+              href={item.path.startsWith("../") ? `/s/${school}/${item.path.slice(3)}` : `/s/${school}/more/${item.path}`}
               className="grid grid-cols-[2.75rem_minmax(0,1fr)_auto] items-center gap-3.5 rounded-2xl p-3 hover:bg-hover focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-accent"
             >
               <span aria-hidden className="grid h-11 w-11 place-items-center rounded-2xl bg-accent-soft text-accent">

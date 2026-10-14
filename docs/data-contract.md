@@ -281,6 +281,26 @@ Team accounts are separate from school accounts (their own sign-in and cookie, s
 
 The trial form (`requestTrial`) now stores typed requests with a status.
 
+### Results: score entry (batch 14, after v1)
+
+Results are for the current term (`ResultsTerm`, keyed `<session start year>-<term number>`).
+Totals, grades and positions use `packages/core/src/grading.ts` and `results.ts`, which the real
+API should use too, so a total never depends on where it was worked out.
+
+| Function | Kind | Input / output | Who | Status |
+|---|---|---|---|---|
+| `getResultsSettings` | read | → parts, scale, showPositions, scoresEntered | owner, admin | fake |
+| `saveResultsSettings` | action | `resultsSettingsSchema`: parts add up to 100 and can't change once scores are in this term; scale needs a band at 0, no repeats | owner, admin | fake |
+| `getResultsOverview` | read | → each class's sheets (complete, in progress) and open unlock requests | owner, admin | fake |
+| `getArmSheets` | read | `armId` → that class's sheets with teacher, status and progress | owner, admin | fake |
+| `getMySheets` | read | → the teacher's own sheets this term | teacher | fake |
+| `getScoreSheet` | read | `armId, subjectId` → parts, scale, status, rows (scores, excluded) | admins; that subject's teacher | fake |
+| `saveScore` | action | `armId, subjectId, studentId, componentId, raw` ("", "ABS" or a number up to the part's marks, 2 decimals) → status | same; teachers not once complete | fake |
+| `setExcluded` | action | `armId, subjectId, studentId, excluded` (electives only; clears their scores) | same | fake |
+| `markComplete` | action | `armId, subjectId`; refused while any student who takes it has an empty part | same | fake |
+| `requestUnlock` | action | `armId, subjectId, { reason }` (5 to 200 characters) | the teacher | fake |
+| `resolveUnlock` | action | `armId, subjectId, approve` → reopens (with or without a request), or declines one | owner, admin | fake |
+
 ### Installable app (batch 10)
 
 The service worker (`public/sw.js`) and its page (`/offline`) live at the root of every school

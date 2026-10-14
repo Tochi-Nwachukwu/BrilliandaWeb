@@ -31,7 +31,7 @@ async function SchoolApp({ params, children }: { params: Promise<{ school: strin
     { href: base, label: "Home", icon: "home", exact: true },
     { href: `${base}/students`, label: "Students", icon: "students" },
     { href: `${base}/classes`, label: "Classes", icon: "classes" },
-    { href: `${base}/subjects`, label: "Subjects", icon: "subjects" },
+    { href: `${base}/results`, label: "Results", icon: "results" },
     { href: `${base}/more`, label: "More", icon: "more" },
   ];
 
@@ -45,6 +45,8 @@ async function SchoolApp({ params, children }: { params: Promise<{ school: strin
       commands={[
         { id: "admins", label: "Admins", icon: "staff", href: `${base}/more/admins`, group: "Go to" },
         { id: "teachers", label: "Teachers", icon: "staff", href: `${base}/more/teachers`, group: "Go to" },
+        { id: "subjects", label: "Subjects", icon: "subjects", href: `${base}/subjects`, group: "Go to" },
+        { id: "results-settings", label: "Results settings", icon: "results", href: `${base}/more/results`, group: "Go to" },
         { id: "sessions", label: "Sessions and terms", icon: "calendar", href: `${base}/more/sessions`, group: "Go to" },
       ]}
       mark={
@@ -56,7 +58,7 @@ async function SchoolApp({ params, children }: { params: Promise<{ school: strin
       note={
         <>
           <b className="mb-0.5 block text-text-primary">Coming soon</b>
-          Results, fees, timetable and messages.
+          Fees, timetable and messages.
         </>
       }
     >

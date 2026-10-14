@@ -61,6 +61,10 @@ const SCHOOL = [
   "/more/teachers",
   "/more/parents",
   "/classes/register/ga-gl1-gn1",
+  "/results",
+  "/results/ga-gl1-gn1",
+  "/results/ga-gl1-gn1/gs-mathematics",
+  "/more/results",
 ];
 
 test("every screen inside a school passes the accessibility scan", { tag: "@both" }, async ({ page }) => {

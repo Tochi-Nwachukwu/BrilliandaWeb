@@ -354,6 +354,25 @@ email, like admins.
   Trial requests from the website's form: new, contacted, signed up or declined, with a note.
 - With this, group 1 of the after-v1 list (new people using the app) has its front end.
 
+### Group 2: Results (from 14 October 2026)
+
+Drawn from the first app (`brillanda-v1`: score entry, publishing, report cards, the parent portal,
+and its decisions D-1 to D-3, F-1, F-32, F-38). User decisions (14 October 2026): CA1 20, CA2 20,
+Exam 60 by default; positions shown, within the arm; an A to F scale. Each school can change all
+three. Batches: 14 score entry; 15 broadsheet, remarks, ratings, publishing and report cards; 16
+parents see results.
+
+#### Batch 14: Score entry
+
+- **Done:** More › Results settings (score parts adding up to 100, which can't change once scores
+  are in for the term; the grading scale with A to F and WAEC presets; positions on or off).
+  Score sheets per arm, subject and term, the same grid for the subject teacher and admins: each
+  box saves on leaving it or Enter (which moves down), ABS for absent, empty means not entered,
+  live totals and grades with the shared maths in `packages/core`. Electives: a student who
+  doesn't take one is left out of the sheet and their average. Mark complete locks the sheet for
+  the teacher; they ask to unlock with a reason; admins unlock or decline. A Results tab for
+  admins (each class's progress, requests waiting); Subjects moved into More.
+
 ## What isn't in v1 (kept for later)
 
 Built today but "after v1" in the plan. Their code stays in `legacy/` and moves across, looking

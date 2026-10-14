@@ -6,7 +6,7 @@ import { EmptyState } from "@brillianda/ui/EmptyState";
 import { SelectField, TextField } from "@brillianda/ui/TextField";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useState, useTransition } from "react";
+import { useEffect, useRef, useState, useTransition } from "react";
 import type { ChangeFilter, ChangeLog } from "@/data/types";
 import { plural } from "@/lib/time";
 
@@ -38,15 +38,20 @@ export function HistoryView({ school, log, filter, now }: { school: string; log:
     const text = params.toString();
     return text ? `?${text}` : "";
   };
-  // Starts from the address as it is now, not from `filter`: right after "Clear filters" the page
-  // hasn't caught up yet, and a search typed then would bring the cleared filters back.
+  // The filters as last asked for. Neither `filter` nor the address has caught up straight after a
+  // change ("Clear filters", then typing at once), so each change builds on this instead.
+  const asked = useRef<URLSearchParams | null>(null);
+  useEffect(() => {
+    asked.current = new URLSearchParams(window.location.search);
+  }, [filter]);
   const go = (patch: Record<string, string | number | undefined>) => {
-    const params = new URLSearchParams(window.location.search);
+    const params = new URLSearchParams(asked.current ?? window.location.search);
     params.delete("show");
     for (const [key, value] of Object.entries(patch)) {
       if (value === undefined || value === "") params.delete(key);
       else params.set(key, String(value));
     }
+    asked.current = params;
     const text = params.toString();
     startTransition(() => router.replace(`${base}${text ? `?${text}` : ""}`, { scroll: false }));
   };
@@ -107,6 +112,7 @@ export function HistoryView({ school, log, filter, now }: { school: string; log:
                     type="button"
                     onClick={() => {
                       setSearch("");
+                      asked.current = new URLSearchParams();
                       startTransition(() => router.replace(base, { scroll: false }));
                     }}
                     className="font-medium text-accent hover:underline focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-accent"

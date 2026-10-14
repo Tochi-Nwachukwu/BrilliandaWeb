@@ -100,3 +100,12 @@ and the daily register"). When you build them, these are the shapes the screens 
   never a student's own record.
 - Pausing and reactivating a school with a reason the school can see; trial requests stored
   with a status (new, contacted, converted, declined) and a team note.
+
+## 7. Results: score entry (added 14 October 2026)
+
+- Per-school results settings: score parts (name, marks; they add up to 100; fixed once scores are
+  in for the term), a grading scale (thresholds with a band at 0), and whether positions show.
+- Scores per student, part, subject, arm and term; `isAbsent` for ABS. Sheets marked complete
+  lock for the teacher; unlock requests with a reason, which admins approve or decline.
+- Electives: a student can be marked as not taking one, which removes them from that sheet.
+- Please compute totals with `packages/core/src/grading.ts` (same as the first app's F-32).

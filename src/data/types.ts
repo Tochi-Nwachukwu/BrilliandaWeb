@@ -279,3 +279,59 @@ export type TrialRequestRow = {
   status: TrialStatus;
   note: string | null;
 };
+
+// ——— Results (batch 14) ———
+
+export type SheetStatus = "not-started" | "in-progress" | "complete";
+export type UnlockRequest = { id: string; by: string; reason: string; at: number };
+
+/** The term results are being entered for: "First Term, 2026/2027". */
+export type ResultsTerm = { key: string; name: string; session: string };
+
+export type ResultsSettingsData = {
+  components: { id: string; name: string; maxScore: number }[];
+  scale: { minScore: number; grade: string; remark: string; isPass: boolean }[];
+  showPositions: boolean;
+  /** Parts can't change once scores are in this term (names and the scale always can). */
+  scoresEntered: boolean;
+};
+
+/** One subject's sheet for one arm, as a line in a list. */
+export type SheetSummary = {
+  armId: string;
+  armLabel: string;
+  subjectId: string;
+  subjectName: string;
+  kind: "compulsory" | "elective";
+  teacher: string | null;
+  status: SheetStatus;
+  complete: number;
+  of: number;
+  unlockRequest: UnlockRequest | null;
+};
+
+/** A score sheet to fill in: every student who takes the subject, with each part's score. */
+export type ScoreSheetData = {
+  term: ResultsTerm;
+  armId: string;
+  armLabel: string;
+  subjectId: string;
+  subjectName: string;
+  kind: "compulsory" | "elective";
+  components: { id: string; name: string; maxScore: number }[];
+  scale: { minScore: number; grade: string; remark: string; isPass: boolean }[];
+  status: SheetStatus;
+  /** Admins can always edit; a teacher until the sheet is marked complete. */
+  canEdit: boolean;
+  isAdmin: boolean;
+  completedBy: { by: string; at: number } | null;
+  unlockRequest: UnlockRequest | null;
+  rows: { studentId: string; fullName: string; admissionNo: string; excluded: boolean; scores: Partial<Record<string, { value: number; isAbsent: boolean }>> }[];
+};
+
+/** Admin's Results page: each class's sheets this term, and unlock requests waiting. */
+export type ResultsOverview = {
+  term: ResultsTerm | null;
+  arms: { armId: string; label: string; sheets: number; complete: number; inProgress: number }[];
+  requests: (UnlockRequest & { armId: string; armLabel: string; subjectId: string; subjectName: string })[];
+};

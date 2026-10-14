@@ -34,6 +34,16 @@ type FakeStore = {
   /** A register taken for one arm on one day, and each student's mark in it. */
   registers: { armId: string; date: string; takenBy: string; takenAt: number; updatedBy?: string; updatedAt?: number }[];
   marks: { armId: string; date: string; studentId: string; mark: "present" | "late" | "absent"; note?: string }[];
+  /** Batch 14: each school's results settings (default: CA1 20, CA2 20, Exam 60; A to F; positions on). */
+  resultsSettings: Map<string, { components: { id: string; name: string; maxScore: number }[]; scale: { minScore: number; grade: string; remark: string; isPass: boolean }[]; showPositions: boolean }>;
+  /** One score per student, part, subject, arm and term (`term` is "<session start year>-<term number>"). */
+  scores: { term: string; armId: string; subjectId: string; studentId: string; componentId: string; value: number; isAbsent: boolean }[];
+  /** Sheets marked complete (locked for teachers until unlocked). */
+  completeSheets: { term: string; armId: string; subjectId: string; by: string; at: number }[];
+  /** Students who don't take an elective. */
+  exclusions: { term: string; armId: string; subjectId: string; studentId: string }[];
+  unlockRequests: { id: string; term: string; armId: string; subjectId: string; by: string; reason: string; at: number; status: "open" | "approved" | "declined" }[];
+  resultsSeeded: boolean;
   /** Batch 12: a parent's account and the guardian record it belongs to (their children). */
   parentLinks: { userId: string; guardianId: string }[];
   /** Sample registers are made on first read, from that day's date (see fake/teaching.ts). */
@@ -281,6 +291,12 @@ function seed(): FakeStore {
     ],
     registers: [],
     marks: [],
+    resultsSettings: new Map(),
+    scores: [],
+    completeSheets: [],
+    exclusions: [],
+    unlockRequests: [],
+    resultsSeeded: false,
     parentLinks: [{ userId: "u14", guardianId: sampleGuardian.id }],
     registersSeeded: false,
     // The sample schools come with their colours chosen; the test schools are as fresh from signup.
