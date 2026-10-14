@@ -221,6 +221,8 @@ export type ParentChild = {
   recent: { date: string; mark: RegisterMark | null }[];
   /** This term's results, once the class is published (batch 16); otherwise just the term's name. */
   results: { term: string; published: false } | { term: string; published: true; average: number | null; position: number | null; of: number } | null;
+  /** Closed terms whose results were published (group 3), newest first. */
+  pastTerms: { key: string; label: string }[];
 };
 export type ParentHome = { fullName: string; schoolDay: boolean; children: ParentChild[] };
 
@@ -288,7 +290,7 @@ export type SheetStatus = "not-started" | "in-progress" | "complete";
 export type UnlockRequest = { id: string; by: string; reason: string; at: number };
 
 /** The term results are being entered for: "First Term, 2026/2027". */
-export type ResultsTerm = { key: string; name: string; session: string };
+export type ResultsTerm = { key: string; name: string; session: string; /** Its place in the session (0-based), and whether it's the last (closed through promotion). */ index: number; isLast: boolean };
 
 export type ResultsSettingsData = {
   components: { id: string; name: string; maxScore: number }[];
@@ -334,6 +336,8 @@ export type ScoreSheetData = {
 /** Admin's Results page: each class's sheets this term, and unlock requests waiting. */
 export type ResultsOverview = {
   term: ResultsTerm | null;
+  /** When no term is open: the next one, opening on its start date. */
+  next: { name: string; startsOn: string } | null;
   arms: { armId: string; label: string; sheets: number; complete: number; inProgress: number }[];
   requests: (UnlockRequest & { armId: string; armLabel: string; subjectId: string; subjectName: string })[];
 };
@@ -386,4 +390,48 @@ export type ReportCardData = {
   nextTermBegins: string | null;
   scale: { minScore: number; grade: string; remark: string; isPass: boolean }[];
   published: boolean;
+};
+
+// ——— Running the school year (group 3) ———
+
+/** Sessions and terms page: the term open for results, what closing it would leave out, and past terms. */
+export type TermStatusData = {
+  open: ResultsTerm | null;
+  /** The term after the open one, whose dates can be adjusted when closing. */
+  following: { name: string; startsOn: string; endsOn: string } | null;
+  /** When no term is open: the next one, which opens on its start date. */
+  waiting: { name: string; startsOn: string } | null;
+  unpublished: { armId: string; label: string }[];
+  closed: { key: string; name: string; session: string; by: string; at: number }[];
+};
+
+/** A term a student has results in. */
+export type ReportTerm = { key: string; name: string; session: string; published: boolean; open: boolean };
+
+/** Promotion at the end of the session (batch 18). */
+export type PromotionDecision = "promote" | "repeat" | "graduate";
+export type PromotionStudentRow = {
+  id: string;
+  fullName: string;
+  admissionNo: string;
+  yearlyAverage: number | null;
+  termsCounted: number;
+  suggested: PromotionDecision;
+  decision: PromotionDecision;
+  reason: string | null;
+  /** Next session's class; null for graduates. */
+  destination: string | null;
+};
+export type PromotionPlan = {
+  sessionName: string;
+  nextSessionName: string;
+  passMark: number;
+  /** True only while the session's last term is the one open for results. */
+  open: boolean;
+  lastTerm: string;
+  classes: { armId: string; label: string; finalClass: boolean; students: PromotionStudentRow[] }[];
+  counts: Record<PromotionDecision, number>;
+  unpublished: { armId: string; label: string }[];
+  /** The next session's suggested first term, for the dialog. */
+  firstTerm: { name: string; startsOn: string; endsOn: string };
 };

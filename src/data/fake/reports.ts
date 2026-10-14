@@ -1,15 +1,14 @@
 // FAKE: what a school does with scores (batch 15): the broadsheet, remarks, behaviour ratings,
 // publishing a class, and report cards. Built on fake/results.ts and the shared maths in core.
 import "server-only";
-import { termOf } from "@brillianda/core/attendance";
+import { attendanceSummary } from "@brillianda/core/attendance";
 import { resolveGrade } from "@brillianda/core/grading";
 import { classResults, rowTotal, type RatingSettings } from "@brillianda/core/results";
 import { fullName } from "@brillianda/core/students";
-import { todayInLagos } from "@/lib/time";
-import type { ActionResult, Broadsheet, ClassReports, ReportCardData, SubjectCell } from "../types";
+import type { ActionResult, AttendanceSummary, Broadsheet, ClassReports, ReportCardData, ResultsTerm, SubjectCell } from "../types";
 import { requireMember, requireStaff } from "./auth";
 import { recordChange } from "./changes";
-import { resultsTermOf, rowsOf, seedResults, settingsOf, statusOf, subjectsForArm } from "./results";
+import { pupilsFor, resultsTermOf, rowsOf, seedResults, settingsOf, statusOf, subjectsForArm } from "./results";
 import { store } from "./store";
 import { armOptions } from "./students";
 import { attendanceOf } from "./teaching";
@@ -34,10 +33,10 @@ async function classAccess(subdomain: string, armId: string) {
 }
 
 /** Each student's subject totals (complete rows only) and the class's averages and positions. */
-function computeClass(subdomain: string, term: string, armId: string) {
+export function computeClass(subdomain: string, term: string, armId: string) {
   const settings = settingsOf(subdomain);
   const subjects = subjectsForArm(subdomain, armId);
-  const pupils = studentsIn(armId);
+  const pupils = pupilsFor(term, armId);
   const cells = new Map<string, Record<string, SubjectCell>>(pupils.map((p) => [p.id, {}]));
   const totals: { studentId: string; subjectId: string; total: number }[] = [];
   for (const { subject } of subjects) {
@@ -174,30 +173,59 @@ export const isPublished = (subdomain: string, armId: string) => {
 
 // ——— Report cards ———
 
-/** One student's card this term. `forParent` (batch 16) only once the class is published. */
-export function buildReportCard(subdomain: string, studentId: string): ReportCardData | null {
+/** A term by its key: the open one, or a closed one (whose name is kept even after the session ends). */
+export function termByKey(subdomain: string, key: string): ResultsTerm | null {
+  const open = resultsTermOf(subdomain);
+  if (open?.key === key) return open;
+  const closed = store.closedTerms.find((c) => c.subdomain === subdomain && c.key === key);
+  if (!closed) return null;
+  const index = Number(key.split("-")[1]) - 1;
+  const calendar = store.calendars.get(subdomain);
+  return { key, name: closed.name, session: closed.session, index, isLast: calendar ? index === calendar.terms.length - 1 : false };
+}
+
+/** The term's dates and the next term's, when it's in the calendar the school has now. */
+function datesOf(subdomain: string, key: string) {
+  const calendar = store.calendars.get(subdomain);
+  const [year, number] = key.split("-").map(Number);
+  if (!calendar || calendar.startYear !== year) return null;
+  return { term: calendar.terms[number! - 1] ?? null, next: calendar.terms[number!] ?? null };
+}
+
+/** The class a student was in for a term: where their scores are, else where they are now. */
+function armIn(studentId: string, key: string, fallback: string) {
+  return [...store.scores, ...store.exclusions].find((x) => x.term === key && x.studentId === studentId)?.armId ?? fallback;
+}
+
+/** One student's card for a term (default: the open one). Parents see it only once its class is published. */
+export function buildReportCard(subdomain: string, studentId: string, termKey?: string): ReportCardData | null {
   const student = store.students.find((s) => s.subdomain === subdomain && s.id === studentId && !s.deletedAt);
-  const term = resultsTermOf(subdomain);
+  const term = termKey ? termByKey(subdomain, termKey) : resultsTermOf(subdomain);
   const school = store.schools.find((s) => s.subdomain === subdomain);
   if (!student || !term || !school) return null;
   seedResults();
-  const { settings, subjects, pupils, results } = computeClass(subdomain, term.key, student.armId);
+  const armId = armIn(studentId, term.key, student.armId);
+  const { settings, subjects, pupils, results } = computeClass(subdomain, term.key, armId);
   const mine = results.get(studentId);
-  const calendar = store.calendars.get(subdomain);
-  const today = todayInLagos();
-  const current = calendar ? termOf(today, calendar.terms) : null;
-  const next = calendar?.terms.find((t) => t.startsOn > (current?.endsOn ?? today));
+  const dates = datesOf(subdomain, term.key);
   const remark = (kind: "teacher" | "principal") => store.remarks.find((r) => r.term === term.key && r.studentId === studentId && r.kind === kind)?.text ?? null;
-  const formTeacherId = store.formTeachers.find((f) => f.armId === student.armId)?.userId;
+  const formTeacherId = store.formTeachers.find((f) => f.armId === armId)?.userId;
   const ratings = ratingSettingsOf(subdomain);
+  // Attendance within the term's own dates; the open term uses this term's register.
+  let attendance: AttendanceSummary = attendanceOf(subdomain, studentId);
+  if (term.key !== resultsTermOf(subdomain)?.key) {
+    const t = dates?.term;
+    const marks = t ? store.marks.filter((m) => m.studentId === studentId && m.date >= t.startsOn && m.date <= t.endsOn).map((m) => m.mark) : [];
+    attendance = t ? { term: term.name, ...attendanceSummary(marks) } : null;
+  }
   return {
     school: { name: school.name, logoUrl: school.logoUrl, brandColor: school.brandColor },
     term,
-    student: { id: student.id, fullName: fullName(student), admissionNo: student.admissionNo, armLabel: armLabelOf(subdomain, student.armId) },
+    student: { id: student.id, fullName: fullName(student), admissionNo: student.admissionNo, armLabel: armLabelOf(subdomain, armId) },
     components: settings.components,
     subjects: subjects
       .map(({ subject }) => {
-        const row = rowsOf(term.key, student.armId, subject.id).find((r) => r.studentId === studentId);
+        const row = rowsOf(term.key, armId, subject.id).find((r) => r.studentId === studentId);
         if (!row || row.excluded) return null;
         const total = rowTotal(row, settings.components);
         const band = total === null ? null : resolveGrade(total, settings.scale);
@@ -214,19 +242,41 @@ export function buildReportCard(subdomain: string, studentId: string): ReportCar
     position: settings.showPositions ? (mine?.position ?? null) : null,
     of: pupils.length,
     showPositions: settings.showPositions,
-    attendance: attendanceOf(subdomain, studentId),
+    attendance,
     ratings: ratings.enabled ? ratings.traits.map((trait) => ({ trait, value: store.ratings.find((r) => r.term === term.key && r.studentId === studentId && r.trait === trait)?.value ?? null })) : [],
     teacherRemark: remark("teacher"),
     principalRemark: remark("principal"),
     formTeacher: store.users.find((u) => u.id === formTeacherId)?.fullName ?? null,
-    nextTermBegins: next?.startsOn ?? null,
+    nextTermBegins: dates?.next?.startsOn ?? null,
     scale: settings.scale,
-    published: isPublished(subdomain, student.armId),
+    published: store.publishedArms.some((p) => p.term === term.key && p.armId === armId),
   };
 }
 
-export async function getReportCard(subdomain: string, studentId: string): Promise<ReportCardData | null> {
+/** Every term a student has results in, newest first, and whether each was published. */
+export function reportTermsOf(subdomain: string, studentId: string): { key: string; name: string; session: string; published: boolean; open: boolean }[] {
+  seedResults();
+  const keys = [...new Set([...store.scores, ...store.exclusions].filter((x) => x.studentId === studentId).map((x) => x.term))];
+  const open = resultsTermOf(subdomain)?.key;
+  return keys
+    .map((key) => {
+      const term = termByKey(subdomain, key);
+      if (!term) return null;
+      const armId = armIn(studentId, key, "");
+      return { key, name: term.name, session: term.session, published: store.publishedArms.some((p) => p.term === key && p.armId === armId), open: key === open };
+    })
+    .filter((x): x is NonNullable<typeof x> => x !== null)
+    .sort((a, b) => b.key.localeCompare(a.key));
+}
+
+export async function getReportCard(subdomain: string, studentId: string, termKey?: string): Promise<ReportCardData | null> {
   const student = store.students.find((s) => s.subdomain === subdomain && s.id === studentId);
   if (!student || !(await classAccess(subdomain, student.armId))) return null;
-  return buildReportCard(subdomain, studentId);
+  return buildReportCard(subdomain, studentId, termKey);
+}
+
+/** A student's result terms, for admins (every term, published or not). */
+export async function getReportTerms(subdomain: string, studentId: string) {
+  if (!(await requireMember(subdomain))) return null;
+  return reportTermsOf(subdomain, studentId);
 }

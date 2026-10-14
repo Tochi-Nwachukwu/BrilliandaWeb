@@ -11,7 +11,7 @@ import { requireMember, requireParent } from "./auth";
 import { recordChange } from "./changes";
 import { store } from "./store";
 import { armOptions } from "./students";
-import { buildReportCard } from "./reports";
+import { buildReportCard, reportTermsOf } from "./reports";
 import { resultsTermOf } from "./results";
 import { attendanceOf } from "./teaching";
 
@@ -133,6 +133,9 @@ export async function getParentHome(subdomain: string): Promise<ParentHome | nul
         attendance: attendanceOf(subdomain, s.id),
         recent: days.map((date) => ({ date, mark: store.marks.find((m) => m.studentId === s.id && m.date === date)?.mark ?? null })),
         results: resultsFor(subdomain, s.id),
+        pastTerms: reportTermsOf(subdomain, s.id)
+          .filter((t) => t.published && !t.open)
+          .map((t) => ({ key: t.key, label: `${t.name}, ${t.session}` })),
       };
     });
   return { fullName: parent.user.fullName, schoolDay: days[0] === today, children };
@@ -149,11 +152,11 @@ function resultsFor(subdomain: string, studentId: string): ParentHome["children"
 }
 
 /** A child's report card, for their parent: their own children only, and only once published. */
-export async function getParentReportCard(subdomain: string, studentId: string): Promise<ReportCardData | null> {
+export async function getParentReportCard(subdomain: string, studentId: string, termKey?: string): Promise<ReportCardData | null> {
   const parent = await requireParent(subdomain);
   if (!parent) return null;
   const child = store.students.find((s) => s.subdomain === subdomain && s.id === studentId && !s.deletedAt && s.guardianId && parent.guardianIds.includes(s.guardianId));
   if (!child) return null;
-  const card = buildReportCard(subdomain, studentId);
+  const card = buildReportCard(subdomain, studentId, termKey);
   return card?.published ? card : null;
 }

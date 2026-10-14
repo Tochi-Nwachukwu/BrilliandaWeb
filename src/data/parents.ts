@@ -14,6 +14,6 @@ export function getParentHome(subdomain: string): Promise<ParentHome | null> {
 }
 
 /** A child's report card for their parent: only their own children, and only once the class is published. */
-export function getParentReportCard(subdomain: string, studentId: string): Promise<ReportCardData | null> {
-  return impl.getParentReportCard(subdomain, studentId);
+export function getParentReportCard(subdomain: string, studentId: string, termKey?: string): Promise<ReportCardData | null> {
+  return impl.getParentReportCard(subdomain, studentId, termKey);
 }

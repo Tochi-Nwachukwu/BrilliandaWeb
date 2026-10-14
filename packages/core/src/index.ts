@@ -19,3 +19,4 @@ export * from "./branding";
 export * from "./hosts";
 export * from "./attendance";
 export * from "./results";
+export * from "./promotion";

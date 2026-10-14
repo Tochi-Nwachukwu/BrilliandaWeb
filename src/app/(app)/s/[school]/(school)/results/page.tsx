@@ -6,7 +6,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { connection } from "next/server";
 import { getResultsOverview } from "@/data/results";
-import { timeAgo } from "@/lib/time";
+import { formatDate, timeAgo } from "@/lib/time";
 
 export const metadata: Metadata = { title: "Results" };
 
@@ -29,7 +29,7 @@ export default async function ResultsPage({ params }: PageProps<"/s/[school]/res
           </Link>
         }
       >
-        {o.term ? `${o.term.name}, ${o.term.session}. Subject teachers fill in their sheets; you can fill in or correct any of them.` : "Results start when the first term does."}
+        {o.term ? `${o.term.name}, ${o.term.session}. Subject teachers fill in their sheets; you can fill in or correct any of them.` : o.next ? `No term is open for scores. ${o.next.name} opens on ${formatDate(o.next.startsOn)}.` : "Results start when the first term does."}
       </PageHeader>
 
       {o.requests.length > 0 && (

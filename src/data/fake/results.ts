@@ -2,7 +2,6 @@
 // The backend replaces this with assessment, score and sheet-status tables; the maths stays in
 // packages/core (grading.ts, results.ts) so both sides agree (F-32).
 import "server-only";
-import { termOf } from "@brillianda/core/attendance";
 import { defaultTerms } from "@brillianda/core/calendar";
 import { parseScoreInput } from "@brillianda/core/grading";
 import { DEFAULT_COMPONENTS, DEFAULT_SCALE, sheetProgress, type ResultsSettings } from "@brillianda/core/results";
@@ -22,17 +21,31 @@ export function settingsOf(subdomain: string) {
   return store.resultsSettings.get(subdomain) ?? { components: DEFAULT_COMPONENTS, scale: DEFAULT_SCALE, showPositions: true };
 }
 
-/** The term results are for: the one today falls in, else the latest that has started. */
-export function resultsTermOf(subdomain: string): ResultsTerm | null {
+function calendarFor(subdomain: string) {
   const calendar = store.calendars.get(subdomain);
   const today = new Date();
   const startYear = calendar?.startYear ?? (today.getUTCMonth() >= 7 ? today.getUTCFullYear() : today.getUTCFullYear() - 1);
-  const terms = calendar?.terms ?? defaultTerms(startYear);
-  const day = todayInLagos();
-  const current = termOf(day, terms);
-  const index = current ? terms.indexOf(current) : terms.findLastIndex((t) => t.startsOn <= day);
-  if (index < 0) return null;
-  return { key: `${startYear}-${index + 1}`, name: terms[index]!.name, session: sessionName(startYear) };
+  return { startYear, terms: calendar?.terms ?? defaultTerms(startYear) };
+}
+
+/**
+ * The term results are for (batch 17): the session's first term that isn't closed, once it has
+ * started. A term stays open until an admin closes it, so scores never lock because a date passed.
+ */
+export function resultsTermOf(subdomain: string): ResultsTerm | null {
+  const { startYear, terms } = calendarFor(subdomain);
+  const closed = new Set(store.closedTerms.filter((c) => c.subdomain === subdomain).map((c) => c.key));
+  const index = terms.findIndex((_, i) => !closed.has(`${startYear}-${i + 1}`));
+  if (index < 0 || terms[index]!.startsOn > todayInLagos()) return null;
+  return { key: `${startYear}-${index + 1}`, name: terms[index]!.name, session: sessionName(startYear), index, isLast: index === terms.length - 1 };
+}
+
+/** The next term, when no term is open: it opens on its start date. */
+export function nextTermOf(subdomain: string): { name: string; startsOn: string } | null {
+  const { startYear, terms } = calendarFor(subdomain);
+  const closed = new Set(store.closedTerms.filter((c) => c.subdomain === subdomain).map((c) => c.key));
+  const next = terms.find((_, i) => !closed.has(`${startYear}-${i + 1}`));
+  return next ? { name: next.name, startsOn: next.startsOn } : null;
 }
 
 const armLabelOf = (subdomain: string, armId: string) => armOptions(subdomain).find((a) => a.id === armId)?.label ?? "a class";
@@ -52,8 +65,19 @@ export function subjectsForArm(subdomain: string, armId: string) {
     .sort((a, b) => a.subject.position - b.subject.position);
 }
 
+/**
+ * Who belongs on a sheet: the arm's students now for the open term; for a closed term, the
+ * students who had scores (or were left out of an elective) in that arm then, since classes move on.
+ */
+export function pupilsFor(term: string, armId: string) {
+  const subdomain = store.arms.find((a) => a.id === armId)?.subdomain;
+  if (subdomain && resultsTermOf(subdomain)?.key === term) return studentsIn(armId);
+  const ids = new Set([...store.scores, ...store.exclusions].filter((x) => x.term === term && x.armId === armId).map((x) => x.studentId));
+  return store.students.filter((s) => ids.has(s.id)).sort((a, b) => a.lastName.localeCompare(b.lastName) || a.firstName.localeCompare(b.firstName));
+}
+
 export function rowsOf(term: string, armId: string, subjectId: string) {
-  return studentsIn(armId).map((s) => {
+  return pupilsFor(term, armId).map((s) => {
     const scores: Record<string, { value: number; isAbsent: boolean }> = {};
     for (const sc of store.scores) if (sc.term === term && sc.armId === armId && sc.subjectId === subjectId && sc.studentId === s.id) scores[sc.componentId] = { value: sc.value, isAbsent: sc.isAbsent };
     return {
@@ -265,10 +289,11 @@ export async function getResultsOverview(subdomain: string): Promise<ResultsOver
   if (!(await requireMember(subdomain))) return null;
   seedResults();
   const term = resultsTermOf(subdomain);
-  if (!term) return { term: null, arms: [], requests: [] };
+  if (!term) return { term: null, next: nextTermOf(subdomain), arms: [], requests: [] };
   const arms = armOptions(subdomain).filter((a) => studentsIn(a.id).length > 0);
   return {
     term,
+    next: null,
     arms: arms.map((a) => {
       const sheets = summaries(subdomain, term.key, a.id);
       return { armId: a.id, label: a.label, sheets: sheets.length, complete: sheets.filter((s) => s.status === "complete").length, inProgress: sheets.filter((s) => s.status === "in-progress").length };

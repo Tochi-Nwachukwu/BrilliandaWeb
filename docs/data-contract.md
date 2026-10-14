@@ -320,6 +320,32 @@ average, position (when the school shows them) and class size. `getParentReportC
 returns `ReportCardData` for the parent's own child only while their class is published; anything
 else is "not found".
 
+### Running the school year: closing a term (batch 17, after v1)
+
+`ResultsTerm` gains `index` and `isLast`. The open term is the first of the session not closed,
+once started (no longer whichever term today falls in).
+
+| Function | Kind | Input / output | Who | Status |
+|---|---|---|---|---|
+| `getTermStatus` | read | → `TermStatusData`: the open term, the term after it (dates), the next term when none is open, unpublished classes, closed terms | owner, admin | fake |
+| `closeTerm` | action | `{ closeUnpublished, nextStartsOn?, nextEndsOn? }` → closes the open term (not the last: promotion does that); refused while classes are unpublished unless `closeUnpublished` | owner, admin | fake |
+| `getReportTerms` | read | `studentId` → every term with results, newest first, published or not | owner, admin | fake |
+| `getReportCard`, `getParentReportCard` | read | gain an optional `termKey`; parents only for published terms | as before | fake |
+
+`getParentHome`'s children gain `pastTerms`: closed terms whose results were published.
+
+### Promotion (batch 18, after v1)
+
+| Function | Kind | Input / output | Who | Status |
+|---|---|---|---|---|
+| `getPromotionPlan` | read | → `PromotionPlan`: session names, pass mark, open (last term only), classes with each student's yearly average, terms counted, suggested and current decision, reason and destination; counts; unpublished classes; the next session's first term | owner, admin | fake |
+| `setPassMark` | action | `{ passMark }` 0 to 100 | owner, admin | fake |
+| `setDecision` | action | `studentId, { decision, reason }`; the suggestion clears the change | owner, admin | fake |
+| `completePromotion` | action | `{ closeUnpublished, startsOn, endsOn }` → closes the last term, moves students, starts the next session → counts | owner, admin | fake |
+
+Rules in `packages/core/src/promotion.ts`, with tests: `yearlyAverage`, `suggestDecision`,
+`defaultPassMark`, `nextArm`.
+
 ### Installable app (batch 10)
 
 The service worker (`public/sw.js`) and its page (`/offline`) live at the root of every school

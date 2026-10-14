@@ -68,6 +68,7 @@ const SCHOOL = [
   "/results/ga-gl1-gn1/remarks",
   "/results/ga-gl1-gn1/report/st1",
   "/more/results",
+  "/more/promotion",
 ];
 
 // Split in three so they run side by side: one long scan of every screen outran the time limit.

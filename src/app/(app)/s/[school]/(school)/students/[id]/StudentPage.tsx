@@ -15,7 +15,7 @@ import { useState, useTransition, type ReactNode } from "react";
 import { initials } from "@/lib/initials";
 import { formatDate, timeAgo } from "@/lib/time";
 import { SampleLinks } from "@/components/auth/forms";
-import type { ActionResult, ArmOption, SampleEmail, StudentDetail } from "@/data/types";
+import type { ActionResult, ArmOption, ReportTerm, SampleEmail, StudentDetail } from "@/data/types";
 import { STATUS_TONE, StatusDialog } from "../StudentsView";
 
 function Fact({ label, children, wide }: { label: string; children: ReactNode; wide?: boolean }) {
@@ -37,6 +37,7 @@ export function StudentPage({
   setStatus,
   remove,
   inviteParent,
+  reportTerms,
 }: {
   school: string;
   student: StudentDetail;
@@ -46,6 +47,8 @@ export function StudentPage({
   remove: () => Promise<ActionResult<null>>;
   /** Invites this student's guardian to the parent app (batch 12). */
   inviteParent: () => Promise<ActionResult<SampleEmail>>;
+  /** Terms with results, newest first (group 3). */
+  reportTerms: ReportTerm[];
 }) {
   const router = useRouter();
   const [dialog, setDialog] = useState<"status" | "delete" | null>(null);
@@ -118,6 +121,25 @@ export function StudentPage({
             </div>
           ) : (
             <EmptyState title="No guardian yet">Add one from Edit. A phone number already on file links siblings to the same guardian.</EmptyState>
+          )}
+        </Card>
+
+        <Card title="Report cards" description="Each term with results, newest first.">
+          {reportTerms.length ? (
+            <ul className="grid gap-1">
+              {reportTerms.map((t) => (
+                <li key={t.key}>
+                  <Link href={`${base}/${student.id}/report?term=${t.key}`} className="flex items-center justify-between gap-3 rounded-xl p-2.5 text-sm hover:bg-hover focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-accent">
+                    <span className="font-medium">
+                      {t.name}, {t.session}
+                    </span>
+                    <span className="text-[12.5px] text-text-secondary">{t.open ? "This term" : t.published ? "Published" : "Not published"}</span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="text-sm text-text-secondary">No results yet.</p>
           )}
         </Card>
 

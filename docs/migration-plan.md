@@ -395,6 +395,37 @@ parents see results.
   one CA (the user is bringing more detail), and past terms' results (they come with closing a
   term, group 3).
 
+### Group 3: Running the school year (from 14 October 2026)
+
+From the first app's F-43 (closing a term) and F-44 (promotion; the user's decision of 5 October
+2026: automatic from the yearly average, and editable). Batches: 17 closing a term; 18 promotion
+at the end of the session.
+
+#### Batch 17: Closing a term
+
+- **Done:** the term open for results is now the session's first term that isn't closed, once it
+  has started; it stays open until an admin closes it, so scores never lock because a date passed.
+  Sessions and terms has a Results term card: close the open term (adjusting the next term's
+  dates), with a "close anyway" for classes not yet published (their parents never see that
+  term). Closing locks its scores and drops waiting unlock requests; the next term's sheets open on
+  its start date. The session's last term closes through promotion (batch 18). Report cards work
+  for any term: a student's profile lists every term with results, and parents see earlier
+  published terms. A past term's card uses the class the student was in then.
+
+#### Batch 18: Promotion at the end of the session
+
+- **Done:** More › Promotion (also from Sessions and terms in the last term). Each student's
+  yearly average is the average of the session's term averages (terms with no results skipped).
+  Suggested: the final class graduates; everyone else moves up at or above the pass mark (default
+  the lowest passing grade, changeable), else repeats; no results at all suggests moving up. Any
+  decision can be changed, with an optional reason; choosing the suggestion clears the change.
+  Completing it (in the last term only) closes that term, moves students to the next class in the
+  same arm name where it exists (recorded in their class history), marks graduates as graduated,
+  and starts the next session with its first term's dates. Classes, subjects and teachers carry
+  over. Unpublished classes need "complete anyway".
+- With this, group 3 has its front end. Test schools: Harbourview (closing a term) and Seaview (in
+  its last term, for promotion).
+
 ## What isn't in v1 (kept for later)
 
 Built today but "after v1" in the plan. Their code stays in `legacy/` and moves across, looking

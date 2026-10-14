@@ -51,6 +51,20 @@ export function ChildView({ child, reportHref }: { child: ParentChild; reportHre
         )}
       </Card>
 
+      {child.pastTerms.length > 0 && (
+        <Card title="Earlier terms">
+          <ul className="grid gap-1">
+            {child.pastTerms.map((t) => (
+              <li key={t.key}>
+                <Link href={`${reportHref}?term=${t.key}`} className="block rounded-xl p-2.5 text-sm font-medium underline-offset-2 hover:bg-hover hover:underline focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-accent">
+                  {t.label}: report card
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </Card>
+      )}
+
       <Card title="Attendance" description={a ? `${a.term}, from the class register. Late counts as present.` : "Shown during term time."}>
         {a && a.days > 0 ? (
           <>

@@ -49,6 +49,10 @@ type FakeStore = {
   remarks: { term: string; studentId: string; kind: "teacher" | "principal"; text: string; by: string; at: number }[];
   ratings: { term: string; studentId: string; trait: string; value: number }[];
   publishedArms: { term: string; armId: string; by: string; at: number }[];
+  /** Batch 17: terms closed for results (scores locked), with their names kept for later sessions. */
+  closedTerms: { subdomain: string; key: string; name: string; session: string; by: string; at: number }[];
+  /** Batch 18: each school's promotion pass mark (default: the lowest passing grade) and decisions changed by hand. */
+  promotion: Map<string, { passMark?: number; overrides: { studentId: string; decision: "promote" | "repeat" | "graduate"; reason: string | null }[] }>;
   /** Batch 12: a parent's account and the guardian record it belongs to (their children). */
   parentLinks: { userId: string; guardianId: string }[];
   /** Sample registers are made on first read, from that day's date (see fake/teaching.ts). */
@@ -217,7 +221,9 @@ function seed(): FakeStore {
   const greenfieldSubjects = seedGreenfieldSubjects(greenfield.levels);
   const greenfieldStudents = seedGreenfieldStudents(greenfield.arms);
   // One per screen size, so the two runs of the arms editor test never edit the same school.
-  const armsTests = ["elmwood", "willowbank"].map((school) => seedArmsTestSchool(school, greenfieldStudents.students[0]!));
+  // harbourview: the school-year test school (closing a term, promotion), with a confirmed calendar.
+  // seaview: the promotion test school, in its last term of 2025/2026 (first two terms closed).
+  const armsTests = ["elmwood", "willowbank", "harbourview", "seaview"].map((school) => seedArmsTestSchool(school, greenfieldStudents.students[0]!));
   // Greenfield's sample parent (batch 12): the guardian of its first student, in JSS 1 Blue.
   const sampleGuardian = greenfieldStudents.guardians.find((g) => g.id === greenfieldStudents.students[0]!.guardianId)!;
   sampleGuardian.email = "parent@greenfield.ng";
@@ -241,6 +247,8 @@ function seed(): FakeStore {
       { subdomain: "willowbank", name: "Willowbank College", status: "active", brandColor: "#7A1F35", logoUrl: null },
       // For the team console test: paused and brought back (batch 13).
       { subdomain: "lakeside", name: "Lakeside Grammar School", status: "active", brandColor: "#2F5D8A", logoUrl: null },
+      { subdomain: "harbourview", name: "Harbourview College", status: "active", brandColor: "#1E6B45", logoUrl: null },
+      { subdomain: "seaview", name: "Seaview Academy", status: "active", brandColor: "#0E6E8C", logoUrl: null },
     ],
     // Sample requests from the marketing site's trial form; minutes before the first read (see fake/console.ts).
     trialRequests: [
@@ -273,6 +281,8 @@ function seed(): FakeStore {
       { id: "u12", fullName: "Bisi Adebayo", email: "teacher@greenfield.ng", password: "brillianda", schools: [{ subdomain: "greenfield", role: "teacher" }] },
       { id: "u13", fullName: "Ifeanyi Okoro", email: "physics@greenfield.ng", password: "brillianda", schools: [{ subdomain: "greenfield", role: "teacher" }] },
       { id: "u14", fullName: sampleGuardian.name, email: "parent@greenfield.ng", password: "brillianda", schools: [{ subdomain: "greenfield", role: "parent" }] },
+      { id: "u19", fullName: "Ese Okoro", email: "owner@seaview.ng", password: "brillianda", schools: [{ subdomain: "seaview", role: "owner" }] },
+      { id: "u18", fullName: "Dapo Williams", email: "owner@harbourview.ng", password: "brillianda", schools: [{ subdomain: "harbourview", role: "owner" }] },
       { id: "u16", fullName: "Folake Adeyemi", email: "owner@lakeside.ng", password: "brillianda", schools: [{ subdomain: "lakeside", role: "owner" }] },
       { id: "u15", fullName: "Kemi Lawal", email: "english@greenfield.ng", password: "brillianda", schools: [{ subdomain: "greenfield", role: "teacher" }] },
       { id: "u17", fullName: jss2Guardian.name, email: "parent2@greenfield.ng", password: "brillianda", schools: [{ subdomain: "greenfield", role: "parent" }] },
@@ -283,7 +293,11 @@ function seed(): FakeStore {
       { id: "i1", token: "demo-invite", subdomain: "greenfield", fullName: "Chidi Okeke", email: "chidi@greenfield.ng", createdAt: 0 },
     ],
     links: new Map(),
-    calendars: new Map([["greenfield", { confirmed: true, startYear: 2026, terms: defaultTerms(2026) }]]),
+    calendars: new Map([
+      ["greenfield", { confirmed: true, startYear: 2026, terms: defaultTerms(2026) }],
+      ["harbourview", { confirmed: true, startYear: 2026, terms: defaultTerms(2026) }],
+      ["seaview", { confirmed: true, startYear: 2025, terms: defaultTerms(2025) }],
+    ]),
     checklistHidden: new Set(),
     // Greenfield's two sample teachers (u12, u13): JSS 1 Blue and SS 1 Green, Mathematics and Physics.
     formTeachers: [
@@ -311,6 +325,11 @@ function seed(): FakeStore {
     remarks: [],
     ratings: [],
     publishedArms: [],
+    closedTerms: [
+      { subdomain: "seaview", key: "2025-1", name: "First Term", session: "2025/2026", by: "Ese Okoro", at: 0 },
+      { subdomain: "seaview", key: "2025-2", name: "Second Term", session: "2025/2026", by: "Ese Okoro", at: 0 },
+    ],
+    promotion: new Map(),
     parentLinks: [
       { userId: "u14", guardianId: sampleGuardian.id },
       { userId: "u17", guardianId: jss2Guardian.id },
@@ -329,6 +348,8 @@ function seed(): FakeStore {
       ["pinecrest", { levelsOffered: ["SECONDARY"], state: "Kaduna", phone: "+2348030000008" }],
       ["elmwood", { levelsOffered: ["SECONDARY"], state: "Cross River", phone: "+2348030000009" }],
       ["willowbank", { levelsOffered: ["SECONDARY"], state: "Kwara", phone: "+2348030000010" }],
+      ["harbourview", { levelsOffered: ["SECONDARY"], state: "Lagos", phone: "+2348030000011" }],
+      ["seaview", { levelsOffered: ["SECONDARY"], state: "Delta", phone: "+2348030000012" }],
     ]),
     levels: [...greenfield.levels, ...armsTests.flatMap((t) => t.levels)],
     armNames: [...greenfield.armNames, ...armsTests.flatMap((t) => t.armNames)],

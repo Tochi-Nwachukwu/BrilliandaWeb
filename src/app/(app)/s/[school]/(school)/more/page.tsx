@@ -7,6 +7,7 @@ export const metadata: Metadata = { title: "More" };
 
 const ITEMS: { path: string; icon: IconName; title: string; detail: string }[] = [
   { path: "branding", icon: "school", title: "Branding", detail: "Your school’s name, colour and logo" },
+  { path: "promotion", icon: "classes", title: "Promotion", detail: "Who moves up at the end of the session" },
   { path: "sessions", icon: "calendar", title: "Sessions and terms", detail: "Your school year, its terms and their dates" },
   { path: "admission-numbers", icon: "students", title: "Admission numbers", detail: "The format new students get, like GC/2026/0042" },
   { path: "history", icon: "activity", title: "Change history", detail: "Who changed what, and when" },

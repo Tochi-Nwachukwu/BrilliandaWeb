@@ -119,3 +119,19 @@ and the daily register"). When you build them, these are the shapes the screens 
 - Publishing per arm and term, only when every subject's sheet is complete; it can be taken
   back. Parents see results only for published arms.
 - Report card data as `ReportCardData` in `src/data/types.ts`.
+
+## 9. Closing a term (added 14 October 2026)
+
+- A term stays open for results until an admin closes it (not when its end date passes). Closing
+  locks its scores, keeps its results and publishing, drops open unlock requests, and can adjust
+  the next term's dates. Refused while classes are unpublished, unless the admin confirms.
+- The last term of a session closes through promotion.
+- Report cards for any past term, using the class the student was in that term.
+
+## 10. Promotion (added 14 October 2026)
+
+- A per-school pass mark (default: the lowest passing grade) and per-student decisions (promote,
+  repeat, graduate) with an optional reason, changeable until promotion is completed.
+- Completing it in the session's last term: close that term, move students to the next class in
+  the same arm name where it exists, mark the final class graduated, record class history, and
+  start the next session. Please use `packages/core/src/promotion.ts` for the suggestions.

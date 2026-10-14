@@ -2,7 +2,7 @@
 import "server-only";
 import type { RatingSettings } from "@brillianda/core/results";
 import * as impl from "./fake/reports";
-import type { Broadsheet, ClassReports, ReportCardData } from "./types";
+import type { Broadsheet, ClassReports, ReportCardData, ReportTerm } from "./types";
 
 /** A class's broadsheet this term. Admins, or that class's form teacher (read only). */
 export function getBroadsheet(subdomain: string, armId: string): Promise<Broadsheet | null> {
@@ -14,9 +14,14 @@ export function getClassReports(subdomain: string, armId: string): Promise<Class
   return impl.getClassReports(subdomain, armId);
 }
 
-/** One student's report card this term. Admins, or their form teacher. */
-export function getReportCard(subdomain: string, studentId: string): Promise<ReportCardData | null> {
-  return impl.getReportCard(subdomain, studentId);
+/** One student's report card for a term (default: the open one). Admins, or their form teacher. */
+export function getReportCard(subdomain: string, studentId: string, termKey?: string): Promise<ReportCardData | null> {
+  return impl.getReportCard(subdomain, studentId, termKey);
+}
+
+/** Every term a student has results in, newest first. Owners and admins. */
+export function getReportTerms(subdomain: string, studentId: string): Promise<ReportTerm[] | null> {
+  return impl.getReportTerms(subdomain, studentId);
 }
 
 /** Whether the school rates behaviour, and which traits. Owners and admins. */

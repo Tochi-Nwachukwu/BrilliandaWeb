@@ -9,10 +9,12 @@ import { getParentReportCard } from "@/data/parents";
 export const metadata: Metadata = { title: "Report card" };
 
 /** A child's report card, for their parent, once the school has published the class's results. */
-export default async function ParentReportCard({ params }: PageProps<"/s/[school]/family/[studentId]/report">) {
+export default async function ParentReportCard({ params, searchParams }: PageProps<"/s/[school]/family/[studentId]/report">) {
   const { school, studentId } = await params;
+  const raw = (await searchParams).term;
+  const termKey = (Array.isArray(raw) ? raw[0] : raw) || undefined;
   await connection();
-  const card = await getParentReportCard(school, studentId);
+  const card = await getParentReportCard(school, studentId, termKey);
   if (!card) notFound();
   return (
     <div className="grid gap-4">

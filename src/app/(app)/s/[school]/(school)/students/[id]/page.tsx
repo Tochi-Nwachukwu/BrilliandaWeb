@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { connection } from "next/server";
 import { inviteParent } from "@/data/actions/parents";
 import { deleteStudent, setStudentsStatus } from "@/data/actions/students";
+import { getReportTerms } from "@/data/reports";
 import { getStudent, listStudents } from "@/data/students";
 import { StudentPage } from "./StudentPage";
 
@@ -12,7 +13,7 @@ export default async function StudentRoute({ params }: PageProps<"/s/[school]/st
   const { school, id } = await params;
   // "3 days ago" depends on the time now.
   await connection();
-  const [student, list] = await Promise.all([getStudent(school, id), listStudents(school)]);
+  const [student, list, reportTerms] = await Promise.all([getStudent(school, id), listStudents(school), getReportTerms(school, id)]);
   if (!student || !list) notFound();
   return (
     <StudentPage
@@ -22,6 +23,7 @@ export default async function StudentRoute({ params }: PageProps<"/s/[school]/st
       now={new Date().getTime()}
       setStatus={setStudentsStatus.bind(null, school)}
       remove={deleteStudent.bind(null, school, id)}
+      reportTerms={reportTerms ?? []}
       inviteParent={inviteParent.bind(null, school, student.guardian?.id ?? "")}
     />
   );
