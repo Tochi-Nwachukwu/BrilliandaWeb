@@ -69,3 +69,16 @@ address we can check every screen against the real API, not only against its spe
   to Home with the setup checklist. If the pass has expired, it says so and links to sign in.
 - We send no Turnstile token yet (`turnstileToken` is optional in your spec). Tell us when it
   becomes required, and the site key to use.
+
+## 4. Teachers and the daily register (added 14 October 2026)
+
+The front end now has teachers and attendance on fake data (see `docs/data-contract.md`, "Teachers
+and the daily register"). When you build them, these are the shapes the screens use:
+
+- A `teacher` role beside `owner` and `admin`. Every admin endpoint must refuse teachers, and
+  teachers only see the classes they're assigned.
+- Invitations with role `teacher` (`POST /v1/invitations` already takes an optional role).
+- Assignments: one form teacher per arm; subject teachers per arm and subject (one teacher each).
+- Registers: one per arm per school day, a mark per student (`present`, `late` or `absent`, plus
+  an optional note up to 120 characters), editable for any school day in the current term, keeping
+  who took it and who last changed it. Late counts as present on a report card.

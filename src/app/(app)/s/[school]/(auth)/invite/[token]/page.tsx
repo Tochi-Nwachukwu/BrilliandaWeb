@@ -57,7 +57,7 @@ async function Accept({ params }: { params: Promise<{ school: string; token: str
       title={`Join ${school.name}`}
       description={
         <p>
-          Hi {firstName}, you’ve been invited as a school admin. {invite.hasAccount ? "Enter your password to join." : "Choose a password to finish setting up your account."}
+          Hi {firstName}, you’ve been invited as {invite.role === "teacher" ? "a teacher" : "a school admin"}. {invite.hasAccount ? "Enter your password to join." : "Choose a password to finish setting up your account."}
           <br />
           <span className="text-text-muted">{invite.email}</span>
         </p>

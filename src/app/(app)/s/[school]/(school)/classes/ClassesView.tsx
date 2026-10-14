@@ -203,6 +203,7 @@ export function ClassesView({ structure, actions }: { structure: ClassStructure;
           name={names.get(open.arm.armNameId)}
           onlyArm={armsOf(open.level.id).length === 1}
           importHref={`${studentsBase}/import?arm=${open.arm.id}`}
+          registerHref={`${armsHref.replace(/\/arms$/, "")}/register/${open.arm.id}`}
           busy={busy}
           onClose={() => setOpen(null)}
           rename={() => {
@@ -327,6 +328,7 @@ function ArmDialog({
   name,
   onlyArm,
   importHref,
+  registerHref,
   busy,
   onClose,
   rename,
@@ -339,6 +341,7 @@ function ArmDialog({
   name?: ArmName;
   onlyArm: boolean;
   importHref: string;
+  registerHref: string;
   busy: boolean;
   onClose: () => void;
   rename: () => void;
@@ -356,6 +359,9 @@ function ArmDialog({
             Rename
           </Button>
         </div>
+        <Link href={registerHref} className="inline-flex min-h-[42px] items-center justify-center gap-2 rounded-full bg-primary px-5 text-sm font-medium text-primary-text hover:bg-primary-hover focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-accent">
+          Open the register
+        </Link>
         <Link href={importHref} className="inline-flex min-h-[42px] items-center justify-center gap-2 rounded-full bg-raise px-5 text-sm font-medium shadow-raised hover:bg-hover focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-accent">
           Import students into {label}
         </Link>

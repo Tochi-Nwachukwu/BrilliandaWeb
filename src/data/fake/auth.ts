@@ -136,6 +136,7 @@ export async function getInvite(subdomain: string, token: string): Promise<Invit
     email: invite.email,
     status: invite.usedAt ? "used" : expired(invite.createdAt) ? "expired" : "open",
     hasAccount: !!byEmail(invite.email),
+    role: invite.role ?? "admin",
   };
 }
 
@@ -151,29 +152,41 @@ export async function acceptInvite(subdomain: string, token: string, password: s
     user = { id: crypto.randomUUID(), fullName: invite.fullName, email: invite.email, password, schools: [] };
     store.users.push(user);
   }
-  if (!roleIn(user, subdomain)) user.schools.push({ subdomain, role: "admin" });
+  const role = invite.role ?? "admin";
+  if (!roleIn(user, subdomain)) user.schools.push({ subdomain, role });
   invite.usedAt = Date.now();
-  recordChange(subdomain, user.fullName, "Joined as an admin");
+  recordChange(subdomain, user.fullName, role === "teacher" ? "Joined as a teacher" : "Joined as an admin");
   await startSession(user);
   return { ok: true, data: null };
 }
 
-/** The signed-in person if they belong to this school (with this role, if given); else null. */
+/**
+ * The signed-in owner or admin of this school (with this role, if given); else null. Teachers are
+ * left out on purpose: every admin screen's data goes through here, so a teacher can't read it even
+ * by typing its address. Teacher-facing data uses requireStaff.
+ */
 export async function requireMember(subdomain: string, role?: SchoolRole) {
   const user = await currentUser();
   const has = user && roleIn(user, subdomain);
-  if (!user || !has || (role && has !== role)) return null;
+  if (!user || !has || (role ? has !== role : has === "teacher")) return null;
   return user;
+}
+
+/** Anyone on the school's staff, teachers included, with their role; else null. */
+export async function requireStaff(subdomain: string) {
+  const user = await currentUser();
+  const role = user && roleIn(user, subdomain);
+  return user && role ? { user, role } : null;
 }
 
 export async function listMembers(subdomain: string): Promise<SchoolMember[]> {
   if (!(await requireMember(subdomain))) return [];
   seedTimes();
   const active: SchoolMember[] = store.users
-    .filter((u) => roleIn(u, subdomain))
+    .filter((u) => { const role = roleIn(u, subdomain); return role === "owner" || role === "admin"; })
     .map((u) => ({ id: u.id, fullName: u.fullName, email: u.email, role: roleIn(u, subdomain)!, status: "active" }));
   const invited: SchoolMember[] = store.invites
-    .filter((i) => i.subdomain === subdomain && !i.usedAt)
+    .filter((i) => i.subdomain === subdomain && !i.usedAt && i.role !== "teacher")
     .map((i) => ({ id: i.id, fullName: i.fullName, email: i.email, role: "admin", status: "invited", invitedAt: i.createdAt }));
   const order = (m: SchoolMember) => (m.role === "owner" ? 0 : m.status === "active" ? 1 : 2);
   return [...active, ...invited].sort((a, b) => order(a) - order(b) || a.fullName.localeCompare(b.fullName));

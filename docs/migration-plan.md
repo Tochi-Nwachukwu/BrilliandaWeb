@@ -315,6 +315,22 @@ as workspaces. Mentions of `apps/web` and `legacy/` earlier in this plan describ
   It never saves a page with school data, so a shared phone keeps no student records. Production
   builds only. With this, every v1 item in the plan has its front end, on fake data.
 
+## After v1
+
+### Batch 11: Teachers and the daily register (14 October 2026)
+
+User decisions (14 October 2026): teachers first, then parents, then the team console; teachers
+come with the daily register so they have a real job from day one; teachers and parents sign in by
+email, like admins.
+
+- **Done:** the `teacher` role, kept out of every admin screen and its data. More › Teachers:
+  invite, make a teacher form teacher of an arm, give them subject classes, remove. Teachers land on
+  Today (is the register in?), Register (present, late or absent, with an optional note; any school
+  day this term can be changed, keeping who took it and who changed it), and My subjects (each
+  class's students; scores come with results). Admins open any class's register from Classes, see
+  today's registers on Home, and a student's attendance this term on their profile.
+- **Next:** parents (batch 12), then the team console (batch 13).
+
 ## What isn't in v1 (kept for later)
 
 Built today but "after v1" in the plan. Their code stays in `legacy/` and moves across, looking

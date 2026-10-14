@@ -17,3 +17,4 @@ export * from "./students";
 export * from "./studentImport";
 export * from "./branding";
 export * from "./hosts";
+export * from "./attendance";

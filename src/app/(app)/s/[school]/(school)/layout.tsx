@@ -23,6 +23,8 @@ async function SchoolApp({ params, children }: { params: Promise<{ school: strin
   const base = `/s/${school.subdomain}`;
   const me = await getCurrentMember(school.subdomain);
   if (!me) redirect(`${base}/login`);
+  // Teachers have their own screens (batch 11); the admin ones stay closed to them.
+  if (me.role === "teacher") redirect(`${base}/teach`);
 
   const nav: NavItem[] = [
     { href: base, label: "Home", icon: "home", exact: true },
@@ -41,6 +43,7 @@ async function SchoolApp({ params, children }: { params: Promise<{ school: strin
       signOut={signOut.bind(null, school.subdomain)}
       commands={[
         { id: "admins", label: "Admins", icon: "staff", href: `${base}/more/admins`, group: "Go to" },
+        { id: "teachers", label: "Teachers", icon: "staff", href: `${base}/more/teachers`, group: "Go to" },
         { id: "sessions", label: "Sessions and terms", icon: "calendar", href: `${base}/more/sessions`, group: "Go to" },
       ]}
       mark={
@@ -52,7 +55,7 @@ async function SchoolApp({ params, children }: { params: Promise<{ school: strin
       note={
         <>
           <b className="mb-0.5 block text-text-primary">Coming soon</b>
-          Attendance, fees, timetable and messages.
+          Results, fees, timetable and messages.
         </>
       }
     >

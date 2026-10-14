@@ -221,6 +221,31 @@ is one); the real record is append-only (plan: safeguards). `GET
 /s/<school>/more/history/export` returns the same filters as a CSV (up to 1,000 lines, cells
 escaped against spreadsheet formulas), or 403 for anyone outside the school.
 
+### Teachers and the daily register (batch 11, after v1)
+
+A third role, `teacher`, alongside `owner` and `admin`. Every admin read and write refuses teachers
+(the fakes' `requireMember` leaves them out by default), so a teacher can't reach admin data even by
+typing an address. Teacher-facing functions use `requireStaff` and check what the teacher is
+assigned. Teachers sign in like admins (email and password, or an email link) and land on
+`/s/<school>/teach`.
+
+| Function | Kind | Input / output | Who | Used by | Status |
+|---|---|---|---|---|---|
+| `getTeachersPage` | read | → `TeachersPage`: teachers (and open invites) with their form classes and subject classes; every arm with its form teacher; the subjects | owner, admin | More › Teachers | fake |
+| `inviteTeacher` | action | `{ fullName, email }` → sample email; the invite carries role `teacher` | owner, admin | More › Teachers | fake |
+| `removeTeacher` | action | teacher id (or invite id); registers they took keep their name | owner, admin | More › Teachers | fake |
+| `setFormTeacher` | action | `armId`, `userId` or null; one form teacher per arm, so setting one replaces the last | owner, admin | More › Teachers | fake |
+| `setSubjectClasses` | action | `userId`, `[{ armId, subjectId }]`: the teacher's whole list. Each arm's subject has one teacher, so a class taken here leaves its last teacher | owner, admin | More › Teachers | fake |
+| `getRegister` | read | `armId`, `date?` → `Register`: the day (default the latest school day), why it can't be marked (weekend, outside this term), who took and changed it, each student's mark and note, this term's days | admins; the arm's form teacher | register screens | fake |
+| `saveRegister` | action | `armId`, `{ date, marks: [{ studentId, mark, note? }] }` (`registerSchema`): every student marked present, late or absent; any school day this term up to today | admins; the arm's form teacher | register screens | fake |
+| `getTeacherHome` | read | → `TeacherHome`: form classes (taken today? days taken this term) and subject classes | the teacher | Today, Register, My subjects | fake |
+| `getSubjectClass` | read | `armId`, `subjectId` → its students | the subject's teacher; admins | My subjects | fake |
+| `getRegistersToday` | read | → `RegistersToday`: on a school day, how many classes' registers are in, and which are missing | owner, admin | Home | fake |
+
+`getStudent` gains `attendance`: this term's days marked, present (late counts as present), late
+and absent. School days are Monday to Friday inside a term (`packages/core/src/attendance.ts`, with
+tests); public holidays come with the school's own calendar later.
+
 ### Installable app (batch 10)
 
 The service worker (`public/sw.js`) and its page (`/offline`) live at the root of every school

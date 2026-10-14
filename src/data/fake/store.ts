@@ -22,6 +22,14 @@ type FakeStore = {
   links: Map<string, FakeLink>;
   calendars: Map<string, { confirmed: boolean; startYear: number; terms: Term[] }>;
   checklistHidden: Set<string>;
+  /** Batch 11: one form teacher per arm; subject teachers per arm and subject. */
+  formTeachers: { armId: string; userId: string }[];
+  subjectTeachers: { armId: string; subjectId: string; userId: string }[];
+  /** A register taken for one arm on one day, and each student's mark in it. */
+  registers: { armId: string; date: string; takenBy: string; takenAt: number; updatedBy?: string; updatedAt?: number }[];
+  marks: { armId: string; date: string; studentId: string; mark: "present" | "late" | "absent"; note?: string }[];
+  /** Sample registers are made on first read, from that day's date (see fake/teaching.ts). */
+  registersSeeded: boolean;
   /** Schools whose owner has saved More › Branding (ticks the checklist item). */
   brandingSaved: Set<string>;
   /** at <= 0 means "that many minutes before the first read" (see fake/home.ts). */
@@ -149,7 +157,7 @@ function seedArmsTestSchool(subdomain: string, student: FakeStudent) {
 }
 
 /** createdAt 0 means "sent just now"; filled in the first time it is read (see fake/auth.ts). */
-export type FakeInvite = { id: string; token: string; subdomain: string; fullName: string; email: string; createdAt: number; usedAt?: number };
+export type FakeInvite = { id: string; token: string; subdomain: string; fullName: string; email: string; createdAt: number; usedAt?: number; role?: "admin" | "teacher" };
 /** Password reset and email sign-in links. */
 export type FakeLink = { kind: "reset" | "magic"; userId: string; subdomain: string; createdAt: number; usedAt?: number };
 
@@ -162,7 +170,7 @@ export type FakeSignupDraft = {
 };
 
 /** FAKE: plain-text passwords, because nothing here is real. Better Auth replaces all of this. */
-export type FakeUser = { id: string; fullName: string; email: string; password: string; phone?: string; schools: { subdomain: string; role: "owner" | "admin" }[] };
+export type FakeUser = { id: string; fullName: string; email: string; password: string; phone?: string; schools: { subdomain: string; role: "owner" | "admin" | "teacher" }[] };
 
 function seed(): FakeStore {
   const greenfield = seedGreenfieldClasses();
@@ -200,6 +208,8 @@ function seed(): FakeStore {
       { id: "u9", fullName: "Musa Danjuma", email: "owner@pinecrest.ng", password: "brillianda", schools: [{ subdomain: "pinecrest", role: "owner" }] },
       { id: "u10", fullName: "Grace Etim", email: "owner@elmwood.ng", password: "brillianda", schools: [{ subdomain: "elmwood", role: "owner" }] },
       { id: "u11", fullName: "Sola Ajayi", email: "owner@willowbank.ng", password: "brillianda", schools: [{ subdomain: "willowbank", role: "owner" }] },
+      { id: "u12", fullName: "Bisi Adebayo", email: "teacher@greenfield.ng", password: "brillianda", schools: [{ subdomain: "greenfield", role: "teacher" }] },
+      { id: "u13", fullName: "Ifeanyi Okoro", email: "physics@greenfield.ng", password: "brillianda", schools: [{ subdomain: "greenfield", role: "teacher" }] },
     ],
     sessions: new Map(),
     handovers: new Map(),
@@ -209,6 +219,20 @@ function seed(): FakeStore {
     links: new Map(),
     calendars: new Map([["greenfield", { confirmed: true, startYear: 2026, terms: defaultTerms(2026) }]]),
     checklistHidden: new Set(),
+    // Greenfield's two sample teachers (u12, u13): JSS 1 Blue and SS 1 Green, Mathematics and Physics.
+    formTeachers: [
+      { armId: "ga-gl1-gn1", userId: "u12" },
+      { armId: "ga-gl4-gn3", userId: "u13" },
+    ],
+    subjectTeachers: [
+      { armId: "ga-gl1-gn1", subjectId: "gs-mathematics", userId: "u12" },
+      { armId: "ga-gl1-gn2", subjectId: "gs-mathematics", userId: "u12" },
+      { armId: "ga-gl4-gn3", subjectId: "gs-physics", userId: "u13" },
+      { armId: "ga-gl4-gn1", subjectId: "gs-physics", userId: "u13" },
+    ],
+    registers: [],
+    marks: [],
+    registersSeeded: false,
     // The sample schools come with their colours chosen; the test schools are as fresh from signup.
     brandingSaved: new Set(["greenfield", "surebloom", "closedschool"]),
     profiles: new Map([

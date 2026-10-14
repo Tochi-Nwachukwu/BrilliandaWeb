@@ -116,6 +116,27 @@ export function StudentPage({
           )}
         </Card>
 
+        <Card title="Attendance" description={student.attendance ? `${student.attendance.term}, from the daily register.` : undefined}>
+          {student.attendance && student.attendance.days > 0 ? (
+            <dl className="grid grid-cols-3 gap-3 text-center">
+              <div className="rounded-2xl bg-sunken p-3">
+                <dt className="text-[12.5px] text-text-secondary">Present</dt>
+                <dd className="text-[22px] font-medium tabular-nums">{student.attendance.present}<span className="text-sm text-text-secondary"> of {student.attendance.days}</span></dd>
+              </div>
+              <div className="rounded-2xl bg-sunken p-3">
+                <dt className="text-[12.5px] text-text-secondary">Late</dt>
+                <dd className="text-[22px] font-medium tabular-nums">{student.attendance.late}</dd>
+              </div>
+              <div className="rounded-2xl bg-sunken p-3">
+                <dt className="text-[12.5px] text-text-secondary">Absent</dt>
+                <dd className="text-[22px] font-medium tabular-nums">{student.attendance.absent}</dd>
+              </div>
+            </dl>
+          ) : (
+            <p className="text-sm text-text-secondary">No registers taken for this student this term yet.</p>
+          )}
+        </Card>
+
         <Card title="Classes">
           <ol className="grid gap-2">
             {[...student.classHistory].reverse().map((c, i) => (

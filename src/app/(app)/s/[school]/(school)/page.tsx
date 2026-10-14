@@ -1,5 +1,5 @@
 import { termPosition, type TermPosition } from "@brillianda/core/calendar";
-import { Card, StatCard } from "@brillianda/ui/Cards";
+import { Card, ProgressBar, StatCard } from "@brillianda/ui/Cards";
 import { EmptyState } from "@brillianda/ui/EmptyState";
 import { Hero } from "@brillianda/ui/Hero";
 import { levelStyle } from "@brillianda/ui/levels";
@@ -11,6 +11,7 @@ import { schoolFromParams } from "@/components/school/school";
 import { hideChecklist } from "@/data/actions/home";
 import { getCurrentMember } from "@/data/auth";
 import { getHomeSummary, getSession, getSetupProgress } from "@/data/home";
+import { getRegistersToday } from "@/data/teaching";
 import type { SessionSetup } from "@/data/types";
 import { formatDate, formatDay, greeting, plural, timeAgo, todayInLagos } from "@/lib/time";
 import { SetupChecklist } from "./SetupChecklist";
@@ -30,11 +31,12 @@ export default async function SchoolHome({ params }: PageProps<"/s/[school]">) {
   const school = await schoolFromParams(params);
   // Greeting and term week depend on the time now.
   await connection();
-  const [me, setup, summary, session] = await Promise.all([
+  const [me, setup, summary, session, registers] = await Promise.all([
     getCurrentMember(school.subdomain),
     getSetupProgress(school.subdomain),
     getHomeSummary(school.subdomain),
     getSession(school.subdomain),
+    getRegistersToday(school.subdomain),
   ]);
   if (!me || !setup || !summary || !session) return null;
 
@@ -91,6 +93,27 @@ export default async function SchoolHome({ params }: PageProps<"/s/[school]">) {
         <StatCard href={`${base}/subjects`} icon="subjects" label="Subjects" value={summary.subjects} note={summary.subjects ? undefined : "None yet"} level={3} index={2} />
         <StatCard href={`${base}/more/admins`} icon="staff" label="Admins" value={summary.admins} note={summary.admins === 1 ? "Just you" : undefined} level={4} index={3} />
       </div>
+
+      {registers && registers.date && registers.total > 0 && (
+        <Card
+          title="Today’s registers"
+          description={registers.taken === registers.total ? "Every class’s register is in." : `${registers.taken} of ${plural(registers.total, "class", "classes")} in so far.`}
+        >
+          <ProgressBar value={registers.taken / registers.total} color="var(--color-chart)" />
+          {registers.missing.length > 0 && (
+            <ul className="mt-4 flex flex-wrap gap-2" aria-label="Registers not taken yet">
+              {registers.missing.slice(0, 12).map((arm) => (
+                <li key={arm.armId}>
+                  <Link href={`${base}/classes/register/${arm.armId}`} className="inline-flex min-h-[36px] items-center rounded-full bg-raise px-3.5 text-[13px] font-medium shadow-raised hover:bg-hover focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-accent">
+                    {arm.label}
+                  </Link>
+                </li>
+              ))}
+              {registers.missing.length > 12 && <li className="self-center text-[13px] text-text-secondary">and {registers.missing.length - 12} more</li>}
+            </ul>
+          )}
+        </Card>
+      )}
 
       <Card
         title="Recent changes"

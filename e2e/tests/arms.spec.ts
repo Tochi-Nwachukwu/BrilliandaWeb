@@ -12,6 +12,9 @@ async function signIn(page: Page, school: string) {
   await expect(page).toHaveURL(new RegExp(`/s/${school}$`));
 }
 
+// Both tests edit the same school, so they run one after the other.
+test.describe.configure({ mode: "serial" });
+
 const card = (page: Page, name: string) => page.getByRole("listitem", { name, exact: true });
 
 test("rename, add, reorder and choose classes for arms, then save once", { tag: "@both" }, async ({ page }, testInfo) => {

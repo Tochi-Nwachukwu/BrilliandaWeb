@@ -37,7 +37,7 @@ export type SubdomainCheck =
   | { available: true; subdomain: string }
   | { available: false; subdomain: string; reason: "taken" | "reserved" | "invalid"; message: string; suggestions: string[] };
 
-export type SchoolRole = "owner" | "admin";
+export type SchoolRole = "owner" | "admin" | "teacher";
 
 /** Who is signed in at a school, and as what. */
 export type SignedInMember = { userId: string; fullName: string; email: string; role: SchoolRole };
@@ -53,7 +53,7 @@ export type SchoolMember = {
   invitedAt?: number;
 };
 
-export type InviteDetails = { schoolName: string; fullName: string; email: string; status: "open" | "used" | "expired"; hasAccount: boolean };
+export type InviteDetails = { schoolName: string; fullName: string; email: string; status: "open" | "used" | "expired"; hasAccount: boolean; role: "admin" | "teacher" };
 
 /**
  * FAKE ONLY: what the email would have said, so screens can be clicked through before real
@@ -129,6 +129,8 @@ export type StudentDetail = StudentRow & {
   guardian: { id: string; name: string; phone: string | null; email: string | null; siblings: { id: string; fullName: string; armLabel: string }[] } | null;
   classHistory: { armLabel: string; from: string }[];
   changes: ChangeEntry[];
+  /** This term's register marks (batch 11). */
+  attendance: AttendanceSummary;
 };
 
 /** A guardian already on file, found by phone, so siblings can share one record. */
@@ -148,3 +150,54 @@ export type ImportSetup = {
 };
 export type ImportBatchSummary = { id: string; at: number; by: string; fileName: string; created: number; updated: number; undoable: boolean; undone: boolean };
 export type ImportResult = { batchId: string; created: number; updated: number; skipped: number; notImported: number; newStudents: { id: string; fullName: string; armLabel: string }[] };
+
+// ——— Teachers and the daily register (batch 11) ———
+
+export type RegisterMark = "present" | "late" | "absent";
+
+/** A teacher on the Teachers page: who they are and what they teach. */
+export type TeacherSummary = {
+  id: string;
+  fullName: string;
+  email: string;
+  status: "active" | "invited";
+  invitedAt?: number;
+  formArms: { armId: string; label: string }[];
+  subjectClasses: { armId: string; subjectId: string; label: string }[];
+};
+export type TeachersPage = {
+  teachers: TeacherSummary[];
+  arms: { id: string; label: string; formTeacherId: string | null }[];
+  subjects: { id: string; name: string; code: string }[];
+};
+
+/** One arm's register for one day. */
+export type Register = {
+  armId: string;
+  armLabel: string;
+  date: string;
+  /** Why this day can't be marked (a weekend, outside the term); null if it can. */
+  problem: string | null;
+  taken: { by: string; at: number; updatedBy?: string; updatedAt?: number } | null;
+  students: { id: string; fullName: string; admissionNo: string; mark: RegisterMark | null; note: string }[];
+  /** This term's school days so far, newest first, and whether each was taken. */
+  days: { date: string; taken: boolean }[];
+};
+
+/** A teacher's home: their form classes and the subjects they teach. */
+export type TeacherHome = {
+  fullName: string;
+  /** Today, when it's a school day; null at weekends and in breaks. */
+  today: string | null;
+  formArms: { armId: string; label: string; students: number; takenToday: boolean; takenThisTerm: number; daysThisTerm: number }[];
+  subjects: { armId: string; subjectId: string; label: string; subjectName: string; students: number }[];
+};
+
+/** The students in one subject class, for its teacher. */
+export type SubjectClass = { armLabel: string; subjectName: string; students: { id: string; fullName: string; admissionNo: string }[] };
+
+/** Home's register card for admins: today's registers. */
+export type RegistersToday = { date: string | null; taken: number; total: number; missing: { armId: string; label: string }[] };
+
+/** A student's attendance this term (late counts as present). */
+export type AttendanceSummary = { term: string; days: number; present: number; late: number; absent: number } | null;

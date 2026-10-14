@@ -27,8 +27,12 @@ export const inviteAdminSchema = z.object({
   email,
 });
 
-export type SchoolRole = "owner" | "admin";
-export const ROLE_LABEL: Record<SchoolRole, string> = { owner: "School owner", admin: "School admin" };
+/** Owners and admins run the school; teachers see only their own classes (batch 11). */
+export type SchoolRole = "owner" | "admin" | "teacher";
+export const ROLE_LABEL: Record<SchoolRole, string> = { owner: "School owner", admin: "School admin", teacher: "Teacher" };
+/** The roles that can open the school's admin screens. */
+export const ADMIN_ROLES: readonly SchoolRole[] = ["owner", "admin"];
+export const isAdminRole = (role: SchoolRole | null | undefined) => role === "owner" || role === "admin";
 
 /** Invite links work once and for 72 hours. */
 export const INVITE_LIFETIME_HOURS = 72;

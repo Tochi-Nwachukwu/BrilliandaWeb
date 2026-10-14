@@ -59,6 +59,8 @@ const SCHOOL = [
   "/more/admission-numbers",
   "/more/branding",
   "/more/history",
+  "/more/teachers",
+  "/classes/register/ga-gl1-gn1",
 ];
 
 test("every screen inside a school passes the accessibility scan", { tag: "@both" }, async ({ page }) => {
@@ -70,4 +72,14 @@ test("every screen inside a school passes the accessibility scan", { tag: "@both
   const href = "/s/greenfield/students/st1";
   await test.step("student profile", () => scan(page, href));
   await test.step("edit student", () => scan(page, `${href}/edit`));
+});
+
+test("a teacher's screens pass the accessibility scan", { tag: "@both" }, async ({ page }) => {
+  test.setTimeout(120_000);
+  await open(page, "/s/greenfield/login");
+  await page.getByLabel("Email").fill("physics@greenfield.ng");
+  await page.getByLabel("Password", { exact: true }).fill("brillianda");
+  await page.getByRole("button", { name: "Sign in", exact: true }).click();
+  await expect(page).toHaveURL(/\/teach$/);
+  for (const path of ["/teach", "/teach/register", "/teach/subjects"]) await test.step(path, () => scan(page, `/s/greenfield${path}`));
 });

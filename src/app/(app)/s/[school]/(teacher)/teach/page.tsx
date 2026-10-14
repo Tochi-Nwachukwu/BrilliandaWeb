@@ -1,0 +1,82 @@
+import { Card } from "@brillianda/ui/Cards";
+import { EmptyState } from "@brillianda/ui/EmptyState";
+import { Icon } from "@brillianda/ui/Icon";
+import { PageHeader } from "@brillianda/ui/PageHeader";
+import type { Metadata } from "next";
+import Link from "next/link";
+import { connection } from "next/server";
+import { getTeacherHome } from "@/data/teaching";
+import { greeting, plural } from "@/lib/time";
+
+export const metadata: Metadata = { title: "Today" };
+
+const linkClass = "rounded-2xl focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-accent";
+
+/** A teacher's Today: is the register in, and the subjects they teach. */
+export default async function TeacherToday({ params }: PageProps<"/s/[school]/teach">) {
+  const { school } = await params;
+  await connection();
+  const home = await getTeacherHome(school);
+  if (!home) return null;
+  const base = `/s/${school}/teach`;
+  const first = home.fullName.split(" ")[0];
+
+  return (
+    <div className="grid gap-4">
+      <PageHeader title={`${greeting()}, ${first}`}>
+        {home.today ? "Here’s what needs you today." : "No school today. This term’s registers stay open to change."}
+      </PageHeader>
+
+      <Card title="Your register" description={home.formArms.length ? "Once a day, for your form class. You can change it afterwards." : undefined}>
+        {home.formArms.length ? (
+          <ul className="grid gap-2">
+            {home.formArms.map((arm) => {
+              const due = home.today !== null && !arm.takenToday;
+              return (
+                <li key={arm.armId}>
+                  <Link href={`${base}/register?arm=${arm.armId}`} className={`${linkClass} grid grid-cols-[2.75rem_minmax(0,1fr)_auto] items-center gap-3.5 bg-sunken p-3.5 hover:bg-hover`}>
+                    <span aria-hidden className={`grid h-11 w-11 place-items-center rounded-2xl ${due ? "bg-warning-bg text-warning" : "bg-success-bg text-success"}`}>
+                      <Icon name={due ? "clock" : "check"} className="h-5 w-5" />
+                    </span>
+                    <span className="min-w-0">
+                      <b className="block font-semibold">{arm.label}</b>
+                      <span className="block text-[13px] text-text-secondary">
+                        {home.today ? (arm.takenToday ? "Today’s register is in." : "Today’s register isn’t taken yet.") : `${plural(arm.students, "student")}.`} {arm.takenThisTerm} of{" "}
+                        {plural(arm.daysThisTerm, "school day")} this term.
+                      </span>
+                    </span>
+                    <span className={`rounded-full px-4 py-2 text-[13px] font-medium ${due ? "bg-primary text-primary-text" : "bg-raise shadow-raised"}`}>{due ? "Take it" : "Open"}</span>
+                  </Link>
+                </li>
+              );
+            })}
+          </ul>
+        ) : (
+          <EmptyState title="No form class yet">When your school makes you a class’s form teacher, its register shows here.</EmptyState>
+        )}
+      </Card>
+
+      <Card title="Your subjects" description={home.subjects.length ? "Each class you teach, with its students. Scores come in a later version." : undefined}>
+        {home.subjects.length ? (
+          <ul className="grid gap-1 sm:grid-cols-2">
+            {home.subjects.map((s) => (
+              <li key={`${s.armId}-${s.subjectId}`}>
+                <Link href={`${base}/subjects/${s.armId}/${s.subjectId}`} className={`${linkClass} flex items-center justify-between gap-3 p-3 hover:bg-hover`}>
+                  <span className="min-w-0">
+                    <b className="block truncate font-semibold">{s.subjectName}</b>
+                    <span className="block text-[13px] text-text-secondary">
+                      {s.label} · {plural(s.students, "student")}
+                    </span>
+                  </span>
+                  <Icon name="chevron" className="h-4 w-4 shrink-0 text-text-muted" />
+                </Link>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <EmptyState title="No subjects yet">When your school gives you subjects to teach, each class shows here.</EmptyState>
+        )}
+      </Card>
+    </div>
+  );
+}

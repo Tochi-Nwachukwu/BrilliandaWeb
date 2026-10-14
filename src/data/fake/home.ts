@@ -36,7 +36,7 @@ export async function saveSession(subdomain: string, input: SessionInput): Promi
 }
 
 function teamSize(subdomain: string) {
-  return store.users.filter((u) => u.schools.some((s) => s.subdomain === subdomain)).length;
+  return store.users.filter((u) => u.schools.some((s) => s.subdomain === subdomain && s.role !== "teacher")).length;
 }
 
 export async function getSetupProgress(subdomain: string): Promise<SetupProgress | null> {
