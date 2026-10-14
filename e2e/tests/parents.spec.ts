@@ -31,6 +31,12 @@ test("a parent sees their own child, and nothing else", { tag: "@both" }, async 
   // Another family's child isn't there, whatever the address says.
   await open(page, "/s/greenfield/family/st70");
   await expect(page.getByText("This page isn’t here")).toBeVisible();
+
+  // The sign-in page says who is signed in, and lets them switch accounts.
+  await open(page, "/s/greenfield/login");
+  await expect(page.getByRole("heading", { name: "You’re already signed in" })).toBeVisible();
+  await page.getByRole("button", { name: "Sign out and use another account" }).click();
+  await expect(page.getByLabel("Email")).toBeVisible();
 });
 
 test("an admin invites a parent, who signs up and sees their child", async ({ page, browser }) => {
