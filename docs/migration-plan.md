@@ -385,6 +385,16 @@ parents see results.
   their class's broadsheet, report cards, the class teacher's remark and ratings (not the
   principal's).
 
+#### Batch 16: Parents see results
+
+- **Done:** a Results card on each child's page: once the class is published, the term's average
+  and position (when shown) and a link to the report card (the same card the school prints);
+  before that, "results aren't out yet". A parent opens only their own children's cards, and
+  only while the class is published; taking results back hides them again.
+- With this, group 2 (results) has its front end. Not done here: several tests rolling up into
+  one CA (the user is bringing more detail), and past terms' results (they come with closing a
+  term, group 3).
+
 ## What isn't in v1 (kept for later)
 
 Built today but "after v1" in the plan. Their code stays in `legacy/` and moves across, looking

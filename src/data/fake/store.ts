@@ -221,6 +221,9 @@ function seed(): FakeStore {
   // Greenfield's sample parent (batch 12): the guardian of its first student, in JSS 1 Blue.
   const sampleGuardian = greenfieldStudents.guardians.find((g) => g.id === greenfieldStudents.students[0]!.guardianId)!;
   sampleGuardian.email = "parent@greenfield.ng";
+  // A second sample parent, for a JSS 2 Blue student: that class is ready to publish (batch 16).
+  const jss2Guardian = greenfieldStudents.guardians.find((g) => g.id === greenfieldStudents.students.find((s) => s.armId === "ga-gl2-gn1" && s.guardianId !== sampleGuardian.id)!.guardianId)!;
+  jss2Guardian.email = "parent2@greenfield.ng";
   return {
     schools: [
       { subdomain: "greenfield", name: "Greenfield College", status: "active", brandColor: "#4A3AA7", logoUrl: null },
@@ -272,6 +275,7 @@ function seed(): FakeStore {
       { id: "u14", fullName: sampleGuardian.name, email: "parent@greenfield.ng", password: "brillianda", schools: [{ subdomain: "greenfield", role: "parent" }] },
       { id: "u16", fullName: "Folake Adeyemi", email: "owner@lakeside.ng", password: "brillianda", schools: [{ subdomain: "lakeside", role: "owner" }] },
       { id: "u15", fullName: "Kemi Lawal", email: "english@greenfield.ng", password: "brillianda", schools: [{ subdomain: "greenfield", role: "teacher" }] },
+      { id: "u17", fullName: jss2Guardian.name, email: "parent2@greenfield.ng", password: "brillianda", schools: [{ subdomain: "greenfield", role: "parent" }] },
     ],
     sessions: new Map(),
     handovers: new Map(),
@@ -307,7 +311,10 @@ function seed(): FakeStore {
     remarks: [],
     ratings: [],
     publishedArms: [],
-    parentLinks: [{ userId: "u14", guardianId: sampleGuardian.id }],
+    parentLinks: [
+      { userId: "u14", guardianId: sampleGuardian.id },
+      { userId: "u17", guardianId: jss2Guardian.id },
+    ],
     registersSeeded: false,
     // The sample schools come with their colours chosen; the test schools are as fresh from signup.
     brandingSaved: new Set(["greenfield", "surebloom", "closedschool"]),

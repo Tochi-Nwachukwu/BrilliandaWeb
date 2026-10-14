@@ -1,4 +1,6 @@
 import { MARK_LABEL } from "@brillianda/core/attendance";
+import { ordinal } from "@brillianda/core/grading";
+import Link from "next/link";
 import { Badge } from "@brillianda/ui/Badge";
 import { Card } from "@brillianda/ui/Cards";
 import type { ParentChild } from "@/data/types";
@@ -7,7 +9,7 @@ const TONE = { present: "success", late: "warning", absent: "danger" } as const;
 const dayLabel = (day: string) => new Date(`${day}T12:00:00Z`).toLocaleDateString("en-GB", { timeZone: "UTC", weekday: "short", day: "numeric", month: "short" });
 
 /** One child, as their parent sees them: who they are, and their attendance this term. */
-export function ChildView({ child }: { child: ParentChild }) {
+export function ChildView({ child, reportHref }: { child: ParentChild; reportHref: string }) {
   const a = child.attendance;
   return (
     <div className="grid gap-4">
@@ -28,6 +30,26 @@ export function ChildView({ child }: { child: ParentChild }) {
           </div>
         </dl>
       </section>
+
+      <Card title="Results" description={child.results?.term}>
+        {child.results?.published ? (
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <p className="text-sm">
+              Average <b className="text-[20px] font-semibold tabular-nums">{child.results.average ?? "—"}</b>
+              {child.results.position ? (
+                <>
+                  {" "}· {ordinal(child.results.position)} of {child.results.of} in {child.armLabel}
+                </>
+              ) : null}
+            </p>
+            <Link href={reportHref} className="inline-flex min-h-[44px] items-center rounded-full bg-primary px-5 text-sm font-medium text-primary-text hover:bg-primary-hover focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-accent">
+              Open the report card
+            </Link>
+          </div>
+        ) : (
+          <p className="text-sm text-text-secondary">{child.results ? "Results for this term aren’t out yet. The school publishes them when every subject is marked." : "Results come with the school term."}</p>
+        )}
+      </Card>
 
       <Card title="Attendance" description={a ? `${a.term}, from the class register. Late counts as present.` : "Shown during term time."}>
         {a && a.days > 0 ? (

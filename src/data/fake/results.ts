@@ -119,6 +119,7 @@ async function sheetAccess(subdomain: string, armId: string, subjectId: string) 
 
 export async function getResultsSettings(subdomain: string): Promise<ResultsSettingsData | null> {
   if (!(await requireMember(subdomain))) return null;
+  seedResults();
   const term = resultsTermOf(subdomain);
   return { ...settingsOf(subdomain), scoresEntered: !!term && store.scores.some((s) => s.term === term.key && store.arms.some((a) => a.id === s.armId && a.subdomain === subdomain)) };
 }

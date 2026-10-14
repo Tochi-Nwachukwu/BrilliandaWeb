@@ -19,7 +19,7 @@ export default async function ChildPage({ params }: PageProps<"/s/[school]/famil
       <Link href={`/s/${school}/family`} className="w-fit rounded text-sm font-medium text-text-secondary hover:text-text-primary focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-accent">
         ← My children
       </Link>
-      <ChildView child={child} />
+      <ChildView child={child} reportHref={`/s/${school}/family/${child.id}/report`} />
     </div>
   );
 }

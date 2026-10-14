@@ -6,11 +6,13 @@ import { schoolDaysSoFar, termOf } from "@brillianda/core/attendance";
 import { defaultTerms } from "@brillianda/core/calendar";
 import { fullName } from "@brillianda/core/students";
 import { todayInLagos } from "@/lib/time";
-import type { ActionResult, ParentAccess, ParentHome, ParentsPage, SampleEmail } from "../types";
+import type { ActionResult, ParentAccess, ParentHome, ParentsPage, ReportCardData, SampleEmail } from "../types";
 import { requireMember, requireParent } from "./auth";
 import { recordChange } from "./changes";
 import { store } from "./store";
 import { armOptions } from "./students";
+import { buildReportCard } from "./reports";
+import { resultsTermOf } from "./results";
 import { attendanceOf } from "./teaching";
 
 const pause = () => new Promise((resolve) => setTimeout(resolve, 300));
@@ -130,7 +132,28 @@ export async function getParentHome(subdomain: string): Promise<ParentHome | nul
         formTeacher: store.users.find((u) => u.id === formTeacherId)?.fullName ?? null,
         attendance: attendanceOf(subdomain, s.id),
         recent: days.map((date) => ({ date, mark: store.marks.find((m) => m.studentId === s.id && m.date === date)?.mark ?? null })),
+        results: resultsFor(subdomain, s.id),
       };
     });
   return { fullName: parent.user.fullName, schoolDay: days[0] === today, children };
+}
+
+/** This term's results for a parent: nothing but the term's name until the class is published. */
+function resultsFor(subdomain: string, studentId: string): ParentHome["children"][number]["results"] {
+  const term = resultsTermOf(subdomain);
+  if (!term) return null;
+  const card = buildReportCard(subdomain, studentId);
+  const label = `${term.name}, ${term.session}`;
+  if (!card?.published) return { term: label, published: false };
+  return { term: label, published: true, average: card.average, position: card.position, of: card.of };
+}
+
+/** A child's report card, for their parent: their own children only, and only once published. */
+export async function getParentReportCard(subdomain: string, studentId: string): Promise<ReportCardData | null> {
+  const parent = await requireParent(subdomain);
+  if (!parent) return null;
+  const child = store.students.find((s) => s.subdomain === subdomain && s.id === studentId && !s.deletedAt && s.guardianId && parent.guardianIds.includes(s.guardianId));
+  if (!child) return null;
+  const card = buildReportCard(subdomain, studentId);
+  return card?.published ? card : null;
 }

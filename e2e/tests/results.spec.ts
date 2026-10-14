@@ -39,7 +39,7 @@ test("a teacher fills a sheet, marks it complete, and an admin unlocks it", { ta
   }
   await expect(page.getByText(/(\d+) of \1 students complete/)).toBeVisible();
   await page.getByRole("button", { name: "Mark complete" }).click();
-  await expect(page.getByText("Marked complete").locator("visible=true")).toBeVisible();
+  await expect(page.getByText("Marked complete", { exact: true }).locator("visible=true").first()).toBeVisible();
   await expect(page.getByText("This sheet is marked complete.", { exact: false })).toBeVisible();
   await expect(first).toBeDisabled();
 
@@ -113,8 +113,23 @@ test("broadsheet, remarks and ratings, a report card, and publishing a class", {
     await page.getByRole("button", { name: "Publish results" }).click();
     await expect(page.getByText("JSS 2 Blue results published").locator("visible=true")).toBeVisible();
     await expect(page.getByText("Published", { exact: true })).toBeVisible();
+
+    // A JSS 2 Blue parent now sees the average and the report card.
+    const parent = await (await page.context().browser()!.newContext()).newPage();
+    await signIn(parent, "parent2@greenfield.ng");
+    await expect(parent).toHaveURL(/\/family$/);
+    const child = parent.getByRole("link").filter({ hasText: "JSS 2 Blue" });
+    if (await child.count()) await child.first().click();
+    await expect(parent.getByText(/^Average/).first()).toBeVisible();
+    await parent.getByRole("link", { name: "Open the report card" }).click();
+    await expect(parent.getByText(/Report card ·/).locator("visible=true").first()).toBeVisible();
+    const cardUrl = parent.url();
+
     await page.getByRole("button", { name: "Take back results" }).click();
     await expect(page.getByText("JSS 2 Blue results taken back").locator("visible=true")).toBeVisible();
+    // Taken back: the card is gone for the parent.
+    await open(parent, new URL(cardUrl).pathname);
+    await expect(parent.getByText("This page isn’t here")).toBeVisible();
   }
 });
 

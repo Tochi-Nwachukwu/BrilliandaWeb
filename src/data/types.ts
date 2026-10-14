@@ -219,6 +219,8 @@ export type ParentChild = {
   attendance: AttendanceSummary;
   /** The latest school days this term, newest first. */
   recent: { date: string; mark: RegisterMark | null }[];
+  /** This term's results, once the class is published (batch 16); otherwise just the term's name. */
+  results: { term: string; published: false } | { term: string; published: true; average: number | null; position: number | null; of: number } | null;
 };
 export type ParentHome = { fullName: string; schoolDay: boolean; children: ParentChild[] };
 

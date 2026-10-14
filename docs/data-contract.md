@@ -313,6 +313,13 @@ API should use too, so a total never depends on where it was worked out.
 | `setPublished` | action | `armId, publish`; publishing needs every subject complete | owner, admin | fake |
 | `getReportCard` | read | `studentId` → `ReportCardData` | admins; the student's form teacher (parents in batch 16, once published) | fake |
 
+### Parents see results (batch 16, after v1)
+
+`getParentHome`'s children gain `results`: the term's name, and once the class is published the
+average, position (when the school shows them) and class size. `getParentReportCard(studentId)`
+returns `ReportCardData` for the parent's own child only while their class is published; anything
+else is "not found".
+
 ### Installable app (batch 10)
 
 The service worker (`public/sw.js`) and its page (`/offline`) live at the root of every school

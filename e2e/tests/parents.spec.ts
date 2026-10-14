@@ -19,6 +19,8 @@ test("a parent sees their own child, and nothing else", { tag: "@both" }, async 
   await expect(page.getByText("JSS 1 Blue").first()).toBeVisible();
   await expect(page.getByText("Bisi Adebayo").first()).toBeVisible();
   await expect(page.getByRole("heading", { name: "Attendance" }).first()).toBeVisible();
+  // JSS 1 Blue isn't published yet, so no results show.
+  await expect(page.getByText("Results for this term aren’t out yet.", { exact: false })).toBeVisible();
 
   // Admin and teacher screens send a parent back to their own.
   await page.goto("/s/greenfield/students");
