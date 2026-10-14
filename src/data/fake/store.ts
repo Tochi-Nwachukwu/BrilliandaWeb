@@ -353,4 +353,20 @@ function seed(): FakeStore {
 }
 
 const holder = globalThis as unknown as { __brilliandaFakeStore?: FakeStore };
-export const store: FakeStore = (holder.__brilliandaFakeStore ??= seed());
+
+/**
+ * One store for the server's life, kept across `pnpm dev` reloads so typed-in data survives. A
+ * store made by older code lacks newer fields; those are filled in from a fresh seed, leaving
+ * everything already there as it is.
+ */
+function keepStore(): FakeStore {
+  const fresh = seed();
+  const existing = holder.__brilliandaFakeStore;
+  if (!existing) return (holder.__brilliandaFakeStore = fresh);
+  for (const key of Object.keys(fresh) as (keyof FakeStore)[]) {
+    if (!(key in existing)) (existing as Record<string, unknown>)[key] = fresh[key];
+  }
+  return existing;
+}
+
+export const store: FakeStore = keepStore();
