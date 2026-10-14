@@ -14,7 +14,8 @@ import { useRouter } from "next/navigation";
 import { useState, useTransition, type ReactNode } from "react";
 import { initials } from "@/lib/initials";
 import { formatDate, timeAgo } from "@/lib/time";
-import type { ActionResult, ArmOption, StudentDetail } from "@/data/types";
+import { SampleLinks } from "@/components/auth/forms";
+import type { ActionResult, ArmOption, SampleEmail, StudentDetail } from "@/data/types";
 import { STATUS_TONE, StatusDialog } from "../StudentsView";
 
 function Fact({ label, children, wide }: { label: string; children: ReactNode; wide?: boolean }) {
@@ -35,6 +36,7 @@ export function StudentPage({
   now,
   setStatus,
   remove,
+  inviteParent,
 }: {
   school: string;
   student: StudentDetail;
@@ -42,6 +44,8 @@ export function StudentPage({
   now: number;
   setStatus: (input: unknown) => Promise<ActionResult<{ changed: number }>>;
   remove: () => Promise<ActionResult<null>>;
+  /** Invites this student's guardian to the parent app (batch 12). */
+  inviteParent: () => Promise<ActionResult<SampleEmail>>;
 }) {
   const router = useRouter();
   const [dialog, setDialog] = useState<"status" | "delete" | null>(null);
@@ -110,6 +114,7 @@ export function StudentPage({
                   </ul>
                 </div>
               )}
+              <ParentAccessRow guardian={student.guardian} invite={inviteParent} />
             </div>
           ) : (
             <EmptyState title="No guardian yet">Add one from Edit. A phone number already on file links siblings to the same guardian.</EmptyState>
@@ -225,6 +230,43 @@ export function StudentPage({
       >
         <p className="text-sm text-text-secondary">If they left the school, close this and change their status instead.</p>
       </ResponsiveDialog>
+    </div>
+  );
+}
+
+/** Whether the guardian uses the parent app, and a way to invite them (batch 12). */
+function ParentAccessRow({ guardian, invite }: { guardian: NonNullable<StudentDetail["guardian"]>; invite: () => Promise<ActionResult<SampleEmail>> }) {
+  const router = useRouter();
+  const [sent, setSent] = useState<SampleEmail | null>(null);
+  const [failure, setFailure] = useState<string | null>(null);
+  const [pending, startTransition] = useTransition();
+  const status =
+    guardian.parentAccess === "active" ? "Uses the parent app." : guardian.parentAccess === "invited" ? "Invited to the parent app." : guardian.email ? "Not on the parent app yet." : "Add an email (from Edit) to invite them to the parent app.";
+  return (
+    <div className="grid gap-2 border-t border-divider pt-4">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <p className="text-sm text-text-secondary">{status}</p>
+        {guardian.parentAccess !== "active" && guardian.email && (
+          <Button
+            size="sm"
+            variant="secondary"
+            loading={pending}
+            onClick={() =>
+              startTransition(async () => {
+                const result = await invite();
+                if (!result.ok) return setFailure(result.error);
+                setSent(result.data);
+                toast("Invite sent");
+                router.refresh();
+              })
+            }
+          >
+            {guardian.parentAccess === "invited" ? "Send again" : "Invite to the parent app"}
+          </Button>
+        )}
+      </div>
+      {failure && <p className="text-sm text-danger">{failure}</p>}
+      {sent && <SampleLinks links={sent.sampleLinks} />}
     </div>
   );
 }

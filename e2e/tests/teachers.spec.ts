@@ -67,7 +67,7 @@ test("an admin invites a teacher, gives them a class and a subject, and they joi
   await zara.getByLabel("Type it again", { exact: true }).fill("zaras-password");
   await zara.getByRole("button", { name: "Join the school" }).click();
   await expect(zara).toHaveURL(/\/teach$/);
-  await expect(zara.getByText("No form class yet")).toBeVisible();
+  await expect(zara.getByText("No classes yet")).toBeVisible();
 
   // The admin makes her form teacher of JSS 2 Gold and gives her English there.
   await open(page, "/s/greenfield/more/teachers");
@@ -95,4 +95,13 @@ test("admins see today's registers and a student's attendance", async ({ page })
   await expect(page.getByLabel("Day")).toBeVisible();
   await open(page, "/s/greenfield/students/st1");
   await expect(page.getByRole("heading", { name: "Attendance" })).toBeVisible();
+});
+
+test("a subject teacher who isn't a form teacher sees their classes, and no register", async ({ page }) => {
+  await signIn(page, "english@greenfield.ng");
+  await expect(page).toHaveURL(/\/teach$/);
+  await expect(page.getByRole("heading", { name: "Your subjects" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Your register" })).toHaveCount(0);
+  await expect(page.getByRole("link", { name: "Register", exact: true })).toHaveCount(0);
+  await expect(page.getByText("English Studies").first()).toBeVisible();
 });

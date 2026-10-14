@@ -20,14 +20,27 @@ export default async function TeacherToday({ params }: PageProps<"/s/[school]/te
   if (!home) return null;
   const base = `/s/${school}/teach`;
   const first = home.fullName.split(" ")[0];
+  const isFormTeacher = home.formArms.length > 0;
+  // Not every teacher is a form teacher: many only teach subjects across classes.
+  if (!isFormTeacher && home.subjects.length === 0) {
+    return (
+      <div className="grid gap-4">
+        <PageHeader title={`${greeting()}, ${first}`} />
+        <div className="rounded-3xl bg-surface p-6 shadow-raised">
+          <EmptyState title="No classes yet">When your school gives you subjects to teach, or makes you a form teacher, they show here.</EmptyState>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="grid gap-4">
       <PageHeader title={`${greeting()}, ${first}`}>
-        {home.today ? "Here’s what needs you today." : "No school today. This term’s registers stay open to change."}
+        {!isFormTeacher ? "The classes you teach, and their students." : home.today ? "Here’s what needs you today." : "No school today. This term’s registers stay open to change."}
       </PageHeader>
 
-      <Card title="Your register" description={home.formArms.length ? "Once a day, for your form class. You can change it afterwards." : undefined}>
+      {isFormTeacher && (
+      <Card title="Your register" description="Once a day, for your form class. You can change it afterwards.">
         {home.formArms.length ? (
           <ul className="grid gap-2">
             {home.formArms.map((arm) => {
@@ -52,9 +65,10 @@ export default async function TeacherToday({ params }: PageProps<"/s/[school]/te
             })}
           </ul>
         ) : (
-          <EmptyState title="No form class yet">When your school makes you a class’s form teacher, its register shows here.</EmptyState>
+          null
         )}
       </Card>
+      )}
 
       <Card title="Your subjects" description={home.subjects.length ? "Each class you teach, with its students. Scores come in a later version." : undefined}>
         {home.subjects.length ? (

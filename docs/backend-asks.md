@@ -82,3 +82,12 @@ and the daily register"). When you build them, these are the shapes the screens 
 - Registers: one per arm per school day, a mark per student (`present`, `late` or `absent`, plus
   an optional note up to 120 characters), editable for any school day in the current term, keeping
   who took it and who last changed it. Late counts as present on a report card.
+
+## 5. Parents (added 14 October 2026)
+
+- A `parent` role. A parent's account links to a guardian record; every parent endpoint returns
+  only that guardian's children. Parents are refused by admin and teacher endpoints.
+- Invitations with role `parent` and the `guardianId` they link to; invite one, or all guardians
+  with an email who aren't invited yet; end a guardian's access.
+- What a parent sees per child: class, admission number, form teacher, attendance this term, and
+  the last ten school days' marks. Not the register's notes.

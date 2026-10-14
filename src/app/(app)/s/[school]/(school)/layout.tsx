@@ -25,6 +25,7 @@ async function SchoolApp({ params, children }: { params: Promise<{ school: strin
   if (!me) redirect(`${base}/login`);
   // Teachers have their own screens (batch 11); the admin ones stay closed to them.
   if (me.role === "teacher") redirect(`${base}/teach`);
+  if (me.role === "parent") redirect(`${base}/family`);
 
   const nav: NavItem[] = [
     { href: base, label: "Home", icon: "home", exact: true },

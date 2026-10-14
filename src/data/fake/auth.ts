@@ -154,8 +154,11 @@ export async function acceptInvite(subdomain: string, token: string, password: s
   }
   const role = invite.role ?? "admin";
   if (!roleIn(user, subdomain)) user.schools.push({ subdomain, role });
+  if (role === "parent" && invite.guardianId && !store.parentLinks.some((l) => l.userId === user!.id && l.guardianId === invite.guardianId)) {
+    store.parentLinks.push({ userId: user.id, guardianId: invite.guardianId });
+  }
   invite.usedAt = Date.now();
-  recordChange(subdomain, user.fullName, role === "teacher" ? "Joined as a teacher" : "Joined as an admin");
+  recordChange(subdomain, user.fullName, role === "teacher" ? "Joined as a teacher" : role === "parent" ? "Joined the parent app" : "Joined as an admin");
   await startSession(user);
   return { ok: true, data: null };
 }
@@ -168,15 +171,23 @@ export async function acceptInvite(subdomain: string, token: string, password: s
 export async function requireMember(subdomain: string, role?: SchoolRole) {
   const user = await currentUser();
   const has = user && roleIn(user, subdomain);
-  if (!user || !has || (role ? has !== role : has === "teacher")) return null;
+  if (!user || !has || (role ? has !== role : has !== "owner" && has !== "admin")) return null;
   return user;
 }
 
-/** Anyone on the school's staff, teachers included, with their role; else null. */
+/** Anyone on the school's staff (owner, admin or teacher), with their role; else null. Parents are not staff. */
 export async function requireStaff(subdomain: string) {
   const user = await currentUser();
   const role = user && roleIn(user, subdomain);
-  return user && role ? { user, role } : null;
+  return user && role && role !== "parent" ? { user, role } : null;
+}
+
+/** The signed-in parent at this school, with the guardian records they belong to; else null. */
+export async function requireParent(subdomain: string) {
+  const user = await currentUser();
+  if (!user || roleIn(user, subdomain) !== "parent") return null;
+  const guardianIds = store.parentLinks.filter((l) => l.userId === user.id).map((l) => l.guardianId);
+  return { user, guardianIds };
 }
 
 export async function listMembers(subdomain: string): Promise<SchoolMember[]> {
@@ -186,7 +197,7 @@ export async function listMembers(subdomain: string): Promise<SchoolMember[]> {
     .filter((u) => { const role = roleIn(u, subdomain); return role === "owner" || role === "admin"; })
     .map((u) => ({ id: u.id, fullName: u.fullName, email: u.email, role: roleIn(u, subdomain)!, status: "active" }));
   const invited: SchoolMember[] = store.invites
-    .filter((i) => i.subdomain === subdomain && !i.usedAt && i.role !== "teacher")
+    .filter((i) => i.subdomain === subdomain && !i.usedAt && (i.role ?? "admin") === "admin")
     .map((i) => ({ id: i.id, fullName: i.fullName, email: i.email, role: "admin", status: "invited", invitedAt: i.createdAt }));
   const order = (m: SchoolMember) => (m.role === "owner" ? 0 : m.status === "active" ? 1 : 2);
   return [...active, ...invited].sort((a, b) => order(a) - order(b) || a.fullName.localeCompare(b.fullName));

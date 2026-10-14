@@ -11,6 +11,7 @@ const ITEMS: { path: string; icon: IconName; title: string; detail: string }[] =
   { path: "admission-numbers", icon: "students", title: "Admission numbers", detail: "The format new students get, like GC/2026/0042" },
   { path: "history", icon: "activity", title: "Change history", detail: "Who changed what, and when" },
   { path: "teachers", icon: "classes", title: "Teachers", detail: "Form classes, subjects, and who takes each register" },
+  { path: "parents", icon: "students", title: "Parents", detail: "Invite guardians to follow their children’s attendance" },
   { path: "admins", icon: "staff", title: "Admins", detail: "Who helps run the school on Brillianda" },
 ];
 

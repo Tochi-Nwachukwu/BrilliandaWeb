@@ -329,7 +329,18 @@ email, like admins.
   day this term can be changed, keeping who took it and who changed it), and My subjects (each
   class's students; scores come with results). Admins open any class's register from Classes, see
   today's registers on Home, and a student's attendance this term on their profile.
-- **Next:** parents (batch 12), then the team console (batch 13).
+- **Subject-only teachers** (user, 14 October 2026): a form class is optional. A teacher with only
+  subjects has no Register tab or register card; their Today leads with their classes.
+
+### Batch 12: Parents (14 October 2026)
+
+- **Done:** a `parent` role whose account belongs to a guardian record, so a parent sees only
+  that guardian's children. Admins invite guardians by the email on their record, one at a time
+  (from the student's page or More › Parents) or all at once, and can end access. Parents land on
+  My children: each child's class, admission number, form teacher, and attendance this term with
+  the last ten school days. The teacher's register notes stay with the school. Parents (and
+  teachers) can't open admin screens; parents aren't staff for teacher data either.
+- **Next:** the team console (batch 13).
 
 ## What isn't in v1 (kept for later)
 

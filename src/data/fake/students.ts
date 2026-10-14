@@ -8,6 +8,7 @@ import { fullName, STATUS_LABEL, type StudentInput, type StudentStatus } from "@
 import type { ActionResult, AdmissionSettings, ArmOption, GuardianMatch, StudentDetail, StudentRow, StudentsList } from "../types";
 import { requireMember } from "./auth";
 import { recordChange } from "./changes";
+import { parentAccessOf } from "./parents";
 import { attendanceOf } from "./teaching";
 import { store, type FakeStudent } from "./store";
 
@@ -89,6 +90,7 @@ export async function getStudent(subdomain: string, id: string): Promise<Student
           siblings: live(subdomain)
             .filter((x) => x.guardianId === g.id && x.id !== s.id)
             .map((x) => ({ id: x.id, fullName: fullName(x), armLabel: anyArmLabel(x.armId) })),
+          parentAccess: parentAccessOf(subdomain, g.id),
         }
       : null,
     classHistory: store.enrolments.filter((e) => e.studentId === s.id).map((e) => ({ armLabel: anyArmLabel(e.armId), from: e.from })),

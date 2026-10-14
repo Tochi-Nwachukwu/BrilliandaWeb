@@ -246,6 +246,23 @@ assigned. Teachers sign in like admins (email and password, or an email link) an
 and absent. School days are Monday to Friday inside a term (`packages/core/src/attendance.ts`, with
 tests); public holidays come with the school's own calendar later.
 
+### Parents (batch 12, after v1)
+
+A fourth role, `parent`. A parent's account is linked to a guardian record (`parentLinks`), and
+every parent read is limited to that guardian's children. Parents are not staff: admin and teacher
+functions refuse them.
+
+| Function | Kind | Input / output | Who | Used by | Status |
+|---|---|---|---|---|---|
+| `getParentsPage` | read | → `ParentsPage`: guardians with children here, their email and phone, and parent-app access (`none`, `invited`, `active`) | owner, admin | More › Parents | fake |
+| `inviteParent` | action | `guardianId` → sample email; needs an email on the guardian's record | owner, admin | More › Parents, student page | fake |
+| `inviteAllParents` | action | → `{ invited, withoutEmail }` and sample emails; every guardian with an email not yet invited | owner, admin | More › Parents | fake |
+| `removeParentAccess` | action | `guardianId` → ends access (or cancels the invite); the records stay | owner, admin | More › Parents | fake |
+| `getParentHome` | read | → `ParentHome`: each of the parent's children with class, admission number, form teacher, attendance this term and the last ten school days' marks (no notes) | the parent | My children | fake |
+
+`getStudent`'s guardian gains `parentAccess`. Invitations carry `role: "parent"` and the
+`guardianId` they link to.
+
 ### Installable app (batch 10)
 
 The service worker (`public/sw.js`) and its page (`/offline`) live at the root of every school

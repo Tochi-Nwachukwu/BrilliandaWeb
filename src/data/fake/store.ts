@@ -28,6 +28,8 @@ type FakeStore = {
   /** A register taken for one arm on one day, and each student's mark in it. */
   registers: { armId: string; date: string; takenBy: string; takenAt: number; updatedBy?: string; updatedAt?: number }[];
   marks: { armId: string; date: string; studentId: string; mark: "present" | "late" | "absent"; note?: string }[];
+  /** Batch 12: a parent's account and the guardian record it belongs to (their children). */
+  parentLinks: { userId: string; guardianId: string }[];
   /** Sample registers are made on first read, from that day's date (see fake/teaching.ts). */
   registersSeeded: boolean;
   /** Schools whose owner has saved More › Branding (ticks the checklist item). */
@@ -157,7 +159,7 @@ function seedArmsTestSchool(subdomain: string, student: FakeStudent) {
 }
 
 /** createdAt 0 means "sent just now"; filled in the first time it is read (see fake/auth.ts). */
-export type FakeInvite = { id: string; token: string; subdomain: string; fullName: string; email: string; createdAt: number; usedAt?: number; role?: "admin" | "teacher" };
+export type FakeInvite = { id: string; token: string; subdomain: string; fullName: string; email: string; createdAt: number; usedAt?: number; role?: "admin" | "teacher" | "parent"; /** Parent invites: the guardian record they become. */ guardianId?: string };
 /** Password reset and email sign-in links. */
 export type FakeLink = { kind: "reset" | "magic"; userId: string; subdomain: string; createdAt: number; usedAt?: number };
 
@@ -170,7 +172,7 @@ export type FakeSignupDraft = {
 };
 
 /** FAKE: plain-text passwords, because nothing here is real. Better Auth replaces all of this. */
-export type FakeUser = { id: string; fullName: string; email: string; password: string; phone?: string; schools: { subdomain: string; role: "owner" | "admin" | "teacher" }[] };
+export type FakeUser = { id: string; fullName: string; email: string; password: string; phone?: string; schools: { subdomain: string; role: "owner" | "admin" | "teacher" | "parent" }[] };
 
 function seed(): FakeStore {
   const greenfield = seedGreenfieldClasses();
@@ -178,6 +180,9 @@ function seed(): FakeStore {
   const greenfieldStudents = seedGreenfieldStudents(greenfield.arms);
   // One per screen size, so the two runs of the arms editor test never edit the same school.
   const armsTests = ["elmwood", "willowbank"].map((school) => seedArmsTestSchool(school, greenfieldStudents.students[0]!));
+  // Greenfield's sample parent (batch 12): the guardian of its first student, in JSS 1 Blue.
+  const sampleGuardian = greenfieldStudents.guardians.find((g) => g.id === greenfieldStudents.students[0]!.guardianId)!;
+  sampleGuardian.email = "parent@greenfield.ng";
   return {
     schools: [
       { subdomain: "greenfield", name: "Greenfield College", status: "active", brandColor: "#4A3AA7", logoUrl: null },
@@ -210,6 +215,8 @@ function seed(): FakeStore {
       { id: "u11", fullName: "Sola Ajayi", email: "owner@willowbank.ng", password: "brillianda", schools: [{ subdomain: "willowbank", role: "owner" }] },
       { id: "u12", fullName: "Bisi Adebayo", email: "teacher@greenfield.ng", password: "brillianda", schools: [{ subdomain: "greenfield", role: "teacher" }] },
       { id: "u13", fullName: "Ifeanyi Okoro", email: "physics@greenfield.ng", password: "brillianda", schools: [{ subdomain: "greenfield", role: "teacher" }] },
+      { id: "u14", fullName: sampleGuardian.name, email: "parent@greenfield.ng", password: "brillianda", schools: [{ subdomain: "greenfield", role: "parent" }] },
+      { id: "u15", fullName: "Kemi Lawal", email: "english@greenfield.ng", password: "brillianda", schools: [{ subdomain: "greenfield", role: "teacher" }] },
     ],
     sessions: new Map(),
     handovers: new Map(),
@@ -229,9 +236,12 @@ function seed(): FakeStore {
       { armId: "ga-gl1-gn2", subjectId: "gs-mathematics", userId: "u12" },
       { armId: "ga-gl4-gn3", subjectId: "gs-physics", userId: "u13" },
       { armId: "ga-gl4-gn1", subjectId: "gs-physics", userId: "u13" },
+      // Kemi Lawal (u15) teaches a subject across classes and isn't a form teacher.
+      ...["gl1", "gl2", "gl3"].flatMap((level) => ["gn1", "gn2"].map((arm) => ({ armId: `ga-${level}-${arm}`, subjectId: "gs-english-studies", userId: "u15" }))),
     ],
     registers: [],
     marks: [],
+    parentLinks: [{ userId: "u14", guardianId: sampleGuardian.id }],
     registersSeeded: false,
     // The sample schools come with their colours chosen; the test schools are as fresh from signup.
     brandingSaved: new Set(["greenfield", "surebloom", "closedschool"]),

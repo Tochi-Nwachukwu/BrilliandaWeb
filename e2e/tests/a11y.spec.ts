@@ -60,6 +60,7 @@ const SCHOOL = [
   "/more/branding",
   "/more/history",
   "/more/teachers",
+  "/more/parents",
   "/classes/register/ga-gl1-gn1",
 ];
 
@@ -82,4 +83,13 @@ test("a teacher's screens pass the accessibility scan", { tag: "@both" }, async 
   await page.getByRole("button", { name: "Sign in", exact: true }).click();
   await expect(page).toHaveURL(/\/teach$/);
   for (const path of ["/teach", "/teach/register", "/teach/subjects"]) await test.step(path, () => scan(page, `/s/greenfield${path}`));
+});
+
+test("a parent's screens pass the accessibility scan", { tag: "@both" }, async ({ page }) => {
+  await open(page, "/s/greenfield/login");
+  await page.getByLabel("Email").fill("parent@greenfield.ng");
+  await page.getByLabel("Password", { exact: true }).fill("brillianda");
+  await page.getByRole("button", { name: "Sign in", exact: true }).click();
+  await expect(page).toHaveURL(/\/family$/);
+  await scan(page, "/s/greenfield/family");
 });

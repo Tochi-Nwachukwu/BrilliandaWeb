@@ -52,7 +52,7 @@ export function TeachersView({
           </Button>
         }
       >
-        Each teacher sees only their own form class (with its daily register) and the classes they teach.
+        Each teacher sees only the classes they teach, and, if they’re a form teacher, that class’s daily register. A form class is optional: many teachers only teach subjects.
       </PageHeader>
 
       {page.teachers.length === 0 ? (

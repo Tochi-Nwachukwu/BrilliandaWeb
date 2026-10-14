@@ -27,9 +27,9 @@ export const inviteAdminSchema = z.object({
   email,
 });
 
-/** Owners and admins run the school; teachers see only their own classes (batch 11). */
-export type SchoolRole = "owner" | "admin" | "teacher";
-export const ROLE_LABEL: Record<SchoolRole, string> = { owner: "School owner", admin: "School admin", teacher: "Teacher" };
+/** Owners and admins run the school; teachers see only their own classes (batch 11); parents only their own children (batch 12). */
+export type SchoolRole = "owner" | "admin" | "teacher" | "parent";
+export const ROLE_LABEL: Record<SchoolRole, string> = { owner: "School owner", admin: "School admin", teacher: "Teacher", parent: "Parent" };
 /** The roles that can open the school's admin screens. */
 export const ADMIN_ROLES: readonly SchoolRole[] = ["owner", "admin"];
 export const isAdminRole = (role: SchoolRole | null | undefined) => role === "owner" || role === "admin";

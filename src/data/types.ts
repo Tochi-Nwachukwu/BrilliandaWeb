@@ -37,7 +37,7 @@ export type SubdomainCheck =
   | { available: true; subdomain: string }
   | { available: false; subdomain: string; reason: "taken" | "reserved" | "invalid"; message: string; suggestions: string[] };
 
-export type SchoolRole = "owner" | "admin" | "teacher";
+export type SchoolRole = "owner" | "admin" | "teacher" | "parent";
 
 /** Who is signed in at a school, and as what. */
 export type SignedInMember = { userId: string; fullName: string; email: string; role: SchoolRole };
@@ -53,7 +53,7 @@ export type SchoolMember = {
   invitedAt?: number;
 };
 
-export type InviteDetails = { schoolName: string; fullName: string; email: string; status: "open" | "used" | "expired"; hasAccount: boolean; role: "admin" | "teacher" };
+export type InviteDetails = { schoolName: string; fullName: string; email: string; status: "open" | "used" | "expired"; hasAccount: boolean; role: "admin" | "teacher" | "parent" };
 
 /**
  * FAKE ONLY: what the email would have said, so screens can be clicked through before real
@@ -126,7 +126,7 @@ export type StudentDetail = StudentRow & {
   admissionDate: string;
   address: string;
   stateOfOrigin: string;
-  guardian: { id: string; name: string; phone: string | null; email: string | null; siblings: { id: string; fullName: string; armLabel: string }[] } | null;
+  guardian: { id: string; name: string; phone: string | null; email: string | null; siblings: { id: string; fullName: string; armLabel: string }[]; parentAccess: ParentAccess } | null;
   classHistory: { armLabel: string; from: string }[];
   changes: ChangeEntry[];
   /** This term's register marks (batch 11). */
@@ -198,6 +198,29 @@ export type SubjectClass = { armLabel: string; subjectName: string; students: { 
 
 /** Home's register card for admins: today's registers. */
 export type RegistersToday = { date: string | null; taken: number; total: number; missing: { armId: string; label: string }[] };
+
+// ——— Parents (batch 12) ———
+
+/** Whether a guardian uses the parent app: not invited, invited, or signed up. */
+export type ParentAccess = "none" | "invited" | "active";
+
+/** More › Parents: every guardian, their children, and their parent-app status. */
+export type ParentsPage = {
+  guardians: { id: string; name: string; email: string | null; phone: string | null; children: { id: string; fullName: string; armLabel: string }[]; access: ParentAccess }[];
+};
+
+/** One child, as their parent sees them. Register notes stay with the school. */
+export type ParentChild = {
+  id: string;
+  fullName: string;
+  armLabel: string;
+  admissionNo: string;
+  formTeacher: string | null;
+  attendance: AttendanceSummary;
+  /** The latest school days this term, newest first. */
+  recent: { date: string; mark: RegisterMark | null }[];
+};
+export type ParentHome = { fullName: string; schoolDay: boolean; children: ParentChild[] };
 
 /** A student's attendance this term (late counts as present). */
 export type AttendanceSummary = { term: string; days: number; present: number; late: number; absent: number } | null;

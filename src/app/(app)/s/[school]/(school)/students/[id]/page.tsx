@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { connection } from "next/server";
+import { inviteParent } from "@/data/actions/parents";
 import { deleteStudent, setStudentsStatus } from "@/data/actions/students";
 import { getStudent, listStudents } from "@/data/students";
 import { StudentPage } from "./StudentPage";
@@ -21,6 +22,7 @@ export default async function StudentRoute({ params }: PageProps<"/s/[school]/st
       now={new Date().getTime()}
       setStatus={setStudentsStatus.bind(null, school)}
       remove={deleteStudent.bind(null, school, id)}
+      inviteParent={inviteParent.bind(null, school, student.guardian?.id ?? "")}
     />
   );
 }
