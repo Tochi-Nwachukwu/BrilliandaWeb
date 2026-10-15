@@ -1,4 +1,5 @@
 // Shapes shared by every data function (docs/data-contract.md).
+import type { BookItem } from "@brillianda/core/booklists";
 import type { Term } from "@brillianda/core/calendar";
 import type { Department, Section } from "@brillianda/core/classes";
 import type { SchoolDetails, SchoolLevel } from "@brillianda/core/signup";
@@ -225,6 +226,8 @@ export type ParentChild = {
   pastTerms: { key: string; label: string }[];
   /** On the child’s birthday, when the school sends birthday messages (batch 19): the school’s message. */
   birthday: string | null;
+  /** Shared book lists (batch 20): this session’s class, and the class they move into next session. */
+  bookLists: { label: string; list: BookList }[];
 };
 export type ParentHome = { fullName: string; schoolDay: boolean; children: ParentChild[] };
 
@@ -456,3 +459,19 @@ export type BirthdaysPage = {
 
 /** Home's card: birthdays in the next 7 days. */
 export type BirthdaysThisWeek = { enabled: boolean; rows: BirthdayRow[] };
+
+// ——— Books and things needed (batch 20) ———
+
+/** One class level's list for one session. Parents see it once it's shared. */
+export type BookList = {
+  levelId: string;
+  levelName: string;
+  startYear: number;
+  session: string;
+  items: (BookItem & { id: string })[];
+  shared: boolean;
+  updated: { by: string; at: number } | null;
+};
+
+/** More › Book lists: every class level's list for one session, and the sessions to choose from. */
+export type BookListsPage = { startYear: number; session: string; sessions: { startYear: number; name: string; label: string }[]; lists: BookList[] };

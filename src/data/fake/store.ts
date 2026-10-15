@@ -3,6 +3,7 @@
 // so a hot reload in development doesn't wipe it.
 import "server-only";
 import { DEFAULT_BIRTHDAY_MESSAGE } from "@brillianda/core/birthdays";
+import type { BookItem } from "@brillianda/core/booklists";
 import { defaultTerms, type Term } from "@brillianda/core/calendar";
 import { armCodes, ARM_PRESETS, buildLadder, type Department, type Section } from "@brillianda/core/classes";
 import { type SchoolDetails, type SchoolLevel } from "@brillianda/core/signup";
@@ -81,6 +82,8 @@ type FakeStore = {
   /** Batch 19: each school's birthday messages, and the texts the daily job sent (one per child per day). */
   birthdaySettings: Map<string, { enabled: boolean; message: string }>;
   birthdayLog: { id: string; subdomain: string; studentId: string; date: string; to: string | null; text: string }[];
+  /** Batch 20: books and things needed, per class level and session; parents see shared ones. */
+  bookLists: { subdomain: string; startYear: number; levelId: string; items: (BookItem & { id: string })[]; shared: boolean; by: string; at: number }[];
 };
 
 /** Greenfield's subjects: the 2025 junior and senior lists, attached by default. */
@@ -219,6 +222,46 @@ export type FakeSignupDraft = {
 
 /** FAKE: plain-text passwords, because nothing here is real. Better Auth replaces all of this. */
 export type FakeUser = { id: string; fullName: string; email: string; password: string; phone?: string; schools: { subdomain: string; role: "owner" | "admin" | "teacher" | "parent" }[] };
+
+/** Greenfield's lists: JSS 1 for this session and JSS 2 for the next, shared; JSS 3's next one a draft. */
+function seedBookLists(): FakeStore["bookLists"] {
+  let n = 0;
+  const item = (category: BookItem["category"], name: string, detail: string, quantity: number, price: number | null) => ({ id: `bk${++n}`, category, name, detail, quantity, price });
+  return [
+    {
+      subdomain: "greenfield",
+      startYear: 2026,
+      levelId: "gl1",
+      shared: true,
+      by: "Amaka Obi",
+      at: 0,
+      items: [
+        item("textbook", "New General Mathematics for JSS 1", "M. F. Macrae and others, Pearson", 1, 4200),
+        item("textbook", "Intensive English for JSS 1", "Evans", 1, 3800),
+        item("stationery", "20-leaf exercise books", "", 12, 250),
+        item("uniform", "Sports wear", "House colour, from the school shop", 1, 6500),
+      ],
+    },
+    {
+      subdomain: "greenfield",
+      startYear: 2027,
+      levelId: "gl2",
+      shared: true,
+      by: "Amaka Obi",
+      at: 0,
+      items: [
+        item("textbook", "New General Mathematics for JSS 2", "M. F. Macrae and others, Pearson", 1, 4500),
+        item("textbook", "Basic Science for JSS 2", "STAN", 1, 3500),
+        item("textbook", "Intensive English for JSS 2", "Evans", 1, null),
+        item("stationery", "20-leaf exercise books", "", 12, 250),
+        item("stationery", "Mathematical set", "", 1, 1500),
+        item("uniform", "Blazer", "Navy, with the school badge", 1, 12000),
+        item("other", "Ream of A4 paper", "For the class printer", 1, null),
+      ],
+    },
+    { subdomain: "greenfield", startYear: 2027, levelId: "gl3", shared: false, by: "Amaka Obi", at: 0, items: [item("textbook", "New General Mathematics for JSS 3", "", 1, 4800)] },
+  ];
+}
 
 function seed(): FakeStore {
   const greenfield = seedGreenfieldClasses();
@@ -373,6 +416,7 @@ function seed(): FakeStore {
     // Greenfield sends birthday messages, to show them; other schools start with them off.
     birthdaySettings: new Map([["greenfield", { enabled: true, message: DEFAULT_BIRTHDAY_MESSAGE }]]),
     birthdayLog: [],
+    bookLists: seedBookLists(),
     admission: new Map([["greenfield", { pattern: "GC/{YEAR}/{NUMBER}", digits: 4, next: greenfieldStudents.next }]]),
     subjects: greenfieldSubjects.subjects,
     subjectLinks: greenfieldSubjects.subjectLinks,

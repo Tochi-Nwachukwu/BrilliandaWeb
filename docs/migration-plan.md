@@ -426,6 +426,13 @@ at the end of the session.
 - With this, group 3 has its front end. Test schools: Harbourview (closing a term) and Seaview (in
   its last term, for promotion).
 
+#### Batch 20: Book lists (15 October 2026)
+
+- **Done:** More › Book lists: a list per class level for this session or the next (textbooks,
+  exercise books and stationery, uniform, other things), with details, quantities and optional
+  prices, a total, copying from another class, and sharing with parents. On a child's page, parents
+  see the list for the class they move into next session and the one for their class now.
+
 #### Batch 19: Birthday messages (15 October 2026)
 
 - **Done:** More › Birthdays: on or off, the school's message with `{name}`, `{age}` and `{school}`

@@ -57,7 +57,7 @@ export async function getBirthdays(subdomain: string): Promise<BirthdaysPage | n
     .reverse()
     .map((l) => {
       const s = store.students.find((x) => x.id === l.studentId);
-      return { id: l.id, date: l.date, fullName: s ? `${s.firstName} ${s.lastName}` : "A student", armLabel: (s && labels.get(s.armId)) ?? "", to: l.to, text: l.text };
+      return { id: l.id, date: l.date, fullName: s ? [s.firstName, s.otherNames, s.lastName].filter(Boolean).join(" ") : "A student", armLabel: (s && labels.get(s.armId)) ?? "", to: l.to, text: l.text };
     });
   return { settings: settingsOf(subdomain), schoolName: schoolName(subdomain), today: todayInLagos(), upcoming: rows(subdomain, 30), sent };
 }

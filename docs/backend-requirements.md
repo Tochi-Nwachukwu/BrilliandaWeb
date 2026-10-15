@@ -376,6 +376,34 @@ date passes.
 On the parent's home (C2), each child gains `birthday`: the filled-in message on the child's
 birthday when the school sends them, otherwise `null`. Rules: `packages/core/src/birthdays.ts`.
 
+### C10. Books and things needed
+
+**Problem.** Parents need to know which books, exercise books, uniform and other things to buy for
+their child's class, especially for the class they move into next session.
+
+**What to store.** A list per school, class level and session (this session or the next): items
+with a kind (`textbook`, `stationery`, `uniform`, `other`), a name, optional details (author,
+publisher, a note), a quantity (1 to 99) and an optional price in whole naira; up to 80 items. And
+whether the list is shared with parents, who changed it last, and when.
+
+**Rules.**
+
+- An empty list can't be shared. Sharing and unsharing go in the change history.
+- A parent sees, for each child: the shared list for the next class level (by the school's
+  order of levels) for next session, unless the child is in the final class; and the shared list
+  for their current class level this session.
+
+**Endpoints we need.**
+
+| What | Suggested | Returns |
+|---|---|---|
+| Every class level's list for a session | `GET /v1/book-lists?session=2027` | `BookListsPage` |
+| Replace one class level's list | `PUT /v1/book-lists/{session}/{levelId}` `{ items }` | 204 |
+| Share or stop sharing | `PUT /v1/book-lists/{session}/{levelId}/shared` `{ shared }` | 204, or 409 for an empty list |
+
+On the parent's home (C2), each child gains `bookLists`: `[{ label, list }]`. Rules:
+`packages/core/src/booklists.ts`.
+
 ---
 
 ## D. Rules both sides must share

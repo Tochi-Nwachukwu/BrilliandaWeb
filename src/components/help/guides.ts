@@ -86,6 +86,7 @@ export function adminGuide(base: string): HelpGuide {
           { q: "How do I add a teacher?", a: "More › Teachers › Invite a teacher. They get an email to set a password. Then give them a form class and the subjects they teach.", href: `${more}/teachers`, link: "Teachers", pages: [`${more}/teachers`] },
           { q: "How do parents get access?", a: "More › Parents. Invite one guardian, or everyone with an email at once. Parents see only their own children.", href: `${more}/parents`, link: "Parents", pages: [`${more}/parents`] },
           { q: "How do I add another admin?", a: "More › Admins › Invite an admin. Only the owner can invite or remove admins.", href: `${more}/admins`, link: "Admins", pages: [`${more}/admins`] },
+          { q: "How do I tell parents which books to buy?", a: "More › Book lists. Pick the session and the class, add the books, exercise books, uniform and anything else, with prices if you like, then Share with parents. Parents see the list for their child’s class, and the one they move into next session.", href: `${more}/book-lists`, link: "Book lists", pages: [`${more}/book-lists`] },
           { q: "How do birthday messages work?", a: "More › Birthdays. Turn them on and write the message: each child’s first name, age and the school’s name are filled in. On the birthday, at 7:00 am, the guardian gets a text and the parent app shows a birthday card. Home lists the week’s birthdays.", href: `${more}/birthdays`, link: "Birthdays", pages: [`${more}/birthdays`, base] },
           { q: "Who changed something?", a: "More › Change history lists every change: who, what and when. Filter by person, date or student, and download it as a spreadsheet.", href: `${more}/history`, link: "Change history", pages: [`${more}/history`] },
         ],
@@ -171,6 +172,7 @@ export function parentGuide(base: string): HelpGuide {
         title: "Your children",
         items: [
           { q: "A child of mine is missing.", a: "Children show here when the school has you as their guardian. Ask the school office to add you to their record with the same email.", pages: [family] },
+          { q: "Which books does my child need?", a: "When the school shares its book list, it shows on your child’s page: what to buy for their class this session, and for the class they move into next session, with prices where the school gives them. Use Print on your phone or computer to keep a copy.", pages: [family] },
           { q: "Will my child get a birthday message?", a: "If the school sends them, you get a text on your child’s birthday, and their page here shows a birthday card. The date comes from your child’s record: if it’s wrong, tell the school.", pages: [family] },
           { q: "What does the attendance show?", a: "Open a child: you see how many school days they were present this term, and the last ten days’ marks. Late counts as present.", href: family, link: "My children", pages: [family] },
         ],

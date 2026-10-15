@@ -384,6 +384,18 @@ birthday child's guardian once (no phone: logged, not sent) and keeps a log. Rul
 `packages/core/src/birthdays.ts`, with tests: `birthdayMessage`, `ageOn`, `isBirthday` (29 February
 falls on 28 February in other years), `upcomingBirthdays`, `smsCount`.
 
+### Book lists (batch 20)
+
+| Function | Kind | Input / output | Who | Status |
+|---|---|---|---|---|
+| `getBookLists` | read | `startYear?` (this session or the next, the default) → `BookListsPage`: every class level's list for that session (items, shared, last changed), and the two sessions | owner, admin | fake |
+| `saveBookList` | action | `levelId, startYear, { items }` (`bookListSchema`: up to 80 items; each a kind, name, details, quantity 1 to 99, whole-naira price or none); replaces the list | owner, admin | fake |
+| `setBookListShared` | action | `levelId, startYear, shared`; an empty list can't be shared | owner, admin | fake |
+
+`getParentHome`'s children gain `bookLists`: the shared list for the class level they move into
+next session (none in the final class), then this session's list for their class. Rules in
+`packages/core/src/booklists.ts`, with tests.
+
 ### Installable app (batch 10)
 
 The service worker (`public/sw.js`) and its page (`/offline`) live at the root of every school
