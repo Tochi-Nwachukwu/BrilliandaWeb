@@ -2,6 +2,7 @@
 import "server-only";
 import type { RatingSettings } from "@brillianda/core/results";
 import * as impl from "./fake/reports";
+import { LIVE } from "./source";
 import type { Broadsheet, ClassReports, ReportCardData, ReportTerm } from "./types";
 
 /** A class's broadsheet this term. Admins, or that class's form teacher (read only). */
@@ -21,6 +22,7 @@ export function getReportCard(subdomain: string, studentId: string, termKey?: st
 
 /** Every term a student has results in, newest first. Owners and admins. */
 export function getReportTerms(subdomain: string, studentId: string): Promise<ReportTerm[] | null> {
+  if (LIVE) return Promise.resolve(null);
   return impl.getReportTerms(subdomain, studentId);
 }
 

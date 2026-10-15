@@ -5,8 +5,13 @@
 // actions/auth.ts — the real actions take it from the request's host.
 import { IMPORT_COLUMNS, MAX_IMPORT_ROWS, type CheckedRow, type RawRow } from "@brillianda/core/studentImport";
 import { revalidatePath } from "next/cache";
-import * as impl from "../fake/imports";
+import { LIVE } from "../api/client";
+import * as live from "../api/imports";
+import * as fake from "../fake/imports";
 import type { ActionResult, ImportResult } from "../types";
+
+// The API where it has endpoints (DATA_SOURCE=api), else sample data.
+const impl = LIVE ? live : fake;
 
 const COLUMN_IDS = new Set<string>(IMPORT_COLUMNS.map((c) => c.id));
 

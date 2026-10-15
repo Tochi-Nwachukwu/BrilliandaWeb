@@ -1,4 +1,4 @@
-import { open } from "./helpers";
+import { open, TOURS_SEEN } from "./helpers";
 import { expect, test, type Page } from "@playwright/test";
 
 // Each school's look and signing in (batch 4), on fake data. Runs at phone and laptop size.
@@ -103,7 +103,7 @@ test("the owner invites an admin, who joins", async ({ page, browser }, testInfo
   await expect(page.getByText(email, { exact: true }).locator("visible=true")).toBeVisible();
   const href = await page.getByRole("link", { name: "Open the invite link" }).getAttribute("href");
 
-  const ruth = await (await browser.newContext()).newPage();
+  const ruth = await (await browser.newContext({ storageState: TOURS_SEEN })).newPage();
   await open(ruth, href!);
   await expect(ruth.getByRole("heading", { name: "Join Greenfield College" })).toBeVisible();
   await ruth.getByLabel("New password", { exact: true }).fill("ruths-password");

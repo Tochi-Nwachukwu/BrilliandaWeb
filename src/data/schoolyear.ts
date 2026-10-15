@@ -2,10 +2,13 @@
 import "server-only";
 import * as promotion from "./fake/promotion";
 import * as impl from "./fake/schoolyear";
+import { LIVE } from "./source";
 import type { TermStatusData } from "./types";
 
 /** The term open for results, unpublished classes, and closed terms. Owners and admins. */
 export function getTermStatus(subdomain: string): Promise<TermStatusData | null> {
+  // Closing terms isn’t on the API yet: Sessions leaves that card out.
+  if (LIVE) return Promise.resolve(null);
   return impl.getTermStatus(subdomain);
 }
 

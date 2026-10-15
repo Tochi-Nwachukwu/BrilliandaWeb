@@ -6,8 +6,13 @@ import { DEPARTMENTS, type Department } from "@brillianda/core/classes";
 import { fieldErrorsOf } from "@brillianda/core/signup";
 import { addSubjectsSchema, subjectNameSchema } from "@brillianda/core/subjects";
 import { revalidatePath } from "next/cache";
-import * as impl from "../fake/subjects";
+import { LIVE } from "../api/client";
+import * as live from "../api/subjects";
+import * as fake from "../fake/subjects";
 import type { ActionResult } from "../types";
+
+// The API where it has endpoints (DATA_SOURCE=api), else sample data.
+const impl = LIVE ? live : fake;
 
 const done = <T,>(school: string, result: ActionResult<T>) => {
   if (result.ok) revalidatePath(`/s/${school}`, "layout");

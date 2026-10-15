@@ -5,8 +5,13 @@
 import { inviteAdminSchema } from "@brillianda/core/auth";
 import { fieldErrorsOf } from "@brillianda/core/signup";
 import { revalidatePath } from "next/cache";
-import * as impl from "../fake/auth";
+import { LIVE } from "../api/client";
+import * as live from "../api/auth";
+import * as fake from "../fake/auth";
 import type { ActionResult, SampleEmail } from "../types";
+
+// The API where it has endpoints (DATA_SOURCE=api), else sample data.
+const impl = LIVE ? live : fake;
 
 export async function inviteAdmin(school: string, input: unknown): Promise<ActionResult<SampleEmail & { resent: boolean }>> {
   const parsed = inviteAdminSchema.safeParse(input);

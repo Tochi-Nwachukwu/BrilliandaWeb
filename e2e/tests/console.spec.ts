@@ -1,5 +1,5 @@
 import { expect, test, type Page } from "@playwright/test";
-import { open } from "./helpers";
+import { open, TOURS_SEEN } from "./helpers";
 
 // The Brillianda team console (batch 13). Team accounts are separate from school accounts.
 
@@ -24,7 +24,7 @@ test("the team sees every school, and opening one is shown to that school", { ta
   await expect(page.getByText(/This visit is recorded/)).toBeVisible();
 
   // The school sees the visit in its own history.
-  const owner = await (await browser.newContext()).newPage();
+  const owner = await (await browser.newContext({ storageState: TOURS_SEEN })).newPage();
   await open(owner, "/s/greenfield/login");
   await owner.getByLabel("Email").fill("owner@greenfield.ng");
   await owner.getByLabel("Password", { exact: true }).fill("brillianda");
@@ -51,7 +51,7 @@ test("only the team signs in; pausing a school and following up a trial request"
   await page.getByLabel("Why pause it?").fill("Asked to pause over the holiday.");
   await page.getByRole("button", { name: "Pause the school" }).click();
   await expect(page.getByText("Lakeside Grammar School is paused").locator("visible=true")).toBeVisible();
-  const visitor = await (await page.context().browser()!.newContext()).newPage();
+  const visitor = await (await page.context().browser()!.newContext({ storageState: TOURS_SEEN })).newPage();
   await visitor.goto("/s/lakeside/login");
   await expect(visitor.getByRole("heading", { name: "This school’s account is paused" })).toBeVisible();
   await page.getByLabel("Why reactivate it?").fill("Back for the new term.");

@@ -6,6 +6,7 @@ import { redirect } from "next/navigation";
 import { Suspense } from "react";
 import { AuthLayout } from "@/components/auth/AuthLayout";
 import { getSignupDraft } from "@/data/signup";
+import { LIVE } from "@/data/source";
 import { SignupSteps } from "../SignupSteps";
 import { VerifyForm } from "./VerifyForm";
 
@@ -30,9 +31,11 @@ async function SentTo() {
         We sent a 6-digit code to <b className="font-medium text-text-primary">{draft?.owner?.email}</b>.
       </p>
       {/* FAKE: until real emails go out. */}
-      <p>
-        <Badge tone="warning">Sample data</Badge> No email is sent yet: any 6 digits work, except 000000.
-      </p>
+      {!LIVE && (
+        <p>
+          <Badge tone="warning">Sample data</Badge> No email is sent yet: any 6 digits work, except 000000.
+        </p>
+      )}
     </>
   );
 }

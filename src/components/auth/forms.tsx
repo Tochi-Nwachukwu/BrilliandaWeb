@@ -120,14 +120,17 @@ export function NewPasswordForm({
   submitLabel,
   pendingLabel,
   onDone,
+  askName = false,
 }: {
   action: (input: unknown) => Promise<ActionResult<null>>;
   submitLabel: string;
   pendingLabel: string;
   onDone: () => void;
+  /** Also ask for the person’s name: an invite that didn’t carry one. */
+  askName?: boolean;
 }) {
   const formRef = useRef<HTMLFormElement>(null);
-  const [values, setValues] = useState({ password: "", confirmation: "" });
+  const [values, setValues] = useState({ fullName: "", password: "", confirmation: "" });
   const [errors, setErrors] = useState<Errors>({});
   const [failure, setFailure] = useState<string | null>(null);
   const [attempt, setAttempt] = useState(0);
@@ -143,13 +146,18 @@ export function NewPasswordForm({
     event.preventDefault();
     setFailure(null);
     const problems = await checkLater(() => import("@brillianda/core/auth").then((m) => m.newPasswordSchema), values);
+    if (askName && values.fullName.trim().length < 2) {
+      setErrors({ ...problems, fullName: "Enter your full name" });
+      setAttempt((n) => n + 1);
+      return;
+    }
     if (problems) {
       setErrors(problems);
       setAttempt((n) => n + 1);
       return;
     }
     startTransition(async () => {
-      const result = await action(values);
+      const result = await action(askName ? values : { password: values.password, confirmation: values.confirmation });
       if (result.ok) return onDone();
       setErrors(firstErrors(result.fieldErrors));
       setFailure(result.fieldErrors ? null : result.error);
@@ -160,6 +168,9 @@ export function NewPasswordForm({
   return (
     <form ref={formRef} onSubmit={submit} noValidate>
       <div className="space-y-5">
+        {askName && (
+          <TextField label="Your full name" name="fullName" autoComplete="name" value={values.fullName} onChange={(e) => set("fullName")(e.target.value)} error={errors.fullName} />
+        )}
         <PasswordField label="New password" name="password" autoComplete="new-password" hint="At least 8 characters" value={values.password} onChange={(e) => set("password")(e.target.value)} error={errors.password} />
         <PasswordField label="Type it again" name="confirmation" autoComplete="new-password" value={values.confirmation} onChange={(e) => set("confirmation")(e.target.value)} error={errors.confirmation} />
       </div>

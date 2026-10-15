@@ -1,5 +1,5 @@
 import { expect, test, type Page } from "@playwright/test";
-import { open } from "./helpers";
+import { open, TOURS_SEEN } from "./helpers";
 
 // Results, batch 14: score sheets on Greenfield. Each screen size fills a different sheet for
 // JSS 1 Gold (Mathematics by Bisi on phone, English Studies by Kemi on laptop), so the runs never
@@ -49,12 +49,12 @@ test("a teacher fills a sheet, marks it complete, and an admin unlocks it", { ta
   await page.getByRole("button", { name: "Send the request" }).click();
   await expect(page.getByText(/You asked to unlock it/)).toBeVisible();
 
-  const admin = await (await browser.newContext()).newPage();
+  const admin = await (await browser.newContext({ storageState: TOURS_SEEN })).newPage();
   await signIn(admin, "owner@greenfield.ng");
   await expect(admin).toHaveURL(/\/s\/greenfield$/);
   await open(admin, "/s/greenfield/results");
   await admin.getByRole("link").filter({ hasText: `${subject}, JSS 1 Gold` }).click();
-  await expect(admin.getByText("One CA score was typed wrongly.", { exact: false })).toBeVisible();
+  await expect(admin.getByText("One CA score was typed wrongly.", { exact: false }).first()).toBeVisible();
   await admin.getByRole("button", { name: "Unlock", exact: true }).click();
   await expect(admin.getByText("Unlocked").locator("visible=true")).toBeVisible();
 
@@ -115,7 +115,7 @@ test("broadsheet, remarks and ratings, a report card, and publishing a class", {
     await expect(page.getByText("Published", { exact: true })).toBeVisible();
 
     // A JSS 2 Blue parent now sees the average and the report card.
-    const parent = await (await page.context().browser()!.newContext()).newPage();
+    const parent = await (await page.context().browser()!.newContext({ storageState: TOURS_SEEN })).newPage();
     await signIn(parent, "parent2@greenfield.ng");
     await expect(parent).toHaveURL(/\/family$/);
     const child = parent.getByRole("link").filter({ hasText: "JSS 2 Blue" });

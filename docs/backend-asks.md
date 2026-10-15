@@ -5,26 +5,21 @@ From the front end, 12 October 2026, after reading the `revamp/v1-backend` branc
 find-school and invitation endpoints match our screens closely. Three things would let us connect
 them fully.
 
-## Where things stand (updated 14 October 2026)
+## Where things stand (updated 15 October 2026)
 
-**Asks 1 to 3 are done.** Thank you: `sessionStart` on signup, `GET` and `DELETE /v1/members`,
-and the test address `https://api-rouge-nine-18.vercel.app`. We've kept them below for the record.
+**Asks 1 to 3 and 11 are done.** Thank you: `sessionStart` on signup, `GET` and
+`DELETE /v1/members`, the test address `https://api-rouge-nine-18.vercel.app`, and endpoints for
+every v1 screen. We've kept them below for the record.
 
-**Covered by your 42 endpoints:** signup, sign-in (password, magic link, handover), password
-reset, find my school, invitations, members, the current session and its terms, the setup
-checklist, Home, and classes and arms.
+**Connected on our side (15 October):** every v1 screen now calls your API: signup, sign-in,
+the team, Home and the calendar, classes, subjects, students, import, change history, branding
+and trial requests. To test it end to end on staging we need ask 12.
 
-**Built on our side with no endpoint yet** (each one runs on fake data that we swap for your
-endpoint once it exists):
+**Built on our side with no endpoint yet** (these run on sample data, and say "Not connected
+yet" when we use your API):
 
 | Area | Ask | Our function list |
 |---|---|---|
-| Subjects | 11 | `docs/data-contract.md`, "Subjects (batch 7)" |
-| Students, guardians, admission numbers | 11 | "Students (batch 8)" |
-| Importing students from a spreadsheet | 11 | "Import (batch 9)" |
-| Branding: school name, colour, logo upload | 11 | "Branding (after batch 10)" |
-| Change history and its CSV | 11 | "Change history (after batch 10)" |
-| Trial requests from the marketing site | 11 | the first table, `requestTrial` |
 | Teachers and the daily register | 4 | "Teachers and the daily register (batch 11)" |
 | Parents | 5 | "Parents (batch 12)" |
 | The team console | 6 | "The team console (batch 13)" |
@@ -167,7 +162,7 @@ and the daily register"). When you build them, these are the shapes the screens 
   the same arm name where it exists, mark the final class graduated, record class history, and
   start the next session. Please use `packages/core/src/promotion.ts` for the suggestions.
 
-## 11. Screens from v1 that have no endpoint yet (added 14 October 2026)
+## 11. Screens from v1 that have no endpoint yet (added 14 October 2026; done 14 October)
 
 These are v1 screens, built before the after-v1 groups above. The inputs and outputs of each
 function are in `docs/data-contract.md`, under the heading named.
@@ -219,3 +214,23 @@ function are in `docs/data-contract.md`, under the heading named.
 
 **Invitation roles:** `POST /v1/invitations` takes a role, but only `admin` is accepted today. We
 need `teacher` (ask 4) and `parent` with a `guardianId` (ask 5).
+
+## 12. To test against staging (added 15 October 2026)
+
+The front end is now connected to every v1 endpoint, with `PROXY_SHARED_SECRET` and the
+staging address rule (`x-forwarded-host: <school>.api-rouge-nine-18.vercel.app` and a matching
+`Origin`). Signup step 1 saves on staging. Two things stop us testing the rest:
+
+- **A test school with logins.** Please create one on staging (say `fecheck`) with an owner and
+  an admin account, and share the passwords privately. With it we can check sign-in, Home,
+  classes, subjects, students, import, history and branding end to end.
+- **Email on staging.** Signup step 2 answers "We could not send the email just now" (we used an
+  `@example.com` address). Codes, magic links, resets and invites all need email. Either verify a
+  sending domain in Resend, or give staging a way to read the last email sent to a test address.
+
+Also, for your information:
+
+- The secret was shared in a chat, not privately. Fine for staging; please use a new one for
+  production.
+- An invitation carries no name, so our accept screen now asks for it. If
+  `POST /v1/invitations` took an optional `fullName`, the invite could greet them by name.

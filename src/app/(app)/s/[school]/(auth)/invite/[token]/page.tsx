@@ -57,13 +57,13 @@ async function Accept({ params }: { params: Promise<{ school: string; token: str
       title={`Join ${school.name}`}
       description={
         <p>
-          Hi {firstName}, {invite.role === "parent" ? "you’ve been invited to follow your children at this school." : `you’ve been invited as ${invite.role === "teacher" ? "a teacher" : "a school admin"}.`} {invite.hasAccount ? "Enter your password to join." : "Choose a password to finish setting up your account."}
+          {firstName ? `Hi ${firstName}, you’ve` : "You’ve"} {invite.role === "parent" ? "been invited to follow your children at this school." : `been invited as ${invite.role === "teacher" ? "a teacher" : "a school admin"}.`} {invite.hasAccount ? "Enter your password to join." : "Choose a password to finish setting up your account."}
           <br />
           <span className="text-text-muted">{invite.email}</span>
         </p>
       }
     >
-      <AcceptInviteFlow action={acceptInvite.bind(null, school.subdomain, token)} homeHref={`/s/${school.subdomain}`} hasAccount={invite.hasAccount} />
+      <AcceptInviteFlow action={acceptInvite.bind(null, school.subdomain, token)} homeHref={`/s/${school.subdomain}`} hasAccount={invite.hasAccount} askName={!invite.fullName} />
     </AuthLayout>
   );
 }

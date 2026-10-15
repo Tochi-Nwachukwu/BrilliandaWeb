@@ -8,6 +8,7 @@ import { SchoolMark } from "@/components/school/SchoolBrand";
 import { schoolFromParams } from "@/components/school/school";
 import { signOut } from "@/data/actions/auth";
 import { getCurrentMember } from "@/data/auth";
+import { LIVE } from "@/data/source";
 
 // The signed-in part of a school: the shell with the plan's tabs. Anyone not signed in at this
 // school goes to its sign-in page.
@@ -41,7 +42,7 @@ async function SchoolApp({ params, children }: { params: Promise<{ school: strin
       nav={nav}
       place={school.name}
       account={{ fullName: me.fullName, roleLabel: ROLE_LABEL[me.role] }}
-      sampleData
+      sampleData={!LIVE}
       help={adminGuide(base)}
       signOut={signOut.bind(null, school.subdomain)}
       commands={[

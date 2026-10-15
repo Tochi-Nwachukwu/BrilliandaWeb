@@ -22,7 +22,7 @@ export default async function SessionsPage({ params }: PageProps<"/s/[school]/mo
   // Which term is "now" depends on today.
   await connection();
   const [session, status] = await Promise.all([getSession(school), getTermStatus(school)]);
-  if (!session || !status) return null;
+  if (!session) return null;
 
   return (
     <div className="grid gap-4">
@@ -30,8 +30,8 @@ export default async function SessionsPage({ params }: PageProps<"/s/[school]/mo
       {!session.confirmed && (
         <Alert tone="info">These are suggested dates, from Lagos State’s school calendar. Check them against your own and save.</Alert>
       )}
-      <Timeline session={session} today={todayInLagos()} closed={status.closed.map((c) => c.name)} />
-      {session.confirmed && <CloseTermCard school={school} status={status} close={closeTerm.bind(null, school)} />}
+      <Timeline session={session} today={todayInLagos()} closed={status?.closed.map((c) => c.name) ?? []} />
+      {session.confirmed && status && <CloseTermCard school={school} status={status} close={closeTerm.bind(null, school)} />}
       <SessionForm key={`${session.startYear}-${session.terms.map((t) => t.startsOn).join()}`} session={session} save={saveSession.bind(null, school)} />
     </div>
   );

@@ -1,12 +1,11 @@
 import { existsSync } from "node:fs";
 import { defineConfig } from "@playwright/test";
+import { TOURS_SEEN } from "./tests/helpers";
 
 // Every flow runs at the plan's two sizes: a 360 px phone and a 1280 px laptop.
 // Locally, a Chromium already on the machine can be used instead of downloading one:
 // set PW_CHROMIUM to its path. CI installs Playwright's own browser.
 const localChromium = process.env.PW_CHROMIUM;
-const TOURS_SEEN = ["admin", "teacher", "parent", "console"].map((id) => ({ name: `brillianda:tour:${id}`, value: "seen" }));
-
 const launchOptions = localChromium && existsSync(localChromium) ? { executablePath: localChromium } : {};
 
 export default defineConfig({
@@ -23,7 +22,7 @@ export default defineConfig({
     trace: "retain-on-failure",
     // The guide pop-ups start by themselves on a first visit; they would sit over every test, so they
     // start out seen. help.spec.ts clears this to test them.
-    storageState: { cookies: [], origins: ["http://localhost:3100", "http://greenfield.localhost:3100"].map((origin) => ({ origin, localStorage: TOURS_SEEN })) },
+    storageState: TOURS_SEEN,
   },
   // Every test runs on a phone. The laptop run takes only those tagged @both: the plan's main
   // flows and the checks where layout matters (accessibility, speed, navigation, the laptop grid).
@@ -43,7 +42,8 @@ export default defineConfig({
     command: "pnpm build && pnpm exec next start -p 3100",
     cwd: "..",
     url: "http://localhost:3100",
-    env: { BRILLIANDA_PLAYGROUND: "1" },
+    // Sample data, whatever .env.local says: the tests check the screens, not the backend.
+    env: { BRILLIANDA_PLAYGROUND: "1", DATA_SOURCE: "fake" },
     reuseExistingServer: false,
     timeout: 300_000,
   },

@@ -56,7 +56,9 @@ export async function signIn(subdomain: string, email: string, password: string)
   return { ok: true, data: null };
 }
 
-export async function signOut(): Promise<void> {
+// The school is for the real one, whose sessions are per school; the fake has one for all.
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export async function signOut(_subdomain?: string): Promise<void> {
   const jar = await cookies();
   const token = jar.get(SESSION_COOKIE)?.value;
   if (token) store.sessions.delete(token);
@@ -140,7 +142,7 @@ export async function getInvite(subdomain: string, token: string): Promise<Invit
   };
 }
 
-export async function acceptInvite(subdomain: string, token: string, password: string): Promise<ActionResult<null>> {
+export async function acceptInvite(subdomain: string, token: string, password: string, fullName?: string): Promise<ActionResult<null>> {
   await pause();
   const invite = openInvite(subdomain, token);
   if (!invite || invite.usedAt || expired(invite.createdAt)) return { ok: false, error: "This invite can’t be used any more. Ask the school owner to send a new one." };
@@ -149,7 +151,7 @@ export async function acceptInvite(subdomain: string, token: string, password: s
     // Someone already on Brillianda (another school) signs in with their own password.
     if (user.password !== password) return { ok: false, error: "That password doesn’t match your Brillianda account.", fieldErrors: { password: ["That password doesn’t match your Brillianda account"] } };
   } else {
-    user = { id: crypto.randomUUID(), fullName: invite.fullName, email: invite.email, password, schools: [] };
+    user = { id: crypto.randomUUID(), fullName: fullName || invite.fullName, email: invite.email, password, schools: [] };
     store.users.push(user);
   }
   const role = invite.role ?? "admin";

@@ -5,8 +5,13 @@
 import { armLayoutSchema, armNameSchema, classSetupSchema, DEPARTMENTS, levelNameSchema, newLevelSchema, type Department } from "@brillianda/core/classes";
 import { fieldErrorsOf } from "@brillianda/core/signup";
 import { revalidatePath } from "next/cache";
-import * as impl from "../fake/classes";
+import { LIVE } from "../api/client";
+import * as live from "../api/classes";
+import * as fake from "../fake/classes";
 import type { ActionResult } from "../types";
+
+// The API where it has endpoints (DATA_SOURCE=api), else sample data.
+const impl = LIVE ? live : fake;
 
 const CHECK = "Please check the highlighted fields.";
 const done = <T,>(school: string, result: ActionResult<T>) => {

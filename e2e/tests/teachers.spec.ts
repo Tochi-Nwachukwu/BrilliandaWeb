@@ -1,5 +1,5 @@
 import { expect, test, type Page } from "@playwright/test";
-import { open } from "./helpers";
+import { open, TOURS_SEEN } from "./helpers";
 
 // Teachers and the daily register (batch 11), on Greenfield. Each screen size uses its own sample
 // teacher and form class (Bisi: JSS 1 Blue on phone, Ifeanyi: SS 1 Green on laptop), so the two runs
@@ -60,7 +60,7 @@ test("an admin invites a teacher, gives them a class and a subject, and they joi
   await page.getByRole("button", { name: "Send the invite" }).click();
   const href = await page.getByRole("link", { name: "Open the invite link" }).getAttribute("href");
 
-  const zara = await (await browser.newContext()).newPage();
+  const zara = await (await browser.newContext({ storageState: TOURS_SEEN })).newPage();
   await open(zara, href!);
   await expect(zara.getByText("you’ve been invited as a teacher")).toBeVisible();
   await zara.getByLabel("New password", { exact: true }).fill("zaras-password");

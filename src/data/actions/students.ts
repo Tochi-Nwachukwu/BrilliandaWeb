@@ -5,8 +5,13 @@
 import { fieldErrorsOf } from "@brillianda/core/signup";
 import { moveStudentsSchema, statusChangeSchema, studentSchema } from "@brillianda/core/students";
 import { revalidatePath } from "next/cache";
-import * as impl from "../fake/students";
+import { LIVE } from "../api/client";
+import * as live from "../api/students";
+import * as fake from "../fake/students";
 import type { ActionResult, AdmissionSettings, GuardianMatch } from "../types";
+
+// The API where it has endpoints (DATA_SOURCE=api), else sample data.
+const impl = LIVE ? live : fake;
 
 const CHECK = "Please check the highlighted fields.";
 const done = <T,>(school: string, result: ActionResult<T>) => {

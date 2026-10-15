@@ -38,6 +38,7 @@ export function StudentPage({
   remove,
   inviteParent,
   reportTerms,
+  showAttendance = true,
 }: {
   school: string;
   student: StudentDetail;
@@ -45,10 +46,12 @@ export function StudentPage({
   now: number;
   setStatus: (input: unknown) => Promise<ActionResult<{ changed: number }>>;
   remove: () => Promise<ActionResult<null>>;
-  /** Invites this student's guardian to the parent app (batch 12). */
-  inviteParent: () => Promise<ActionResult<SampleEmail>>;
+  /** Invites this student's guardian to the parent app (batch 12). Left out while the parent app has no backend. */
+  inviteParent?: () => Promise<ActionResult<SampleEmail>>;
   /** Terms with results, newest first (group 3). */
   reportTerms: ReportTerm[];
+  /** The register’s summary (batch 11); off while registers have no backend. */
+  showAttendance?: boolean;
 }) {
   const router = useRouter();
   const [dialog, setDialog] = useState<"status" | "delete" | null>(null);
@@ -117,7 +120,7 @@ export function StudentPage({
                   </ul>
                 </div>
               )}
-              <ParentAccessRow guardian={student.guardian} invite={inviteParent} />
+              {inviteParent && <ParentAccessRow guardian={student.guardian} invite={inviteParent} />}
             </div>
           ) : (
             <EmptyState title="No guardian yet">Add one from Edit. A phone number already on file links siblings to the same guardian.</EmptyState>
@@ -143,26 +146,28 @@ export function StudentPage({
           )}
         </Card>
 
-        <Card title="Attendance" description={student.attendance ? `${student.attendance.term}, from the daily register.` : undefined}>
-          {student.attendance && student.attendance.days > 0 ? (
-            <dl className="grid grid-cols-3 gap-3 text-center">
-              <div className="rounded-2xl bg-sunken p-3">
-                <dt className="text-[12.5px] text-text-secondary">Present</dt>
-                <dd className="text-[22px] font-medium tabular-nums">{student.attendance.present}<span className="text-sm text-text-secondary"> of {student.attendance.days}</span></dd>
-              </div>
-              <div className="rounded-2xl bg-sunken p-3">
-                <dt className="text-[12.5px] text-text-secondary">Late</dt>
-                <dd className="text-[22px] font-medium tabular-nums">{student.attendance.late}</dd>
-              </div>
-              <div className="rounded-2xl bg-sunken p-3">
-                <dt className="text-[12.5px] text-text-secondary">Absent</dt>
-                <dd className="text-[22px] font-medium tabular-nums">{student.attendance.absent}</dd>
-              </div>
-            </dl>
-          ) : (
-            <p className="text-sm text-text-secondary">No registers taken for this student this term yet.</p>
-          )}
-        </Card>
+        {showAttendance && (
+          <Card title="Attendance" description={student.attendance ? `${student.attendance.term}, from the daily register.` : undefined}>
+            {student.attendance && student.attendance.days > 0 ? (
+              <dl className="grid grid-cols-3 gap-3 text-center">
+                <div className="rounded-2xl bg-sunken p-3">
+                  <dt className="text-[12.5px] text-text-secondary">Present</dt>
+                  <dd className="text-[22px] font-medium tabular-nums">{student.attendance.present}<span className="text-sm text-text-secondary"> of {student.attendance.days}</span></dd>
+                </div>
+                <div className="rounded-2xl bg-sunken p-3">
+                  <dt className="text-[12.5px] text-text-secondary">Late</dt>
+                  <dd className="text-[22px] font-medium tabular-nums">{student.attendance.late}</dd>
+                </div>
+                <div className="rounded-2xl bg-sunken p-3">
+                  <dt className="text-[12.5px] text-text-secondary">Absent</dt>
+                  <dd className="text-[22px] font-medium tabular-nums">{student.attendance.absent}</dd>
+                </div>
+              </dl>
+            ) : (
+              <p className="text-sm text-text-secondary">No registers taken for this student this term yet.</p>
+            )}
+          </Card>
+        )}
 
         <Card title="Classes">
           <ol className="grid gap-2">

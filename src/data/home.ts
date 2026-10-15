@@ -1,7 +1,12 @@
 // Home and the school's calendar (docs/data-contract.md). Screens import from here, never from fake/.
 import "server-only";
-import * as impl from "./fake/home";
+import { LIVE } from "./api/client";
+import * as live from "./api/home";
+import * as fake from "./fake/home";
 import type { HomeSummary, SessionSetup, SetupProgress } from "./types";
+
+// The API where it has endpoints (DATA_SOURCE=api), else sample data.
+const impl = LIVE ? live : fake;
 
 /** The current session and its terms; unsaved schools get suggested dates. Null for non-members. */
 export function getSession(subdomain: string): Promise<SessionSetup | null> {

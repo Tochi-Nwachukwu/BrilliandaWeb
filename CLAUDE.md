@@ -56,6 +56,10 @@ and in the brillanda-v1 folder, for reference only.
   `packages/core/src/hosts.ts`, with tests. In development open `http://greenfield.localhost:3000`
   (Chrome needs no setup), or `/s/<school>/…` on plain localhost, which still works. In-app links
   still use `/s/<school>/…`; on a school's own address those work too, for that school only.
+- `DATA_SOURCE=api` (in `.env.local`) runs the connected screens on the API through
+  `src/data/api/*`, twins of `src/data/fake/*` (docs/data-contract.md, "Connected to the API").
+  A new function needs both, and a wrapper that picks with `LIVE`. Screens with no endpoint yet
+  show `NotConnected` when `LIVE` is on. Browser tests always run on the fake.
 - Tailwind v4 runs through `@tailwindcss/turbopack`; theme tokens are in CSS (`@theme`), not a JS config.
   Workspace packages need an `@source` line so their classes are found.
 - Screens use `AppShell` from `src/components/shell`. The look (Pastel or Neutral) lives in

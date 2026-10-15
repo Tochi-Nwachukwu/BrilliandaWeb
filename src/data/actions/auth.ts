@@ -8,8 +8,13 @@
 import { emailOnlySchema, newPasswordSchema, signInSchema } from "@brillianda/core/auth";
 import { fieldErrorsOf } from "@brillianda/core/signup";
 import { redirect } from "next/navigation";
-import * as impl from "../fake/auth";
+import { LIVE } from "../api/client";
+import * as live from "../api/auth";
+import * as fake from "../fake/auth";
 import type { ActionResult, SampleEmail } from "../types";
+
+// The API where it has endpoints (DATA_SOURCE=api), else sample data.
+const impl = LIVE ? live : fake;
 
 const CHECK_FIELDS = "Please check the highlighted fields.";
 
@@ -21,7 +26,7 @@ export async function signIn(school: string, input: unknown): Promise<ActionResu
 
 /** Ends the session and goes to the school's sign-in page. */
 export async function signOut(school: string): Promise<void> {
-  await impl.signOut();
+  await impl.signOut(school);
   redirect(`/s/${school}/login`);
 }
 
@@ -73,5 +78,6 @@ export async function acceptInvite(school: string, token: string, input: unknown
   } else if (!password) {
     return { ok: false, error: CHECK_FIELDS, fieldErrors: { password: ["Enter your password"] } };
   }
-  return impl.acceptInvite(school, String(token), password);
+  const fullName = String((input as { fullName?: unknown })?.fullName ?? "").trim().slice(0, 120);
+  return impl.acceptInvite(school, String(token), password, fullName || undefined);
 }

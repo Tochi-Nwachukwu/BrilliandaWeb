@@ -5,8 +5,13 @@
 import { sessionSchema } from "@brillianda/core/calendar";
 import { fieldErrorsOf } from "@brillianda/core/signup";
 import { revalidatePath } from "next/cache";
-import * as impl from "../fake/home";
+import { LIVE } from "../api/client";
+import * as live from "../api/home";
+import * as fake from "../fake/home";
 import type { ActionResult, SessionSetup } from "../types";
+
+// The API where it has endpoints (DATA_SOURCE=api), else sample data.
+const impl = LIVE ? live : fake;
 
 /** Saves the session and its terms (two or three, in order, names editable). Owners and admins. */
 export async function saveSession(school: string, input: unknown): Promise<ActionResult<SessionSetup>> {

@@ -3,8 +3,13 @@
 // The four signup screens' saves (plan: "Creating a school"; docs/data-contract.md). Each one
 // checks its input with the same schema the page used, then hands over to the implementation.
 import { fieldErrorsOf, ownerAccountSchema, schoolAddressSchema, schoolDetailsSchema, verifyCodeSchema } from "@brillianda/core/signup";
-import * as impl from "../fake/signup";
+import { LIVE } from "../api/client";
+import * as live from "../api/signup";
+import * as fake from "../fake/signup";
 import type { ActionResult, SignupDraft, SubdomainCheck } from "../types";
+
+// The API where it has endpoints (DATA_SOURCE=api), else sample data.
+const impl = LIVE ? live : fake;
 
 const CHECK_FIELDS = "Please check the highlighted fields.";
 

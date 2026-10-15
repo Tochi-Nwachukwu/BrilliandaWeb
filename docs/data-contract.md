@@ -6,6 +6,30 @@ these. Each one ships with a **fake implementation** in `src/data/fake`, on samp
 every screen works before the backend does. The backend teammate replaces each fake with the real
 thing; the screens don't change.
 
+## Connected to the API (from 15 October 2026)
+
+The backend is a separate API (their `docs/frontend-integration.md`), so each fake now has a twin
+in `src/data/api/` with the same functions and shapes, calling the API from our server. The
+wrappers in `src/data` pick one: `DATA_SOURCE=api` uses the API, anything else the fake (the
+browser tests always run on the fake). Connected: everything in the v1 tables below (signup,
+sign-in, the team, Home and the calendar, classes, subjects, students, import, change history,
+branding, trial requests). Not connected, because the API has no endpoints for them yet: the
+after-v1 batches (teachers and registers, parents, the team console, results, closing a term,
+promotion). With `DATA_SOURCE=api` their screens say "Not connected yet" (a `layout.tsx` in
+each), and Home, Sessions and the student page leave out their parts.
+
+- `src/data/api/client.ts` calls the API with the school's address, the shared secret and the
+  person's session; `packages/core/src/apiBridge.ts` holds the rules, with tests.
+- Sessions: the API pins its cookie to each school's address. Ours are kept per school under
+  `bda.<school>.<name>` and sent back only on that school's calls, so `/s/<school>/…` on one
+  address (localhost, staging) still keeps schools apart.
+- Staging has no school subdomains: with `API_ROOT_DOMAIN` set, calls go out as from
+  `<school>.<API_ROOT_DOMAIN>`, and the logo is served at `/s/<school>/api/v1/school/logo`
+  (forwarded by `proxy.ts`).
+- Errors are problem documents; `failureOf` turns them into `ActionResult` (field errors from
+  each `pointer`, renamed where our field names differ, e.g. signup's `name` → `schoolName`).
+- The API's invites carry no name, so accepting one asks for it.
+
 ## Conventions
 
 - **Reads** are plain async functions, called from Server Components:
@@ -30,19 +54,19 @@ thing; the screens don't change.
 
 ## Functions
 
-Each batch adds its functions here. **Status:** `fake` (front end only) or `real` (backend done).
+Each batch adds its functions here. **Status:** `fake` (front end only) or `real` (an API endpoint, used with `DATA_SOURCE=api`).
 
 | Function | Kind | Input / output | Used by | Status |
 |---|---|---|---|---|
-| `getSchoolBySubdomain` | read | `subdomain: string` → `SchoolSummary \| null` | school layout | fake |
-| `requestTrial` | action | trial form values → `ActionResult<null>`; checked with `validateTrialRequest` (core). Accept a filled honeypot (`website`) silently | marketing site | fake |
-| `getSignupDraft` | read | — (reads the signup cookie) → `SignupDraft \| null`; never returns the password | signup screens | fake |
-| `saveSchoolDetails` | action | `schoolDetailsSchema` → `ActionResult<SignupDraft>`; starts a draft | signup 1 | fake |
-| `saveOwnerAccount` | action | `ownerAccountSchema` → `ActionResult<SignupDraft>`; sends the 6-digit code (Resend); bot check (Turnstile) goes here | signup 2 | fake |
-| `resendSignupCode` | action | — → `ActionResult<SignupDraft>`; refuses within 60 s of the last code | signup 3 | fake |
-| `verifySignupEmail` | action | `verifyCodeSchema` → `ActionResult<SignupDraft>`; codes last 10 minutes | signup 3 | fake |
-| `checkSubdomain` | action | `name, state?` → `SubdomainCheck` (free, or taken / reserved / invalid with up to 3 suggestions); rate limit it | signup 4 | fake |
-| `createSchool` | action | `schoolAddressSchema` → `ActionResult<{ subdomain, url }>`; one transaction (plan: "What happens on Create"), then signs the owner in on the new address and returns where to go | signup 4 | fake |
+| `getSchoolBySubdomain` | read | `subdomain: string` → `SchoolSummary \| null` | school layout | real |
+| `requestTrial` | action | trial form values → `ActionResult<null>`; checked with `validateTrialRequest` (core). Accept a filled honeypot (`website`) silently | marketing site | real |
+| `getSignupDraft` | read | — (reads the signup cookie) → `SignupDraft \| null`; never returns the password | signup screens | real |
+| `saveSchoolDetails` | action | `schoolDetailsSchema` → `ActionResult<SignupDraft>`; starts a draft | signup 1 | real |
+| `saveOwnerAccount` | action | `ownerAccountSchema` → `ActionResult<SignupDraft>`; sends the 6-digit code (Resend); bot check (Turnstile) goes here | signup 2 | real |
+| `resendSignupCode` | action | — → `ActionResult<SignupDraft>`; refuses within 60 s of the last code | signup 3 | real |
+| `verifySignupEmail` | action | `verifyCodeSchema` → `ActionResult<SignupDraft>`; codes last 10 minutes | signup 3 | real |
+| `checkSubdomain` | action | `name, state?` → `SubdomainCheck` (free, or taken / reserved / invalid with up to 3 suggestions); rate limit it | signup 4 | real |
+| `createSchool` | action | `schoolAddressSchema` → `ActionResult<{ subdomain, url }>`; one transaction (plan: "What happens on Create"), then signs the owner in on the new address and returns where to go | signup 4 | real |
 
 ### Notes for the real signup
 
@@ -67,22 +91,22 @@ page passes the school it is on. The real actions must take the school from the 
 
 | Function | Kind | Input / output | Used by | Status |
 |---|---|---|---|---|
-| `getCurrentMember` | read | `subdomain` → `SignedInMember \| null`; someone signed in at another school counts as signed out | school pages, sign-in | fake |
-| `getMySchools` | read | — → `SchoolSummary[]` (active schools of the signed-in person) | `/login` picker | fake |
-| `getInvite` | read | `subdomain, token` → `InviteDetails \| null` (open, used or expired; whether they already have an account) | accept invite | fake |
-| `listMembers` | read | `subdomain` → `SchoolMember[]`: owner, admins, open invites; empty for non-members | More › Admins | fake |
-| `signIn` | action | `school, signInSchema` → `ActionResult<null>`; unknown email, wrong password and another school's account all give the same message | sign in | fake |
-| `signOut` | action | `school` → redirects to the school's sign-in | account menu | fake |
-| `requestPasswordReset` | action | `school, emailOnlySchema` → `ActionResult<SampleEmail>`; the same answer whether or not the email is on file; link lasts 1 hour | forgot password | fake |
-| `resetPassword` | action | `school, token, newPasswordSchema` → `ActionResult<null>`; ends every other session | reset password | fake |
-| `sendMagicLink` | action | `school, emailOnlySchema` → `ActionResult<SampleEmail>`; same answer either way; works once, 1 hour | email sign-in link | fake |
-| `signInWithLink` | action | `school, token` → `ActionResult<null>`; called by a button press, so link scanners can't spend it | email sign-in link | fake |
-| `completeHandover` | action | `school, token` → `ActionResult<null>`; the one-time pass from the end of signup (60 seconds, used once) becomes a session on the school's own address. Real: `POST /v1/auth/handover` | `/s/<school>/auth/handover?token=` | fake |
-| `findMySchool` | action | `emailOnlySchema` → `ActionResult<SampleEmail>`; emails a link to each school; never says whether the email exists | `/login` | fake |
-| `acceptInvite` | action | `school, token, { password, confirmation } or { password, hasAccount: true }` → `ActionResult<null>`; signs in | accept invite | fake |
-| `inviteAdmin` | action | `school, inviteAdminSchema` → `ActionResult<SampleEmail & { resent }>`; owner only; re-inviting the same email resends | Admins | fake |
-| `cancelInvite` | action | `school, inviteId` → `ActionResult<null>`; owner only | Admins | fake |
-| `removeAdmin` | action | `school, userId` → `ActionResult<null>`; owner only; never the owner | Admins | fake |
+| `getCurrentMember` | read | `subdomain` → `SignedInMember \| null`; someone signed in at another school counts as signed out | school pages, sign-in | real |
+| `getMySchools` | read | — → `SchoolSummary[]` (active schools of the signed-in person) | `/login` picker | fake: sessions are per school address, so the main site has none; the real one returns [] and people use Find my school |
+| `getInvite` | read | `subdomain, token` → `InviteDetails \| null` (open, used or expired; whether they already have an account) | accept invite | real |
+| `listMembers` | read | `subdomain` → `SchoolMember[]`: owner, admins, open invites; empty for non-members | More › Admins | real |
+| `signIn` | action | `school, signInSchema` → `ActionResult<null>`; unknown email, wrong password and another school's account all give the same message | sign in | real |
+| `signOut` | action | `school` → redirects to the school's sign-in | account menu | real |
+| `requestPasswordReset` | action | `school, emailOnlySchema` → `ActionResult<SampleEmail>`; the same answer whether or not the email is on file; link lasts 1 hour | forgot password | real |
+| `resetPassword` | action | `school, token, newPasswordSchema` → `ActionResult<null>`; ends every other session | reset password | real |
+| `sendMagicLink` | action | `school, emailOnlySchema` → `ActionResult<SampleEmail>`; same answer either way; works once, 1 hour | email sign-in link | real |
+| `signInWithLink` | action | `school, token` → `ActionResult<null>`; called by a button press, so link scanners can't spend it | email sign-in link | real |
+| `completeHandover` | action | `school, token` → `ActionResult<null>`; the one-time pass from the end of signup (60 seconds, used once) becomes a session on the school's own address. Real: `POST /v1/auth/handover` | `/s/<school>/auth/handover?token=` | real |
+| `findMySchool` | action | `emailOnlySchema` → `ActionResult<SampleEmail>`; emails a link to each school; never says whether the email exists | `/login` | real |
+| `acceptInvite` | action | `school, token, { password, confirmation } or { password, hasAccount: true }` → `ActionResult<null>`; signs in | accept invite | real |
+| `inviteAdmin` | action | `school, inviteAdminSchema` → `ActionResult<SampleEmail & { resent }>`; owner only; re-inviting the same email resends | Admins | real |
+| `cancelInvite` | action | `school, inviteId` → `ActionResult<null>`; owner only | Admins | real |
+| `removeAdmin` | action | `school, userId` → `ActionResult<null>`; owner only; never the owner | Admins | real |
 
 `SampleEmail` (`{ sampleLinks? }`) is **fake only**: the links an email would carry, so the screens
 can be clicked through. The real functions return nothing there. `src/data/samples.ts`
@@ -94,11 +118,11 @@ Sample accounts: `owner@greenfield.ng`, `admin@greenfield.ng` (also an admin at 
 
 | Function | Kind | Input / output | Used by | Status |
 |---|---|---|---|---|
-| `getSession` | read | `subdomain` → `SessionSetup \| null`: session year, 2 or 3 terms, and `confirmed` (false until saved; unsaved schools get suggested dates from `defaultTerms`) | Home, Sessions and terms | fake |
-| `getSetupProgress` | read | `subdomain` → `SetupProgress`: the plan's six steps (calendar, classes, arms, subjects, students, admins) done or not, and whether the checklist is hidden | Home | fake |
-| `getHomeSummary` | read | `subdomain` → `HomeSummary`: counts of students, classes, arms, subjects, admins, and the 6 latest changes (the audit log) | Home | fake |
-| `saveSession` | action | `school, sessionSchema` → `ActionResult<SessionSetup>`; owners and admins; writes a change entry | Sessions and terms | fake |
-| `hideChecklist` | action | `school, hidden` → `ActionResult<null>` | Home | fake |
+| `getSession` | read | `subdomain` → `SessionSetup \| null`: session year, 2 or 3 terms, and `confirmed` (false until saved; unsaved schools get suggested dates from `defaultTerms`) | Home, Sessions and terms | real |
+| `getSetupProgress` | read | `subdomain` → `SetupProgress`: the plan's six steps (calendar, classes, arms, subjects, students, admins) done or not, and whether the checklist is hidden | Home | real |
+| `getHomeSummary` | read | `subdomain` → `HomeSummary`: counts of students, classes, arms, subjects, admins, and the 6 latest changes (the audit log) | Home | real |
+| `saveSession` | action | `school, sessionSchema` → `ActionResult<SessionSetup>`; owners and admins; writes a change entry | Sessions and terms | real |
+| `hideChecklist` | action | `school, hidden` → `ActionResult<null>` | Home | real |
 
 - Field errors use the full path for nested fields (`terms.1.startsOn`), via `fieldErrorsOf` in core.
 - At signup, `createSchool` stores suggested dates for the session year the owner chose; the calendar
@@ -135,10 +159,10 @@ Actions inside this app — see their `docs/decisions.md`. What that means for u
 
 | Function | Kind | Input / output | Used by | Status |
 |---|---|---|---|---|
-| `getClassStructure` | read | `subdomain` → `ClassStructure`: levels (ordered, with section), arm names (once per school, with codes), arms (level × arm name, department, archived, student count), and the levels offered at signup | Classes, Home | fake |
-| `setupClasses` | action | `school, classSetupSchema` (levels, arms with codes, arms per level) → `ActionResult<null>`; only while the school has no classes | quick setup | fake |
-| `renameLevel` · `addLevel` · `removeLevel` · `setLevelArchived` | action | `levelNameSchema` / `newLevelSchema`; removing is refused while any of its arms has students | Classes | fake |
-| `addArm` · `renameArmName` · `setArmDepartment` · `setArmArchived` · `removeArm` | action | an existing arm name or `armNameSchema`; a rename applies in every class; departments are for senior arms; removing is refused with students or for a class's only arm | Classes | fake |
+| `getClassStructure` | read | `subdomain` → `ClassStructure`: levels (ordered, with section), arm names (once per school, with codes), arms (level × arm name, department, archived, student count), and the levels offered at signup | Classes, Home | real |
+| `setupClasses` | action | `school, classSetupSchema` (levels, arms with codes, arms per level) → `ActionResult<null>`; only while the school has no classes | quick setup | real |
+| `renameLevel` · `addLevel` · `removeLevel` · `setLevelArchived` | action | `levelNameSchema` / `newLevelSchema`; removing is refused while any of its arms has students | Classes | real |
+| `addArm` · `renameArmName` · `setArmDepartment` · `setArmArchived` · `removeArm` | action | an existing arm name or `armNameSchema`; a rename applies in every class; departments are for senior arms; removing is refused with students or for a class's only arm | Classes | real |
 
 The ladder, naming schemes, default range from the levels offered, arm presets, codes and the
 preview sentence are pure functions in `packages/core/src/classes.ts`, with tests.
@@ -149,12 +173,12 @@ preview sentence are pure functions in `packages/core/src/classes.ts`, with test
 
 | Function | Kind | Input / output | Used by | Status |
 |---|---|---|---|---|
-| `getSubjectsSetup` | read | `subdomain` → `SubjectsSetup`: the school's subjects (catalogue-linked or custom), their links to class levels (compulsory or elective, department), its levels, the NERDC bands it runs, and the catalogue | Subjects, Home | fake |
-| `addSubjects` | action | `school, addSubjectsSchema` (catalogue ids, own subjects with codes) → `ActionResult<{ added }>`; catalogue subjects attach to their default levels | Subjects | fake |
-| `renameSubject` | action | `subjectNameSchema`; stays linked to its catalogue entry | Subjects | fake |
-| `removeSubject` | action | `subjectId` → `ActionResult<null>` | Subjects | fake |
-| `setSubjectLink` | action | `subjectId, levelId, "compulsory" \| "elective" \| null` | Subjects grid / phone toggles | fake |
-| `setSubjectDepartment` | action | `subjectId, department \| null` for its senior electives | Subjects | fake |
+| `getSubjectsSetup` | read | `subdomain` → `SubjectsSetup`: the school's subjects (catalogue-linked or custom), their links to class levels (compulsory or elective, department), its levels, the NERDC bands it runs, and the catalogue | Subjects, Home | real |
+| `addSubjects` | action | `school, addSubjectsSchema` (catalogue ids, own subjects with codes) → `ActionResult<{ added }>`; catalogue subjects attach to their default levels | Subjects | real |
+| `renameSubject` | action | `subjectNameSchema`; stays linked to its catalogue entry | Subjects | real |
+| `removeSubject` | action | `subjectId` → `ActionResult<null>` | Subjects | real |
+| `setSubjectLink` | action | `subjectId, levelId, "compulsory" \| "elective" \| null` | Subjects grid / phone toggles | real |
+| `setSubjectDepartment` | action | `subjectId, department \| null` for its senior electives | Subjects | real |
 
 The catalogue copy is `src/data/fake/catalogue.ts` (57 entries: the plan's 2025 lists and the legacy
 subjects it names). The real one is platform data the backend seeds. The rules (bands, pre-ticks,
@@ -164,16 +188,16 @@ default links, codes) are in `packages/core/src/subjects.ts`, with tests.
 
 | Function | Kind | Input / output | Used by | Status |
 |---|---|---|---|---|
-| `listStudents` | read | `subdomain` → `StudentsList`: every student not deleted (`StudentRow`), the classes they can sit in (`ArmOption`), the next admission number | Students, add/edit | fake |
-| `getStudent` | read | `subdomain, id` → `StudentDetail`: details, guardian with siblings, class history, changes | student page | fake |
-| `getAdmissionSettings` | read | `subdomain` → pattern, digits, next number, preview | More › Admission numbers | fake |
-| `addStudent` | action | `studentSchema` → `ActionResult<{ id, admissionNo, fullName }>`; blank admission number takes the school's next (a per-school counter in the real one); duplicates refused | add | fake |
-| `updateStudent` | action | `studentId, studentSchema`; a new class is added to the class history | edit | fake |
-| `moveStudents` | action | `moveStudentsSchema` (ids, armId) → `{ moved }` | bulk move | fake |
-| `setStudentsStatus` | action | `statusChangeSchema` (ids, status) → `{ changed }`; active, suspended, withdrawn, transferred, graduated | bulk / student page | fake |
-| `deleteStudent` | action | `studentId`; soft delete, for mistakes only | student page | fake |
-| `findGuardian` | action | `phone` → `GuardianMatch \| null`, so siblings share a guardian | add/edit | fake |
-| `setAdmissionFormat` | action | `{ pattern, digits }` with `{YEAR}` and `{NUMBER}` | More › Admission numbers | fake |
+| `listStudents` | read | `subdomain` → `StudentsList`: every student not deleted (`StudentRow`), the classes they can sit in (`ArmOption`), the next admission number | Students, add/edit | real |
+| `getStudent` | read | `subdomain, id` → `StudentDetail`: details, guardian with siblings, class history, changes | student page | real |
+| `getAdmissionSettings` | read | `subdomain` → pattern, digits, next number, preview | More › Admission numbers | real |
+| `addStudent` | action | `studentSchema` → `ActionResult<{ id, admissionNo, fullName }>`; blank admission number takes the school's next (a per-school counter in the real one); duplicates refused | add | real |
+| `updateStudent` | action | `studentId, studentSchema`; a new class is added to the class history | edit | real |
+| `moveStudents` | action | `moveStudentsSchema` (ids, armId) → `{ moved }` | bulk move | real |
+| `setStudentsStatus` | action | `statusChangeSchema` (ids, status) → `{ changed }`; active, suspended, withdrawn, transferred, graduated | bulk / student page | real |
+| `deleteStudent` | action | `studentId`; soft delete, for mistakes only | student page | real |
+| `findGuardian` | action | `phone` → `GuardianMatch \| null`, so siblings share a guardian | add/edit | real |
+| `setAdmissionFormat` | action | `{ pattern, digits }` with `{YEAR}` and `{NUMBER}` | More › Admission numbers | real |
 
 Export is done in the browser from the list (`toCsv` in core escapes cells starting with =, +, - or
 @). Search ignores accents (`matchesSearch`). The student photo the plan lists is not built yet: it
@@ -183,11 +207,11 @@ needs file storage from the backend.
 
 | Function | Kind | Input / output | Used by | Status |
 |---|---|---|---|---|
-| `getImportSetup` | read | `subdomain` → `ImportSetup`: class levels and arms (for matching), existing students (for duplicates), the remembered column mapping, the last 5 imports | Import | fake |
-| `checkImport` | action | `rows` (mapped cells, ≤ 5,000), `armId \| null` → `CheckedRow[]` from `checkRows` in core; the server's own check | Import review | fake |
-| `commitImport` | action | `{ rows, armId, update: rowIndexes, fileName }` → `ImportResult`; re-checks, writes ready rows in chunks of 500 under one batch id, updates or skips duplicate admission numbers | Import | fake |
-| `undoImport` | action | `batchId` → `{ removed }`; within 24 hours and only if none of the new students was edited since | Import result / recent imports | fake |
-| `saveImportMapping` | action | heading (lower case) → column id; offered first next time | Import | fake |
+| `getImportSetup` | read | `subdomain` → `ImportSetup`: class levels and arms (for matching), existing students (for duplicates), the remembered column mapping, the last 5 imports | Import | real |
+| `checkImport` | action | `rows` (mapped cells, ≤ 5,000), `armId \| null` → `CheckedRow[]` from `checkRows` in core; the server's own check | Import review | real |
+| `commitImport` | action | `{ rows, armId, update: rowIndexes, fileName }` → `ImportResult`; re-checks, writes ready rows in chunks of 500 under one batch id, updates or skips duplicate admission numbers | Import | real |
+| `undoImport` | action | `batchId` → `{ removed }`; within 24 hours and only if none of the new students was edited since | Import result / recent imports | real |
+| `saveImportMapping` | action | heading (lower case) → column id; offered first next time | Import | real |
 
 The browser reads Excel (`exceljs`), CSV and Word tables (`.docx`, via `jszip`; the first table
 counts as the sheet) and builds the Excel templates with Class, Arm, Gender and State dropdowns
@@ -198,10 +222,10 @@ and validation rules are pure functions in `packages/core/src/studentImport.ts`,
 
 | Function | Kind | Input / output | Used by | Status |
 |---|---|---|---|---|
-| `getSchoolBySubdomain` | read | (as before) `SchoolSummary` with `name`, `brandColor`, `logoUrl` | every school page, Branding | fake |
-| `updateBranding` | action | `{ name, brandColor }` (checked by `brandingSchema` in core) → `SchoolSummary`. Owner only | More › Branding | fake |
-| `uploadLogo` | action | `FormData` with one file, `logo`: PNG or JPEG, at most 512 px and 300 KB (the browser shrinks and re-encodes it first) → `SchoolSummary`. Owner only | More › Branding | fake |
-| `removeLogo` | action | nothing → `SchoolSummary`. Owner only | More › Branding | fake |
+| `getSchoolBySubdomain` | read | (as before) `SchoolSummary` with `name`, `brandColor`, `logoUrl` | every school page, Branding | real |
+| `updateBranding` | action | `{ name, brandColor }` (checked by `brandingSchema` in core) → `SchoolSummary`. Owner only | More › Branding | real |
+| `uploadLogo` | action | `FormData` with one file, `logo`: PNG or JPEG, at most 512 px and 300 KB (the browser shrinks and re-encodes it first) → `SchoolSummary`. Owner only | More › Branding | real |
+| `removeLogo` | action | nothing → `SchoolSummary`. Owner only | More › Branding | real |
 
 The fake keeps the logo in memory as a `data:` URL. The real one stores the file in private
 storage and returns a short-lived signed URL as `logoUrl` (plan: uploads), and should re-check
@@ -213,7 +237,7 @@ is recorded in the change history. The setup checklist has a new optional first 
 
 | Function | Kind | Input / output | Used by | Status |
 |---|---|---|---|---|
-| `listChanges` | read | `subdomain`, `{ who?, search?, from?, to?, studentId?, limit? }` (days are ISO dates in Lagos time, both ends included) → `ChangeLog`: entries newest first, each with the student it was about (if any), the total that match, everyone who appears, and the filtered student | More › Change history, its CSV download | fake |
+| `listChanges` | read | `subdomain`, `{ who?, search?, from?, to?, studentId?, limit? }` (days are ISO dates in Lagos time, both ends included) → `ChangeLog`: entries newest first, each with the student it was about (if any), the total that match, everyone who appears, and the filtered student | More › Change history, its CSV download | real |
 
 The filtering happens on the server, as a real record of two years and more must. Every write
 already records a line (`recordChange` in the fakes: who, what, when, and the student when there

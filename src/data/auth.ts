@@ -1,7 +1,12 @@
 // Who is signed in (docs/data-contract.md). Screens import from here, never from fake/.
 import "server-only";
-import * as impl from "./fake/auth";
+import { LIVE } from "./api/client";
+import * as live from "./api/auth";
+import * as fake from "./fake/auth";
 import type { InviteDetails, SchoolSummary, SignedInMember } from "./types";
+
+// The API where it has endpoints (DATA_SOURCE=api), else sample data.
+const impl = LIVE ? live : fake;
 
 /**
  * The person signed in at this school and their role, or null. Someone signed in at another

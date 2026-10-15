@@ -1,5 +1,5 @@
 import { expect, test, type Page } from "@playwright/test";
-import { open } from "./helpers";
+import { open, TOURS_SEEN } from "./helpers";
 
 // Parents (batch 12), on Greenfield. The sample parent (parent@greenfield.ng) is the guardian of the
 // first JSS 1 Blue student, whose class has sample registers.
@@ -52,7 +52,7 @@ test("an admin invites a parent, who signs up and sees their child", async ({ pa
   await expect(page.getByText(/Invite sent to/).locator("visible=true")).toBeVisible();
   const href = await page.getByRole("link", { name: /^Open .+’s invite$/ }).first().getAttribute("href");
 
-  const parent = await (await browser.newContext()).newPage();
+  const parent = await (await browser.newContext({ storageState: TOURS_SEEN })).newPage();
   await open(parent, href!);
   await expect(parent.getByText("you’ve been invited to follow your children at this school.")).toBeVisible();
   await parent.getByLabel("New password", { exact: true }).fill("a-parents-password");

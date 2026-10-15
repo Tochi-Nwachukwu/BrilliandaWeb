@@ -1,8 +1,13 @@
 // The school's record of changes (plan: "Audit log of changes"; docs/data-contract.md). Screens
 // import from here, never from fake/.
 import "server-only";
-import * as impl from "./fake/changes";
+import { LIVE } from "./api/client";
+import * as live from "./api/changes";
+import * as fake from "./fake/changes";
 import type { ChangeFilter, ChangeLog } from "./types";
+
+// The API where it has endpoints (DATA_SOURCE=api), else sample data.
+const impl = LIVE ? live : fake;
 
 /**
  * Who changed what, newest first, narrowed by person, words, Lagos dates or one student. Owners

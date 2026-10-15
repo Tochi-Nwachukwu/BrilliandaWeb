@@ -1,7 +1,12 @@
 // The school a page belongs to (docs/data-contract.md). Screens import from here, never from fake/.
 import "server-only";
-import * as impl from "./fake/school";
+import { LIVE } from "./api/client";
+import * as live from "./api/school";
+import * as fake from "./fake/school";
 import type { SchoolSummary } from "./types";
+
+// The API where it has endpoints (DATA_SOURCE=api), else sample data.
+const impl = LIVE ? live : fake;
 
 /**
  * The school at a subdomain, or null if there isn't one. Suspended and archived schools are

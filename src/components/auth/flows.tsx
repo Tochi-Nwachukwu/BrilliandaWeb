@@ -53,10 +53,10 @@ export function LinkSignIn({ action, homeHref }: { action: () => Promise<ActionR
 }
 
 /** Joining a school: a new password, or the existing Brillianda password for someone already in another school. */
-export function AcceptInviteFlow({ action, homeHref, hasAccount }: { action: (input: unknown) => Promise<ActionResult<null>>; homeHref: string; hasAccount: boolean }) {
+export function AcceptInviteFlow({ action, homeHref, hasAccount, askName = false }: { action: (input: unknown) => Promise<ActionResult<null>>; homeHref: string; hasAccount: boolean; askName?: boolean }) {
   const router = useRouter();
   const done = () => router.replace(homeHref);
-  if (!hasAccount) return <NewPasswordForm action={action} submitLabel="Join the school" pendingLabel="Setting up…" onDone={done} />;
+  if (!hasAccount) return <NewPasswordForm action={action} submitLabel="Join the school" pendingLabel="Setting up…" onDone={done} askName={askName} />;
   return <ExistingAccountForm action={action} onDone={done} />;
 }
 

@@ -1,6 +1,18 @@
 import type { Page } from "@playwright/test";
 
 /**
+ * Every guide pop-up already seen: they start by themselves on a first visit and would sit over the
+ * page. The config gives every test this; a second window opened in a test needs it too.
+ */
+export const TOURS_SEEN = {
+  cookies: [],
+  origins: ["http://localhost:3100", "http://greenfield.localhost:3100"].map((origin) => ({
+    origin,
+    localStorage: ["admin", "teacher", "parent", "console"].map((id) => ({ name: `brillianda:tour:${id}`, value: "seen" })),
+  })),
+};
+
+/**
  * Go to a page and wait until it is interactive (the app sets <html data-hydrated>). A load the
  * page itself interrupts (a sign-in still redirecting, say) is tried once more.
  */

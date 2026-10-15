@@ -426,6 +426,13 @@ at the end of the session.
 - With this, group 3 has its front end. Test schools: Harbourview (closing a term) and Seaview (in
   its last term, for promotion).
 
+#### Connecting to the API (15 October 2026)
+
+- **Done:** every v1 function has a real twin in `src/data/api/`, switched on with
+  `DATA_SOURCE=api` (docs/data-contract.md, "Connected to the API"). Checked on staging: the
+  proxy, "no school at this address", the address check, and signup step 1. The rest waits for
+  a test school and staging email (`docs/backend-asks.md`, ask 12).
+
 #### Guide pop-ups and Help (15 October 2026)
 
 - **Done:** every dashboard (school admin, teacher, parent, team console) has a short tour that
