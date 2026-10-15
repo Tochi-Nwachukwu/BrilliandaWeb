@@ -5,13 +5,14 @@ import Link from "next/link";
 import { Badge } from "@brillianda/ui/Badge";
 import { Card } from "@brillianda/ui/Cards";
 import { Icon } from "@brillianda/ui/Icon";
-import type { ParentChild } from "@/data/types";
+import type { ActionResult, ParentChild } from "@/data/types";
+import { ChildDetails } from "./ChildDetails";
 
 const TONE = { present: "success", late: "warning", absent: "danger" } as const;
 const dayLabel = (day: string) => new Date(`${day}T12:00:00Z`).toLocaleDateString("en-GB", { timeZone: "UTC", weekday: "short", day: "numeric", month: "short" });
 
 /** One child, as their parent sees them: who they are, and their attendance this term. */
-export function ChildView({ child, reportHref }: { child: ParentChild; reportHref: string }) {
+export function ChildView({ child, reportHref, askCorrection }: { child: ParentChild; reportHref: string; askCorrection: (input: unknown) => Promise<ActionResult<null>> }) {
   const a = child.attendance;
   return (
     <div className="grid gap-4">
@@ -38,6 +39,8 @@ export function ChildView({ child, reportHref }: { child: ParentChild; reportHre
           </div>
         </dl>
       </section>
+
+      <ChildDetails details={child.details} corrections={child.corrections} ask={askCorrection} />
 
       <Card title="Results" description={child.results?.term}>
         {child.results?.published ? (

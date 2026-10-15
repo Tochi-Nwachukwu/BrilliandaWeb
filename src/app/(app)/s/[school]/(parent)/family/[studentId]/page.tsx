@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { connection } from "next/server";
+import { requestCorrection } from "@/data/actions/corrections";
 import { getParentHome } from "@/data/parents";
 import { ChildView } from "../ChildView";
 
@@ -19,7 +20,7 @@ export default async function ChildPage({ params }: PageProps<"/s/[school]/famil
       <Link href={`/s/${school}/family`} className="w-fit rounded text-sm font-medium text-text-secondary hover:text-text-primary focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-accent">
         ← My children
       </Link>
-      <ChildView child={child} reportHref={`/s/${school}/family/${child.id}/report`} />
+      <ChildView child={child} reportHref={`/s/${school}/family/${child.id}/report`} askCorrection={requestCorrection.bind(null, school, child.id)} />
     </div>
   );
 }

@@ -4,6 +4,7 @@ import { PageHeader } from "@brillianda/ui/PageHeader";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { connection } from "next/server";
+import { requestCorrection } from "@/data/actions/corrections";
 import { getParentHome } from "@/data/parents";
 import { greeting } from "@/lib/time";
 import { ChildView } from "./ChildView";
@@ -27,7 +28,11 @@ export default async function FamilyPage({ params }: PageProps<"/s/[school]/fami
           <EmptyState title="No children linked yet">If this is wrong, ask the school to check the guardian on your child’s record.</EmptyState>
         </div>
       ) : home.children.length === 1 ? (
-        <ChildView child={home.children[0]!} reportHref={`/s/${school}/family/${home.children[0]!.id}/report`} />
+        <ChildView
+          child={home.children[0]!}
+          reportHref={`/s/${school}/family/${home.children[0]!.id}/report`}
+          askCorrection={requestCorrection.bind(null, school, home.children[0]!.id)}
+        />
       ) : (
         <ul className="grid gap-3 sm:grid-cols-2">
           {home.children.map((child) => (

@@ -404,6 +404,42 @@ whether the list is shared with parents, who changed it last, and when.
 On the parent's home (C2), each child gains `bookLists`: `[{ label, list }]`. Rules:
 `packages/core/src/booklists.ts`.
 
+### C11. Student details for parents, and corrections
+
+**Problem.** Parents should see what the school has on record for their child, and ask for
+mistakes to be fixed without visiting the office.
+
+**What we need.**
+
+- On each child in the parent's home (C2), `details`: first, other and last names, date of birth,
+  gender, admission date, state of origin, address, and the guardian's name, phone and email.
+- Correction requests: the child, who asked, when, the changes (field, what the record said, what
+  it should say), an optional note (up to 300 characters), and the status (`open`, `approved`,
+  `declined`) with who answered, when, and the reason for declining.
+
+**Rules.**
+
+- Fields a parent can ask about: `firstName`, `otherNames`, `lastName`, `dateOfBirth`, `gender`,
+  `stateOfOrigin`, `address`, `guardianPhone`, `guardianEmail`. Each new value is checked with
+  the same rules as the school's student form. Values that match the record are dropped; a
+  request with nothing left is refused.
+- Only for the parent's own children.
+- Approving changes the student's record (or the guardian's, for phone and email) in one go and
+  writes it to the change history with the student. Declining needs a reason (3 to 200
+  characters), which the parent sees.
+
+**Endpoints we need.**
+
+| What | Suggested | Returns |
+|---|---|---|
+| Ask for a correction | `POST /v1/me/children/{studentId}/corrections` `{ changes: [{ field, value }], note }` | 201 |
+| Requests waiting, then the latest 20 answered | `GET /v1/corrections` | `CorrectionsPage` |
+| How many are waiting | `GET /v1/corrections/count` | `{ open }` |
+| Approve or decline | `POST /v1/corrections/{id}/resolve` `{ approve, reason? }` | 204, or 409 if already answered |
+
+Each child in the parent's home also gains `corrections`: that child's latest five requests.
+Rules: `packages/core/src/corrections.ts`.
+
 ---
 
 ## D. Rules both sides must share
@@ -418,6 +454,8 @@ or call the same code:
 | `results.ts` | Default parts and scale, settings checks, class averages and positions, rating settings |
 | `attendance.ts` | Marks, school days (Monday to Friday inside a term), the register's checks |
 | `promotion.ts` | Yearly average, suggested decision, default pass mark, next class |
+| `booklists.ts` | Book list items, totals, categories |
+| `corrections.ts` | Which fields parents can correct, and each field's check |
 | `birthdays.ts` | Filling in the message, ages, 29 February, the coming birthdays, how many texts a message takes |
 
 The default scale: A 70+, B 60+, C 50+, D 45+, E 40+ (all passes), F below 40.

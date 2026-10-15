@@ -1,6 +1,7 @@
 // Shapes shared by every data function (docs/data-contract.md).
 import type { BookItem } from "@brillianda/core/booklists";
 import type { Term } from "@brillianda/core/calendar";
+import type { CorrectableField } from "@brillianda/core/corrections";
 import type { Department, Section } from "@brillianda/core/classes";
 import type { SchoolDetails, SchoolLevel } from "@brillianda/core/signup";
 import type { ImportArm, ImportLevel } from "@brillianda/core/studentImport";
@@ -228,6 +229,9 @@ export type ParentChild = {
   birthday: string | null;
   /** Shared book lists (batch 20): this session’s class, and the class they move into next session. */
   bookLists: { label: string; list: BookList }[];
+  /** The child’s record (batch 21), and the parent’s correction requests, newest first. */
+  details: ChildDetails;
+  corrections: CorrectionRow[];
 };
 export type ParentHome = { fullName: string; schoolDay: boolean; children: ParentChild[] };
 
@@ -475,3 +479,35 @@ export type BookList = {
 
 /** More › Book lists: every class level's list for one session, and the sessions to choose from. */
 export type BookListsPage = { startYear: number; session: string; sessions: { startYear: number; name: string; label: string }[]; lists: BookList[] };
+
+// ——— Biodata and corrections (batch 21) ———
+
+/** A child's details as their parent sees them. */
+export type ChildDetails = {
+  firstName: string;
+  otherNames: string;
+  lastName: string;
+  dateOfBirth: string;
+  gender: StudentGender;
+  admissionDate: string;
+  stateOfOrigin: string;
+  address: string;
+  guardian: { name: string; phone: string | null; email: string | null } | null;
+};
+
+/** One request to correct a child's details. `from` is what the record said when it was asked. */
+export type CorrectionRow = {
+  id: string;
+  at: number;
+  studentId: string;
+  studentName: string;
+  armLabel: string;
+  by: string;
+  changes: { field: CorrectableField; from: string; to: string }[];
+  note: string;
+  status: "open" | "approved" | "declined";
+  decided: { by: string; at: number; reason: string | null } | null;
+};
+
+/** More › Corrections: waiting first, then the latest answered. */
+export type CorrectionsPage = { open: CorrectionRow[]; answered: CorrectionRow[] };

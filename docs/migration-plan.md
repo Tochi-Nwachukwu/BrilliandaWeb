@@ -426,6 +426,14 @@ at the end of the session.
 - With this, group 3 has its front end. Test schools: Harbourview (closing a term) and Seaview (in
   its last term, for promotion).
 
+#### Batch 21: Biodata and corrections (15 October 2026)
+
+- **Done:** a child's page for parents shows their details (names, date of birth, gender, state of
+  origin, address, admission date, guardian). Ask for a correction: pick what's wrong and what it
+  should say (several at once), checked with the student form's rules. Requests wait in More ›
+  Corrections (counted on the More tab); an admin corrects the record (in the change history) or
+  declines with a reason the parent sees.
+
 #### Batch 20: Book lists (15 October 2026)
 
 - **Done:** More › Book lists: a list per class level for this session or the next (textbooks,

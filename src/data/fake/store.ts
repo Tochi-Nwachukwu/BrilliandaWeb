@@ -4,6 +4,7 @@
 import "server-only";
 import { DEFAULT_BIRTHDAY_MESSAGE } from "@brillianda/core/birthdays";
 import type { BookItem } from "@brillianda/core/booklists";
+import type { CorrectableField } from "@brillianda/core/corrections";
 import { defaultTerms, type Term } from "@brillianda/core/calendar";
 import { armCodes, ARM_PRESETS, buildLadder, type Department, type Section } from "@brillianda/core/classes";
 import { type SchoolDetails, type SchoolLevel } from "@brillianda/core/signup";
@@ -84,6 +85,18 @@ type FakeStore = {
   birthdayLog: { id: string; subdomain: string; studentId: string; date: string; to: string | null; text: string }[];
   /** Batch 20: books and things needed, per class level and session; parents see shared ones. */
   bookLists: { subdomain: string; startYear: number; levelId: string; items: (BookItem & { id: string })[]; shared: boolean; by: string; at: number }[];
+  /** Batch 21: parents asking the school to correct their child’s details. */
+  corrections: {
+    id: string;
+    subdomain: string;
+    studentId: string;
+    by: string;
+    at: number;
+    changes: { field: CorrectableField; from: string; to: string }[];
+    note: string;
+    status: "open" | "approved" | "declined";
+    decided?: { by: string; at: number; reason: string | null };
+  }[];
 };
 
 /** Greenfield's subjects: the 2025 junior and senior lists, attached by default. */
@@ -417,6 +430,7 @@ function seed(): FakeStore {
     birthdaySettings: new Map([["greenfield", { enabled: true, message: DEFAULT_BIRTHDAY_MESSAGE }]]),
     birthdayLog: [],
     bookLists: seedBookLists(),
+    corrections: [],
     admission: new Map([["greenfield", { pattern: "GC/{YEAR}/{NUMBER}", digits: 4, next: greenfieldStudents.next }]]),
     subjects: greenfieldSubjects.subjects,
     subjectLinks: greenfieldSubjects.subjectLinks,

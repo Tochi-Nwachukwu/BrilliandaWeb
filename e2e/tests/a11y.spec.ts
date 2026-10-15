@@ -71,6 +71,7 @@ const SCHOOL = [
   "/more/promotion",
   "/more/birthdays",
   "/more/book-lists",
+  "/more/corrections",
 ];
 
 // Split in three so they run side by side: one long scan of every screen outran the time limit.

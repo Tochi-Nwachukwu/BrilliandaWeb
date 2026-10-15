@@ -2,10 +2,13 @@ import { Icon, type IconName } from "@brillianda/ui/Icon";
 import { PageHeader } from "@brillianda/ui/PageHeader";
 import type { Metadata } from "next";
 import Link from "next/link";
+import { connection } from "next/server";
+import { countOpenCorrections } from "@/data/corrections";
 
 export const metadata: Metadata = { title: "More" };
 
 const ITEMS: { path: string; icon: IconName; title: string; detail: string }[] = [
+  { path: "corrections", icon: "inbox", title: "Corrections", detail: "Parents asking to correct their child’s details" },
   { path: "branding", icon: "school", title: "Branding", detail: "Your school’s name, colour and logo" },
   { path: "promotion", icon: "classes", title: "Promotion", detail: "Who moves up at the end of the session" },
   { path: "book-lists", icon: "book", title: "Book lists", detail: "Books and things each class needs, for parents" },
@@ -23,6 +26,8 @@ const ITEMS: { path: string; icon: IconName; title: string; detail: string }[] =
 /** Everything that isn't one of the four main tabs (plan: phone tab bar ends with More). */
 export default async function MorePage({ params }: PageProps<"/s/[school]/more">) {
   const { school } = await params;
+  await connection();
+  const waiting = await countOpenCorrections(school);
   return (
     <>
       <PageHeader title="More" />
@@ -40,7 +45,15 @@ export default async function MorePage({ params }: PageProps<"/s/[school]/more">
                 <b className="block font-semibold">{item.title}</b>
                 <span className="block truncate text-[13px] text-text-secondary">{item.detail}</span>
               </span>
-              <Icon name="chevron" className="h-4 w-4 text-text-muted" />
+              <span className="flex items-center gap-2">
+                {item.path === "corrections" && waiting > 0 && (
+                  <span className="grid h-6 min-w-6 place-items-center rounded-full bg-danger px-2 text-[12px] font-semibold text-primary-text">
+                    {waiting}
+                    <span className="sr-only"> waiting</span>
+                  </span>
+                )}
+                <Icon name="chevron" className="h-4 w-4 text-text-muted" />
+              </span>
             </Link>
           </li>
         ))}

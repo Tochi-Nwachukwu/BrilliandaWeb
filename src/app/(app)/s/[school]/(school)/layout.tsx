@@ -8,6 +8,7 @@ import { SchoolMark } from "@/components/school/SchoolBrand";
 import { schoolFromParams } from "@/components/school/school";
 import { signOut } from "@/data/actions/auth";
 import { getCurrentMember } from "@/data/auth";
+import { countOpenCorrections } from "@/data/corrections";
 import { LIVE } from "@/data/source";
 
 // The signed-in part of a school: the shell with the plan's tabs. Anyone not signed in at this
@@ -28,13 +29,15 @@ async function SchoolApp({ params, children }: { params: Promise<{ school: strin
   // Teachers have their own screens (batch 11); the admin ones stay closed to them.
   if (me.role === "teacher") redirect(`${base}/teach`);
   if (me.role === "parent") redirect(`${base}/family`);
+  // Parents' correction requests waiting (batch 21), on the More tab.
+  const waiting = await countOpenCorrections(school.subdomain);
 
   const nav: NavItem[] = [
     { href: base, label: "Home", icon: "home", exact: true, tour: "nav-home" },
     { href: `${base}/students`, label: "Students", icon: "students", tour: "nav-students" },
     { href: `${base}/classes`, label: "Classes", icon: "classes", tour: "nav-classes" },
     { href: `${base}/results`, label: "Results", icon: "results", tour: "nav-results" },
-    { href: `${base}/more`, label: "More", icon: "more", tour: "nav-more" },
+    { href: `${base}/more`, label: "More", icon: "more", tour: "nav-more", count: waiting },
   ];
 
   return (

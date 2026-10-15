@@ -396,6 +396,20 @@ falls on 28 February in other years), `upcomingBirthdays`, `smsCount`.
 next session (none in the final class), then this session's list for their class. Rules in
 `packages/core/src/booklists.ts`, with tests.
 
+### Biodata and corrections (batch 21)
+
+| Function | Kind | Input / output | Who | Status |
+|---|---|---|---|---|
+| `requestCorrection` | action | `studentId, correctionRequestSchema` (`{ changes: [{ field, value }], note }`; each value checked with the student form's rules); only changed values are kept; refused for someone else's child | the parent | fake |
+| `getCorrections` | read | → `CorrectionsPage`: requests waiting, then the latest 20 answered | owner, admin | fake |
+| `countOpenCorrections` | read | → how many are waiting (the More tab's count) | owner, admin | fake |
+| `resolveCorrection` | action | `id, { approve: true }` changes the record and writes the change history; `{ approve: false, reason }` (3 to 200 characters) declines, and the parent sees the reason | owner, admin | fake |
+
+`getParentHome`'s children gain `details` (`ChildDetails`: names, date of birth, gender, admission
+date, state of origin, address, guardian) and `corrections` (their latest five requests). Fields a
+parent can ask about: first, other and last names, date of birth, gender, state of origin, address,
+the guardian's phone and email. Rules in `packages/core/src/corrections.ts`, with tests.
+
 ### Installable app (batch 10)
 
 The service worker (`public/sw.js`) and its page (`/offline`) live at the root of every school

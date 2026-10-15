@@ -10,6 +10,7 @@ import type { ActionResult, ParentAccess, ParentHome, ParentsPage, ReportCardDat
 import { requireMember, requireParent } from "./auth";
 import { birthdayFor } from "./birthdays";
 import { bookListsFor } from "./booklists";
+import { correctionsFor, detailsOf } from "./corrections";
 import { recordChange } from "./changes";
 import { store } from "./store";
 import { armOptions } from "./students";
@@ -140,6 +141,8 @@ export async function getParentHome(subdomain: string): Promise<ParentHome | nul
           .map((t) => ({ key: t.key, label: `${t.name}, ${t.session}` })),
         birthday: birthdayFor(subdomain, s.id),
         bookLists: bookListsFor(subdomain, s.armId),
+        details: detailsOf(s),
+        corrections: correctionsFor(subdomain, s.id),
       };
     });
   return { fullName: parent.user.fullName, schoolDay: days[0] === today, children };
