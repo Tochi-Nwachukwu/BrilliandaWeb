@@ -2,6 +2,7 @@
 // replaces it (docs/data-contract.md). It resets when the dev server restarts. Kept on globalThis
 // so a hot reload in development doesn't wipe it.
 import "server-only";
+import { DEFAULT_BIRTHDAY_MESSAGE } from "@brillianda/core/birthdays";
 import { defaultTerms, type Term } from "@brillianda/core/calendar";
 import { armCodes, ARM_PRESETS, buildLadder, type Department, type Section } from "@brillianda/core/classes";
 import { type SchoolDetails, type SchoolLevel } from "@brillianda/core/signup";
@@ -77,6 +78,9 @@ type FakeStore = {
   /** Remembered column mappings, by school (plan: Brillianda remembers it for next time). */
   importMappings: Map<string, Record<string, string>>;
   importBatches: { id: string; subdomain: string; at: number; by: string; created: string[]; updated: number; fileName: string; undoneAt: number | null }[];
+  /** Batch 19: each school's birthday messages, and the texts the daily job sent (one per child per day). */
+  birthdaySettings: Map<string, { enabled: boolean; message: string }>;
+  birthdayLog: { id: string; subdomain: string; studentId: string; date: string; to: string | null; text: string }[];
 };
 
 /** Greenfield's subjects: the 2025 junior and senior lists, attached by default. */
@@ -223,6 +227,13 @@ function seed(): FakeStore {
   // One per screen size, so the two runs of the arms editor test never edit the same school.
   // harbourview: the school-year test school (closing a term, promotion), with a confirmed calendar.
   // seaview: the promotion test school, in its last term of 2025/2026 (first two terms closed).
+  // Birthdays to show (batch 19): st1 (the sample parent's child) today, two more later this week.
+  const lagosToday = new Date(Date.now() + 3_600_000).toISOString().slice(0, 10);
+  const inDays = (n: number) => new Date(Date.parse(`${lagosToday}T12:00:00Z`) + n * 86_400_000).toISOString().slice(5, 10);
+  for (const [id, n] of [["st1", 0], ["st6", 2], ["st11", 5]] as const) {
+    const s = greenfieldStudents.students.find((x) => x.id === id);
+    if (s) s.dateOfBirth = `${s.dateOfBirth.slice(0, 4)}-${inDays(n)}`;
+  }
   const armsTests = ["elmwood", "willowbank", "harbourview", "seaview"].map((school) => seedArmsTestSchool(school, greenfieldStudents.students[0]!));
   // Greenfield's sample parent (batch 12): the guardian of its first student, in JSS 1 Blue.
   const sampleGuardian = greenfieldStudents.guardians.find((g) => g.id === greenfieldStudents.students[0]!.guardianId)!;
@@ -359,6 +370,9 @@ function seed(): FakeStore {
     enrolments: greenfieldStudents.enrolments,
     importMappings: new Map(),
     importBatches: [],
+    // Greenfield sends birthday messages, to show them; other schools start with them off.
+    birthdaySettings: new Map([["greenfield", { enabled: true, message: DEFAULT_BIRTHDAY_MESSAGE }]]),
+    birthdayLog: [],
     admission: new Map([["greenfield", { pattern: "GC/{YEAR}/{NUMBER}", digits: 4, next: greenfieldStudents.next }]]),
     subjects: greenfieldSubjects.subjects,
     subjectLinks: greenfieldSubjects.subjectLinks,

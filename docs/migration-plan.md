@@ -426,6 +426,13 @@ at the end of the session.
 - With this, group 3 has its front end. Test schools: Harbourview (closing a term) and Seaview (in
   its last term, for promotion).
 
+#### Batch 19: Birthday messages (15 October 2026)
+
+- **Done:** More › Birthdays: on or off, the school's message with `{name}`, `{age}` and `{school}`
+  (with a preview and how many texts it takes), the next 30 days' birthdays (flagging guardians
+  with no phone), and the texts sent. Home lists the week's birthdays; on the day, the parent app
+  shows the school's message on the child's page. The texts themselves are the backend's daily job.
+
 #### Connecting to the API (15 October 2026)
 
 - **Done:** every v1 function has a real twin in `src/data/api/`, switched on with

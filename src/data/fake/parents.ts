@@ -8,6 +8,7 @@ import { fullName } from "@brillianda/core/students";
 import { todayInLagos } from "@/lib/time";
 import type { ActionResult, ParentAccess, ParentHome, ParentsPage, ReportCardData, SampleEmail } from "../types";
 import { requireMember, requireParent } from "./auth";
+import { birthdayFor } from "./birthdays";
 import { recordChange } from "./changes";
 import { store } from "./store";
 import { armOptions } from "./students";
@@ -136,6 +137,7 @@ export async function getParentHome(subdomain: string): Promise<ParentHome | nul
         pastTerms: reportTermsOf(subdomain, s.id)
           .filter((t) => t.published && !t.open)
           .map((t) => ({ key: t.key, label: `${t.name}, ${t.session}` })),
+        birthday: birthdayFor(subdomain, s.id),
       };
     });
   return { fullName: parent.user.fullName, schoolDay: days[0] === today, children };

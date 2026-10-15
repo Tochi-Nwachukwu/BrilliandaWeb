@@ -3,6 +3,7 @@ import { ordinal } from "@brillianda/core/grading";
 import Link from "next/link";
 import { Badge } from "@brillianda/ui/Badge";
 import { Card } from "@brillianda/ui/Cards";
+import { Icon } from "@brillianda/ui/Icon";
 import type { ParentChild } from "@/data/types";
 
 const TONE = { present: "success", late: "warning", absent: "danger" } as const;
@@ -13,6 +14,12 @@ export function ChildView({ child, reportHref }: { child: ParentChild; reportHre
   const a = child.attendance;
   return (
     <div className="grid gap-4">
+      {child.birthday && (
+        <section aria-label="Birthday" className="flex items-start gap-4 rounded-[28px] p-5 shadow-raised sm:p-6" style={{ background: "var(--level-3-tint)", color: "var(--level-3-deep)" }}>
+          <Icon name="cake" className="h-8 w-8 shrink-0" />
+          <p className="text-[15px] font-medium leading-relaxed">{child.birthday}</p>
+        </section>
+      )}
       <section className="rounded-[28px] bg-surface p-5 shadow-raised sm:p-6">
         <h2 className="text-[22px] font-semibold tracking-[-0.02em]">{child.fullName}</h2>
         <dl className="mt-3 grid gap-3 text-sm sm:grid-cols-3">

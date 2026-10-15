@@ -223,6 +223,8 @@ export type ParentChild = {
   results: { term: string; published: false } | { term: string; published: true; average: number | null; position: number | null; of: number } | null;
   /** Closed terms whose results were published (group 3), newest first. */
   pastTerms: { key: string; label: string }[];
+  /** On the child’s birthday, when the school sends birthday messages (batch 19): the school’s message. */
+  birthday: string | null;
 };
 export type ParentHome = { fullName: string; schoolDay: boolean; children: ParentChild[] };
 
@@ -435,3 +437,22 @@ export type PromotionPlan = {
   /** The next session's suggested first term, for the dialog. */
   firstTerm: { name: string; startsOn: string; endsOn: string };
 };
+
+// ——— Birthdays (batch 19) ———
+
+/** A student whose birthday is coming, for the school. */
+export type BirthdayRow = { studentId: string; fullName: string; armLabel: string; on: string; inDays: number; turns: number; guardianPhone: string | null };
+
+/** More › Birthdays: the school's message, who's next, and what went out. */
+export type BirthdaysPage = {
+  settings: { enabled: boolean; message: string };
+  schoolName: string;
+  today: string;
+  /** The next 30 days, today first. */
+  upcoming: BirthdayRow[];
+  /** The latest texts sent, newest first. `to` is null when the guardian has no phone on file. */
+  sent: { id: string; date: string; fullName: string; armLabel: string; to: string | null; text: string }[];
+};
+
+/** Home's card: birthdays in the next 7 days. */
+export type BirthdaysThisWeek = { enabled: boolean; rows: BirthdayRow[] };

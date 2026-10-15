@@ -10,10 +10,11 @@ import { initials } from "@/lib/initials";
 import { schoolFromParams } from "@/components/school/school";
 import { hideChecklist } from "@/data/actions/home";
 import { getCurrentMember } from "@/data/auth";
+import { getBirthdaysThisWeek } from "@/data/birthdays";
 import { getHomeSummary, getSession, getSetupProgress } from "@/data/home";
 import { getRegistersToday } from "@/data/teaching";
 import type { SessionSetup } from "@/data/types";
-import { formatDate, formatDay, greeting, plural, timeAgo, todayInLagos } from "@/lib/time";
+import { formatDate, formatDay, greeting, plural, soonLabel, timeAgo, todayInLagos } from "@/lib/time";
 import { SetupChecklist } from "./SetupChecklist";
 
 export const metadata: Metadata = { title: "Home" };
@@ -31,12 +32,13 @@ export default async function SchoolHome({ params }: PageProps<"/s/[school]">) {
   const school = await schoolFromParams(params);
   // Greeting and term week depend on the time now.
   await connection();
-  const [me, setup, summary, session, registers] = await Promise.all([
+  const [me, setup, summary, session, registers, birthdays] = await Promise.all([
     getCurrentMember(school.subdomain),
     getSetupProgress(school.subdomain),
     getHomeSummary(school.subdomain),
     getSession(school.subdomain),
     getRegistersToday(school.subdomain),
+    getBirthdaysThisWeek(school.subdomain),
   ]);
   if (!me || !setup || !summary || !session) return null;
 
@@ -112,6 +114,34 @@ export default async function SchoolHome({ params }: PageProps<"/s/[school]">) {
               {registers.missing.length > 12 && <li className="self-center text-[13px] text-text-secondary">and {registers.missing.length - 12} more</li>}
             </ul>
           )}
+        </Card>
+      )}
+
+      {birthdays && birthdays.rows.length > 0 && (
+        <Card
+          title="Birthdays this week"
+          description={birthdays.enabled ? "Their guardians get a text on the day." : "Birthday messages are off."}
+          action={
+            <Link href={`${base}/more/birthdays`} className="rounded text-sm font-medium text-accent hover:underline focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-accent">
+              Birthdays
+            </Link>
+          }
+        >
+          <ul className="grid gap-1 sm:grid-cols-2" aria-label="Birthdays this week">
+            {birthdays.rows.map((b) => (
+              <li key={b.studentId}>
+                <Link href={`${base}/students/${b.studentId}`} className="flex items-center justify-between gap-3 rounded-2xl p-2.5 hover:bg-hover focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-accent">
+                  <span className="min-w-0">
+                    <b className="block truncate text-sm font-semibold">{b.fullName}</b>
+                    <span className="text-[12.5px] text-text-secondary">
+                      {b.armLabel} · turns {b.turns}
+                    </span>
+                  </span>
+                  <span className="shrink-0 text-sm font-medium">{soonLabel(b.on, b.inDays)}</span>
+                </Link>
+              </li>
+            ))}
+          </ul>
         </Card>
       )}
 

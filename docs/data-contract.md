@@ -370,6 +370,20 @@ once started (no longer whichever term today falls in).
 Rules in `packages/core/src/promotion.ts`, with tests: `yearlyAverage`, `suggestDecision`,
 `defaultPassMark`, `nextArm`.
 
+### Birthdays (batch 19)
+
+| Function | Kind | Input / output | Who | Status |
+|---|---|---|---|---|
+| `getBirthdays` | read | → `BirthdaysPage`: settings (on or off, the message), the next 30 days' birthdays (class, age turning, guardian's phone or none), the latest 20 texts sent | owner, admin | fake |
+| `getBirthdaysThisWeek` | read | → `BirthdaysThisWeek`: on or off, and the next 7 days' birthdays | owner, admin (Home) | fake |
+| `saveBirthdaySettings` | action | `birthdaySettingsSchema`: `{ enabled, message }`; the message must include `{name}`, up to 300 characters | owner, admin | fake |
+
+`getParentHome`'s children gain `birthday`: the school's message for that child, on their birthday
+only, when the school sends them. The real one is a daily job at 7:00 am Lagos time that texts each
+birthday child's guardian once (no phone: logged, not sent) and keeps a log. Rules in
+`packages/core/src/birthdays.ts`, with tests: `birthdayMessage`, `ageOn`, `isBirthday` (29 February
+falls on 28 February in other years), `upcomingBirthdays`, `smsCount`.
+
 ### Installable app (batch 10)
 
 The service worker (`public/sw.js`) and its page (`/offline`) live at the root of every school

@@ -22,6 +22,13 @@ export function formatShortDate(isoDay: string): string {
   return new Date(`${isoDay}T12:00:00Z`).toLocaleDateString("en-GB", { timeZone: "UTC", day: "numeric", month: "short" });
 }
 
+/** "Today", "Tomorrow", or "Fri 17 Oct": a day soon, from an ISO day and how many days away it is. */
+export function soonLabel(isoDay: string, inDays: number): string {
+  if (inDays === 0) return "Today";
+  if (inDays === 1) return "Tomorrow";
+  return new Date(`${isoDay}T12:00:00Z`).toLocaleDateString("en-GB", { timeZone: "UTC", weekday: "short", day: "numeric", month: "short" });
+}
+
 export function greeting(now = new Date()): string {
   const hour = Number(new Intl.DateTimeFormat("en-GB", { timeZone: ZONE, hour: "numeric", hourCycle: "h23" }).format(now));
   if (hour < 12) return "Good morning";

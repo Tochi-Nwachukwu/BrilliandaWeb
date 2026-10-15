@@ -348,6 +348,34 @@ date passes.
 | Set a student's decision | `PUT /v1/promotion/students/{id}` `{ decision, reason }` | 204 |
 | Complete it | `POST /v1/promotion/complete` `{ closeUnpublished, startsOn, endsOn }` | `{ promoted, repeating, graduated, session }` |
 
+### C9. Birthday messages
+
+**Problem.** Schools want each student's family to get a birthday greeting, automatically.
+
+**What to store.** Per school: on or off, and the message (up to 300 characters, must include
+`{name}`; may include `{age}` and `{school}`). A log of texts sent: student, day, phone, text.
+
+**Rules.**
+
+- Every day at 7:00 am Lagos time, for each active student whose birthday is today, text the
+  guardian's phone **once** with the message filled in: `{name}` is the first name, `{age}` the
+  age they turn as an ordinal ("12th"), `{school}` the school's name.
+- A birthday on 29 February is celebrated on 28 February in other years.
+- A guardian with no phone: log it as not sent.
+- An SMS provider is needed (for example Termii). Texts with letters like ọ or ẹ are Unicode:
+  70 characters a text instead of 160, which costs more.
+
+**Endpoints we need.**
+
+| What | Suggested | Returns |
+|---|---|---|
+| The settings, the next 30 days' birthdays, the latest 20 texts sent | `GET /v1/birthdays` | `BirthdaysPage` |
+| The next 7 days, for Home | `GET /v1/birthdays?days=7` | `BirthdaysThisWeek` |
+| Save the settings | `PUT /v1/birthdays/settings` `{ enabled, message }` | 204 |
+
+On the parent's home (C2), each child gains `birthday`: the filled-in message on the child's
+birthday when the school sends them, otherwise `null`. Rules: `packages/core/src/birthdays.ts`.
+
 ---
 
 ## D. Rules both sides must share
@@ -362,6 +390,7 @@ or call the same code:
 | `results.ts` | Default parts and scale, settings checks, class averages and positions, rating settings |
 | `attendance.ts` | Marks, school days (Monday to Friday inside a term), the register's checks |
 | `promotion.ts` | Yearly average, suggested decision, default pass mark, next class |
+| `birthdays.ts` | Filling in the message, ages, 29 February, the coming birthdays, how many texts a message takes |
 
 The default scale: A 70+, B 60+, C 50+, D 45+, E 40+ (all passes), F below 40.
 

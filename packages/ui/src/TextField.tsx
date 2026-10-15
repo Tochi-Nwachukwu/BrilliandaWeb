@@ -1,6 +1,6 @@
 "use client";
 
-import { forwardRef, useId, type InputHTMLAttributes, type ReactNode, type SelectHTMLAttributes, type TextareaHTMLAttributes } from "react";
+import { forwardRef, useId, type InputHTMLAttributes, type ReactNode, type Ref, type SelectHTMLAttributes, type TextareaHTMLAttributes } from "react";
 import { cx } from "./cx";
 
 type TextFieldProps = InputHTMLAttributes<HTMLInputElement> & {
@@ -93,7 +93,7 @@ export function SelectField({ label, error, hint, className, children, ...props 
   );
 }
 
-type TextAreaFieldProps = TextareaHTMLAttributes<HTMLTextAreaElement> & { label: string; error?: string; hint?: ReactNode };
+type TextAreaFieldProps = TextareaHTMLAttributes<HTMLTextAreaElement> & { label: string; error?: string; hint?: ReactNode; ref?: Ref<HTMLTextAreaElement> };
 
 export function TextAreaField({ label, error, hint, className, ...props }: TextAreaFieldProps) {
   return (
