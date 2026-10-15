@@ -1,5 +1,8 @@
 # Requests for the backend team
 
+> **Replaced by `docs/backend-requirements.md`** (15 October 2026), the complete list in one
+> place. This file is kept as the history of earlier requests.
+
 From the front end, 12 October 2026, after reading the `revamp/v1-backend` branch (commit
 `2afeeb7`, "phase one") of `Tochi-Nwachukwu/brillianda`. The new signup, sign-in, password,
 find-school and invitation endpoints match our screens closely. Three things would let us connect
