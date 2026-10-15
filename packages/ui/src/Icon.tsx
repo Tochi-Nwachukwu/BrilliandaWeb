@@ -113,6 +113,12 @@ const PATHS = {
       <circle cx="18.5" cy="12" r="1.2" />
     </>
   ),
+  help: (
+    <>
+      <circle cx="12" cy="12" r="8.5" />
+      <path d="M9.6 9.6a2.4 2.4 0 1 1 3.4 2.2c-.6.3-1 .8-1 1.4v.6M12 16.6v.1" />
+    </>
+  ),
   calendar: (
     <>
       <rect x="4" y="5" width="16" height="15" rx="3" />

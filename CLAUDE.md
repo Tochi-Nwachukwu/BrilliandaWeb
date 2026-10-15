@@ -60,6 +60,10 @@ and in the brillanda-v1 folder, for reference only.
   Workspace packages need an `@source` line so their classes are found.
 - Screens use `AppShell` from `src/components/shell`. The look (Pastel or Neutral) lives in
   `src/lib/look.ts`; the `<head>` script in the root layout applies it before first paint.
+- Each dashboard passes `help` to `AppShell`: its guide pop-ups and Help questions, written in
+  `src/components/help/guides.ts`. A tour step points at a `data-tour` mark (nav items take `tour`).
+  When a screen changes, update its answers there. Browser tests start with the tours seen
+  (`e2e/playwright.config.ts`); `help.spec.ts` starts fresh.
 - Browser tests wait for `<html data-hydrated>` (set by `components/Hydrated.tsx`) through
   `open()` in `e2e/tests/helpers.ts`. Don't use `waitUntil: "networkidle"`: Chrome's cached
   prefetches can keep it waiting forever.

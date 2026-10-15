@@ -3,6 +3,7 @@ import { PageSpinner } from "@brillianda/ui/Spinner";
 import { redirect } from "next/navigation";
 import { connection } from "next/server";
 import { Suspense } from "react";
+import { teacherGuide } from "@/components/help/guides";
 import { AppShell, type NavItem } from "@/components/shell/AppShell";
 import { SchoolMark } from "@/components/school/SchoolBrand";
 import { schoolFromParams } from "@/components/school/school";
@@ -32,14 +33,14 @@ async function Teacher({ params, children }: { params: Promise<{ school: string 
   const isFormTeacher = (home?.formArms.length ?? 0) > 0;
 
   const nav: NavItem[] = [
-    { href: `${base}/teach`, label: "Today", icon: "home", exact: true },
+    { href: `${base}/teach`, label: "Today", icon: "home", exact: true, tour: "nav-today" },
     ...(isFormTeacher
       ? ([
-          { href: `${base}/teach/register`, label: "Register", icon: "check" },
-          { href: `${base}/teach/class`, label: "My class", short: "Class", icon: "results" },
+          { href: `${base}/teach/register`, label: "Register", icon: "check", tour: "nav-register" },
+          { href: `${base}/teach/class`, label: "My class", short: "Class", icon: "results", tour: "nav-class" },
         ] as NavItem[])
       : []),
-    { href: `${base}/teach/subjects`, label: "My subjects", short: "Subjects", icon: "subjects" },
+    { href: `${base}/teach/subjects`, label: "My subjects", short: "Subjects", icon: "subjects", tour: "nav-subjects" },
   ];
 
   return (
@@ -48,6 +49,7 @@ async function Teacher({ params, children }: { params: Promise<{ school: string 
       place={school.name}
       account={{ fullName: me.fullName, roleLabel: ROLE_LABEL[me.role] }}
       sampleData
+      help={teacherGuide(base, isFormTeacher)}
       signOut={signOut.bind(null, school.subdomain)}
       mark={
         <span className="flex min-w-0 items-center gap-2.5">

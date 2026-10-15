@@ -2,6 +2,7 @@ import { ROLE_LABEL } from "@brillianda/core/auth";
 import { PageSpinner } from "@brillianda/ui/Spinner";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
+import { adminGuide } from "@/components/help/guides";
 import { AppShell, type NavItem } from "@/components/shell/AppShell";
 import { SchoolMark } from "@/components/school/SchoolBrand";
 import { schoolFromParams } from "@/components/school/school";
@@ -28,11 +29,11 @@ async function SchoolApp({ params, children }: { params: Promise<{ school: strin
   if (me.role === "parent") redirect(`${base}/family`);
 
   const nav: NavItem[] = [
-    { href: base, label: "Home", icon: "home", exact: true },
-    { href: `${base}/students`, label: "Students", icon: "students" },
-    { href: `${base}/classes`, label: "Classes", icon: "classes" },
-    { href: `${base}/results`, label: "Results", icon: "results" },
-    { href: `${base}/more`, label: "More", icon: "more" },
+    { href: base, label: "Home", icon: "home", exact: true, tour: "nav-home" },
+    { href: `${base}/students`, label: "Students", icon: "students", tour: "nav-students" },
+    { href: `${base}/classes`, label: "Classes", icon: "classes", tour: "nav-classes" },
+    { href: `${base}/results`, label: "Results", icon: "results", tour: "nav-results" },
+    { href: `${base}/more`, label: "More", icon: "more", tour: "nav-more" },
   ];
 
   return (
@@ -41,6 +42,7 @@ async function SchoolApp({ params, children }: { params: Promise<{ school: strin
       place={school.name}
       account={{ fullName: me.fullName, roleLabel: ROLE_LABEL[me.role] }}
       sampleData
+      help={adminGuide(base)}
       signOut={signOut.bind(null, school.subdomain)}
       commands={[
         { id: "admins", label: "Admins", icon: "staff", href: `${base}/more/admins`, group: "Go to" },

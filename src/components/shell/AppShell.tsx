@@ -8,6 +8,8 @@ import { Toaster } from "@brillianda/ui/Toast";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState, type ReactNode } from "react";
+import { Help, openHelp, startTour } from "@/components/help/Help";
+import type { HelpGuide } from "@/components/help/guides";
 import { initials } from "@/lib/initials";
 import { setLook, useLook, type Look } from "@/lib/look";
 
@@ -21,6 +23,8 @@ export type NavItem = {
   exact?: boolean;
   /** A small red count, e.g. requests waiting. */
   count?: number;
+  /** The guide pop-ups point at this (a `target` in components/help/guides.ts). */
+  tour?: string;
 };
 
 export type ShellAccount = { fullName: string; roleLabel: string };
@@ -52,6 +56,7 @@ export function AppShell({
   commands = [],
   signOut,
   mark,
+  help,
   children,
 }: {
   nav: NavItem[];
@@ -67,10 +72,18 @@ export function AppShell({
   signOut?: () => void | Promise<void>;
   /** The phone top bar's left side: the school's logo and name (plan). Our wordmark if absent. */
   mark?: ReactNode;
+  /** This dashboard’s Help panel and guide pop-ups. */
+  help?: HelpGuide;
   children: ReactNode;
 }) {
   const pathname = usePathname();
   const goTo: Command[] = nav.map((item) => ({ id: item.href, label: item.label, icon: item.icon, href: item.href, group: "Go to" }));
+  const helpCommands: Command[] = help
+    ? [
+        { id: "help", label: "Help", icon: "help", run: openHelp, group: "Help", keywords: ["questions", "how"] },
+        { id: "tour", label: "Take the tour", icon: "help", run: startTour, group: "Help", keywords: ["guide", "walk through"] },
+      ]
+    : [];
 
   return (
     <div className="min-h-dvh md:grid md:grid-cols-[248px_minmax(0,1fr)] md:gap-3 md:p-3">
@@ -94,6 +107,7 @@ export function AppShell({
               <Link
                 key={item.href}
                 href={item.href}
+                data-tour={item.tour}
                 aria-current={active ? "page" : undefined}
                 className={cx(
                   "flex h-10 items-center gap-3 rounded-xl px-3 text-[15px] font-medium transition-colors",
@@ -128,6 +142,7 @@ export function AppShell({
           >
             <Icon name="search" className="h-5 w-5" />
           </button>
+          {help && <Help guide={help} />}
           {sampleData && (
             <Badge tone="warning" title="Screens use stand-in data until their part of the backend is built">
               Sample data
@@ -149,6 +164,7 @@ export function AppShell({
             <Link
               key={item.href}
               href={item.href}
+              data-tour={item.tour}
               aria-current={active ? "page" : undefined}
               className={cx(
                 "relative grid justify-items-center gap-0.5 rounded-2xl py-1.5 text-[11px] font-medium focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-accent",
@@ -163,7 +179,7 @@ export function AppShell({
         })}
       </nav>
 
-      <CommandPalette commands={[...goTo, ...commands]} />
+      <CommandPalette commands={[...goTo, ...commands, ...helpCommands]} />
     </div>
   );
 }

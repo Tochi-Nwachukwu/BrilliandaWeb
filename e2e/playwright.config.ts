@@ -5,6 +5,8 @@ import { defineConfig } from "@playwright/test";
 // Locally, a Chromium already on the machine can be used instead of downloading one:
 // set PW_CHROMIUM to its path. CI installs Playwright's own browser.
 const localChromium = process.env.PW_CHROMIUM;
+const TOURS_SEEN = ["admin", "teacher", "parent", "console"].map((id) => ({ name: `brillianda:tour:${id}`, value: "seen" }));
+
 const launchOptions = localChromium && existsSync(localChromium) ? { executablePath: localChromium } : {};
 
 export default defineConfig({
@@ -19,6 +21,9 @@ export default defineConfig({
     baseURL: "http://localhost:3100",
     launchOptions,
     trace: "retain-on-failure",
+    // The guide pop-ups start by themselves on a first visit; they would sit over every test, so they
+    // start out seen. help.spec.ts clears this to test them.
+    storageState: { cookies: [], origins: ["http://localhost:3100", "http://greenfield.localhost:3100"].map((origin) => ({ origin, localStorage: TOURS_SEEN })) },
   },
   // Every test runs on a phone. The laptop run takes only those tagged @both: the plan's main
   // flows and the checks where layout matters (accessibility, speed, navigation, the laptop grid).

@@ -426,6 +426,15 @@ at the end of the session.
 - With this, group 3 has its front end. Test schools: Harbourview (closing a term) and Seaview (in
   its last term, for promotion).
 
+#### Guide pop-ups and Help (15 October 2026)
+
+- **Done:** every dashboard (school admin, teacher, parent, team console) has a short tour that
+  starts on the first visit on a device (skippable; Escape skips too) and a Help button in the top
+  bar: questions and answers for that dashboard, this page's questions first, a search, links to
+  the right screen, and "Take the tour again". Also in the command palette. Teachers without a
+  form class get no register stop. That the tour was seen is kept in the browser only, so it shows
+  again on a new device; a backend field can replace that later if wanted.
+
 ## What isn't in v1 (kept for later)
 
 Built today but "after v1" in the plan. Their code stays in `legacy/` and moves across, looking

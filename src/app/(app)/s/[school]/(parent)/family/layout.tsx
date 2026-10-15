@@ -2,6 +2,7 @@ import { ROLE_LABEL } from "@brillianda/core/auth";
 import { PageSpinner } from "@brillianda/ui/Spinner";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
+import { parentGuide } from "@/components/help/guides";
 import { AppShell, type NavItem } from "@/components/shell/AppShell";
 import { SchoolMark } from "@/components/school/SchoolBrand";
 import { schoolFromParams } from "@/components/school/school";
@@ -25,11 +26,12 @@ async function Parent({ params, children }: { params: Promise<{ school: string }
   if (!me) redirect(`${base}/login`);
   if (me.role !== "parent") redirect(base);
 
-  const nav: NavItem[] = [{ href: `${base}/family`, label: "My children", short: "Children", icon: "students" }];
+  const nav: NavItem[] = [{ href: `${base}/family`, label: "My children", short: "Children", icon: "students", tour: "nav-children" }];
 
   return (
     <AppShell
       nav={nav}
+      help={parentGuide(base)}
       place={school.name}
       account={{ fullName: me.fullName, roleLabel: ROLE_LABEL[me.role] }}
       sampleData
