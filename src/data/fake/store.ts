@@ -5,6 +5,7 @@ import "server-only";
 import { DEFAULT_BIRTHDAY_MESSAGE } from "@brillianda/core/birthdays";
 import type { BookItem } from "@brillianda/core/booklists";
 import type { CorrectableField } from "@brillianda/core/corrections";
+import { DEFAULT_PERIODS, DAYS, type Day, type Period } from "@brillianda/core/timetable";
 import { defaultTerms, type Term } from "@brillianda/core/calendar";
 import { armCodes, ARM_PRESETS, buildLadder, type Department, type Section } from "@brillianda/core/classes";
 import { type SchoolDetails, type SchoolLevel } from "@brillianda/core/signup";
@@ -97,6 +98,10 @@ type FakeStore = {
     status: "open" | "approved" | "declined";
     decided?: { by: string; at: number; reason: string | null };
   }[];
+  /** Batch 22: each school's bell schedule, each class's lessons, and an uploaded timetable document (a PDF). */
+  bellSchedules: Map<string, Period[]>;
+  lessons: { subdomain: string; armId: string; day: Day; periodId: string; subjectId: string }[];
+  timetableFiles: Map<string, { name: string; type: string; size: number; url: string; by: string; at: number }>;
 };
 
 /** Greenfield's subjects: the 2025 junior and senior lists, attached by default. */
@@ -276,6 +281,20 @@ function seedBookLists(): FakeStore["bookLists"] {
   ];
 }
 
+/**
+ * Greenfield's timetable: a full week for JSS 1 Blue and JSS 1 Gold, from JSS 1's compulsory
+ * subjects. Gold runs three lessons behind Blue, so no teacher of both is in two places at once.
+ */
+function seedLessons(links: { subjectId: string; levelId: string; kind: string }[]): FakeStore["lessons"] {
+  const subjects = links.filter((l) => l.levelId === "gl1" && l.kind === "compulsory").map((l) => l.subjectId);
+  if (!subjects.length) return [];
+  const slots = DAYS.flatMap((day) => DEFAULT_PERIODS.filter((p) => p.kind === "lesson").map((p) => ({ day, periodId: p.id })));
+  return [
+    ["ga-gl1-gn1", 0],
+    ["ga-gl1-gn2", 3],
+  ].flatMap(([armId, shift]) => slots.map((slot, i) => ({ subdomain: "greenfield", armId: armId as string, ...slot, subjectId: subjects[(i + (shift as number)) % subjects.length]! })));
+}
+
 function seed(): FakeStore {
   const greenfield = seedGreenfieldClasses();
   const greenfieldSubjects = seedGreenfieldSubjects(greenfield.levels);
@@ -431,6 +450,9 @@ function seed(): FakeStore {
     birthdayLog: [],
     bookLists: seedBookLists(),
     corrections: [],
+    bellSchedules: new Map([["greenfield", DEFAULT_PERIODS]]),
+    lessons: seedLessons(greenfieldSubjects.subjectLinks),
+    timetableFiles: new Map(),
     admission: new Map([["greenfield", { pattern: "GC/{YEAR}/{NUMBER}", digits: 4, next: greenfieldStudents.next }]]),
     subjects: greenfieldSubjects.subjects,
     subjectLinks: greenfieldSubjects.subjectLinks,

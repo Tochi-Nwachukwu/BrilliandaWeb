@@ -410,6 +410,27 @@ date, state of origin, address, guardian) and `corrections` (their latest five r
 parent can ask about: first, other and last names, date of birth, gender, state of origin, address,
 the guardian's phone and email. Rules in `packages/core/src/corrections.ts`, with tests.
 
+### Timetable (batch 22)
+
+One bell schedule per school (periods and breaks, Monday to Friday) and a lesson per class, day and
+period. A lesson's teacher isn't stored: it is the class's teacher for that subject (batch 11).
+
+| Function | Kind | Input / output | Who | Status |
+|---|---|---|---|---|
+| `getTimetable` | read | → `TimetablePage`: periods, classes, subjects (with the levels that take them), lessons with their teacher, clashes (a teacher in two classes at once), the uploaded document, and who is asking | owner, admin, teacher | fake |
+| `getMyLessonsToday` | read | `day` (1 to 5, or null) → the teacher's lessons that day, in order | teacher | fake |
+| `saveBellSchedule` | action | `{ periods }` (`periodsSchema`: up to 16, in order, no overlaps, ends after starts, at least one lesson) → `{ removed }`: lessons in removed periods (or ones made breaks) are dropped | owner, admin | fake |
+| `setLesson` | action | `armId, { day, periodId, subjectId \| null }`; null makes it free; no lessons in breaks | owner, admin | fake |
+| `importTimetable` | action | `{ fileName, classes: [{ armId, lessons }] }` (`timetableImportSchema`) → replaces those classes' weeks | owner, admin | fake |
+| `uploadTimetableFile`, `removeTimetableFile` | action | `FormData` with `file`: a PDF up to 2 MB, kept as the school's timetable document | owner, admin | fake |
+
+The browser reads uploads (`src/lib/timetable/files.ts`): Excel (a sheet per class, matched by
+name), CSV and Word tables, with days down the side or across the top and periods matched by name
+or start time; subjects by name, code or a common short form. The Excel template has a sheet per
+class, filled in, with each class's subjects in a dropdown. Rules in
+`packages/core/src/timetable.ts`, with tests. Server Actions now accept up to 3 MB
+(`next.config.ts`) for the PDF.
+
 ### Installable app (batch 10)
 
 The service worker (`public/sw.js`) and its page (`/offline`) live at the root of every school

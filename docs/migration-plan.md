@@ -426,6 +426,13 @@ at the end of the session.
 - With this, group 3 has its front end. Test schools: Harbourview (closing a term) and Seaview (in
   its last term, for promotion).
 
+#### Batch 22: Timetable (15 October 2026)
+
+- **Done:** More › Timetable: the bell schedule (one for the school), each class's week (a subject
+  per period, teacher from Teachers), clash warnings, the Excel template, and uploads: Excel, CSV
+  and Word fill the grid; a PDF is kept as a document staff can open. Teachers get a Timetable
+  tab (My week, or any class with their lessons highlighted) and today's lessons on Today.
+
 #### Batch 21: Biodata and corrections (15 October 2026)
 
 - **Done:** a child's page for parents shows their details (names, date of birth, gender, state of

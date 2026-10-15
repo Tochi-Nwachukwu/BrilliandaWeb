@@ -64,7 +64,7 @@ async function SchoolApp({ params, children }: { params: Promise<{ school: strin
       note={
         <>
           <b className="mb-0.5 block text-text-primary">Coming soon</b>
-          Fees, timetable and messages.
+          Fees and messages.
         </>
       }
     >

@@ -440,6 +440,40 @@ mistakes to be fixed without visiting the office.
 Each child in the parent's home also gains `corrections`: that child's latest five requests.
 Rules: `packages/core/src/corrections.ts`.
 
+### C12. Timetable
+
+**Problem.** Schools need one timetable everyone works from. Admins set it; teachers see it, with
+their own lessons highlighted.
+
+**What to store.**
+
+- Per school, the bell schedule: periods in order, each with an id, a name, start and end times
+  (`HH:MM`) and a kind (`lesson` or `break`). The same for every class, Monday to Friday.
+- Per class, day (1 to 5) and lesson period: a subject.
+- Optionally, one timetable document per school (a PDF up to 2 MB), in file storage.
+
+**Rules.**
+
+- A lesson's teacher isn't stored: it's the class's teacher for that subject (C1).
+- Periods: up to 16, in order, no overlaps, each ending after it starts, at least one lesson.
+  Saving a schedule that removes a period (or makes it a break) drops its lessons.
+- No lessons in breaks. Flag (don't refuse) a teacher in two classes at once.
+- Uploads are read in the browser; the API receives whole classes' weeks to replace.
+- Owners and admins change it; teachers read it (all classes).
+
+**Endpoints we need.**
+
+| What | Suggested | Returns |
+|---|---|---|
+| The whole timetable for staff | `GET /v1/timetable` | `TimetablePage` |
+| The bell schedule | `PUT /v1/timetable/periods` `{ periods }` | `{ removed }` |
+| One lesson | `PUT /v1/timetable/{armId}/{day}/{periodId}` `{ subjectId \| null }` | 204 |
+| Replace classes' weeks | `PUT /v1/timetable/classes` `{ fileName, classes: [{ armId, lessons }] }` | `{ classes, lessons }` |
+| The document | `PUT` / `DELETE /v1/timetable/document` (multipart `file`), `GET` to download | 204 |
+| A teacher's lessons on a day | `GET /v1/me/lessons?day=` | lessons in period order |
+
+Rules: `packages/core/src/timetable.ts`.
+
 ---
 
 ## D. Rules both sides must share
@@ -456,6 +490,7 @@ or call the same code:
 | `promotion.ts` | Yearly average, suggested decision, default pass mark, next class |
 | `booklists.ts` | Book list items, totals, categories |
 | `corrections.ts` | Which fields parents can correct, and each field's check |
+| `timetable.ts` | The bell schedule's checks, clashes, reading uploaded grids, matching subject names |
 | `birthdays.ts` | Filling in the message, ages, 29 February, the coming birthdays, how many texts a message takes |
 
 The default scale: A 70+, B 60+, C 50+, D 45+, E 40+ (all passes), F below 40.

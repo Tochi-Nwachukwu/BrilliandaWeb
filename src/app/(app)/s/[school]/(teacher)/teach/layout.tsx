@@ -41,6 +41,7 @@ async function Teacher({ params, children }: { params: Promise<{ school: string 
         ] as NavItem[])
       : []),
     { href: `${base}/teach/subjects`, label: "My subjects", short: "Subjects", icon: "subjects", tour: "nav-subjects" },
+    { href: `${base}/teach/timetable`, label: "Timetable", icon: "calendar", tour: "nav-timetable" },
   ];
 
   return (
@@ -56,12 +57,6 @@ async function Teacher({ params, children }: { params: Promise<{ school: string 
           <SchoolMark {...school} className="h-9 w-9 text-[13px]" />
           <span className="truncate text-[17px] font-semibold tracking-tight">{school.name}</span>
         </span>
-      }
-      note={
-        <>
-          <b className="mb-0.5 block text-text-primary">Coming soon</b>
-          Scores and report cards.
-        </>
       }
     >
       {children}

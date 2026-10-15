@@ -86,6 +86,8 @@ export function adminGuide(base: string): HelpGuide {
           { q: "How do I add a teacher?", a: "More › Teachers › Invite a teacher. They get an email to set a password. Then give them a form class and the subjects they teach.", href: `${more}/teachers`, link: "Teachers", pages: [`${more}/teachers`] },
           { q: "How do parents get access?", a: "More › Parents. Invite one guardian, or everyone with an email at once. Parents see only their own children.", href: `${more}/parents`, link: "Parents", pages: [`${more}/parents`] },
           { q: "How do I add another admin?", a: "More › Admins › Invite an admin. Only the owner can invite or remove admins.", href: `${more}/admins`, link: "Admins", pages: [`${more}/admins`] },
+          { q: "How do I set up the timetable?", a: "More › Timetable. First check the Bell schedule (the periods and breaks, the same for every class). Then pick a class and choose a subject for each period, or download the template, fill it in Excel and upload it (Excel, CSV and Word all work). A PDF can be uploaded too, as a document staff can open, but it can’t highlight anyone’s lessons.", href: `${more}/timetable`, link: "Timetable", pages: [`${more}/timetable`] },
+          { q: "Who teaches each lesson on the timetable?", a: "The class’s teacher for that subject, from More › Teachers. If a teacher ends up in two classes at once, the timetable warns you.", href: `${more}/teachers`, link: "Teachers", pages: [`${more}/timetable`] },
           { q: "A parent says their child’s details are wrong. What do I do?", a: "Parents can ask for a correction from their child’s page. Requests show in More › Corrections, with a count on the More tab. Check each one, then Correct the record (it changes the student’s details and goes in the change history) or Decline with a reason the parent sees.", href: `${more}/corrections`, link: "Corrections", pages: [`${more}/corrections`, `${base}/students`] },
           { q: "How do I tell parents which books to buy?", a: "More › Book lists. Pick the session and the class, add the books, exercise books, uniform and anything else, with prices if you like, then Share with parents. Parents see the list for their child’s class, and the one they move into next session.", href: `${more}/book-lists`, link: "Book lists", pages: [`${more}/book-lists`] },
           { q: "How do birthday messages work?", a: "More › Birthdays. Turn them on and write the message: each child’s first name, age and the school’s name are filled in. On the birthday, at 7:00 am, the guardian gets a text and the parent app shows a birthday card. Home lists the week’s birthdays.", href: `${more}/birthdays`, link: "Birthdays", pages: [`${more}/birthdays`, base] },
@@ -120,6 +122,7 @@ export function teacherGuide(base: string, formTeacher: boolean): HelpGuide {
           ]
         : []),
       { target: "nav-subjects", title: "My subjects", body: "A score sheet for every class you teach. Fill in the scores and mark the sheet complete." },
+      { target: "nav-timetable", title: "Timetable", body: "Your week, and every class’s, with your own lessons highlighted." },
       { target: "help", title: "Help is always here", body: "Answers about each screen, and this tour again." },
     ],
     topics: [
@@ -137,6 +140,7 @@ export function teacherGuide(base: string, formTeacher: boolean): HelpGuide {
       {
         title: "Scores and results",
         items: [
+          { q: "Where is my timetable?", a: "Timetable shows your week: each lesson with its class. Choose A class to see any class’s week, with your lessons highlighted. Today lists your lessons for the day. If something is wrong, tell your school’s admin.", href: `${teach}/timetable`, link: "Timetable", pages: [`${teach}/timetable`, teach] },
           { q: "How do I enter scores?", a: "My subjects › open a class and subject. Type each student’s scores; they save as you go. The total and grade fill in themselves.", href: `${teach}/subjects`, link: "My subjects", pages: [`${teach}/subjects`, teach] },
           { q: "What does Mark complete do?", a: "It tells the school your sheet is done, so results can be checked and published. Ask an admin if you need to change it after.", pages: [`${teach}/subjects`] },
           { q: "A class or subject is missing.", a: "Your admin assigns subjects and classes in Teachers. Ask them to add it.", pages: [`${teach}/subjects`] },

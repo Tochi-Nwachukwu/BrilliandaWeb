@@ -29,6 +29,13 @@ export function soonLabel(isoDay: string, inDays: number): string {
   return new Date(`${isoDay}T12:00:00Z`).toLocaleDateString("en-GB", { timeZone: "UTC", weekday: "short", day: "numeric", month: "short" });
 }
 
+/** Monday 1 to Friday 5 in Lagos today, or null at weekends (the timetable’s days). */
+export function lagosWeekday(now = new Date()): 1 | 2 | 3 | 4 | 5 | null {
+  const name = new Intl.DateTimeFormat("en-GB", { timeZone: ZONE, weekday: "short" }).format(now);
+  const i = ["Mon", "Tue", "Wed", "Thu", "Fri"].indexOf(name);
+  return i < 0 ? null : ((i + 1) as 1 | 2 | 3 | 4 | 5);
+}
+
 export function greeting(now = new Date()): string {
   const hour = Number(new Intl.DateTimeFormat("en-GB", { timeZone: ZONE, hour: "numeric", hourCycle: "h23" }).format(now));
   if (hour < 12) return "Good morning";

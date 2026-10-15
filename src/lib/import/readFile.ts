@@ -43,7 +43,7 @@ export function parseCsv(text: string): string[][] {
 const isoDay = (d: Date) => `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, "0")}-${String(d.getUTCDate()).padStart(2, "0")}`;
 
 /** An Excel cell as text. Date cells become 2014-03-14, so they are never read the wrong way round. */
-function cellText(value: unknown): string {
+export function cellText(value: unknown): string {
   if (value === null || value === undefined) return "";
   if (value instanceof Date) return isoDay(value);
   if (typeof value === "object") {
@@ -74,8 +74,28 @@ async function readXlsx(buffer: ArrayBuffer): Promise<string[][]> {
   return rows;
 }
 
+/** Every visible sheet of a workbook, by name (the timetable: a sheet per class). */
+export async function readXlsxSheets(buffer: ArrayBuffer): Promise<{ name: string; rows: string[][] }[]> {
+  const { default: ExcelJS } = await import("exceljs");
+  const book = new ExcelJS.Workbook();
+  await book.xlsx.load(buffer);
+  return book.worksheets
+    .filter((s) => s.state === "visible")
+    .map((sheet) => {
+      const rows: string[][] = [];
+      sheet.eachRow({ includeEmpty: false }, (row) => {
+        const cells: string[] = [];
+        row.eachCell({ includeEmpty: true }, (cell, col) => {
+          cells[col - 1] = cellText(cell.value).trim();
+        });
+        rows.push(Array.from(cells, (c) => c ?? ""));
+      });
+      return { name: sheet.name, rows };
+    });
+}
+
 /** The first table in a Word document, one row per table row. Paragraphs in a cell join with a space. */
-async function readDocx(buffer: ArrayBuffer): Promise<string[][] | null> {
+export async function readDocx(buffer: ArrayBuffer): Promise<string[][] | null> {
   const { default: JSZip } = await import("jszip");
   const zip = await JSZip.loadAsync(buffer);
   const xml = await zip.file("word/document.xml")?.async("string");

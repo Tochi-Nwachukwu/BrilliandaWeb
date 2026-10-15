@@ -5,8 +5,10 @@ import { PageHeader } from "@brillianda/ui/PageHeader";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { connection } from "next/server";
+import { shortTime } from "@brillianda/core/timetable";
 import { getTeacherHome } from "@/data/teaching";
-import { greeting, plural } from "@/lib/time";
+import { getMyLessonsToday } from "@/data/timetable";
+import { greeting, lagosWeekday, plural } from "@/lib/time";
 
 export const metadata: Metadata = { title: "Today" };
 
@@ -16,7 +18,7 @@ const linkClass = "rounded-2xl focus-visible:outline-hidden focus-visible:ring-2
 export default async function TeacherToday({ params }: PageProps<"/s/[school]/teach">) {
   const { school } = await params;
   await connection();
-  const home = await getTeacherHome(school);
+  const [home, lessons] = await Promise.all([getTeacherHome(school), getMyLessonsToday(school, lagosWeekday())]);
   if (!home) return null;
   const base = `/s/${school}/teach`;
   const first = home.fullName.split(" ")[0];
@@ -38,6 +40,28 @@ export default async function TeacherToday({ params }: PageProps<"/s/[school]/te
       <PageHeader title={`${greeting()}, ${first}`}>
         {!isFormTeacher ? "The classes you teach, and their students." : home.today ? "Here’s what needs you today." : "No school today. This term’s registers stay open to change."}
       </PageHeader>
+
+      {lessons && lessons.length > 0 && (
+        <Card
+          title="Your lessons today"
+          action={
+            <Link href={`${base}/timetable`} className="rounded text-sm font-medium text-accent hover:underline focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-accent">
+              Timetable
+            </Link>
+          }
+        >
+          <ol className="grid gap-1.5" aria-label="Your lessons today">
+            {lessons.map((l) => (
+              <li key={`${l.period.id}-${l.armLabel}`} className="grid grid-cols-[4.5rem_minmax(0,1fr)] items-center gap-3 rounded-2xl bg-sunken p-2.5 text-sm">
+                <span className="text-[12.5px] text-text-secondary">{shortTime(l.period.start)}–{shortTime(l.period.end)}</span>
+                <span className="min-w-0">
+                  <b className="font-semibold">{l.subjectName}</b> <span className="text-text-secondary">· {l.armLabel}</span>
+                </span>
+              </li>
+            ))}
+          </ol>
+        </Card>
+      )}
 
       {isFormTeacher && (
       <Card title="Your register" description="Once a day, for your form class. You can change it afterwards.">

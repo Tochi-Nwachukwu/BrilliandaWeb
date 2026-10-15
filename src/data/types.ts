@@ -2,6 +2,7 @@
 import type { BookItem } from "@brillianda/core/booklists";
 import type { Term } from "@brillianda/core/calendar";
 import type { CorrectableField } from "@brillianda/core/corrections";
+import type { Day, Period } from "@brillianda/core/timetable";
 import type { Department, Section } from "@brillianda/core/classes";
 import type { SchoolDetails, SchoolLevel } from "@brillianda/core/signup";
 import type { ImportArm, ImportLevel } from "@brillianda/core/studentImport";
@@ -511,3 +512,22 @@ export type CorrectionRow = {
 
 /** More › Corrections: waiting first, then the latest answered. */
 export type CorrectionsPage = { open: CorrectionRow[]; answered: CorrectionRow[] };
+
+// ——— Timetable (batch 22) ———
+
+/** One lesson, with the class's teacher for that subject (null until one is set in Teachers). */
+export type TimetableLesson = { armId: string; day: Day; periodId: string; subjectId: string; teacherId: string | null; teacherName: string | null };
+
+/** The school's timetable, for staff. Teachers see every class, with their own lessons marked by `me`. */
+export type TimetablePage = {
+  periods: Period[];
+  arms: { id: string; label: string; levelId: string }[];
+  /** The school's subjects, and which class levels take each (for the editor's choices). */
+  subjects: { id: string; name: string; code: string; levelIds: string[] }[];
+  lessons: TimetableLesson[];
+  /** A teacher in two classes at once. */
+  clashes: { teacherName: string; day: Day; periodId: string; armLabels: string[] }[];
+  /** An uploaded timetable document (a PDF): opened as it is, nothing highlighted. */
+  file: { name: string; size: number; url: string; by: string; at: number } | null;
+  me: { userId: string; canEdit: boolean };
+};
