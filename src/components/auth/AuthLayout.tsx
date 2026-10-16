@@ -38,6 +38,13 @@ const STEPS = [
   { title: "Every student, in one place", detail: "Import your list from Excel or Word." },
 ];
 
+// On a school’s own sign-in page: what the school runs here, for whoever is signing in.
+const SCHOOL_CARDS = [
+  { title: "Registers, every school day", detail: "Taken in a minute, seen by parents." },
+  { title: "Results and report cards", detail: "Scores in, checked, then published." },
+  { title: "Timetables and tests", detail: "For teachers and students alike." },
+];
+
 /** Where each card floats over the photo, and how its drift is timed. Scattered, not a staircase. */
 const FLOAT = [
   { at: "left-0 top-[4%]", motion: "[animation-duration:7s]" },
@@ -45,69 +52,82 @@ const FLOAT = [
   { at: "left-[6%] bottom-[2%]", motion: "[animation-delay:-4.6s] [animation-duration:9s]" },
 ];
 
+type PanelColours = { bg: string; text: string; accent: string };
+
 /**
- * Wide screens only. The school courtyard photo, faded into the panel colour, with the three steps
+ * Wide screens only: the school courtyard photo, faded into the panel colour, with three cards
  * floating over it. A CSS background, so phones (which never show the panel) never download it.
+ * Brillianda’s own pages use its colours; a school’s sign-in pages use the school’s.
  */
-async function BrandPanel() {
+function PhotoPanel({ colours, top, cards, children }: { colours: PanelColours; top: ReactNode; cards: { title: string; detail: string }[]; children: ReactNode }) {
   return (
-    <aside className="sticky top-0 isolate hidden h-dvh flex-col overflow-hidden bg-panel p-12 text-primary-text lg:flex">
+    <aside
+      className="sticky top-0 isolate hidden h-dvh flex-col overflow-hidden bg-[var(--pp-bg)] p-12 text-[var(--pp-text)] lg:flex"
+      style={{ ["--pp-bg" as string]: colours.bg, ["--pp-text" as string]: colours.text, ["--pp-accent" as string]: colours.accent }}
+    >
       <div aria-hidden className="absolute inset-0 -z-20 bg-cover bg-center opacity-45" style={{ backgroundImage: "url(/photos/school-courtyard-736.webp)" }} />
       {/* Darker at the top and bottom, where the words are. */}
-      <div aria-hidden className="absolute inset-0 -z-10 bg-[linear-gradient(180deg,color-mix(in_oklab,var(--color-panel)_70%,transparent),transparent_30%,transparent_55%,color-mix(in_oklab,var(--color-panel)_92%,transparent)_85%)]" />
+      <div aria-hidden className="absolute inset-0 -z-10 bg-[linear-gradient(180deg,color-mix(in_oklab,var(--pp-bg)_70%,transparent),transparent_30%,transparent_55%,color-mix(in_oklab,var(--pp-bg)_92%,transparent)_85%)]" />
 
-      <AuthWordmark className="self-start focus-visible:ring-offset-panel" />
+      {top}
 
       <ol className="relative my-8 min-h-[300px] flex-1">
-        {STEPS.map((step, index) => (
+        {cards.map((card, index) => (
           <li
-            key={step.title}
+            key={card.title}
             className={cx(
-              "absolute flex w-[min(21rem,82%)] animate-[bob_7s_ease-in-out_infinite] items-center gap-4 rounded-2xl border border-white/15 bg-[color-mix(in_oklab,var(--color-panel)_62%,transparent)] p-4 shadow-[0_24px_48px_-24px_rgba(0,0,0,0.6)] backdrop-blur-md",
+              "absolute flex w-[min(21rem,82%)] animate-[bob_7s_ease-in-out_infinite] items-center gap-4 rounded-2xl border border-white/15 bg-[color-mix(in_oklab,var(--pp-bg)_62%,transparent)] p-4 shadow-[0_24px_48px_-24px_rgba(0,0,0,0.6)] backdrop-blur-md",
               FLOAT[index]!.at,
               FLOAT[index]!.motion,
             )}
           >
-            <span aria-hidden className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-white/20 font-display text-base font-medium text-panel-accent">
+            <span aria-hidden className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-white/20 font-display text-base font-medium text-[var(--pp-accent)]">
               {index + 1}
             </span>
             <span>
-              <span className="block text-sm font-medium">{step.title}</span>
-              <span className="mt-0.5 block text-sm text-[color-mix(in_oklab,var(--color-primary-text)_80%,transparent)]">{step.detail}</span>
+              <span className="block text-sm font-medium">{card.title}</span>
+              <span className="mt-0.5 block text-sm text-[color-mix(in_oklab,var(--pp-text)_80%,transparent)]">{card.detail}</span>
             </span>
           </li>
         ))}
       </ol>
 
-      <div>
-        <p className="flex items-center gap-2 text-xs font-medium uppercase tracking-[0.14em] text-panel-accent">
-          <span aria-hidden className="h-1.5 w-1.5 rounded-full bg-panel-accent" />
-          For Nigerian schools
-        </p>
-        <p className="mt-4 max-w-[15em] font-display text-[40px] font-medium leading-[1.1] tracking-tight">Your whole school, set up in an afternoon.</p>
-        <p className="mt-8 text-sm text-[color-mix(in_oklab,var(--color-primary-text)_78%,transparent)]">© {await currentYear()} Brillianda</p>
-      </div>
+      <div>{children}</div>
     </aside>
   );
 }
 
-/** A school's own sign-in panel: its colour, its mark and its name, instead of ours. */
+async function BrandPanel() {
+  return (
+    <PhotoPanel
+      colours={{ bg: "var(--color-panel)", text: "var(--color-primary-text)", accent: "var(--color-panel-accent)" }}
+      top={<AuthWordmark className="self-start focus-visible:ring-offset-panel" />}
+      cards={STEPS}
+    >
+      <p className="flex items-center gap-2 text-xs font-medium uppercase tracking-[0.14em] text-panel-accent">
+        <span aria-hidden className="h-1.5 w-1.5 rounded-full bg-panel-accent" />
+        For Nigerian schools
+      </p>
+      <p className="mt-4 max-w-[15em] font-display text-[40px] font-medium leading-[1.1] tracking-tight">Your whole school, set up in an afternoon.</p>
+      <p className="mt-8 text-sm text-[color-mix(in_oklab,var(--color-primary-text)_78%,transparent)]">© {await currentYear()} Brillianda</p>
+    </PhotoPanel>
+  );
+}
+
+/** A school’s own sign-in panel: the same photo and cards, in its colour, with its mark and name. */
 async function SchoolPanel({ school }: { school: AuthSchool }) {
   const p = brandPalette(school.brandColor);
   const muted = mix(p.primaryText, p.primary, 0.28);
   return (
-    <aside className="sticky top-0 hidden h-dvh flex-col justify-between overflow-y-auto p-12 lg:flex" style={{ background: p.primary, color: p.primaryText }}>
-      <SchoolMark {...school} className="h-12 w-12 text-base shadow-[inset_0_0_0_1px_rgba(255,255,255,0.18)]" />
-      <div>
-        <p className="max-w-[12em] font-display text-[40px] font-medium leading-[1.1] tracking-tight">{school.name}</p>
-        <p className="mt-4 max-w-[22rem] text-base" style={{ color: muted }}>
-          Classes, subjects and students, in one place.
-        </p>
-      </div>
-      <p className="text-sm" style={{ color: muted }}>
+    <PhotoPanel colours={{ bg: p.primary, text: p.primaryText, accent: p.primaryText }} top={<SchoolMark {...school} className="h-12 w-12 self-start text-base shadow-[inset_0_0_0_1px_rgba(255,255,255,0.18)]" />} cards={SCHOOL_CARDS}>
+      <p className="max-w-[12em] font-display text-[40px] font-medium leading-[1.1] tracking-tight">{school.name}</p>
+      <p className="mt-4 max-w-[22rem] text-base" style={{ color: muted }}>
+        Classes, subjects and students, in one place.
+      </p>
+      <p className="mt-8 text-sm" style={{ color: muted }}>
         Powered by Brillianda · © {await currentYear()}
       </p>
-    </aside>
+    </PhotoPanel>
   );
 }
 
