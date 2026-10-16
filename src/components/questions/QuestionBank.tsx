@@ -10,7 +10,8 @@ import { ResponsiveDialog } from "@brillianda/ui/ResponsiveDialog";
 import { Spinner } from "@brillianda/ui/Spinner";
 import { SelectField, TextAreaField, TextField } from "@brillianda/ui/TextField";
 import { toast } from "@brillianda/ui/Toast";
-import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import { FormError } from "@/components/auth/FormError";
 import type { ActionResult, BankQuestion, QuestionBankPage } from "@/data/types";
@@ -28,6 +29,7 @@ const pairKey = (p: { subjectId: string; levelId: string }) => `${p.subjectId}|$
 /** The question bank (batch 24): filter, write, generate with AI, edit and delete. */
 export function QuestionBank({ page, actions }: { page: QuestionBankPage; actions: BankActions }) {
   const router = useRouter();
+  const pathname = usePathname();
   const [pair, setPair] = useState("");
   const [type, setType] = useState("");
   const [query, setQuery] = useState("");
@@ -55,6 +57,12 @@ export function QuestionBank({ page, actions }: { page: QuestionBankPage; action
           <ProgressBar value={page.usage.used / page.usage.limit} color="var(--color-chart)" />
         </div>
         <div className="flex flex-wrap gap-2">
+          <Link
+            href={`${pathname}/print`}
+            className="inline-flex h-10 items-center rounded-full bg-raise px-4 text-sm font-medium shadow-raised hover:bg-hover focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-accent"
+          >
+            Print a paper
+          </Link>
           <Button variant="secondary" onClick={() => setDialog({ kind: "write" })}>
             Write a question
           </Button>

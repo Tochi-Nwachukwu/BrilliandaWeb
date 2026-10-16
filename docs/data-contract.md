@@ -491,6 +491,12 @@ in `packages/core/src/cbt.ts`, with tests.
 The deadline is the start plus the length, or the close, whichever is first; past it, the attempt is
 submitted with what was saved. The student's screen counts down from the server's time.
 
+### Printing question papers (batch 26)
+
+No new functions: the paper is built in the browser from `getQuestionBank`
+(`src/components/papers`). Versions use `seededOrder` from `packages/core/src/questions.ts`, so a
+version prints the same each time.
+
 ### Installable app (batch 10)
 
 The service worker (`public/sw.js`) and its page (`/offline`) live at the root of every school

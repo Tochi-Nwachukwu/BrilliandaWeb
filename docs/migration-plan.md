@@ -426,6 +426,15 @@ at the end of the session.
 - With this, group 3 has its front end. Test schools: Harbourview (closing a term) and Seaview (in
   its last term, for promotion).
 
+#### Batch 26: Printing question papers (16 October 2026)
+
+- **Done:** Questions › Print a paper (and More › Question bank › Print a paper): choose the
+  subject and class and the questions, the title, time allowed and instructions, one to three
+  versions (questions and options in a different order each), and the answer key with marking
+  guide on its own page. The paper has the school's name, a name and class line, Section A
+  (objective, true or false, gaps) and Section B (theory, with answer lines). Print or save as
+  PDF; only the paper prints. Built in the browser from the bank: nothing new from the backend.
+
 #### Batch 25: CBT (16 October 2026)
 
 - **Done:** teachers get a Tests tab (admins More › Tests): set a test from the bank (classes,

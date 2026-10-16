@@ -92,18 +92,27 @@
   }
 }
 
-/* Printing a report card: only the card, on white, without the app around it. */
+/* Printing a report card or a question paper: only it, on white, without the app around it. */
 @media print {
-  body:has(.report-card) * {
+  body:has(.report-card) *,
+  body:has(.print-paper) * {
     visibility: hidden;
   }
   body:has(.report-card) .report-card,
-  body:has(.report-card) .report-card * {
+  body:has(.report-card) .report-card *,
+  body:has(.print-paper) .print-paper,
+  body:has(.print-paper) .print-paper * {
     visibility: visible;
   }
-  body:has(.report-card) .report-card {
+  body:has(.report-card) .report-card,
+  body:has(.print-paper) .print-paper {
     position: absolute;
     inset: 0 0 auto 0;
     background: #fff;
   }
+}
+
+/* Printed pages keep a margin, so nothing runs to the edge of the sheet. */
+@page {
+  margin: 16mm;
 }

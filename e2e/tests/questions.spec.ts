@@ -33,4 +33,13 @@ test("a teacher generates questions, checks them, and saves them to the bank", a
   await check.getByRole("button", { name: "Save 3 questions to the bank" }).click();
   await expect(check).toHaveCount(0);
   await expect(page.getByText(/From AI, checked by Bisi Adebayo/).first()).toBeVisible();
+
+  // A printed paper from the bank, in two versions, with its answer key (batch 26).
+  await page.getByRole("link", { name: "Print a paper" }).click();
+  await page.getByRole("button", { name: /^Choose all/ }).click();
+  await page.getByLabel("Versions").selectOption("2");
+  await page.getByRole("button", { name: "Preview the paper" }).click();
+  await expect(page.getByRole("region", { name: "Version A" })).toContainText("GREENFIELD COLLEGE", { ignoreCase: true });
+  await expect(page.getByRole("region", { name: "Version B" })).toBeVisible();
+  await expect(page.getByRole("region", { name: "Answer key" })).toContainText("Version B");
 });
