@@ -3,11 +3,11 @@
 //   address and its own cookies (plan: "Subdomain rules").
 // - /api/* goes to the backend API with the headers it trusts (their docs/frontend-integration.md).
 //   On staging (API_ROOT_DOMAIN set) schools have no subdomains, so /s/<school>/api/* names the
-//   school in the path, and the API is told it came from <school>.<API_ROOT_DOMAIN>.
+//   school in the path, and is passed on to the API's /s/<school>/… (staging names schools there).
 // - brillianda.com, localhost and Vercel preview addresses are served as they are, which keeps the
 //   /s/<school>/… development addresses working.
 // The rules themselves are in packages/core/src/hosts.ts, with tests.
-import { apiAddress, apiCookieName } from "@brillianda/core/apiBridge";
+import { apiCookieName, apiRequest } from "@brillianda/core/apiBridge";
 import { rootDomains, routeFor } from "@brillianda/core/hosts";
 import { NextResponse, type NextRequest } from "next/server";
 import { LIVE } from "@/data/source";
@@ -32,7 +32,9 @@ function toApi(request: NextRequest, headers: Headers, host: string, school: str
   if (request.method !== "GET" && request.method !== "HEAD" && request.headers.get("origin") !== request.nextUrl.origin) {
     return NextResponse.json({ code: "csrf_rejected", status: 403, title: "Not allowed from this page" }, { status: 403 });
   }
-  const address = API_ROOT ? apiAddress(school, API_ROOT) : { host, proto: request.nextUrl.protocol.replace(":", ""), origin: request.nextUrl.origin };
+  const address = API_ROOT
+    ? apiRequest(school, path, API_ROOT, true)
+    : { path, host, proto: request.nextUrl.protocol.replace(":", ""), origin: request.nextUrl.origin };
   headers.set("x-forwarded-host", address.host);
   headers.set("x-forwarded-proto", address.proto);
   headers.set("x-forwarded-for", request.headers.get("x-forwarded-for") ?? "");
@@ -46,7 +48,7 @@ function toApi(request: NextRequest, headers: Headers, host: string, school: str
     .join("; ");
   if (session) headers.set("cookie", session);
   else headers.delete("cookie");
-  return NextResponse.rewrite(new URL(path + request.nextUrl.search, api), { request: { headers } });
+  return NextResponse.rewrite(new URL(address.path + request.nextUrl.search, api), { request: { headers } });
 }
 
 export function proxy(request: NextRequest) {

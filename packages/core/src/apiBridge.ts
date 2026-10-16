@@ -16,14 +16,29 @@ export type Problem = {
 };
 
 /**
- * The address a call claims to come from. The API reads the school from it. On staging the API's
- * own domain stands in for ours (`<school>.api-….vercel.app`), since Vercel can't give every
- * school a subdomain; in production it is the school's real address.
+ * The address a call claims to come from, in production: the school's real address
+ * (`<school>.brillianda.com`), from which the API reads the school.
  */
 export function apiAddress(school: string | null, root: string): { host: string; origin: string; proto: "http" | "https" } {
   const host = school ? `${school}.${root}` : root;
   const proto = root === "localhost" || root.startsWith("localhost:") ? "http" : "https";
   return { host, origin: `${proto}://${host}`, proto };
+}
+
+/**
+ * Where a call goes, and the address it claims to come from. In production the API reads the
+ * school from the host. Staging can't give every school a subdomain, so there the API names the
+ * school in the path instead (`/s/<school>/v1/…`, the servers in its openapi.json) and every call
+ * comes from the API's own domain.
+ */
+export function apiRequest(
+  school: string | null,
+  path: string,
+  root: string,
+  staging: boolean,
+): { path: string; host: string; origin: string; proto: "http" | "https" } {
+  if (!staging) return { path, ...apiAddress(school, root) };
+  return { path: school ? `/s/${school}${path}` : path, ...apiAddress(null, root) };
 }
 
 /**

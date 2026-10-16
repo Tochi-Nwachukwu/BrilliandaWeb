@@ -1,17 +1,35 @@
 import { describe, expect, it } from "vitest";
-import { apiAddress, apiCookieName, failureOf, fieldKey, keptCookieName, parseSetCookie } from "./apiBridge";
+import { apiAddress, apiCookieName, apiRequest, failureOf, fieldKey, keptCookieName, parseSetCookie } from "./apiBridge";
 
 describe("apiAddress", () => {
-  it("puts the school in front of the API's root on staging", () => {
-    expect(apiAddress("greenfield", "api-rouge-nine-18.vercel.app")).toEqual({
-      host: "greenfield.api-rouge-nine-18.vercel.app",
-      origin: "https://greenfield.api-rouge-nine-18.vercel.app",
+  it("is the school's own address in production", () => {
+    expect(apiAddress("greenfield", "brillianda.com")).toEqual({
+      host: "greenfield.brillianda.com",
+      origin: "https://greenfield.brillianda.com",
       proto: "https",
     });
   });
   it("uses the root itself for the main site, and http on localhost", () => {
     expect(apiAddress(null, "brillianda.com").host).toBe("brillianda.com");
     expect(apiAddress("surebloom", "localhost").origin).toBe("http://surebloom.localhost");
+  });
+});
+
+describe("apiRequest", () => {
+  const staging = "api-rouge-nine-18.vercel.app";
+  it("names the school in the path on staging, and comes from the API's own domain", () => {
+    expect(apiRequest("fecheck", "/v1/auth/login", staging, true)).toEqual({
+      path: "/s/fecheck/v1/auth/login",
+      host: staging,
+      origin: `https://${staging}`,
+      proto: "https",
+    });
+  });
+  it("leaves main-site calls alone on staging", () => {
+    expect(apiRequest(null, "/v1/signup", staging, true)).toMatchObject({ path: "/v1/signup", host: staging });
+  });
+  it("names the school in the host in production", () => {
+    expect(apiRequest("fecheck", "/v1/school", "brillianda.com", false)).toMatchObject({ path: "/v1/school", host: "fecheck.brillianda.com" });
   });
 });
 

@@ -5,9 +5,10 @@
 // - DATA_SOURCE=api switches the screens that have endpoints onto the API. Anything else keeps
 //   every screen on sample data, as the browser tests do.
 // - API_URL and API_PROXY_SECRET: where the API runs, and the secret it trusts us with.
-// - API_ROOT_DOMAIN: staging only, the API's own domain, under which it addresses schools.
+// - API_ROOT_DOMAIN: staging only, the API's own domain. Its presence means staging: schools are
+//   named in the path (/s/<school>/v1/…) rather than the host.
 import "server-only";
-import { apiAddress, apiCookieName, failureOf, keptCookieName, parseSetCookie, unreachable, type Failure, type Problem } from "@brillianda/core/apiBridge";
+import { apiCookieName, apiRequest, failureOf, keptCookieName, parseSetCookie, unreachable, type Failure, type Problem } from "@brillianda/core/apiBridge";
 import { cookies, headers } from "next/headers";
 
 export { LIVE } from "../source";
@@ -27,9 +28,9 @@ function root(): string {
   return (process.env.API_ROOT_DOMAIN ?? process.env.ROOT_DOMAIN ?? "brillianda.com").split(",")[0]!.trim().toLowerCase();
 }
 
-/** Where a call claims to come from: a school's address, or the main site when `school` is null. */
-export function addressOf(school: string | null) {
-  return apiAddress(school, root());
+/** Where a call goes and where it claims to come from: a school, or the main site when `school` is null. */
+function requestFor(school: string | null, path: string) {
+  return apiRequest(school, path, root(), Boolean(process.env.API_ROOT_DOMAIN?.trim()));
 }
 
 /**
@@ -41,10 +42,10 @@ export async function api<T>(school: string | null, path: string, { method = "GE
   const secret = process.env.API_PROXY_SECRET;
   if (!base || !secret) return { ok: false, status: 503, problem: unreachable("Brillianda isn’t connected here yet.") };
 
-  const url = new URL(path, base);
+  const { path: target, host, origin, proto } = requestFor(school, path);
+  const url = new URL(target, base);
   for (const [key, value] of Object.entries(query ?? {})) if (value !== undefined && value !== null && value !== "") url.searchParams.set(key, String(value));
 
-  const { host, origin, proto } = addressOf(school);
   const jar = await cookies();
   const sent = jar
     .getAll()
