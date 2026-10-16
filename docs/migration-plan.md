@@ -426,6 +426,14 @@ at the end of the session.
 - With this, group 3 has its front end. Test schools: Harbourview (closing a term) and Seaview (in
   its last term, for promotion).
 
+#### Batch 23: Student accounts and the student portal (16 October 2026)
+
+- **Done:** students sign in with email and password once the school invites them (More ›
+  Student accounts: search, filter by class, invite, send again, end access). The portal: Today
+  (lessons, attendance, results, birthday), Timetable, Results with report cards, Book list, with
+  its own Help and tour. Sample student: `student@greenfield.ng`, Chiamaka in JSS 1 Blue. CBT comes
+  next (batches 24 to 26).
+
 #### Batch 22: Timetable (15 October 2026)
 
 - **Done:** More › Timetable: the bell schedule (one for the school), each class's week (a subject

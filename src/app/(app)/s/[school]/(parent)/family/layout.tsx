@@ -45,7 +45,7 @@ async function Parent({ params, children }: { params: Promise<{ school: string }
       note={
         <>
           <b className="mb-0.5 block text-text-primary">Coming soon</b>
-          Results, report cards and school fees.
+          School fees.
         </>
       }
     >

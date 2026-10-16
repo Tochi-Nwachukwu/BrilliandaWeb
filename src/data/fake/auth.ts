@@ -156,11 +156,14 @@ export async function acceptInvite(subdomain: string, token: string, password: s
   }
   const role = invite.role ?? "admin";
   if (!roleIn(user, subdomain)) user.schools.push({ subdomain, role });
+  if (role === "student" && invite.studentId && !store.studentLinks.some((l) => l.studentId === invite.studentId)) {
+    store.studentLinks.push({ userId: user.id, studentId: invite.studentId });
+  }
   if (role === "parent" && invite.guardianId && !store.parentLinks.some((l) => l.userId === user!.id && l.guardianId === invite.guardianId)) {
     store.parentLinks.push({ userId: user.id, guardianId: invite.guardianId });
   }
   invite.usedAt = Date.now();
-  recordChange(subdomain, user.fullName, role === "teacher" ? "Joined as a teacher" : role === "parent" ? "Joined the parent app" : "Joined as an admin");
+  recordChange(subdomain, user.fullName, role === "teacher" ? "Joined as a teacher" : role === "parent" ? "Joined the parent app" : role === "student" ? "Joined the student portal" : "Joined as an admin");
   await startSession(user);
   return { ok: true, data: null };
 }
@@ -177,11 +180,20 @@ export async function requireMember(subdomain: string, role?: SchoolRole) {
   return user;
 }
 
-/** Anyone on the school's staff (owner, admin or teacher), with their role; else null. Parents are not staff. */
+/** Anyone on the school's staff (owner, admin or teacher), with their role; else null. Parents and students are not staff. */
 export async function requireStaff(subdomain: string) {
   const user = await currentUser();
   const role = user && roleIn(user, subdomain);
-  return user && role && role !== "parent" ? { user, role } : null;
+  return user && (role === "owner" || role === "admin" || role === "teacher") ? { user, role } : null;
+}
+
+/** The signed-in student at this school, with their own student record; else null. */
+export async function requireStudent(subdomain: string) {
+  const user = await currentUser();
+  if (!user || roleIn(user, subdomain) !== "student") return null;
+  const link = store.studentLinks.find((l) => l.userId === user.id);
+  const student = link && store.students.find((s) => s.id === link.studentId && s.subdomain === subdomain && !s.deletedAt);
+  return student ? { user, student } : null;
 }
 
 /** The signed-in parent at this school, with the guardian records they belong to; else null. */

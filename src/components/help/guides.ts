@@ -20,7 +20,7 @@ export type HelpItem = {
 
 export type HelpGuide = {
   /** Which dashboard: also the key that remembers the tour was seen. */
-  id: "admin" | "teacher" | "parent" | "console";
+  id: "admin" | "teacher" | "parent" | "student" | "console";
   /** The dashboard’s first page: questions listed for it show there only, not on every page below it. */
   home: string;
   tour: TourStep[];
@@ -84,6 +84,7 @@ export function adminGuide(base: string): HelpGuide {
         title: "Your team and parents",
         items: [
           { q: "How do I add a teacher?", a: "More › Teachers › Invite a teacher. They get an email to set a password. Then give them a form class and the subjects they teach.", href: `${more}/teachers`, link: "Teachers", pages: [`${more}/teachers`] },
+          { q: "How do students get access?", a: "More › Student accounts. Invite a student with their email (their own, or one the school gives them); they set a password and sign in at the school’s address. They see their timetable, attendance, results and book list, and later take tests.", href: `${more}/student-accounts`, link: "Student accounts", pages: [`${more}/student-accounts`] },
           { q: "How do parents get access?", a: "More › Parents. Invite one guardian, or everyone with an email at once. Parents see only their own children.", href: `${more}/parents`, link: "Parents", pages: [`${more}/parents`] },
           { q: "How do I add another admin?", a: "More › Admins › Invite an admin. Only the owner can invite or remove admins.", href: `${more}/admins`, link: "Admins", pages: [`${more}/admins`] },
           { q: "How do I set up the timetable?", a: "More › Timetable. First check the Bell schedule (the periods and breaks, the same for every class). Then pick a class and choose a subject for each period, or download the template, fill it in Excel and upload it (Excel, CSV and Word all work). A PDF can be uploaded too, as a document staff can open, but it can’t highlight anyone’s lessons.", href: `${more}/timetable`, link: "Timetable", pages: [`${more}/timetable`] },
@@ -200,6 +201,46 @@ export function parentGuide(base: string): HelpGuide {
       },
     ],
     stuck: "Still stuck? Contact your child’s school office.",
+  };
+}
+
+export function studentGuide(base: string): HelpGuide {
+  const learn = `${base}/learn`;
+  return {
+    id: "student",
+    home: learn,
+    tour: [
+      { title: "Welcome to your school on Brillianda", body: "Your lessons, attendance, results and what you need for class, in one place. Three quick stops." },
+      { target: "nav-today", title: "Today", body: "Today’s lessons, your attendance this term, and your results when they’re out." },
+      { target: "nav-timetable", title: "Timetable", body: "Your class’s week, with each lesson’s teacher." },
+      { target: "nav-results", title: "Results", body: "Your report cards, once the school publishes them." },
+      { target: "help", title: "Help is always here", body: "Answers to common questions, and this tour again." },
+    ],
+    topics: [
+      {
+        title: "Your school day",
+        items: [
+          { q: "Where is my timetable?", a: "Timetable shows your class’s week. Today lists today’s lessons.", href: `${learn}/timetable`, link: "Timetable", pages: [learn] },
+          { q: "My attendance looks wrong.", a: "Your form teacher takes the register each school day. If a day is wrong, tell them: they can correct it.", pages: [learn] },
+          { q: "Which books do I need?", a: "Book list shows what your class needs, and what to get for next session, once the school shares it.", href: `${learn}/books`, link: "Book list", pages: [learn] },
+        ],
+      },
+      {
+        title: "Results",
+        items: [
+          { q: "When can I see my results?", a: "When the school publishes them, usually at the end of the term. Open Results to see your report card.", href: `${learn}/results`, link: "Results", pages: [`${learn}/results`] },
+          { q: "How do I print my report card?", a: "Open the report card and choose Print or save as PDF.", pages: [`${learn}/results`] },
+        ],
+      },
+      {
+        title: "Your account",
+        items: [
+          { q: "How do I sign out?", a: "Press your initials at the top right, then Sign out. Always sign out on a shared computer." },
+          { q: "I forgot my password.", a: "On the sign-in page, choose Forgot your password and we’ll email you a link." },
+        ],
+      },
+    ],
+    stuck: "Still stuck? Ask your form teacher or the school office.",
   };
 }
 

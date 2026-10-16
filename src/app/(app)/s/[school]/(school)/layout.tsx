@@ -29,6 +29,7 @@ async function SchoolApp({ params, children }: { params: Promise<{ school: strin
   // Teachers have their own screens (batch 11); the admin ones stay closed to them.
   if (me.role === "teacher") redirect(`${base}/teach`);
   if (me.role === "parent") redirect(`${base}/family`);
+  if (me.role === "student") redirect(`${base}/learn`);
   // Parents' correction requests waiting (batch 21), on the More tab.
   const waiting = await countOpenCorrections(school.subdomain);
 

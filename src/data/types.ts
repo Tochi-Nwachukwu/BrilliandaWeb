@@ -40,7 +40,7 @@ export type SubdomainCheck =
   | { available: true; subdomain: string }
   | { available: false; subdomain: string; reason: "taken" | "reserved" | "invalid"; message: string; suggestions: string[] };
 
-export type SchoolRole = "owner" | "admin" | "teacher" | "parent";
+export type SchoolRole = "owner" | "admin" | "teacher" | "parent" | "student";
 
 /** Who is signed in at a school, and as what. */
 export type SignedInMember = { userId: string; fullName: string; email: string; role: SchoolRole };
@@ -56,7 +56,7 @@ export type SchoolMember = {
   invitedAt?: number;
 };
 
-export type InviteDetails = { schoolName: string; fullName: string; email: string; status: "open" | "used" | "expired"; hasAccount: boolean; role: "admin" | "teacher" | "parent" };
+export type InviteDetails = { schoolName: string; fullName: string; email: string; status: "open" | "used" | "expired"; hasAccount: boolean; role: "admin" | "teacher" | "parent" | "student" };
 
 /**
  * FAKE ONLY: what the email would have said, so screens can be clicked through before real
@@ -531,3 +531,32 @@ export type TimetablePage = {
   file: { name: string; size: number; url: string; by: string; at: number } | null;
   me: { userId: string; canEdit: boolean };
 };
+
+// ——— Students and the student portal (batch 23) ———
+
+export type StudentAccess = "none" | "invited" | "active";
+
+/** More › Student accounts: every active student, and whether they use the student portal. */
+export type StudentAccountsPage = {
+  students: { id: string; fullName: string; admissionNo: string; armId: string; armLabel: string; access: StudentAccess; email: string | null }[];
+  arms: { id: string; label: string }[];
+};
+
+/** A student's own home: who they are, today's lessons, attendance, results and book lists. */
+export type StudentHome = {
+  fullName: string;
+  armLabel: string;
+  admissionNo: string;
+  formTeacher: string | null;
+  birthday: string | null;
+  /** Today's lessons, in order; empty at weekends or when the timetable has none. */
+  lessonsToday: { periodLabel: string; start: string; end: string; subjectName: string }[];
+  attendance: AttendanceSummary;
+  recent: { date: string; mark: RegisterMark | null }[];
+  results: ParentChild["results"];
+  pastTerms: { key: string; label: string }[];
+  bookLists: { label: string; list: BookList }[];
+};
+
+/** A student's class week. */
+export type ClassTimetable = { armLabel: string; periods: Period[]; lessons: { day: Day; periodId: string; subjectName: string; teacherName: string | null }[] };

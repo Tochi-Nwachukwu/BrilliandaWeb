@@ -20,6 +20,7 @@ const ITEMS: { path: string; icon: IconName; title: string; detail: string }[] =
   { path: "../subjects", icon: "subjects", title: "Subjects", detail: "What each class level takes" },
   { path: "results", icon: "results", title: "Results settings", detail: "Score parts, grades and positions" },
   { path: "teachers", icon: "classes", title: "Teachers", detail: "Form classes, subjects, and who takes each register" },
+  { path: "student-accounts", icon: "students", title: "Student accounts", detail: "Invite students to the student portal" },
   { path: "parents", icon: "students", title: "Parents", detail: "Invite guardians to follow their children’s attendance" },
   { path: "admins", icon: "staff", title: "Admins", detail: "Who helps run the school on Brillianda" },
 ];

@@ -59,6 +59,8 @@ type FakeStore = {
   promotion: Map<string, { passMark?: number; overrides: { studentId: string; decision: "promote" | "repeat" | "graduate"; reason: string | null }[] }>;
   /** Batch 12: a parent's account and the guardian record it belongs to (their children). */
   parentLinks: { userId: string; guardianId: string }[];
+  /** Batch 23: a student's account and the student record it belongs to. */
+  studentLinks: { userId: string; studentId: string }[];
   /** Sample registers are made on first read, from that day's date (see fake/teaching.ts). */
   registersSeeded: boolean;
   /** Schools whose owner has saved More › Branding (ticks the checklist item). */
@@ -226,7 +228,7 @@ export type FakeTrialRequest = {
 };
 
 /** createdAt 0 means "sent just now"; filled in the first time it is read (see fake/auth.ts). */
-export type FakeInvite = { id: string; token: string; subdomain: string; fullName: string; email: string; createdAt: number; usedAt?: number; role?: "admin" | "teacher" | "parent"; /** Parent invites: the guardian record they become. */ guardianId?: string };
+export type FakeInvite = { id: string; token: string; subdomain: string; fullName: string; email: string; createdAt: number; usedAt?: number; role?: "admin" | "teacher" | "parent" | "student"; /** Parent invites: the guardian record they become. */ guardianId?: string; /** Student invites: the student they are. */ studentId?: string };
 /** Password reset and email sign-in links. */
 export type FakeLink = { kind: "reset" | "magic"; userId: string; subdomain: string; createdAt: number; usedAt?: number };
 
@@ -239,7 +241,7 @@ export type FakeSignupDraft = {
 };
 
 /** FAKE: plain-text passwords, because nothing here is real. Better Auth replaces all of this. */
-export type FakeUser = { id: string; fullName: string; email: string; password: string; phone?: string; schools: { subdomain: string; role: "owner" | "admin" | "teacher" | "parent" }[] };
+export type FakeUser = { id: string; fullName: string; email: string; password: string; phone?: string; schools: { subdomain: string; role: "owner" | "admin" | "teacher" | "parent" | "student" }[] };
 
 /** Greenfield's lists: JSS 1 for this session and JSS 2 for the next, shared; JSS 3's next one a draft. */
 function seedBookLists(): FakeStore["bookLists"] {
@@ -367,6 +369,8 @@ function seed(): FakeStore {
       { id: "u12", fullName: "Bisi Adebayo", email: "teacher@greenfield.ng", password: "brillianda", schools: [{ subdomain: "greenfield", role: "teacher" }] },
       { id: "u13", fullName: "Ifeanyi Okoro", email: "physics@greenfield.ng", password: "brillianda", schools: [{ subdomain: "greenfield", role: "teacher" }] },
       { id: "u14", fullName: sampleGuardian.name, email: "parent@greenfield.ng", password: "brillianda", schools: [{ subdomain: "greenfield", role: "parent" }] },
+      // The sample student: Chiamaka in JSS 1 Blue, the sample parent's child (batch 23).
+      { id: "u20", fullName: "Chiamaka Grace Okafor", email: "student@greenfield.ng", password: "brillianda", schools: [{ subdomain: "greenfield", role: "student" }] },
       { id: "u19", fullName: "Ese Okoro", email: "owner@seaview.ng", password: "brillianda", schools: [{ subdomain: "seaview", role: "owner" }] },
       { id: "u18", fullName: "Dapo Williams", email: "owner@harbourview.ng", password: "brillianda", schools: [{ subdomain: "harbourview", role: "owner" }] },
       { id: "u16", fullName: "Folake Adeyemi", email: "owner@lakeside.ng", password: "brillianda", schools: [{ subdomain: "lakeside", role: "owner" }] },
@@ -416,6 +420,7 @@ function seed(): FakeStore {
       { subdomain: "seaview", key: "2025-2", name: "Second Term", session: "2025/2026", by: "Ese Okoro", at: 0 },
     ],
     promotion: new Map(),
+    studentLinks: [{ userId: "u20", studentId: "st1" }],
     parentLinks: [
       { userId: "u14", guardianId: sampleGuardian.id },
       { userId: "u17", guardianId: jss2Guardian.id },

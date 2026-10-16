@@ -474,6 +474,36 @@ their own lessons highlighted.
 
 Rules: `packages/core/src/timetable.ts`.
 
+### C13. Student accounts and the student portal
+
+**Problem.** Students need their own sign-in: to see their timetable, attendance, results and
+book list, and to take tests (CBT, next).
+
+**Who.** A new role, `student`. A student's account links to their student record. Every student
+endpoint returns only that student. Students are refused by owner, admin, teacher and parent
+endpoints.
+
+**Rules.**
+
+- Students sign in with email and password, like staff (B2's invitations, with role `student` and
+  the `studentId`). The email is the student's own or one the school gives them; it can't belong
+  to someone else at the school.
+- Ending access removes the account's role at this school; the student's record stays.
+- Students are often under 18: this is the reason for the AI terms check in
+  `docs/ai-integration.md`, Step 0, and for the child-safety and data-protection duties that
+  come with it.
+
+**Endpoints we need.**
+
+| What | Suggested | Returns |
+|---|---|---|
+| Students with their portal access | `GET /v1/student-accounts` | `StudentAccountsPage` |
+| Invite a student | `POST /v1/students/{id}/invite` `{ email }` | 201 |
+| End access or cancel the invite | `DELETE /v1/students/{id}/access` | 204 |
+| The student's home | `GET /v1/me/student` | `StudentHome` |
+| Their class's week | `GET /v1/me/timetable` | `ClassTimetable` |
+| Their report card, once published | `GET /v1/me/report-card?term=` | `ReportCardData` |
+
 ---
 
 ## D. Rules both sides must share

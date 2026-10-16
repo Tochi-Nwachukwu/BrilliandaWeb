@@ -73,6 +73,7 @@ const SCHOOL = [
   "/more/book-lists",
   "/more/corrections",
   "/more/timetable",
+  "/more/student-accounts",
 ];
 
 // Split in three so they run side by side: one long scan of every screen outran the time limit.
@@ -107,6 +108,16 @@ test("a parent's screens pass the accessibility scan", { tag: "@both" }, async (
   await page.getByRole("button", { name: "Sign in", exact: true }).click();
   await expect(page).toHaveURL(/\/family$/);
   await scan(page, "/s/greenfield/family");
+});
+
+test("a student’s screens pass the accessibility scan", { tag: "@both" }, async ({ page }) => {
+  test.setTimeout(120_000);
+  await open(page, "/s/greenfield/login");
+  await page.getByLabel("Email").fill("student@greenfield.ng");
+  await page.getByLabel("Password", { exact: true }).fill("brillianda");
+  await page.getByRole("button", { name: "Sign in", exact: true }).click();
+  await expect(page).toHaveURL(/\/learn$/);
+  for (const path of ["/learn", "/learn/timetable", "/learn/results", "/learn/books"]) await test.step(path, () => scan(page, `/s/greenfield${path}`));
 });
 
 test("the team console passes the accessibility scan", { tag: "@both" }, async ({ page }) => {

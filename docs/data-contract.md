@@ -431,6 +431,22 @@ class, filled in, with each class's subjects in a dropdown. Rules in
 `packages/core/src/timetable.ts`, with tests. Server Actions now accept up to 3 MB
 (`next.config.ts`) for the PDF.
 
+### Students and the student portal (batch 23)
+
+A fifth role, `student`. A student's account is linked to their own student record
+(`studentLinks`); every student read returns only them. Students sign in with email and password,
+like staff, after an invitation; they land on `/s/<school>/learn`. Every other area refuses them
+(`requireStaff` is now owner, admin or teacher only).
+
+| Function | Kind | Input / output | Who | Status |
+|---|---|---|---|---|
+| `getStudentAccounts` | read | → `StudentAccountsPage`: active students with class and portal access (`none`, `invited`, `active`, and the email) | owner, admin | fake |
+| `inviteStudent` | action | `studentId, { email }` → sample email; the invite carries role `student` and the `studentId`; refused if that email is already someone's at this school | owner, admin | fake |
+| `removeStudentAccess` | action | `studentId` → ends access or cancels the invite; the record stays | owner, admin | fake |
+| `getStudentHome` | read | → `StudentHome`: class, admission number, form teacher, birthday message, today's lessons, attendance and the last ten days, this term's results once published, earlier published terms, book lists | the student | fake |
+| `getStudentTimetable` | read | → `ClassTimetable`: the class's periods and lessons with teachers | the student | fake |
+| `getStudentReportCard` | read | `termKey?` → `ReportCardData`, only once published | the student | fake |
+
 ### Installable app (batch 10)
 
 The service worker (`public/sw.js`) and its page (`/offline`) live at the root of every school

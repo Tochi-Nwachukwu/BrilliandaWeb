@@ -22,7 +22,7 @@ const pause = () => new Promise((resolve) => setTimeout(resolve, 300));
 const fail = (error: string): ActionResult<never> => ({ ok: false, error });
 const ADMINS_ONLY = "Only the school’s owner and admins can do this.";
 
-function termsOf(subdomain: string) {
+export function termsOf(subdomain: string) {
   const saved = store.calendars.get(subdomain);
   if (saved) return saved.terms;
   const today = new Date();
@@ -149,7 +149,7 @@ export async function getParentHome(subdomain: string): Promise<ParentHome | nul
 }
 
 /** This term's results for a parent: nothing but the term's name until the class is published. */
-function resultsFor(subdomain: string, studentId: string): ParentHome["children"][number]["results"] {
+export function resultsFor(subdomain: string, studentId: string): ParentHome["children"][number]["results"] {
   const term = resultsTermOf(subdomain);
   if (!term) return null;
   const card = buildReportCard(subdomain, studentId);
