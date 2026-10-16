@@ -8,16 +8,20 @@ import { authLinkClass } from "@/components/auth/styles";
 import { SchoolMark } from "@/components/school/SchoolBrand";
 import { findMySchool } from "@/data/actions/auth";
 import { getMySchools } from "@/data/auth";
+import { GoToSchool } from "./GoToSchool";
 
-export const metadata: Metadata = { title: "Find your school" };
+/** Where schools live: brillianda.com, or staging.brillianda.com on the staging site. */
+const ROOT = (process.env.ROOT_DOMAIN ?? "brillianda.com").split(",")[0]!.trim().toLowerCase();
+
+export const metadata: Metadata = { title: "Sign in to your school" };
 
 // brillianda.com/login (plan: "Signing in later"). Everyone signs in at their school's own
 // address; this page gets them there.
 export default function FindMySchoolPage() {
   return (
     <AuthLayout
-      title="Find your school"
-      description="Each school signs in at its own address, like greenfield.brillianda.com. Enter your email and we’ll send you a link to each of your schools."
+      title="Sign in to your school"
+      description={`Each school signs in at its own address, like greenfield.${ROOT}.`}
       footer={
         <>
           New to Brillianda?{" "}
@@ -30,6 +34,7 @@ export default function FindMySchoolPage() {
       <Suspense>
         <YourSchools />
       </Suspense>
+      <GoToSchool root={ROOT} />
       <EmailRequestForm
         action={findMySchool}
         submitLabel="Email me my schools"
@@ -62,7 +67,9 @@ async function YourSchools() {
               <SchoolMark {...school} className="h-10 w-10 text-[13px]" />
               <span className="min-w-0 flex-1">
                 <b className="block truncate font-semibold">{school.name}</b>
-                <span className="block truncate text-[12.5px] text-text-secondary">{school.subdomain}.brillianda.com</span>
+                <span className="block truncate text-[12.5px] text-text-secondary">
+                  {school.subdomain}.{ROOT}
+                </span>
               </span>
               <Icon name="chevron" className="h-4 w-4 text-text-muted" />
             </Link>
