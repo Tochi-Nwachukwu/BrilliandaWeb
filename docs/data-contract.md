@@ -447,6 +447,23 @@ like staff, after an invitation; they land on `/s/<school>/learn`. Every other a
 | `getStudentTimetable` | read | → `ClassTimetable`: the class's periods and lessons with teachers | the student | fake |
 | `getStudentReportCard` | read | `termKey?` → `ReportCardData`, only once published | the student | fake |
 
+### The question bank and generating questions (batch 24)
+
+One question shape for the bank, the AI generator, CBT and printed papers: `questionSchema` in
+`packages/core/src/questions.ts` (objective with 2 to 5 options and the right one; true or false;
+fill in the gap with accepted answers; theory with a marking guide; marks, topic, difficulty). A
+teacher works in the subject and class level pairs they teach; owners and admins in all.
+
+| Function | Kind | Input / output | Who | Status |
+|---|---|---|---|---|
+| `getQuestionBank` | read | → `QuestionBankPage`: the pairs this person may write for, their questions (with source, author, and whether they're the author), this month's AI use | teacher, owner, admin | fake |
+| `generateQuestions` | action | `generateRequestSchema` (purpose, subject, class level, 1 to 10 topics, notes, counts per type adding to 1 to 60, difficulty) → `{ questions, usage }`; nothing saved; refused past the school's monthly allowance | same | fake (sample questions) |
+| `saveQuestions` | action | `{ subjectId, levelId, questions, source }` (each checked with `questionSchema`) → `{ saved }` | same | fake |
+| `updateQuestion`, `deleteQuestion` | action | `id` (and the question); a teacher their own only, admins any | same | fake |
+
+The real generator is the AI call in `docs/ai-integration.md` (Step 6). Marking and shuffling
+rules (`markAnswer`, `seededOrder`) are in the same core file, with tests, ready for CBT.
+
 ### Installable app (batch 10)
 
 The service worker (`public/sw.js`) and its page (`/offline`) live at the root of every school

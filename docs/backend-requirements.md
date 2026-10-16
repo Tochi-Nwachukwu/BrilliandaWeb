@@ -504,6 +504,32 @@ endpoints.
 | Their class's week | `GET /v1/me/timetable` | `ClassTimetable` |
 | Their report card, once published | `GET /v1/me/report-card?term=` | `ReportCardData` |
 
+### C14. The question bank and AI-generated questions
+
+**Problem.** Teachers build up questions for tests, assignments and exams, and want AI to draft
+them, which they then check.
+
+**What to store.** Questions per school, subject and class level, in the shape of `questionSchema`
+(`packages/core/src/questions.ts`), with who wrote it, when, and whether it came from AI. AI
+generations used per school per month.
+
+**Rules.**
+
+- A teacher sees and writes questions for the subject and class level pairs they teach (C1);
+  owners and admins for all. A teacher changes or deletes only their own.
+- Generating returns drafts only; nothing is saved until the teacher saves.
+- The monthly allowance (300 by default) and everything about the AI call: `docs/ai-integration.md`.
+  **Read its Step 0 first**: Google's terms don't allow Gemini in a service used by under-18s.
+
+**Endpoints we need.**
+
+| What | Suggested | Returns |
+|---|---|---|
+| The bank and this month's AI use | `GET /v1/questions` | `QuestionBankPage` |
+| Generate drafts | `POST /v1/questions/generate` (`generateRequestSchema`) | `{ questions, usage }` |
+| Save questions | `POST /v1/questions` `{ subjectId, levelId, questions, source }` | `{ saved }` |
+| Change or delete one | `PUT` / `DELETE /v1/questions/{id}` | 204 |
+
 ---
 
 ## D. Rules both sides must share
@@ -521,6 +547,7 @@ or call the same code:
 | `booklists.ts` | Book list items, totals, categories |
 | `corrections.ts` | Which fields parents can correct, and each field's check |
 | `timetable.ts` | The bell schedule's checks, clashes, reading uploaded grids, matching subject names |
+| `questions.ts` | The question shape, marking answers, shuffling per student, what a generate request may ask |
 | `birthdays.ts` | Filling in the message, ages, 29 February, the coming birthdays, how many texts a message takes |
 
 The default scale: A 70+, B 60+, C 50+, D 45+, E 40+ (all passes), F below 40.

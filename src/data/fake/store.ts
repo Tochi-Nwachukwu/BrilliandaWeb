@@ -5,6 +5,7 @@ import "server-only";
 import { DEFAULT_BIRTHDAY_MESSAGE } from "@brillianda/core/birthdays";
 import type { BookItem } from "@brillianda/core/booklists";
 import type { CorrectableField } from "@brillianda/core/corrections";
+import type { Question } from "@brillianda/core/questions";
 import { DEFAULT_PERIODS, DAYS, type Day, type Period } from "@brillianda/core/timetable";
 import { defaultTerms, type Term } from "@brillianda/core/calendar";
 import { armCodes, ARM_PRESETS, buildLadder, type Department, type Section } from "@brillianda/core/classes";
@@ -104,6 +105,9 @@ type FakeStore = {
   bellSchedules: Map<string, Period[]>;
   lessons: { subdomain: string; armId: string; day: Day; periodId: string; subjectId: string }[];
   timetableFiles: Map<string, { name: string; type: string; size: number; url: string; by: string; at: number }>;
+  /** Batch 24: each school's question bank, and AI generations used per month ("2026-10"). */
+  questionBank: { id: string; subdomain: string; subjectId: string; levelId: string; question: Question; source: "ai" | "teacher"; byId: string; by: string; at: number }[];
+  aiUsage: Map<string, number>;
 };
 
 /** Greenfield's subjects: the 2025 junior and senior lists, attached by default. */
@@ -297,6 +301,19 @@ function seedLessons(links: { subjectId: string; levelId: string; kind: string }
   ].flatMap(([armId, shift]) => slots.map((slot, i) => ({ subdomain: "greenfield", armId: armId as string, ...slot, subjectId: subjects[(i + (shift as number)) % subjects.length]! })));
 }
 
+/** A few of Bisi Adebayo's (u12) JSS 1 Mathematics questions, so the bank isn't empty. */
+function seedQuestionBank(): FakeStore["questionBank"] {
+  const q = (question: Question, n: number) => ({ id: `qb${n}`, subdomain: "greenfield", subjectId: "gs-mathematics", levelId: "gl1", question, source: "teacher" as const, byId: "u12", by: "Bisi Adebayo", at: 0 });
+  const base = { marks: 1, topic: "Fractions", difficulty: "easy" as const };
+  return [
+    q({ type: "objective", text: "Simplify 6/8.", options: ["3/4", "2/3", "4/6", "1/2"], answer: 0, ...base }, 1),
+    q({ type: "objective", text: "What is 1/2 + 1/4?", options: ["2/6", "3/4", "1/6", "2/4"], answer: 1, ...base }, 2),
+    q({ type: "trueFalse", text: "2/4 is equal to 1/2.", answer: true, ...base }, 3),
+    q({ type: "fillGap", text: "The top number of a fraction is called the ____.", answers: ["numerator"], ...base, marks: 2 }, 4),
+    q({ type: "theory", text: "Ada spent 1/3 of her money on books and 1/4 on food. What fraction did she have left? Show your working.", guide: "1/3 + 1/4 = 7/12 spent; 1 − 7/12 = 5/12 left.", ...base, marks: 5, difficulty: "medium" }, 5),
+  ];
+}
+
 function seed(): FakeStore {
   const greenfield = seedGreenfieldClasses();
   const greenfieldSubjects = seedGreenfieldSubjects(greenfield.levels);
@@ -458,6 +475,8 @@ function seed(): FakeStore {
     bellSchedules: new Map([["greenfield", DEFAULT_PERIODS]]),
     lessons: seedLessons(greenfieldSubjects.subjectLinks),
     timetableFiles: new Map(),
+    questionBank: seedQuestionBank(),
+    aiUsage: new Map([[`greenfield|${new Date().toISOString().slice(0, 7)}`, 12]]),
     admission: new Map([["greenfield", { pattern: "GC/{YEAR}/{NUMBER}", digits: 4, next: greenfieldStudents.next }]]),
     subjects: greenfieldSubjects.subjects,
     subjectLinks: greenfieldSubjects.subjectLinks,

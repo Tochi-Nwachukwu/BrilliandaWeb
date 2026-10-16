@@ -2,6 +2,7 @@
 import type { BookItem } from "@brillianda/core/booklists";
 import type { Term } from "@brillianda/core/calendar";
 import type { CorrectableField } from "@brillianda/core/corrections";
+import type { Question } from "@brillianda/core/questions";
 import type { Day, Period } from "@brillianda/core/timetable";
 import type { Department, Section } from "@brillianda/core/classes";
 import type { SchoolDetails, SchoolLevel } from "@brillianda/core/signup";
@@ -560,3 +561,17 @@ export type StudentHome = {
 
 /** A student's class week. */
 export type ClassTimetable = { armLabel: string; periods: Period[]; lessons: { day: Day; periodId: string; subjectName: string; teacherName: string | null }[] };
+
+// ——— The question bank and generating questions (batch 24) ———
+
+export type BankQuestion = { id: string; subjectId: string; levelId: string; question: Question; source: "ai" | "teacher"; by: string; byMe: boolean; at: number };
+
+/** The questions a person can see and write: a teacher's own subjects and classes; everything for admins. */
+export type QuestionBankPage = {
+  /** Subject and class level pairs this person may write questions for. */
+  pairs: { subjectId: string; subjectName: string; levelId: string; levelName: string }[];
+  questions: BankQuestion[];
+  /** This month's AI generations: used, the school's allowance, and when it resets. */
+  usage: { used: number; limit: number; resetsOn: string };
+  canEditAll: boolean;
+};

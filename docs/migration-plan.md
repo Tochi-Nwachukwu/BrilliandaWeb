@@ -426,6 +426,15 @@ at the end of the session.
 - With this, group 3 has its front end. Test schools: Harbourview (closing a term) and Seaview (in
   its last term, for promotion).
 
+#### Batch 24: The question bank and generating questions (16 October 2026)
+
+- **Done:** a Questions tab for teachers (their own subjects and classes) and More › Question bank
+  for admins (all of them): filter by subject and class, type and words; write a question (all four
+  types); edit and delete your own; Generate questions (topics, how many of each type, difficulty)
+  → a short wait → check every draft, edit or remove it → save to the bank. The school's AI use
+  this month shows at the top. The generator is a fake (real questions for a few topics, plain
+  samples otherwise) until the backend connects AI.
+
 #### Batch 23: Student accounts and the student portal (16 October 2026)
 
 - **Done:** students sign in with email and password once the school invites them (More ›

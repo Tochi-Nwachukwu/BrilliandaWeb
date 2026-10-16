@@ -74,6 +74,7 @@ const SCHOOL = [
   "/more/corrections",
   "/more/timetable",
   "/more/student-accounts",
+  "/more/questions",
 ];
 
 // Split in three so they run side by side: one long scan of every screen outran the time limit.
@@ -98,7 +99,7 @@ test("a teacher's screens pass the accessibility scan", { tag: "@both" }, async 
   await page.getByLabel("Password", { exact: true }).fill("brillianda");
   await page.getByRole("button", { name: "Sign in", exact: true }).click();
   await expect(page).toHaveURL(/\/teach$/);
-  for (const path of ["/teach", "/teach/register", "/teach/subjects", "/teach/class", "/teach/timetable"]) await test.step(path, () => scan(page, `/s/greenfield${path}`));
+  for (const path of ["/teach", "/teach/register", "/teach/subjects", "/teach/class", "/teach/timetable", "/teach/questions"]) await test.step(path, () => scan(page, `/s/greenfield${path}`));
 });
 
 test("a parent's screens pass the accessibility scan", { tag: "@both" }, async ({ page }) => {
