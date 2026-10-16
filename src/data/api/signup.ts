@@ -13,6 +13,7 @@ type Draft = {
   owner: { fullName: string; email: string; phone: string | null } | null;
   emailVerified: boolean;
   codeSentTo: string | null;
+  existingAccount: boolean;
   resendAvailableInSec: number;
 };
 
@@ -36,6 +37,7 @@ function draftOf(d: Draft): SignupDraft {
     // The API says how long until a new code may be sent; our timers count from when it was sent.
     codeSentAt: d.codeSentTo ? Date.now() - Math.max(0, RESEND_AFTER_SECONDS - d.resendAvailableInSec) * 1000 : null,
     emailVerified: d.emailVerified,
+    existingAccount: Boolean(d.existingAccount),
   };
 }
 
@@ -98,8 +100,8 @@ export async function checkSubdomain(input: string): Promise<SubdomainCheck> {
 
 type Created = { school: { subdomain: string; url: string }; handoverUrl: string };
 
-export async function createSchool(subdomain: string): Promise<ActionResult<{ subdomain: string; url: string }>> {
-  const result = await api<Created>(null, "/v1/signup/complete", { method: "POST", body: { subdomain } });
+export async function createSchool(subdomain: string, existingPassword?: string): Promise<ActionResult<{ subdomain: string; url: string }>> {
+  const result = await api<Created>(null, "/v1/signup/complete", { method: "POST", body: { subdomain, ...(existingPassword ? { existingPassword } : {}) } });
   if (!result.ok) {
     if (result.problem.code === "subdomain_unavailable") {
       const message = result.problem.detail ?? "Another school has this address";
@@ -110,6 +112,7 @@ export async function createSchool(subdomain: string): Promise<ActionResult<{ su
   const created = result.data.school.subdomain;
   // On staging the school's address is the API's stand-in, so the pass is used on our own pages.
   const handover = new URL(result.data.handoverUrl);
-  const url = process.env.API_ROOT_DOMAIN ? `/s/${created}${handover.pathname}${handover.search}` : result.data.handoverUrl;
+  const onOurPages = handover.pathname.startsWith(`/s/${created}/`) ? handover.pathname : `/s/${created}${handover.pathname}`;
+  const url = process.env.API_ROOT_DOMAIN ? `${onOurPages}${handover.search}` : result.data.handoverUrl;
   return { ok: true, data: { subdomain: created, url } };
 }

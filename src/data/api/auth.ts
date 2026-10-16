@@ -4,6 +4,7 @@ import "server-only";
 import { cache } from "react";
 import type { ActionResult, InviteDetails, SampleEmail, SchoolMember, SchoolSummary, SignedInMember } from "../types";
 import { api, dropCookies, fail, read } from "./client";
+import { outboxSample } from "./outbox";
 
 type Me = { user: { id: string; email: string; fullName: string }; membership: { role: "owner" | "admin" }; school: { name: string; subdomain: string } };
 
@@ -37,13 +38,15 @@ export async function signOut(subdomain?: string): Promise<void> {
 }
 
 export async function requestPasswordReset(subdomain: string, email: string): Promise<ActionResult<SampleEmail>> {
+  const since = Date.now();
   const result = await api(subdomain, "/v1/auth/password-reset", { method: "POST", body: { email } });
-  return result.ok ? { ok: true, data: {} } : fail(result);
+  return result.ok ? { ok: true, data: await outboxSample(email, since) } : fail(result);
 }
 
 export async function sendMagicLink(subdomain: string, email: string): Promise<ActionResult<SampleEmail>> {
+  const since = Date.now();
   const result = await api(subdomain, "/v1/auth/magic-link", { method: "POST", body: { email } });
-  return result.ok ? { ok: true, data: {} } : fail(result);
+  return result.ok ? { ok: true, data: await outboxSample(email, since) } : fail(result);
 }
 
 export async function resetPassword(subdomain: string, token: string, password: string): Promise<ActionResult<null>> {
@@ -59,8 +62,9 @@ export async function signInWithLink(subdomain: string, token: string): Promise<
 }
 
 export async function findMySchool(email: string): Promise<ActionResult<SampleEmail>> {
+  const since = Date.now();
   const result = await api(null, "/v1/auth/find-school", { method: "POST", body: { email } });
-  return result.ok ? { ok: true, data: {} } : fail(result);
+  return result.ok ? { ok: true, data: await outboxSample(email, since) } : fail(result);
 }
 
 type Lookup = { email: string; role: "owner" | "admin"; school: { name: string }; invitedBy: string | null; existingAccount: boolean };
@@ -101,8 +105,9 @@ export async function listMembers(subdomain: string): Promise<SchoolMember[]> {
 }
 
 export async function inviteAdmin(subdomain: string, _fullName: string, email: string): Promise<ActionResult<SampleEmail & { resent: boolean }>> {
+  const since = Date.now();
   const result = await api(subdomain, "/v1/invitations", { method: "POST", body: { email, role: "admin" } });
-  if (result.ok) return { ok: true, data: { resent: false } };
+  if (result.ok) return { ok: true, data: { resent: false, ...(await outboxSample(email, since)) } };
   if (result.problem.code === "conflict") return { ok: false, error: result.problem.detail ?? "They’re already on the team.", fieldErrors: { email: [result.problem.detail ?? "Already on the team"] } };
   return fail(result);
 }

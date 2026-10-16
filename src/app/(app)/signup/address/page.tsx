@@ -29,5 +29,5 @@ async function AddressStep() {
   if (!draft?.school) redirect("/signup");
   if (!draft.owner) redirect("/signup/account");
   if (!draft.emailVerified) redirect("/signup/verify");
-  return <AddressForm suggestions={suggestSubdomains(draft.school.schoolName)} state={draft.school.state} />;
+  return <AddressForm suggestions={suggestSubdomains(draft.school.schoolName)} state={draft.school.state} existingAccount={draft.existingAccount} />;
 }

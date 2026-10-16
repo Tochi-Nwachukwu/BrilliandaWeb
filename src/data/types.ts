@@ -35,6 +35,8 @@ export type SignupDraft = {
   /** When the current code was sent (ms since 1970), for the expiry and resend timers. */
   codeSentAt: number | null;
   emailVerified: boolean;
+  /** The email already has a Brillianda account (a second campus): the last step asks for its password. */
+  existingAccount: boolean;
 };
 
 /** The answer to "can we have this address?" while the owner types. */
@@ -61,10 +63,11 @@ export type SchoolMember = {
 export type InviteDetails = { schoolName: string; fullName: string; email: string; status: "open" | "used" | "expired"; hasAccount: boolean; role: "admin" | "teacher" | "parent" | "student" };
 
 /**
- * FAKE ONLY: what the email would have said, so screens can be clicked through before real
- * emails exist. The real functions never return this.
+ * What the email said, so screens can be clicked through without an inbox: the fakes make it up;
+ * on staging it comes from the API’s outbox (`fromOutbox`; src/data/api/outbox.ts). Production
+ * never returns it. A `code` is shown as text, not a link.
  */
-export type SampleEmail = { sampleLinks?: { label: string; href: string }[] };
+export type SampleEmail = { sampleLinks?: { label: string; href: string; fromOutbox?: boolean; code?: string }[] };
 
 /** The school's current session and its terms. `confirmed` is false until someone saves it. */
 export type SessionSetup = { startYear: number; name: string; terms: Term[]; confirmed: boolean };

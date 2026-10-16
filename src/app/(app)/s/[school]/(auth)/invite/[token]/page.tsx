@@ -1,4 +1,4 @@
-import { INVITE_LIFETIME_HOURS } from "@brillianda/core/auth";
+import { INVITE_LIFETIME_DAYS } from "@brillianda/core/auth";
 import { PageSpinner } from "@brillianda/ui/Spinner";
 import type { Metadata } from "next";
 import Link from "next/link";
@@ -10,6 +10,7 @@ import { authLinkClass } from "@/components/auth/styles";
 import { schoolFromParams } from "@/components/school/school";
 import { acceptInvite } from "@/data/actions/auth";
 import { getInvite } from "@/data/auth";
+import { LIVE } from "@/data/source";
 
 export const metadata: Metadata = { title: "Join your school" };
 
@@ -42,7 +43,7 @@ async function Accept({ params }: { params: Promise<{ school: string; token: str
         description={
           <>
             <p>{invite?.status === "used" ? "It has already been used to join." : invite?.status === "expired" ? "It has expired." : "The link isn’t right. It may have been cancelled."}</p>
-            <p>Invite links work once and for {INVITE_LIFETIME_HOURS} hours. Ask the school’s owner to send a new one.</p>
+            <p>Invite links work once and for {INVITE_LIFETIME_DAYS} days. Ask the school’s owner to send a new one.</p>
           </>
         }
         footer={signIn}
@@ -57,13 +58,13 @@ async function Accept({ params }: { params: Promise<{ school: string; token: str
       title={`Join ${school.name}`}
       description={
         <p>
-          {firstName ? `Hi ${firstName}, you’ve` : "You’ve"} {invite.role === "parent" ? "been invited to follow your children at this school." : invite.role === "student" ? "been invited to the student portal: your timetable, tests and results." : `been invited as ${invite.role === "teacher" ? "a teacher" : "a school admin"}.`} {invite.hasAccount ? "Enter your password to join." : "Choose a password to finish setting up your account."}
+          {firstName ? `Hi ${firstName}, you’ve` : "You’ve"} {invite.role === "parent" ? "been invited to follow your children at this school." : invite.role === "student" ? "been invited to the student portal: your timetable, tests and results." : `been invited as ${invite.role === "teacher" ? "a teacher" : "a school admin"}.`} {invite.hasAccount ? (LIVE ? "You already use Brillianda: press Join." : "Enter your password to join.") : "Choose a password to finish setting up your account."}
           <br />
           <span className="text-text-muted">{invite.email}</span>
         </p>
       }
     >
-      <AcceptInviteFlow action={acceptInvite.bind(null, school.subdomain, token)} homeHref={`/s/${school.subdomain}`} hasAccount={invite.hasAccount} askName={!invite.fullName} />
+      <AcceptInviteFlow action={acceptInvite.bind(null, school.subdomain, token)} homeHref={`/s/${school.subdomain}`} hasAccount={invite.hasAccount} askName={!invite.fullName} joinOnly={LIVE} />
     </AuthLayout>
   );
 }

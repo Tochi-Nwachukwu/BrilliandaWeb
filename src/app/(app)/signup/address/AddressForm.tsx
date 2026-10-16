@@ -2,6 +2,7 @@
 
 import { normaliseSubdomain, subdomainProblem, SUBDOMAIN_MAX } from "@brillianda/core/subdomain";
 import { Button } from "@brillianda/ui/Button";
+import { PasswordField } from "@brillianda/ui/PasswordField";
 import { cx } from "@brillianda/ui/cx";
 import { Spinner } from "@brillianda/ui/Spinner";
 import { useEffect, useId, useRef, useState, useTransition, type FormEvent } from "react";
@@ -12,7 +13,9 @@ import type { SubdomainCheck } from "@/data/types";
 const DEBOUNCE_MS = 400;
 
 /** Screen 4: the school's address, checked as it is typed. */
-export function AddressForm({ suggestions, state }: { suggestions: string[]; state: string }) {
+export function AddressForm({ suggestions, state, existingAccount = false }: { suggestions: string[]; state: string; existingAccount?: boolean }) {
+  const [password, setPassword] = useState("");
+  const [passwordError, setPasswordError] = useState<string | undefined>();
   const id = useId();
   const inputRef = useRef<HTMLInputElement>(null);
   const [name, setName] = useState(suggestions[0] ?? "");
@@ -60,11 +63,18 @@ export function AddressForm({ suggestions, state }: { suggestions: string[]; sta
       inputRef.current?.focus();
       return;
     }
+    if (existingAccount && !password) {
+      setPasswordError("Enter your Brillianda password");
+      return;
+    }
     startTransition(async () => {
-      const created = await createSchool({ subdomain });
+      const created = await createSchool({ subdomain, existingPassword: existingAccount ? password : undefined });
       // A full page load: the school's pages are a different part of the app.
       if (created.ok) window.location.assign(created.data.url);
-      else setFailure(created.error);
+      else {
+        setPasswordError(created.fieldErrors?.existingPassword?.[0]);
+        setFailure(created.fieldErrors?.existingPassword ? null : created.error);
+      }
     });
   };
 
@@ -142,6 +152,20 @@ export function AddressForm({ suggestions, state }: { suggestions: string[]; sta
               </span>
             ))}
         </p>
+      )}
+
+      {existingAccount && (
+        <div className="mt-6">
+          <PasswordField
+            label="Your Brillianda password"
+            name="existingPassword"
+            autoComplete="current-password"
+            hint="This email already has a Brillianda account, for another school. Use the same password."
+            value={password}
+            onChange={(e) => (setPassword(e.target.value), setPasswordError(undefined))}
+            error={passwordError}
+          />
+        </div>
       )}
 
       <div className="mt-8">

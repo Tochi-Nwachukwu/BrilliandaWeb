@@ -37,7 +37,8 @@ export const ROLE_LABEL: Record<SchoolRole, string> = { owner: "School owner", a
 export const ADMIN_ROLES: readonly SchoolRole[] = ["owner", "admin"];
 export const isAdminRole = (role: SchoolRole | null | undefined) => role === "owner" || role === "admin";
 
-/** Invite links work once and for 72 hours. */
-export const INVITE_LIFETIME_HOURS = 72;
-/** Password reset and email sign-in links work for an hour. */
-export const LINK_LIFETIME_MINUTES = 60;
+/** Invite links work once and for 7 days (the API’s rule). */
+export const INVITE_LIFETIME_DAYS = 7;
+export const INVITE_LIFETIME_HOURS = INVITE_LIFETIME_DAYS * 24;
+/** Email sign-in links work for 15 minutes, password reset links for 30 (the API’s rules). */
+export const LINK_LIFETIME_MINUTES = { magic: 15, reset: 30 } as const;

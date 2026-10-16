@@ -38,6 +38,8 @@ function publicDraft(draft: FakeSignupDraft): SignupDraft {
     owner: draft.owner ? { fullName: draft.owner.fullName, email: draft.owner.email } : null,
     codeSentAt: draft.codeSentAt ?? null,
     emailVerified: draft.emailVerified,
+    // The sample data reuses the password from step 2 instead.
+    existingAccount: false,
   };
 }
 
@@ -115,7 +117,8 @@ export async function checkSubdomain(input: string, state?: string): Promise<Sub
   return { available: true, subdomain };
 }
 
-export async function createSchool(subdomain: string): Promise<ActionResult<{ subdomain: string; url: string }>> {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export async function createSchool(subdomain: string, _existingPassword?: string): Promise<ActionResult<{ subdomain: string; url: string }>> {
   await pause();
   const jar = await cookies();
   const id = await draftId(false);

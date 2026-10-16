@@ -1,6 +1,6 @@
 "use client";
 
-import { INVITE_LIFETIME_HOURS, inviteAdminSchema, ROLE_LABEL } from "@brillianda/core/auth";
+import { INVITE_LIFETIME_DAYS, inviteAdminSchema, ROLE_LABEL } from "@brillianda/core/auth";
 import { Badge } from "@brillianda/ui/Badge";
 import { Button } from "@brillianda/ui/Button";
 import { Icon } from "@brillianda/ui/Icon";
@@ -203,7 +203,7 @@ function InviteDialog({
       open
       onClose={onClose}
       title="Invite an admin"
-      description={`They’ll get an email with a link to join. It works for ${INVITE_LIFETIME_HOURS} hours.`}
+      description={`They’ll get an email with a link to join. It works for ${INVITE_LIFETIME_DAYS} days.`}
       footer={
         <>
           <Button variant="secondary" onClick={onClose}>

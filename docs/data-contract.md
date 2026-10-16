@@ -23,12 +23,20 @@ each), and Home, Sessions and the student page leave out their parts.
 - Sessions: the API pins its cookie to each school's address. Ours are kept per school under
   `bda.<school>.<name>` and sent back only on that school's calls, so `/s/<school>/…` on one
   address (localhost, staging) still keeps schools apart.
-- Staging has no school subdomains: with `API_ROOT_DOMAIN` set, calls go out as from
-  `<school>.<API_ROOT_DOMAIN>`, and the logo is served at `/s/<school>/api/v1/school/logo`
-  (forwarded by `proxy.ts`).
+- Staging has no school subdomains: with `API_ROOT_DOMAIN` set, a school's calls go to the API's
+  `/s/<school>/v1/…` (the servers in its `openapi.json`) as from `API_ROOT_DOMAIN` itself, and the
+  logo is served at `/s/<school>/api/v1/school/logo` (forwarded by `proxy.ts`). Until 16 October
+  2026 staging read the school from the host (`<school>.<API_ROOT_DOMAIN>`); the API dropped that
+  and every school lookup answered "no school at this address".
 - Errors are problem documents; `failureOf` turns them into `ActionResult` (field errors from
   each `pointer`, renamed where our field names differ, e.g. signup's `name` → `schoolName`).
-- The API's invites carry no name, so accepting one asks for it.
+- The API's invites carry no name, so accepting one asks for it. Someone who already has an
+  account just presses Join. A second campus (an email that already has an account) gives that
+  account's password on signup's last step.
+- **Staging outbox** (`src/data/api/outbox.ts`): until the API can email every inbox, it keeps
+  sent emails in an outbox. With `MAIL_OUTBOX_KEY` and `API_ROOT_DOMAIN` set, screens that send an
+  email show its link (or code) from there, and signup's code screen shows the code. Never on in
+  production. Staging must hold test accounts only: anyone who types an email sees its link.
 
 ## Conventions
 

@@ -145,7 +145,7 @@ function InviteDialog({ invite, onClose, onDone }: { invite: (input: unknown) =>
     });
   };
   return (
-    <ResponsiveDialog open onClose={onClose} title="Invite a teacher" description="They get an email with a link to set a password. It works for 72 hours.">
+    <ResponsiveDialog open onClose={onClose} title="Invite a teacher" description="They get an email with a link to set a password. It works for 7 days.">
       {sent ? (
         <div className="grid gap-4" role="status">
           <p className="text-sm">Invite sent to {values.email}.</p>

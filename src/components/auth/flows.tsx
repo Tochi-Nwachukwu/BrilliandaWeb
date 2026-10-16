@@ -53,11 +53,49 @@ export function LinkSignIn({ action, homeHref }: { action: () => Promise<ActionR
 }
 
 /** Joining a school: a new password, or the existing Brillianda password for someone already in another school. */
-export function AcceptInviteFlow({ action, homeHref, hasAccount, askName = false }: { action: (input: unknown) => Promise<ActionResult<null>>; homeHref: string; hasAccount: boolean; askName?: boolean }) {
+export function AcceptInviteFlow({
+  action,
+  homeHref,
+  hasAccount,
+  askName = false,
+  joinOnly = false,
+}: {
+  action: (input: unknown) => Promise<ActionResult<null>>;
+  homeHref: string;
+  hasAccount: boolean;
+  askName?: boolean;
+  /** Someone with an account just presses Join (the API’s rule); the sample data asks for their password. */
+  joinOnly?: boolean;
+}) {
   const router = useRouter();
   const done = () => router.replace(homeHref);
   if (!hasAccount) return <NewPasswordForm action={action} submitLabel="Join the school" pendingLabel="Setting up…" onDone={done} askName={askName} />;
+  if (joinOnly) return <JoinButton action={action} onDone={done} />;
   return <ExistingAccountForm action={action} onDone={done} />;
+}
+
+function JoinButton({ action, onDone }: { action: (input: unknown) => Promise<ActionResult<null>>; onDone: () => void }) {
+  const [failure, setFailure] = useState<string | null>(null);
+  const [pending, startTransition] = useTransition();
+  return (
+    <div>
+      <FormError message={failure} />
+      <Button
+        size="lg"
+        className="w-full"
+        loading={pending}
+        onClick={() =>
+          startTransition(async () => {
+            const result = await action({ hasAccount: true });
+            if (result.ok) return onDone();
+            setFailure(result.error);
+          })
+        }
+      >
+        {pending ? "Joining…" : "Join the school"}
+      </Button>
+    </div>
+  );
 }
 
 function ExistingAccountForm({ action, onDone }: { action: (input: unknown) => Promise<ActionResult<null>>; onDone: () => void }) {

@@ -75,7 +75,8 @@ export async function acceptInvite(school: string, token: string, input: unknown
   if (!hasAccount) {
     const parsed = newPasswordSchema.safeParse(input);
     if (!parsed.success) return { ok: false, error: CHECK_FIELDS, fieldErrors: fieldErrorsOf(parsed.error) };
-  } else if (!password) {
+  } else if (!password && !LIVE) {
+    // The sample data checks the existing account’s password; the API only needs the invite.
     return { ok: false, error: CHECK_FIELDS, fieldErrors: { password: ["Enter your password"] } };
   }
   const fullName = String((input as { fullName?: unknown })?.fullName ?? "").trim().slice(0, 120);

@@ -90,7 +90,7 @@ export async function sendMagicLink(subdomain: string, email: string): Promise<A
 function consumeLink(kind: "reset" | "magic", subdomain: string, token: string): FakeUser | null {
   const link = store.links.get(token);
   if (!link || link.kind !== kind || link.subdomain !== subdomain || link.usedAt) return null;
-  if (Date.now() - link.createdAt > LINK_LIFETIME_MINUTES * 60 * 1000) return null;
+  if (Date.now() - link.createdAt > LINK_LIFETIME_MINUTES[kind] * 60 * 1000) return null;
   link.usedAt = Date.now();
   return store.users.find((u) => u.id === link.userId) ?? null;
 }

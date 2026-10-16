@@ -51,5 +51,7 @@ export async function checkSubdomain(name: string, state?: string): Promise<Subd
 export async function createSchool(input: unknown): Promise<ActionResult<{ subdomain: string; url: string }>> {
   const parsed = schoolAddressSchema.safeParse(input);
   if (!parsed.success) return { ok: false, error: CHECK_FIELDS, fieldErrors: fieldErrorsOf(parsed.error) };
-  return impl.createSchool(parsed.data.subdomain);
+  // A second campus: the existing Brillianda account's password.
+  const existingPassword = String((input as { existingPassword?: unknown })?.existingPassword ?? "").slice(0, 128);
+  return impl.createSchool(parsed.data.subdomain, existingPassword || undefined);
 }

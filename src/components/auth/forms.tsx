@@ -11,25 +11,40 @@ import type { ActionResult, SampleEmail } from "@/data/types";
 import { FormError, useFocusOnFailure } from "./FormError";
 
 /** FAKE ONLY: the links an email would have carried, so the flow can be clicked through. */
-export function SampleLinks({ links }: { links?: { label: string; href: string }[] }) {
+export function SampleLinks({ links }: { links?: { label: string; href: string; fromOutbox?: boolean; code?: string }[] }) {
   if (!links?.length) return null;
+  const outbox = links.some((l) => l.fromOutbox);
   return (
     <div className="mt-6 rounded-2xl bg-sunken p-4">
       <p className="flex items-center gap-2 text-sm font-semibold">
-        <Badge tone="warning">Sample data</Badge> No email is sent yet
+        {outbox ? (
+          <>
+            <Badge tone="info">Staging</Badge> The email was sent
+          </>
+        ) : (
+          <>
+            <Badge tone="warning">Sample data</Badge> No email is sent yet
+          </>
+        )}
       </p>
-      <p className="mt-1 text-xs text-text-secondary">The email would contain:</p>
+      <p className="mt-1 text-xs text-text-secondary">{outbox ? "From the staging outbox, until real emails reach every inbox. It contains:" : "The email would contain:"}</p>
       <ul className="mt-3 grid gap-2">
-        {links.map((link) => (
-          <li key={link.href}>
-            <Link
-              href={link.href}
-              className="flex min-h-[40px] items-center justify-center rounded-full bg-raise px-4 text-sm font-medium shadow-raised hover:bg-hover focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-accent"
-            >
-              {link.label}
-            </Link>
-          </li>
-        ))}
+        {links.map((link) =>
+          link.code ? (
+            <li key={link.code} className="text-center text-sm">
+              {link.label} <b className="font-mono text-[18px] tracking-[0.2em]">{link.code}</b>
+            </li>
+          ) : (
+            <li key={link.href}>
+              <Link
+                href={link.href}
+                className="flex min-h-[40px] items-center justify-center rounded-full bg-raise px-4 text-sm font-medium shadow-raised hover:bg-hover focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-accent"
+              >
+                {link.label}
+              </Link>
+            </li>
+          ),
+        )}
       </ul>
     </div>
   );
