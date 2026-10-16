@@ -13,7 +13,18 @@ import type { SubdomainCheck } from "@/data/types";
 const DEBOUNCE_MS = 400;
 
 /** Screen 4: the school's address, checked as it is typed. */
-export function AddressForm({ suggestions, state, existingAccount = false }: { suggestions: string[]; state: string; existingAccount?: boolean }) {
+export function AddressForm({
+  suggestions,
+  state,
+  root,
+  existingAccount = false,
+}: {
+  suggestions: string[];
+  state: string;
+  /** Where school addresses live (brillianda.com; staging.brillianda.com on staging). */
+  root: string;
+  existingAccount?: boolean;
+}) {
   const [password, setPassword] = useState("");
   const [passwordError, setPasswordError] = useState<string | undefined>();
   const id = useId();
@@ -51,7 +62,7 @@ export function AddressForm({ suggestions, state, existingAccount = false }: { s
       : !current
         ? { tone: "quiet", text: "Checking…" }
         : current.available
-          ? { tone: "ok", text: `${current.subdomain}.brillianda.com is yours to take` }
+          ? { tone: "ok", text: `${current.subdomain}.${root} is yours to take` }
           : { tone: "bad", text: current.message };
   const offers = current && !current.available ? current.suggestions : [];
   const canCreate = !!current?.available && !checking;
@@ -106,7 +117,7 @@ export function AddressForm({ suggestions, state, existingAccount = false }: { s
           className="min-w-0 flex-1 border-0 bg-transparent py-3 pl-4 text-base outline-hidden"
         />
         <span aria-hidden className="shrink-0 pr-4 text-base text-text-secondary">
-          .brillianda.com
+          .{root}
         </span>
       </div>
       <p id={statusId} aria-live="polite" className={cx("mt-1.5 flex items-center gap-1.5 text-sm", status.tone === "ok" ? "font-medium text-success" : status.tone === "bad" ? "text-danger" : "text-text-secondary")}>

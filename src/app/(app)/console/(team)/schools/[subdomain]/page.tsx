@@ -11,6 +11,7 @@ import { getConsoleSchool } from "@/data/console";
 import { displayNigerianPhone } from "@brillianda/core/nigeria";
 import { timeAgo } from "@/lib/time";
 import { StatusPanel } from "./StatusPanel";
+import { schoolAddress } from "@/lib/domain";
 
 export const metadata: Metadata = { title: "School", robots: { index: false } };
 
@@ -37,7 +38,7 @@ export default async function ConsoleSchoolPage({ params }: PageProps<"/console/
       </Link>
       <PageHeader title={s.name}>
         <span className="flex flex-wrap items-center gap-2">
-          {s.subdomain}.brillianda.com
+          {schoolAddress(s.subdomain)}
           {s.status === "suspended" ? <Badge tone="warning">Paused</Badge> : <Badge tone="success">Active</Badge>}
         </span>
       </PageHeader>

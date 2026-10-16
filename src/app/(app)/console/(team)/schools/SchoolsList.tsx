@@ -11,7 +11,7 @@ import type { ConsoleSchool } from "@/data/types";
 import { plural, timeAgo } from "@/lib/time";
 
 /** Every school, searchable by name, address or owner, and filtered by status. */
-export function SchoolsList({ schools, now }: { schools: ConsoleSchool[]; now: number }) {
+export function SchoolsList({ schools, now, root }: { schools: ConsoleSchool[]; now: number; root: string }) {
   const [query, setQuery] = useState("");
   const [status, setStatus] = useState<"all" | "active" | "suspended">("all");
   const shown = schools.filter(
@@ -47,7 +47,7 @@ export function SchoolsList({ schools, now }: { schools: ConsoleSchool[]; now: n
                     <b className="truncate font-semibold">{s.name}</b>
                     {s.status === "suspended" && <Badge tone="warning">Paused</Badge>}
                   </span>
-                  <span className="block truncate text-[13px] text-text-secondary">{s.subdomain}.brillianda.com</span>
+                  <span className="block truncate text-[13px] text-text-secondary">{s.subdomain}.{root}</span>
                 </span>
                 <span className="hidden min-w-0 text-[13px] md:block">
                   <span className="block truncate">{s.owner?.fullName ?? "No owner"}</span>

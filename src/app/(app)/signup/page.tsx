@@ -7,6 +7,7 @@ import { connection } from "next/server";
 import { Suspense } from "react";
 import { AuthLayout, authLinkClass } from "@/components/auth/AuthLayout";
 import { getSignupDraft } from "@/data/signup";
+import { ROOT_DOMAIN } from "@/lib/domain";
 import { SchoolForm } from "./SchoolForm";
 import { SignupSteps } from "./SignupSteps";
 
@@ -19,7 +20,7 @@ export default function SignupSchoolPage() {
     <AuthLayout
       above={<SignupSteps current={1} />}
       title="Create your school"
-      description="Four short steps. Your school gets its own address, like greenfield.brillianda.com."
+      description={`Four short steps. Your school gets its own address, like greenfield.${ROOT_DOMAIN}.`}
       footer={
         <>
           Already on Brillianda?{" "}

@@ -8,10 +8,8 @@ import { authLinkClass } from "@/components/auth/styles";
 import { SchoolMark } from "@/components/school/SchoolBrand";
 import { findMySchool } from "@/data/actions/auth";
 import { getMySchools } from "@/data/auth";
+import { ROOT_DOMAIN as ROOT } from "@/lib/domain";
 import { GoToSchool } from "./GoToSchool";
-
-/** Where schools live: brillianda.com, or staging.brillianda.com on the staging site. */
-const ROOT = (process.env.ROOT_DOMAIN ?? "brillianda.com").split(",")[0]!.trim().toLowerCase();
 
 export const metadata: Metadata = { title: "Sign in to your school" };
 

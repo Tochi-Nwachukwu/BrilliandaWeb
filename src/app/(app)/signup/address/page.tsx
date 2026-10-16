@@ -6,6 +6,7 @@ import { Suspense } from "react";
 import { AuthLayout } from "@/components/auth/AuthLayout";
 import { getSignupDraft } from "@/data/signup";
 import { SignupSteps } from "../SignupSteps";
+import { ROOT_DOMAIN } from "@/lib/domain";
 import { AddressForm } from "./AddressForm";
 
 export const metadata: Metadata = { title: "Your school’s address" };
@@ -29,5 +30,5 @@ async function AddressStep() {
   if (!draft?.school) redirect("/signup");
   if (!draft.owner) redirect("/signup/account");
   if (!draft.emailVerified) redirect("/signup/verify");
-  return <AddressForm suggestions={suggestSubdomains(draft.school.schoolName)} state={draft.school.state} existingAccount={draft.existingAccount} />;
+  return <AddressForm suggestions={suggestSubdomains(draft.school.schoolName)} state={draft.school.state} root={ROOT_DOMAIN} existingAccount={draft.existingAccount} />;
 }
