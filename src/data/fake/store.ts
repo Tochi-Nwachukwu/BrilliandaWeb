@@ -5,7 +5,8 @@ import "server-only";
 import { DEFAULT_BIRTHDAY_MESSAGE } from "@brillianda/core/birthdays";
 import type { BookItem } from "@brillianda/core/booklists";
 import type { CorrectableField } from "@brillianda/core/corrections";
-import type { Question } from "@brillianda/core/questions";
+import type { Where } from "@brillianda/core/cbt";
+import type { Question, Response } from "@brillianda/core/questions";
 import { DEFAULT_PERIODS, DAYS, type Day, type Period } from "@brillianda/core/timetable";
 import { defaultTerms, type Term } from "@brillianda/core/calendar";
 import { armCodes, ARM_PRESETS, buildLadder, type Department, type Section } from "@brillianda/core/classes";
@@ -108,6 +109,34 @@ type FakeStore = {
   /** Batch 24: each school's question bank, and AI generations used per month ("2026-10"). */
   questionBank: { id: string; subdomain: string; subjectId: string; levelId: string; question: Question; source: "ai" | "teacher"; byId: string; by: string; at: number }[];
   aiUsage: Map<string, number>;
+  /** Batch 25: CBT tests (questions copied from the bank when set) and students' attempts. */
+  tests: {
+    id: string;
+    subdomain: string;
+    title: string;
+    instructions: string;
+    subjectId: string;
+    levelId: string;
+    armIds: string[];
+    questions: Question[];
+    /** The bank questions they were copied from, for changing a draft. */
+    questionIds: string[];
+    durationMinutes: number;
+    opensAt: string;
+    closesAt: string;
+    where: Where;
+    accessCode: string;
+    shuffle: boolean;
+    showScore: boolean;
+    componentId: string;
+    term: string;
+    status: "draft" | "published";
+    byId: string;
+    by: string;
+    at: number;
+    sentAt: number | null;
+  }[];
+  attempts: { id: string; testId: string; studentId: string; startedAt: number; submittedAt: number | null; responses: Record<number, Response>; theoryMarks: Record<number, number>; leftPage: number }[];
 };
 
 /** Greenfield's subjects: the 2025 junior and senior lists, attached by default. */
@@ -314,6 +343,39 @@ function seedQuestionBank(): FakeStore["questionBank"] {
   ];
 }
 
+/** An open JSS 1 Blue Mathematics test from Bisi's questions, so the sample student has one to take. */
+function seedTests(): FakeStore["tests"] {
+  const bank = seedQuestionBank();
+  const now = Date.now();
+  return [
+    {
+      id: "tt1",
+      subdomain: "greenfield",
+      title: "Fractions: class test",
+      instructions: "Answer every question. You have 20 minutes.",
+      subjectId: "gs-mathematics",
+      levelId: "gl1",
+      armIds: ["ga-gl1-gn1"],
+      questions: bank.map((b) => b.question),
+      questionIds: bank.map((b) => b.id),
+      durationMinutes: 20,
+      opensAt: new Date(now - 86_400_000).toISOString(),
+      closesAt: new Date(now + 7 * 86_400_000).toISOString(),
+      where: "anywhere",
+      accessCode: "K7PX4M",
+      shuffle: true,
+      showScore: true,
+      componentId: "ca1",
+      term: "2026-1",
+      status: "published",
+      byId: "u12",
+      by: "Bisi Adebayo",
+      at: 0,
+      sentAt: null,
+    },
+  ];
+}
+
 function seed(): FakeStore {
   const greenfield = seedGreenfieldClasses();
   const greenfieldSubjects = seedGreenfieldSubjects(greenfield.levels);
@@ -476,6 +538,8 @@ function seed(): FakeStore {
     lessons: seedLessons(greenfieldSubjects.subjectLinks),
     timetableFiles: new Map(),
     questionBank: seedQuestionBank(),
+    tests: seedTests(),
+    attempts: [],
     aiUsage: new Map([[`greenfield|${new Date().toISOString().slice(0, 7)}`, 12]]),
     admission: new Map([["greenfield", { pattern: "GC/{YEAR}/{NUMBER}", digits: 4, next: greenfieldStudents.next }]]),
     subjects: greenfieldSubjects.subjects,

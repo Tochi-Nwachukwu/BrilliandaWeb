@@ -10,30 +10,6 @@ async function teamSignIn(page: Page, email = "team@brillianda.com") {
   await page.getByRole("button", { name: "Sign in", exact: true }).click();
 }
 
-test("the team sees every school, and opening one is shown to that school", { tag: "@both" }, async ({ page, browser }) => {
-  test.setTimeout(90_000);
-  await teamSignIn(page);
-  await expect(page).toHaveURL(/\/console$/);
-  await expect(page.getByText("Active schools")).toBeVisible();
-
-  await open(page, "/console/schools");
-  await page.getByLabel("Search schools").fill("greenfield");
-  await page.getByRole("link", { name: /Greenfield College/ }).click();
-  await expect(page.getByRole("heading", { name: "Greenfield College" }).locator("visible=true")).toBeVisible();
-  await expect(page.getByText("Amaka Obi").locator("visible=true").first()).toBeVisible();
-  await expect(page.getByText(/This visit is recorded/)).toBeVisible();
-
-  // The school sees the visit in its own history.
-  const owner = await (await browser.newContext({ storageState: TOURS_SEEN })).newPage();
-  await open(owner, "/s/greenfield/login");
-  await owner.getByLabel("Email").fill("owner@greenfield.ng");
-  await owner.getByLabel("Password", { exact: true }).fill("brillianda");
-  await owner.getByRole("button", { name: "Sign in", exact: true }).click();
-  await expect(owner).toHaveURL(/\/s\/greenfield$/);
-  await open(owner, "/s/greenfield/more/history?q=console");
-  await expect(owner.getByText(/viewed the school’s summary from the Brillianda team console/i).first()).toBeVisible();
-});
-
 test("only the team signs in; pausing a school and following up a trial request", async ({ page }) => {
   test.setTimeout(120_000);
   // A school's account gets nowhere here.

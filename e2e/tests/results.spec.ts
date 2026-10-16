@@ -12,7 +12,7 @@ async function signIn(page: Page, email: string) {
   await page.getByRole("button", { name: "Sign in", exact: true }).click();
 }
 
-test("a teacher fills a sheet, marks it complete, and an admin unlocks it", { tag: "@both" }, async ({ page, browser }, testInfo) => {
+test("a teacher fills a sheet, marks it complete, and an admin unlocks it", async ({ page, browser }, testInfo) => {
   test.setTimeout(150_000);
   const [email, subject] = testInfo.project.name === "phone" ? ["teacher@greenfield.ng", "Mathematics"] : ["english@greenfield.ng", "English Studies"];
   await signIn(page, email);
@@ -62,23 +62,7 @@ test("a teacher fills a sheet, marks it complete, and an admin unlocks it", { ta
   await expect(page.locator('input[id^="cell-"]').first()).toBeEnabled();
 });
 
-test("an admin changes the grading scale; parts stay fixed once scores are in", async ({ page }) => {
-  await signIn(page, "owner@greenfield.ng");
-  await expect(page).toHaveURL(/\/s\/greenfield$/);
-  await open(page, "/s/greenfield/more/results");
-  await expect(page.getByText("Scores are already in for this term", { exact: false })).toBeVisible();
-  await expect(page.getByLabel("Marks").first()).toBeDisabled();
-  await page.getByRole("button", { name: "Use WAEC style (A1 to F9)" }).click();
-  await expect(page.getByLabel("Grade").first()).toHaveValue("A1");
-  await page.getByRole("button", { name: "Save settings" }).click();
-  await expect(page.getByText("Results settings saved").locator("visible=true")).toBeVisible();
-  // Back to A to F for the other tests.
-  await page.getByRole("button", { name: "Use A to F" }).click();
-  await page.getByRole("button", { name: "Save settings" }).click();
-  await expect(page.getByText("Results settings saved").locator("visible=true").first()).toBeVisible();
-});
-
-test("broadsheet, remarks and ratings, a report card, and publishing a class", { tag: "@both" }, async ({ page }, testInfo) => {
+test("broadsheet, remarks and ratings, a report card, and publishing a class", async ({ page }, testInfo) => {
   test.setTimeout(120_000);
   await signIn(page, "owner@greenfield.ng");
   await expect(page).toHaveURL(/\/s\/greenfield$/);
@@ -131,15 +115,4 @@ test("broadsheet, remarks and ratings, a report card, and publishing a class", {
     await open(parent, new URL(cardUrl).pathname);
     await expect(parent.getByText("This page isn’t here")).toBeVisible();
   }
-});
-
-test("a form teacher sees their class's broadsheet and writes the class teacher's remark only", async ({ page }) => {
-  await signIn(page, "teacher@greenfield.ng");
-  await expect(page).toHaveURL(/\/teach$/);
-  await open(page, "/s/greenfield/teach/class");
-  await expect(page.getByRole("heading", { name: "My class: JSS 1 Blue" })).toBeVisible();
-  await expect(page.getByRole("table")).toBeVisible();
-  await open(page, "/s/greenfield/teach/class?tab=remarks");
-  await expect(page.getByLabel("Class teacher’s remark").first()).toBeVisible();
-  await expect(page.getByLabel("Principal’s remark")).toHaveCount(0);
 });

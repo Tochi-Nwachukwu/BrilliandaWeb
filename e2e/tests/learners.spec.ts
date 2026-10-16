@@ -11,27 +11,6 @@ async function signIn(page: Page, email: string) {
   await page.getByRole("button", { name: "Sign in", exact: true }).click();
 }
 
-test("a student sees their own day, timetable, results and book list, and nothing else", { tag: "@both" }, async ({ page }) => {
-  await signIn(page, "student@greenfield.ng");
-  await expect(page).toHaveURL(/\/s\/greenfield\/learn$/);
-  await expect(page.getByRole("heading", { name: /, Chiamaka$/ })).toBeVisible();
-  await expect(page.getByRole("heading", { name: "Today’s lessons" })).toBeVisible();
-  await expect(page.getByRole("heading", { name: "Attendance" })).toBeVisible();
-
-  await open(page, "/s/greenfield/learn/timetable");
-  await expect(page.getByText("JSS 1 Blue’s week.")).toBeVisible();
-  await open(page, "/s/greenfield/learn/books");
-  await expect(page.getByText("New General Mathematics for JSS 2")).toBeVisible();
-  await open(page, "/s/greenfield/learn/results");
-  await expect(page.getByRole("heading", { name: "This term" })).toBeVisible();
-
-  // Admin, teacher and parent screens send a student back to their own.
-  for (const path of ["/students", "/teach", "/family"]) {
-    await page.goto(`/s/greenfield${path}`);
-    await expect(page).toHaveURL(/\/learn$/);
-  }
-});
-
 test("the school invites a student, who joins and lands in the portal", async ({ page, browser }) => {
   await signIn(page, "admin@greenfield.ng");
   await expect(page).toHaveURL(/\/s\/greenfield$/);

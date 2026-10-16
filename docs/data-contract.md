@@ -464,6 +464,33 @@ teacher works in the subject and class level pairs they teach; owners and admins
 The real generator is the AI call in `docs/ai-integration.md` (Step 6). Marking and shuffling
 rules (`markAnswer`, `seededOrder`) are in the same core file, with tests, ready for CBT.
 
+### CBT: tests on Brillianda (batch 25)
+
+A teacher sets a test from the question bank for classes they teach that subject in (admins for
+any): a window (opens, closes), a length, anywhere or in school only (students need a six-character
+code shown on the test's page), shuffling, whether students see their score on submitting, and
+the score-sheet part the scores go into. Questions are copied into the test when it's set. Rules
+in `packages/core/src/cbt.ts`, with tests.
+
+| Function | Kind | Input / output | Who | Status |
+|---|---|---|---|---|
+| `getTests` | read | → `TestRow[]`: the person's tests (all for admins) with window, submitted of students, theory still to mark, scores sent | teacher, admin | fake |
+| `getTestEditor` | read | `testId?` → `TestEditorData`: subject-class pairs with their arms, the bank, the score-sheet parts, the draft | teacher, admin | fake |
+| `saveTest` | action | `{ id?, subjectId, levelId, publish, settings: testSettingsSchema }` → `{ id }`; only drafts can change | teacher, admin | fake |
+| `deleteTest` | action | `id`; only before anyone starts | teacher, admin | fake |
+| `getTestResults` | read | `id` → `TestResults`: each student's state, answers, score, how often they left the page; per-question right answers | teacher, admin | fake |
+| `markTheory` | action | `id, { attemptId, index, marks }` (0 to the question's marks, in halves) | teacher, admin | fake |
+| `sendScores` | action | `id` → `{ sent, skipped, lockedClasses }`: submitted and fully marked attempts, scaled to the part's marks, into this term's sheet; sheets marked complete are skipped | teacher, admin | fake |
+| `getMyTests` | read | → `StudentTestRow[]` | student | fake |
+| `getTakingTest` | read | `id` → `TakingTest`: questions in this student's order, options shuffled, **no answers**; the deadline once started | student | fake |
+| `startTest` | action | `id, { code }`; in the window; the code for school-only tests | student | fake |
+| `saveAnswer` | action | `id, { index, response }` (an option, true or false, or text); refused after the deadline plus 30 seconds | student | fake |
+| `noteLeftPage` | action | `id`: the page was hidden (another tab or app) | student | fake |
+| `submitTest` | action | `id` → the score when the test shows it | student | fake |
+
+The deadline is the start plus the length, or the close, whichever is first; past it, the attempt is
+submitted with what was saved. The student's screen counts down from the server's time.
+
 ### Installable app (batch 10)
 
 The service worker (`public/sw.js`) and its page (`/offline`) live at the root of every school

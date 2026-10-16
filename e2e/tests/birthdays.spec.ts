@@ -11,7 +11,7 @@ async function signIn(page: Page, email: string) {
   await page.getByRole("button", { name: "Sign in", exact: true }).click();
 }
 
-test("the school sees the week's birthdays, the texts sent, and its message", { tag: "@both" }, async ({ page }) => {
+test("the school sees the week's birthdays, the texts sent, and its message", async ({ page }) => {
   await signIn(page, "admin@greenfield.ng");
   await expect(page).toHaveURL(/\/s\/greenfield$/);
   const week = page.getByRole("list", { name: "Birthdays this week" });
@@ -31,11 +31,4 @@ test("the school sees the week's birthdays, the texts sent, and its message", { 
   await message.fill("Happy birthday, ");
   await page.getByRole("button", { name: "Add {name}" }).click();
   await expect(page.getByText("Happy birthday, Chiamaka", { exact: true })).toBeVisible();
-});
-
-test("a parent sees the school's birthday message on the day", async ({ page }) => {
-  await signIn(page, "parent@greenfield.ng");
-  await expect(page).toHaveURL(/\/family$/);
-  await open(page, "/s/greenfield/family/st1");
-  await expect(page.getByRole("region", { name: "Birthday" })).toContainText(/Happy \d+\w\w birthday, Chiamaka! Everyone at Greenfield College/);
 });

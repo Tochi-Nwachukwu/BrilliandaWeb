@@ -62,12 +62,3 @@ test("add, find, edit, move and export a student (the plan's gate)", { tag: "@bo
   const file = await download;
   expect(file.suggestedFilename()).toMatch(/^students-\d{4}-\d{2}-\d{2}\.csv$/);
 });
-
-test("required fields are checked before saving", async ({ page }) => {
-  await signIn(page);
-  await open(page, "/s/greenfield/students/new");
-  await page.getByRole("button", { name: "Save", exact: true }).locator("visible=true").click();
-  await expect(page.getByText("Enter the first name")).toBeVisible();
-  await expect(page.getByText("Choose Male or Female")).toBeVisible();
-  await expect(page.getByText("Choose a class").last()).toBeVisible();
-});

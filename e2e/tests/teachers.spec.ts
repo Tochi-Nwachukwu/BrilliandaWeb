@@ -12,7 +12,7 @@ async function signIn(page: Page, email: string) {
   await page.getByRole("button", { name: "Sign in", exact: true }).click();
 }
 
-test("a form teacher takes the register, and can't open the admin screens", { tag: "@both" }, async ({ page }, testInfo) => {
+test("a form teacher takes the register, and can't open the admin screens", async ({ page }, testInfo) => {
   test.setTimeout(90_000);
   const phone = testInfo.project.name === "phone";
   const [email, arm] = phone ? ["teacher@greenfield.ng", "JSS 1 Blue"] : ["physics@greenfield.ng", "SS 1 Green"];
@@ -92,13 +92,4 @@ test("an admin invites a teacher, gives them a class and a subject, and they joi
   await expect(page.getByLabel("Day")).toBeVisible();
   await open(page, "/s/greenfield/students/st1");
   await expect(page.getByRole("heading", { name: "Attendance" })).toBeVisible();
-});
-
-test("a subject teacher who isn't a form teacher sees their classes, and no register", async ({ page }) => {
-  await signIn(page, "english@greenfield.ng");
-  await expect(page).toHaveURL(/\/teach$/);
-  await expect(page.getByRole("heading", { name: "Your subjects" })).toBeVisible();
-  await expect(page.getByRole("heading", { name: "Your register" })).toHaveCount(0);
-  await expect(page.getByRole("link", { name: "Register", exact: true })).toHaveCount(0);
-  await expect(page.getByText("English Studies").first()).toBeVisible();
 });

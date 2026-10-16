@@ -8,7 +8,7 @@ export const TOURS_SEEN = {
   cookies: [],
   origins: ["http://localhost:3100", "http://greenfield.localhost:3100"].map((origin) => ({
     origin,
-    localStorage: ["admin", "teacher", "parent", "console"].map((id) => ({ name: `brillianda:tour:${id}`, value: "seen" })),
+    localStorage: ["admin", "teacher", "parent", "student", "console"].map((id) => ({ name: `brillianda:tour:${id}`, value: "seen" })),
   })),
 };
 

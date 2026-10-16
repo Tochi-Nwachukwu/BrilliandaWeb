@@ -5,7 +5,7 @@ import { expect, test } from "@playwright/test";
 
 const at = (school: string, path = "/") => `http://${school}.localhost:3100${path}`;
 
-test("a school's own address shows its pages and keeps it signed in", { tag: "@both" }, async ({ page }) => {
+test("a school's own address shows its pages and keeps it signed in", async ({ page }) => {
   await page.goto(at("greenfield", "/login"));
   await expect(page.getByText("Greenfield College").locator("visible=true").first()).toBeVisible();
   await page.getByLabel("Email").fill("owner@greenfield.ng");

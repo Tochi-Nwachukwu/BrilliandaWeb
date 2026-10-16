@@ -11,7 +11,7 @@ async function signIn(page: Page, email: string) {
   await page.getByRole("button", { name: "Sign in", exact: true }).click();
 }
 
-test("a parent sees the lists for this class and the next one", { tag: "@both" }, async ({ page }) => {
+test("a parent sees the lists for this class and the next one", async ({ page }) => {
   await signIn(page, "parent@greenfield.ng");
   await expect(page).toHaveURL(/\/family$/);
   await open(page, "/s/greenfield/family/st1");

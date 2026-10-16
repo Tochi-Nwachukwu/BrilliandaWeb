@@ -20,7 +20,7 @@ function usageOf(subdomain: string) {
 }
 
 /** The subject and class level pairs a person may write for. */
-function pairsFor(subdomain: string, userId: string, admin: boolean) {
+export function pairsFor(subdomain: string, userId: string, admin: boolean) {
   const levels = store.levels.filter((l) => l.subdomain === subdomain && !l.archived).sort((a, b) => a.position - b.position);
   const subjects = store.subjects.filter((s) => s.subdomain === subdomain);
   const all = store.subjectLinks

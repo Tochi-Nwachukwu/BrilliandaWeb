@@ -27,6 +27,7 @@ async function Student({ params, children }: { params: Promise<{ school: string 
 
   const nav: NavItem[] = [
     { href: `${base}/learn`, label: "Today", icon: "home", exact: true, tour: "nav-today" },
+    { href: `${base}/learn/tests`, label: "Tests", icon: "scores", tour: "nav-tests" },
     { href: `${base}/learn/timetable`, label: "Timetable", icon: "calendar", tour: "nav-timetable" },
     { href: `${base}/learn/results`, label: "Results", icon: "results", tour: "nav-results" },
     { href: `${base}/learn/books`, label: "Book list", short: "Books", icon: "book", tour: "nav-books" },
@@ -45,12 +46,6 @@ async function Student({ params, children }: { params: Promise<{ school: string 
           <SchoolMark {...school} className="h-9 w-9 text-[13px]" />
           <span className="truncate text-[17px] font-semibold tracking-tight">{school.name}</span>
         </span>
-      }
-      note={
-        <>
-          <b className="mb-0.5 block text-text-primary">Coming soon</b>
-          Tests on Brillianda (CBT).
-        </>
       }
     >
       {children}

@@ -2,7 +2,7 @@ import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
 import { open } from "./helpers";
 
-// The plan's accessibility bar (WCAG 2.2 AA): every screen is scanned by axe at both sizes, and any
+// The plan's accessibility bar (WCAG 2.2 AA): the key screens are scanned by axe (one of each kind: forms, lists, grids, dialogs), and any
 // problem it can find automatically fails the run. Axe can't judge everything (whether a label
 // makes sense, say), so this is a floor, not the whole check. Read-only: nothing here saves.
 
@@ -28,105 +28,47 @@ async function scan(page: Page, url: string) {
   expect.soft(report, `Accessibility problems on ${url}`).toEqual([]);
 }
 
-async function signIn(page: Page) {
+async function signInAs(page: Page, email: string, lands: RegExp) {
+  await page.context().clearCookies();
   await open(page, "/s/greenfield/login");
-  await page.getByLabel("Email").fill("owner@greenfield.ng");
+  await page.getByLabel("Email").fill(email);
   await page.getByLabel("Password", { exact: true }).fill("brillianda");
   await page.getByRole("button", { name: "Sign in", exact: true }).click();
-  await expect(page).toHaveURL(/\/s\/greenfield$/);
+  await expect(page).toHaveURL(lands);
 }
 
-const PUBLIC = ["/", "/login", "/signup", "/s/greenfield/login", "/s/greenfield/forgot-password", "/s/greenfield/magic-link"];
-
-test("every public screen passes the accessibility scan", { tag: "@both" }, async ({ page }) => {
-  test.setTimeout(120_000);
+test("the public screens and the team console pass the accessibility scan", async ({ page }) => {
+  test.setTimeout(150_000);
   await page.addInitScript(() => localStorage.setItem("brillianda-seen", "1"));
-  for (const url of PUBLIC) await test.step(url, () => scan(page, url));
-});
-
-const SCHOOL = [
-  "",
-  "/classes",
-  "/classes/arms",
-  "/subjects",
-  "/students",
-  "/students/new",
-  "/students/import",
-  "/more",
-  "/more/admins",
-  "/more/sessions",
-  "/more/admission-numbers",
-  "/more/branding",
-  "/more/history",
-  "/more/teachers",
-  "/more/parents",
-  "/classes/register/ga-gl1-gn1",
-  "/results",
-  "/results/ga-gl1-gn1",
-  "/results/ga-gl1-gn1/gs-mathematics",
-  "/results/ga-gl1-gn1/broadsheet",
-  "/results/ga-gl1-gn1/remarks",
-  "/results/ga-gl1-gn1/report/st1",
-  "/more/results",
-  "/more/promotion",
-  "/more/birthdays",
-  "/more/book-lists",
-  "/more/corrections",
-  "/more/timetable",
-  "/more/student-accounts",
-  "/more/questions",
-];
-
-// Split in three so they run side by side: one long scan of every screen outran the time limit.
-const GROUPS = {
-  "setup and students": [...SCHOOL.slice(0, 7), "/students/st1", "/students/st1/edit"],
-  "more and registers": SCHOOL.slice(7, 15),
-  results: SCHOOL.slice(15),
-};
-
-for (const [group, paths] of Object.entries(GROUPS)) {
-  test(`school screens (${group}) pass the accessibility scan`, { tag: "@both" }, async ({ page }) => {
-    test.setTimeout(150_000);
-    await signIn(page);
-    for (const path of paths) await test.step(path || "home", () => scan(page, `/s/greenfield${path}`));
-  });
-}
-
-test("a teacher's screens pass the accessibility scan", { tag: "@both" }, async ({ page }) => {
-  test.setTimeout(120_000);
-  await open(page, "/s/greenfield/login");
-  await page.getByLabel("Email").fill("physics@greenfield.ng");
-  await page.getByLabel("Password", { exact: true }).fill("brillianda");
-  await page.getByRole("button", { name: "Sign in", exact: true }).click();
-  await expect(page).toHaveURL(/\/teach$/);
-  for (const path of ["/teach", "/teach/register", "/teach/subjects", "/teach/class", "/teach/timetable", "/teach/questions"]) await test.step(path, () => scan(page, `/s/greenfield${path}`));
-});
-
-test("a parent's screens pass the accessibility scan", { tag: "@both" }, async ({ page }) => {
-  await open(page, "/s/greenfield/login");
-  await page.getByLabel("Email").fill("parent@greenfield.ng");
-  await page.getByLabel("Password", { exact: true }).fill("brillianda");
-  await page.getByRole("button", { name: "Sign in", exact: true }).click();
-  await expect(page).toHaveURL(/\/family$/);
-  await scan(page, "/s/greenfield/family");
-});
-
-test("a student’s screens pass the accessibility scan", { tag: "@both" }, async ({ page }) => {
-  test.setTimeout(120_000);
-  await open(page, "/s/greenfield/login");
-  await page.getByLabel("Email").fill("student@greenfield.ng");
-  await page.getByLabel("Password", { exact: true }).fill("brillianda");
-  await page.getByRole("button", { name: "Sign in", exact: true }).click();
-  await expect(page).toHaveURL(/\/learn$/);
-  for (const path of ["/learn", "/learn/timetable", "/learn/results", "/learn/books"]) await test.step(path, () => scan(page, `/s/greenfield${path}`));
-});
-
-test("the team console passes the accessibility scan", { tag: "@both" }, async ({ page }) => {
-  test.setTimeout(120_000);
-  await scan(page, "/console/login");
+  for (const url of ["/", "/signup", "/s/greenfield/login", "/s/greenfield/forgot-password", "/console/login"]) await test.step(url, () => scan(page, url));
   await page.getByLabel("Email").fill("team@brillianda.com");
   await page.getByLabel("Password", { exact: true }).fill("brillianda");
   await page.getByRole("button", { name: "Sign in", exact: true }).click();
   await expect(page).toHaveURL(/\/console$/);
-  for (const path of ["/console", "/console/schools", "/console/schools/greenfield", "/console/trials"]) await test.step(path, () => scan(page, path));
+  for (const url of ["/console", "/console/schools/greenfield"]) await test.step(url, () => scan(page, url));
+});
+
+// One of each kind of school screen: setup, lists, a record, forms, grids and results.
+const SCHOOL = [
+  ["", "/classes", "/subjects", "/students", "/students/st1", "/students/new", "/students/import", "/more"],
+  ["/more/sessions", "/more/branding", "/more/history", "/more/teachers", "/more/timetable", "/more/book-lists", "/classes/register/ga-gl1-gn1"],
+  ["/results/ga-gl1-gn1", "/results/ga-gl1-gn1/gs-mathematics", "/results/ga-gl1-gn1/broadsheet", "/results/ga-gl1-gn1/report/st1", "/more/promotion", "/more/questions", "/more/tests/tt1"],
+];
+
+for (const [i, paths] of SCHOOL.entries()) {
+  test(`school screens (part ${i + 1} of ${SCHOOL.length}) pass the accessibility scan`, async ({ page }) => {
+    test.setTimeout(150_000);
+    await signInAs(page, "owner@greenfield.ng", /\/s\/greenfield$/);
+    for (const path of paths) await test.step(path || "home", () => scan(page, `/s/greenfield${path}`));
+  });
+}
+
+test("teachers’, parents’ and students’ screens pass the accessibility scan", async ({ page }) => {
+  test.setTimeout(180_000);
+  await signInAs(page, "physics@greenfield.ng", /\/teach$/);
+  for (const path of ["/teach", "/teach/register", "/teach/subjects", "/teach/timetable"]) await test.step(path, () => scan(page, `/s/greenfield${path}`));
+  await signInAs(page, "parent@greenfield.ng", /\/family$/);
+  await test.step("/family", () => scan(page, "/s/greenfield/family"));
+  await signInAs(page, "student@greenfield.ng", /\/learn$/);
+  for (const path of ["/learn", "/learn/timetable", "/learn/tests", "/learn/tests/tt1"]) await test.step(path, () => scan(page, `/s/greenfield${path}`));
 });

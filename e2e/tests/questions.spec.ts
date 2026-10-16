@@ -12,7 +12,7 @@ async function signIn(page: Page, email: string) {
   await expect(page).toHaveURL(/\/teach$/);
 }
 
-test("a teacher generates questions, checks them, and saves them to the bank", { tag: "@both" }, async ({ page }) => {
+test("a teacher generates questions, checks them, and saves them to the bank", async ({ page }) => {
   test.setTimeout(90_000);
   await signIn(page, "teacher@greenfield.ng");
   await open(page, "/s/greenfield/teach/questions");
@@ -33,23 +33,4 @@ test("a teacher generates questions, checks them, and saves them to the bank", {
   await check.getByRole("button", { name: "Save 3 questions to the bank" }).click();
   await expect(check).toHaveCount(0);
   await expect(page.getByText(/From AI, checked by Bisi Adebayo/).first()).toBeVisible();
-});
-
-test("a teacher writes a question, and sees only their own subjects", async ({ page }) => {
-  await signIn(page, "english@greenfield.ng");
-  await open(page, "/s/greenfield/teach/questions");
-  await expect(page.getByText("Simplify 6/8.")).toHaveCount(0);
-
-  await page.getByRole("button", { name: "Write a question" }).click();
-  const dialog = page.getByRole("dialog", { name: "Write a question" });
-  await expect(dialog.getByLabel("Subject and class")).toContainText("English Studies");
-  await dialog.getByRole("button", { name: "Add to the bank" }).click();
-  await expect(dialog.getByText("Please check the highlighted fields.")).toBeVisible();
-  await dialog.getByLabel("Question", { exact: true }).fill("Choose the noun: “The girl sang.”");
-  for (const [i, o] of ["The", "girl", "sang"].entries()) await dialog.getByLabel(`Option ${String.fromCharCode(65 + i)}`, { exact: true }).fill(o);
-  await dialog.getByRole("button", { name: "Remove option D" }).click();
-  await dialog.getByLabel("Option B is the right answer").check();
-  await dialog.getByRole("button", { name: "Add to the bank" }).click();
-  await expect(dialog).toHaveCount(0);
-  await expect(page.getByText("Choose the noun: “The girl sang.”")).toBeVisible();
 });

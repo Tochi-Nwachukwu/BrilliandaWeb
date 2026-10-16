@@ -12,7 +12,7 @@ async function signIn(page: Page, email: string) {
   await page.getByRole("button", { name: "Sign in", exact: true }).click();
 }
 
-test("the tour shows once, can be skipped, and comes back from Help", { tag: "@both" }, async ({ page }) => {
+test("the tour shows once, can be skipped, and comes back from Help", async ({ page }) => {
   await signIn(page, "admin@greenfield.ng");
   await expect(page).toHaveURL(/\/s\/greenfield$/);
 
@@ -39,22 +39,4 @@ test("the tour shows once, can be skipped, and comes back from Help", { tag: "@b
   await expect(help.getByText(/Download the template/)).toBeVisible();
   await help.getByRole("button", { name: "Take the tour again" }).click();
   await expect(page.getByRole("dialog", { name: "Welcome to your school on Brillianda" })).toBeVisible();
-});
-
-test("a teacher's Help is about their own screens", async ({ page }) => {
-  // Kemi teaches English only, with no form class: no register stop, and Help says why.
-  await signIn(page, "english@greenfield.ng");
-  await expect(page).toHaveURL(/\/teach$/);
-  const tour = page.getByRole("dialog", { name: "Welcome, teacher" });
-  await tour.getByRole("button", { name: "Show me" }).click();
-  await expect(page.getByRole("dialog", { name: "Today" })).toBeVisible();
-  await page.getByRole("button", { name: "Next" }).click();
-  await expect(page.getByRole("dialog", { name: "My subjects" })).toBeVisible();
-  await page.keyboard.press("Escape");
-  await expect(page.getByRole("dialog")).toHaveCount(0);
-
-  await page.getByRole("button", { name: "Help" }).click();
-  const help = page.getByRole("dialog", { name: "Help" });
-  await expect(help.getByText("Why don’t I have a register?").first()).toBeVisible();
-  await expect(help.getByText("How do I add a student?")).toHaveCount(0);
 });

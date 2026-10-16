@@ -530,6 +530,47 @@ generations used per school per month.
 | Save questions | `POST /v1/questions` `{ subjectId, levelId, questions, source }` | `{ saved }` |
 | Change or delete one | `PUT` / `DELETE /v1/questions/{id}` | 204 |
 
+### C15. CBT: tests taken on Brillianda
+
+**Problem.** Teachers want to set tests that students take on a phone or computer, mark
+themselves where they can, and feed the score sheets.
+
+**What to store.**
+
+- Tests: title, instructions, subject, class level, classes, a copy of the questions (from C14),
+  length, opens and closes, `anywhere` or `school`, the access code, shuffle, show score, the
+  score-sheet part, draft or set, who set it.
+- Attempts: test, student, started, submitted, each answer, the teacher's theory marks, times the
+  page was left.
+
+**Rules** (`packages/core/src/cbt.ts`):
+
+- **The server keeps the clock.** Deadline = start + length, or the close, whichever is first.
+  Answers are accepted up to 30 seconds after it (slow connections), then the attempt is
+  submitted with what was saved.
+- **Never send the answers to a student**, not even hidden. Shuffle per attempt, the same order
+  every time for that attempt.
+- School-only tests need the code to start.
+- Objective, true/false and gap answers mark themselves (all or nothing; gaps ignore case and
+  spaces). Theory waits for the teacher.
+- Sending scores: submitted, fully marked attempts only, scaled to the part's marks (two decimals),
+  into the current term's sheet. Sheets marked complete are skipped.
+
+**Endpoints we need.**
+
+| What | Suggested | Returns |
+|---|---|---|
+| A teacher's tests | `GET /v1/tests` | `TestRow[]` |
+| What can go in a test, or a draft | `GET /v1/tests/editor?test=` | `TestEditorData` |
+| Save or set a test | `POST` / `PUT /v1/tests/{id}` | `{ id }` |
+| Delete a draft | `DELETE /v1/tests/{id}` | 204, or 409 once started |
+| Results | `GET /v1/tests/{id}/results` | `TestResults` |
+| Mark a theory answer | `PUT /v1/tests/{id}/attempts/{attemptId}/marks/{index}` `{ marks }` | 204 |
+| Send scores | `POST /v1/tests/{id}/send-scores` | `{ sent, skipped, lockedClasses }` |
+| A student's tests | `GET /v1/me/tests` | `StudentTestRow[]` |
+| One test to take | `GET /v1/me/tests/{id}` | `TakingTest` |
+| Start, answer, left the page, submit | `POST /v1/me/tests/{id}/start` `{ code }`, `PUT …/answers/{index}`, `POST …/left`, `POST …/submit` | 204, or the score |
+
 ---
 
 ## D. Rules both sides must share
@@ -548,6 +589,7 @@ or call the same code:
 | `corrections.ts` | Which fields parents can correct, and each field's check |
 | `timetable.ts` | The bell schedule's checks, clashes, reading uploaded grids, matching subject names |
 | `questions.ts` | The question shape, marking answers, shuffling per student, what a generate request may ask |
+| `cbt.ts` | Test settings, the window and deadline, scoring an attempt, scaling into a score-sheet part |
 | `birthdays.ts` | Filling in the message, ages, 29 February, the coming birthdays, how many texts a message takes |
 
 The default scale: A 70+, B 60+, C 50+, D 45+, E 40+ (all passes), F below 40.

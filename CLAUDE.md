@@ -82,12 +82,12 @@ and in the brillanda-v1 folder, for reference only.
   `src/lib/formCheck.ts`. Fixed choices that a public screen shows live in zod-free files
   (`core/signupOptions.ts`). Main content must not fade in from opacity 0: Chrome then counts it
   as shown late (or never), and `e2e/tests/budget.spec.ts` fails. Slide it in (`animate-lift`).
-- Browser tests run on a phone; the laptop run takes only tests tagged `{ tag: "@both" }` (the
-  plan's main flows, and anything whose layout differs). Tag a new test @both only if a laptop could
-  break it differently. Logic already covered by a unit test in `packages/core` needs no browser
-  test. The speed budget runs last and alone (projects `speed-phone`, `speed-laptop`).
-- `e2e/tests/a11y.spec.ts` scans every screen with axe (WCAG 2.2 AA). Add each new screen to its
-  list. Text uses the text tokens, never a faded colour (`opacity-*`) on text, and a link inside a
+- Browser tests run on a phone. Keep them few: one flow per feature, covering its main path; don't
+  add a test for something another flow already passes through. The laptop run takes only tests
+  tagged `{ tag: "@both" }`, kept for the five where the wide layout is what's checked (sidebar,
+  Ctrl+K, the subjects grid, the students list, the timetable table).
+- `e2e/tests/a11y.spec.ts` scans one of each kind of screen with axe (WCAG 2.2 AA). Add a new
+  screen only when it brings a new kind of layout or control. Text uses the text tokens, never a faded colour (`opacity-*`) on text, and a link inside a
   sentence is underlined, not only coloured.
 - The service worker (`public/sw.js`) must never cache a page or data, only `/_next/static/` files
   and `/offline`. Bump its `VERSION` when changing what it saves.

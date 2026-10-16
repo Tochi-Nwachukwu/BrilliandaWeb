@@ -25,27 +25,3 @@ test("Ctrl+K opens the command palette and goes to a page", { tag: "@both" }, as
   await page.keyboard.press("Enter");
   await expect(page).toHaveURL(/\/dev\/subjects$/);
 });
-
-test("the look is remembered after a reload", async ({ page }) => {
-  await open(page, "/dev");
-  const neutral = page.getByRole("button", { name: "Neutral" });
-  await expect(async () => {
-    if (!(await neutral.isVisible())) await page.getByRole("button", { name: "Your account" }).click();
-    await expect(neutral).toBeVisible({ timeout: 1000 });
-  }).toPass();
-  await neutral.click();
-  await expect(page.locator("html")).toHaveAttribute("data-theme", "neutral");
-  await page.reload();
-  await expect(page.locator("html")).toHaveAttribute("data-theme", "neutral");
-});
-
-test("selecting students shows the action bar", { tag: "@both" }, async ({ page, isMobile }) => {
-  await open(page, "/dev/students");
-  if (isMobile) {
-    await page.getByRole("button", { name: "Select", exact: true }).click();
-    await page.getByRole("list", { name: "Students" }).getByRole("button").first().click();
-  } else {
-    await page.getByRole("checkbox", { name: "Select", exact: true }).first().check();
-  }
-  await expect(page.getByRole("region", { name: "Selected" })).toContainText("1 student selected");
-});

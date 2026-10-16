@@ -125,6 +125,7 @@ export function teacherGuide(base: string, formTeacher: boolean): HelpGuide {
         : []),
       { target: "nav-subjects", title: "My subjects", body: "A score sheet for every class you teach. Fill in the scores and mark the sheet complete." },
       { target: "nav-timetable", title: "Timetable", body: "Your week, and every class’s, with your own lessons highlighted." },
+      { target: "nav-tests", title: "Tests", body: "Set tests from your question bank, see who has taken them, mark theory answers and send the scores to the score sheet." },
       { target: "nav-questions", title: "Questions", body: "Your question bank: write questions, or generate a set with AI and check every one." },
       { target: "help", title: "Help is always here", body: "Answers about each screen, and this tour again." },
     ],
@@ -143,6 +144,7 @@ export function teacherGuide(base: string, formTeacher: boolean): HelpGuide {
       {
         title: "Scores and results",
         items: [
+          { q: "How do I set a test on Brillianda (CBT)?", a: "Tests › Set a test. Choose the class, pick questions from your bank, set when it opens and closes and how long it is, and whether it’s taken anywhere or in school only (students then need the code shown on the test’s page). Objective answers mark themselves; mark theory answers from the test’s page, then Send the scores to CA1, CA2 or Exam.", href: `${teach}/tests`, link: "Tests", pages: [`${teach}/tests`] },
           { q: "How do I make questions with AI?", a: "Questions › Generate questions. Pick the subject and class, the topics and how many of each type, then Generate. AI makes mistakes: read every question, fix or remove it, and save the ones you’ll use. Your school has a monthly allowance, shown at the top.", href: `${teach}/questions`, link: "Questions", pages: [`${teach}/questions`] },
           { q: "Where is my timetable?", a: "Timetable shows your week: each lesson with its class. Choose A class to see any class’s week, with your lessons highlighted. Today lists your lessons for the day. If something is wrong, tell your school’s admin.", href: `${teach}/timetable`, link: "Timetable", pages: [`${teach}/timetable`, teach] },
           { q: "How do I enter scores?", a: "My subjects › open a class and subject. Type each student’s scores; they save as you go. The total and grade fill in themselves.", href: `${teach}/subjects`, link: "My subjects", pages: [`${teach}/subjects`, teach] },
@@ -215,6 +217,7 @@ export function studentGuide(base: string): HelpGuide {
     tour: [
       { title: "Welcome to your school on Brillianda", body: "Your lessons, attendance, results and what you need for class, in one place. Three quick stops." },
       { target: "nav-today", title: "Today", body: "Today’s lessons, your attendance this term, and your results when they’re out." },
+      { target: "nav-tests", title: "Tests", body: "Tests your teachers set. Start one when it’s open; the clock runs from when you start." },
       { target: "nav-timetable", title: "Timetable", body: "Your class’s week, with each lesson’s teacher." },
       { target: "nav-results", title: "Results", body: "Your report cards, once the school publishes them." },
       { target: "help", title: "Help is always here", body: "Answers to common questions, and this tour again." },
@@ -223,6 +226,7 @@ export function studentGuide(base: string): HelpGuide {
       {
         title: "Your school day",
         items: [
+          { q: "How do tests work?", a: "Tests lists the tests set for your class. When one is open, start it: the clock starts then and doesn’t stop. Your answers save as you go, even if the connection drops for a moment. Submit when you’re done; when time is up, it’s submitted for you. A test in school needs the code your teacher gives in the room.", href: `${learn}/tests`, link: "Tests", pages: [`${learn}/tests`, learn] },
           { q: "Where is my timetable?", a: "Timetable shows your class’s week. Today lists today’s lessons.", href: `${learn}/timetable`, link: "Timetable", pages: [learn] },
           { q: "My attendance looks wrong.", a: "Your form teacher takes the register each school day. If a day is wrong, tell them: they can correct it.", pages: [learn] },
           { q: "Which books do I need?", a: "Book list shows what your class needs, and what to get for next session, once the school shares it.", href: `${learn}/books`, link: "Book list", pages: [learn] },

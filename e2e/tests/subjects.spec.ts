@@ -12,12 +12,6 @@ async function signIn(page: Page, school: string, email: string) {
   await expect(page).toHaveURL(new RegExp(`/s/${school}$`));
 }
 
-test("a school without classes is sent to set them up first", async ({ page }) => {
-  await signIn(page, "royalheights", "owner@royalheights.ng");
-  await open(page, "/s/royalheights/subjects");
-  await expect(page.getByText("Set up your classes first")).toBeVisible();
-});
-
 test("each class level's subjects can be set on a phone (the plan's gate)", async ({ page, isMobile }) => {
   test.skip(!isMobile, "The phone layout");
   await signIn(page, "greenfield", "admin@greenfield.ng");
@@ -50,41 +44,4 @@ test("the laptop grid cycles compulsory, elective, off", { tag: "@both" }, async
   await expect(cell).toHaveAccessibleName("Mathematics in JSS 1: Compulsory");
 });
 
-test("a subject can be renamed and stays linked to the catalogue", { tag: "@both" }, async ({ page, isMobile }) => {
-  await signIn(page, "greenfield", "owner@greenfield.ng");
-  await open(page, "/s/greenfield/subjects");
-  // Each screen size renames its own subject, so the two runs never trip over each other.
-  const [subject, renamed] = isMobile ? ["Business Studies BUS", "Business"] : ["Government GOV", "Government and Politics"];
-  if (isMobile) await page.getByRole("tab", { name: /^JSS 1 / }).click();
-  else await page.getByRole("button", { name: subject }).click();
-  if (isMobile) await page.getByRole("button", { name: subject }).click();
-  await expect(page.getByText("From the national catalogue. Renaming keeps it linked.")).toBeVisible();
-  await page.getByLabel("Subject name").fill(renamed);
-  await page.getByRole("button", { name: "Save" }).click();
-  await expect(page.getByText("Subject saved")).toBeVisible();
-});
-
 const fresh = (project: string) => (project === "phone" ? { school: "brookfield", email: "owner@brookfield.ng" } : { school: "cedarwood", email: "owner@cedarwood.ng" });
-
-test("the first pick has the 2025 list ticked, and attaches subjects to their classes", async ({ page }, testInfo) => {
-  const { school, email } = fresh(testInfo.project.name);
-  await signIn(page, school, email);
-  await open(page, `/s/${school}/classes`);
-  // The class tests set up these schools; on a fresh server, set them up here.
-  if (await page.getByRole("heading", { name: "Set up your classes" }).isVisible()) {
-    await page.getByRole("button", { name: "Next: arms" }).click();
-    await page.getByRole("button", { name: /^Create \d+ classes$/ }).click();
-    await expect(page.getByRole("heading", { name: "Junior secondary" })).toBeVisible();
-  }
-  await open(page, `/s/${school}/subjects`);
-  await expect(page.getByRole("heading", { name: "Choose your subjects" })).toBeVisible();
-  await expect(page.getByLabel(/^Biology/)).toBeChecked();
-
-  await page.getByPlaceholder("e.g. Phonics").fill("Verbal Reasoning");
-  await page.getByRole("button", { name: "Add", exact: true }).click();
-  await page.getByRole("button", { name: /^Add \d+ subjects$/ }).click();
-
-  await expect(page.getByRole("heading", { name: "Subjects", exact: true })).toBeVisible();
-  await open(page, `/s/${school}`);
-  await expect(page.getByText("Choose your subjects (done)")).toBeAttached();
-});

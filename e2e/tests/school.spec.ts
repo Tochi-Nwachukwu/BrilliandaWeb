@@ -14,7 +14,7 @@ async function signIn(page: Page, school: string, email: string, password = "bri
   await expect(page).toHaveURL(new RegExp(`/s/${school}$`));
 }
 
-test("two schools wear their own name and colour", { tag: "@both" }, async ({ page }) => {
+test("two schools wear their own name and colour", async ({ page }) => {
   await page.goto("/s/greenfield/login");
   await expect(page.getByText("Greenfield College").locator("visible=true").first()).toBeVisible();
   expect(await primary(page)).toBe("#4A3AA7");
@@ -31,7 +31,7 @@ test("an unknown address and a paused school say so", async ({ page }) => {
   await expect(page.getByRole("heading", { name: "This school’s account is paused" })).toBeVisible();
 });
 
-test("signing in, out, and the wrong password", { tag: "@both" }, async ({ page }) => {
+test("signing in, out, and the wrong password", async ({ page }) => {
   await page.goto("/s/greenfield");
   await expect(page).toHaveURL(/\/s\/greenfield\/login$/);
 
@@ -68,29 +68,6 @@ test("a forgotten password can be reset from the emailed link", async ({ page })
   await signIn(page, "surebloom", "owner@surebloom.ng", "a-new-password");
 });
 
-test("an unknown email gets the same answer and no link", async ({ page }) => {
-  await open(page, "/s/greenfield/forgot-password");
-  await page.getByLabel("Email").fill("nobody@nowhere.ng");
-  await page.getByRole("button", { name: "Send reset link" }).click();
-  await expect(page.getByText("If that email is on file, a reset link is on its way.")).toBeVisible();
-  await expect(page.getByRole("link", { name: "Open the reset link" })).toHaveCount(0);
-});
-
-test("an emailed sign-in link signs you in once", async ({ page }) => {
-  await open(page, "/s/greenfield/magic-link");
-  await page.getByLabel("Email").fill("admin@greenfield.ng");
-  await page.getByRole("button", { name: "Email me a link" }).click();
-  await page.getByRole("link", { name: "Open the sign-in link" }).click();
-  await expect(page).toHaveURL(/\/magic\//);
-  const link = page.url();
-  await page.getByRole("button", { name: "Sign in" }).click();
-  await expect(page).toHaveURL(/\/s\/greenfield$/);
-
-  await open(page, link);
-  await page.getByRole("button", { name: "Sign in" }).click();
-  await expect(page.getByText("This link has expired or has been used.")).toBeVisible();
-});
-
 test("the owner invites an admin, who joins", async ({ page, browser }, testInfo) => {
   test.setTimeout(60_000);
   const email = `ruth-${testInfo.project.name}-${Date.now() % 100000}@greenfield.ng`;
@@ -116,18 +93,4 @@ test("the owner invites an admin, who joins", async ({ page, browser }, testInfo
   await expect(ruth.getByText("Ruth Ekanem (you)")).toBeVisible();
   await expect(ruth.getByRole("button", { name: "Invite an admin" })).toHaveCount(0);
   await expect(ruth.getByRole("button", { name: "Remove" })).toHaveCount(0);
-});
-
-test("someone in two schools gets a picker on /login", async ({ page }) => {
-  await signIn(page, "greenfield", "admin@greenfield.ng");
-  await page.goto("/login");
-  await expect(page.getByRole("link", { name: /Greenfield College/ })).toBeVisible();
-  await expect(page.getByRole("link", { name: /Surebloom School/ })).toBeVisible();
-});
-
-test("Find my school answers the same for any email", async ({ page }) => {
-  await open(page, "/login");
-  await page.getByLabel("Email").fill("nobody@nowhere.ng");
-  await page.getByRole("button", { name: "Email me my schools" }).click();
-  await expect(page.getByText("If that email is on file, we’ve sent a link to each of your schools.")).toBeVisible();
 });

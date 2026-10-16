@@ -426,6 +426,19 @@ at the end of the session.
 - With this, group 3 has its front end. Test schools: Harbourview (closing a term) and Seaview (in
   its last term, for promotion).
 
+#### Batch 25: CBT (16 October 2026)
+
+- **Done:** teachers get a Tests tab (admins More › Tests): set a test from the bank (classes,
+  window, length, anywhere or in school with a code, shuffling, show the score, which score-sheet
+  part), see who has taken it, read answers, mark theory, and send the scores to CA1, CA2 or Exam
+  (scaled; complete sheets skipped). Students get a Tests tab: start a test when it's open, a
+  timer from the server's clock, a question navigator, flags, answers saved as they go (and
+  retried without a connection), submit (or submitted at the deadline). Leaving the page is noted
+  for the teacher.
+- **Fewer browser tests (user request):** about 50 instead of 112. The laptop run keeps five
+  layout checks; accessibility scans one of each kind of screen in four tests; the speed check
+  measures the marketing home; checks covered by another flow were removed.
+
 #### Batch 24: The question bank and generating questions (16 October 2026)
 
 - **Done:** a Questions tab for teachers (their own subjects and classes) and More › Question bank

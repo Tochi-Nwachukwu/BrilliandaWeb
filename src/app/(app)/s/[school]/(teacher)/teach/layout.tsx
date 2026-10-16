@@ -43,6 +43,7 @@ async function Teacher({ params, children }: { params: Promise<{ school: string 
     { href: `${base}/teach/subjects`, label: "My subjects", short: "Subjects", icon: "subjects", tour: "nav-subjects" },
     { href: `${base}/teach/timetable`, label: "Timetable", icon: "calendar", tour: "nav-timetable" },
     { href: `${base}/teach/questions`, label: "Questions", icon: "scores", tour: "nav-questions" },
+    { href: `${base}/teach/tests`, label: "Tests", icon: "check", tour: "nav-tests" },
   ];
 
   return (

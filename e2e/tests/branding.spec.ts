@@ -15,7 +15,7 @@ async function signIn(page: Page, school: string, email: string) {
   await expect(page).toHaveURL(new RegExp(`/s/${school}$`));
 }
 
-test("an owner sets the school's name, colour and logo", { tag: "@both" }, async ({ page }, testInfo) => {
+test("an owner sets the school's name, colour and logo", async ({ page }, testInfo) => {
   test.setTimeout(90_000);
   const school = testInfo.project.name === "phone" ? "oakridge" : "pinecrest";
   await signIn(page, school, `owner@${school}.ng`);
@@ -65,13 +65,4 @@ test("an owner sets the school's name, colour and logo", { tag: "@both" }, async
   await page.getByRole("button", { name: "Remove", exact: true }).click();
   await expect(page.getByText("Logo removed").locator("visible=true")).toBeVisible();
   await expect(page.getByRole("button", { name: "Upload logo" })).toBeVisible();
-});
-
-test("an admin sees the branding but can't change it", async ({ page }) => {
-  await signIn(page, "greenfield", "admin@greenfield.ng");
-  await open(page, "/s/greenfield/more/branding");
-  await expect(page.getByText("Only the school owner can change the name, colour and logo.")).toBeVisible();
-  await expect(page.getByLabel("School name")).toBeDisabled();
-  await expect(page.getByRole("button", { name: "Save", exact: true })).toHaveCount(0);
-  await expect(page.getByRole("button", { name: "Upload logo" })).toHaveCount(0);
 });

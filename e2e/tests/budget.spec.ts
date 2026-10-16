@@ -35,12 +35,9 @@ async function measure(page: Page, url: string) {
   );
 }
 
-for (const [name, url] of [
-  ["the marketing home", "/"],
-  ["signup", "/signup"],
-  ["a school's sign-in", "/s/greenfield/login"],
-] as const) {
-  test(`${name} stays within the speed budget`, { tag: "@both" }, async ({ page }, testInfo) => {
+// The heaviest page people land on. The others are lighter and share its budget.
+for (const [name, url] of [["the marketing home", "/"]] as const) {
+  test(`${name} stays within the speed budget`, async ({ page }, testInfo) => {
     await page.addInitScript(() => localStorage.setItem("brillianda-seen", "1"));
     const { jsKb, lcp } = await measure(page, url);
     testInfo.annotations.push({ type: "budget", description: `${url}: ${jsKb} KB of JavaScript, shown in ${lcp} ms` });

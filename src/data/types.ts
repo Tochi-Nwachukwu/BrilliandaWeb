@@ -2,7 +2,8 @@
 import type { BookItem } from "@brillianda/core/booklists";
 import type { Term } from "@brillianda/core/calendar";
 import type { CorrectableField } from "@brillianda/core/corrections";
-import type { Question } from "@brillianda/core/questions";
+import type { Scored, TestSettings, Where } from "@brillianda/core/cbt";
+import type { Question, Response } from "@brillianda/core/questions";
 import type { Day, Period } from "@brillianda/core/timetable";
 import type { Department, Section } from "@brillianda/core/classes";
 import type { SchoolDetails, SchoolLevel } from "@brillianda/core/signup";
@@ -574,4 +575,89 @@ export type QuestionBankPage = {
   /** This month's AI generations: used, the school's allowance, and when it resets. */
   usage: { used: number; limit: number; resetsOn: string };
   canEditAll: boolean;
+};
+
+// ——— CBT: tests on Brillianda (batch 25) ———
+
+/** One test, as its teacher (or an admin) sees it in the list. */
+export type TestRow = {
+  id: string;
+  title: string;
+  subjectName: string;
+  levelName: string;
+  armLabels: string[];
+  questions: number;
+  marks: number;
+  durationMinutes: number;
+  opensAt: string;
+  closesAt: string;
+  where: Where;
+  status: "draft" | "published";
+  /** Before, during or after its window. */
+  window: "before" | "open" | "closed";
+  submitted: number;
+  students: number;
+  /** Theory answers still to mark. */
+  toMark: number;
+  sentAt: number | null;
+  by: string;
+  byMe: boolean;
+};
+
+/** Setting or changing a test: what can go in it. */
+export type TestEditorData = {
+  pairs: { subjectId: string; subjectName: string; levelId: string; levelName: string; arms: { id: string; label: string }[] }[];
+  bank: BankQuestion[];
+  components: { id: string; name: string; maxScore: number }[];
+  /** The test being changed (drafts only), or null for a new one. */
+  test: (TestSettings & { id: string; subjectId: string; levelId: string }) | null;
+};
+
+/** A test's results, for marking and sending scores. */
+export type TestResults = {
+  test: TestRow & { accessCode: string; showScore: boolean; component: { id: string; name: string; maxScore: number } | null; questionList: Question[] };
+  rows: {
+    studentId: string;
+    fullName: string;
+    armLabel: string;
+    state: "not started" | "in progress" | "submitted";
+    attemptId: string | null;
+    score: Scored | null;
+    leftPage: number;
+    responses: Record<number, Response>;
+    theoryMarks: Record<number, number>;
+  }[];
+  /** For each question: how many answered it, and how many got it right (theory: null). */
+  stats: { answered: number; right: number | null }[];
+};
+
+/** A test in a student's list. */
+export type StudentTestRow = {
+  id: string;
+  title: string;
+  subjectName: string;
+  durationMinutes: number;
+  questions: number;
+  opensAt: string;
+  closesAt: string;
+  where: Where;
+  window: "before" | "open" | "closed";
+  attempt: "none" | "in progress" | "submitted";
+  /** Shown once submitted, when the teacher allows it: the objective score, or the full score once marked. */
+  score: { total: number; max: number; complete: boolean } | null;
+};
+
+/** A test being taken: questions in this student's order, without answers. */
+export type TakingTest = {
+  id: string;
+  title: string;
+  instructions: string;
+  subjectName: string;
+  durationMinutes: number;
+  where: Where;
+  /** Null until started. Milliseconds since 1970. */
+  deadline: number | null;
+  submitted: boolean;
+  questions: { index: number; type: Question["type"]; text: string; marks: number; options: { index: number; text: string }[] }[];
+  responses: Record<number, Response>;
 };

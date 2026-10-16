@@ -38,21 +38,3 @@ test("the whole history, narrowed by person, words and dates", async ({ page }) 
   await open(page, "/s/greenfield/more/history?from=2020-01-01&to=2020-12-31");
   await expect(page.getByText("Nothing matches")).toBeVisible();
 });
-
-test("one student's history, and the CSV download (for the school's own people only)", async ({ page }) => {
-  // Before signing in, the download is refused.
-  expect((await page.request.get("/s/greenfield/more/history/export")).status()).toBe(403);
-  await signIn(page);
-  await open(page, "/s/greenfield/more/history?student=st1");
-  await expect(page.getByText("Only changes to")).toBeVisible();
-  await page.getByRole("button", { name: "Show everyone" }).click();
-  await expect(page.getByText("Only changes to")).toHaveCount(0);
-
-  const csv = await page.request.get("/s/greenfield/more/history/export?who=Amaka%20Obi");
-  expect(csv.status()).toBe(200);
-  expect(csv.headers()["content-type"]).toContain("text/csv");
-  const text = await csv.text();
-  expect(text.split("\r\n")[0]).toBe("When (Lagos time),Who,What,Student");
-  expect(text).toContain("Created the school");
-  expect(text).not.toContain("Joined as an admin");
-});

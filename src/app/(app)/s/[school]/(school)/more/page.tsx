@@ -11,6 +11,7 @@ const ITEMS: { path: string; icon: IconName; title: string; detail: string }[] =
   { path: "corrections", icon: "inbox", title: "Corrections", detail: "Parents asking to correct their child’s details" },
   { path: "branding", icon: "school", title: "Branding", detail: "Your school’s name, colour and logo" },
   { path: "promotion", icon: "classes", title: "Promotion", detail: "Who moves up at the end of the session" },
+  { path: "tests", icon: "check", title: "Tests (CBT)", detail: "Every test set, its results and marking" },
   { path: "questions", icon: "scores", title: "Question bank", detail: "Questions for tests and exams, and AI use this month" },
   { path: "timetable", icon: "calendar", title: "Timetable", detail: "Each class’s week, and the bell schedule" },
   { path: "book-lists", icon: "book", title: "Book lists", detail: "Books and things each class needs, for parents" },

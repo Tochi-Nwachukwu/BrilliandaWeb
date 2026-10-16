@@ -57,7 +57,7 @@ function plantedList(tag: string): string {
   return lines.join("\n");
 }
 
-test("a 1,000-row list with planted mistakes is fixed and imported (the plan's gate)", { tag: "@both" }, async ({ page }, testInfo) => {
+test("a 1,000-row list with planted mistakes is fixed and imported (the plan's gate)", async ({ page }, testInfo) => {
   test.setTimeout(180_000);
   const tag = testInfo.project.name === "phone" ? "Ph" : "Lp";
   await signIn(page);
@@ -111,26 +111,3 @@ async function wordTable(tag: string): Promise<Buffer> {
   zip.file("word/document.xml", xml);
   return zip.generateAsync({ type: "nodebuffer" });
 }
-
-test("a Word document's table imports like a spreadsheet, and an old .doc is explained", async ({ page }, testInfo) => {
-  const tag = testInfo.project.name === "phone" ? "Ph" : "Lp";
-  await signIn(page);
-  await open(page, "/s/greenfield/students/import");
-  await pickFile(page, { name: "jss-list.docx", mimeType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document", buffer: await wordTable(tag) }, page.getByText("2. Match the columns"));
-  await expect(page.getByLabel("What “Name” holds")).toHaveValue("fullName");
-  await page.getByRole("button", { name: "Check 2 rows" }).click();
-  await expect(page.getByRole("button", { name: /Ready\s*2/ })).toBeVisible();
-  await page.getByRole("button", { name: "Import 2 students" }).click();
-  await expect(page.getByText("2 added")).toBeVisible();
-
-  await page.getByRole("button", { name: "Import another file" }).click();
-  await pickFile(page, { name: "list.doc", mimeType: "application/msword", buffer: Buffer.from("old") }, page.getByText("This is an old Word file (.doc)", { exact: false }));
-});
-
-test("the template downloads as Excel", async ({ page }) => {
-  await signIn(page);
-  await open(page, "/s/greenfield/students/import");
-  const download = page.waitForEvent("download");
-  await page.getByRole("button", { name: "Download the Excel template" }).click();
-  expect((await download).suggestedFilename()).toBe("Greenfield-College-students-template.xlsx");
-});

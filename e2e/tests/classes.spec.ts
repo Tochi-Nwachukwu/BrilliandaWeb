@@ -14,16 +14,8 @@ async function signIn(page: Page, school: string, email: string) {
 
 const fresh = (project: string) => (project === "phone" ? { school: "brookfield", email: "owner@brookfield.ng" } : { school: "cedarwood", email: "owner@cedarwood.ng" });
 
-test("a school with classes sees them by section", async ({ page }) => {
-  await signIn(page, "greenfield", "owner@greenfield.ng");
-  await open(page, "/s/greenfield/classes");
-  await expect(page.getByRole("heading", { name: "Junior secondary" })).toBeVisible();
-  await expect(page.getByRole("heading", { name: "Senior secondary" })).toBeVisible();
-  await expect(page.getByText("18 classes in 6 levels", { exact: false })).toBeVisible();
-});
-
 test.describe.serial("the quick setup", () => {
-  test("JSS 1 to SS 3 with three flower arms makes 18 classes (the plan's gate)", { tag: "@both" }, async ({ page }, testInfo) => {
+  test("JSS 1 to SS 3 with three flower arms makes 18 classes (the plan's gate)", async ({ page }, testInfo) => {
     const { school, email } = fresh(testInfo.project.name);
     await signIn(page, school, email);
     await open(page, `/s/${school}/classes`);
@@ -44,28 +36,4 @@ test.describe.serial("the quick setup", () => {
     await expect(page.getByRole("heading", { name: "Junior secondary" })).toBeVisible();
   });
 
-  test("renaming an arm renames it in every class, and the rules hold", async ({ page }, testInfo) => {
-    const { school, email } = fresh(testInfo.project.name);
-    await signIn(page, school, email);
-    await open(page, `/s/${school}/classes`);
-
-    await page.getByRole("button", { name: "Anthurium ANT" }).click();
-    await page.getByLabel("Arm name").fill("Amaryllis");
-    await page.getByLabel("Short code").fill("AMA");
-    await page.getByRole("button", { name: "Rename everywhere" }).click();
-    await expect(page.getByRole("button", { name: "Amaryllis AMA" })).toBeVisible();
-    await expect(page.getByRole("button", { name: "Anthurium ANT" })).toHaveCount(0);
-
-    // A class can take one more arm of its own.
-    await page.getByRole("button", { name: "Add an arm to JSS 1" }).click();
-    await page.getByLabel("New arm name").fill("Daisy");
-    await page.getByLabel("Short code").fill("DAI");
-    await page.getByRole("button", { name: "Add the new arm" }).click();
-    await expect(page.getByText("19 classes in 6 levels", { exact: false })).toBeVisible();
-
-    // The checklist now has classes and arms ticked off.
-    await open(page, `/s/${school}`);
-    await expect(page.getByText("Add your classes (done)")).toBeAttached();
-    await expect(page.getByText("Split classes into arms (done)")).toBeAttached();
-  });
 });
