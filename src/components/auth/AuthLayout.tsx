@@ -116,10 +116,13 @@ async function BrandPanel() {
 
 /** A school’s own sign-in panel: the same photo and cards, in its colour, with its mark and name. */
 async function SchoolPanel({ school }: { school: AuthSchool }) {
-  const p = brandPalette(school.brandColor);
-  const muted = mix(p.primaryText, p.primary, 0.28);
+  // The school’s colour as a tint of the deep panel colour, not the whole panel: a bright brand
+  // colour over the photo is too much. White text reads on it whatever the colour.
+  const brand = brandPalette(school.brandColor).primary;
+  const bg = mix(brand, "#15121F", 0.72);
+  const muted = mix("#FFFFFF", bg, 0.28);
   return (
-    <PhotoPanel colours={{ bg: p.primary, text: p.primaryText, accent: p.primaryText }} top={<SchoolMark {...school} className="h-12 w-12 self-start text-base shadow-[inset_0_0_0_1px_rgba(255,255,255,0.18)]" />} cards={SCHOOL_CARDS}>
+    <PhotoPanel colours={{ bg, text: "#FFFFFF", accent: mix(brand, "#FFFFFF", 0.6) }} top={<SchoolMark {...school} className="h-12 w-12 self-start text-base shadow-[inset_0_0_0_1px_rgba(255,255,255,0.18)]" />} cards={SCHOOL_CARDS}>
       <p className="max-w-[12em] font-display text-[40px] font-medium leading-[1.1] tracking-tight">{school.name}</p>
       <p className="mt-4 max-w-[22rem] text-base" style={{ color: muted }}>
         Classes, subjects and students, in one place.
