@@ -1,6 +1,8 @@
 # What the front end needs from the backend
 
-From the Brillianda front-end team, 15 October 2026.
+From the Brillianda front-end team. Updated 19 October 2026: only what is still open. Done and
+connected: staging emails (the outbox), the test school, names and roles on invitations,
+teachers and the daily register, and parents.
 
 This is the complete list, in one place. Each item says what the problem is, what we need, the
 rules that matter, and how we'll know it's done. It is written from the screens' side only: we
@@ -8,11 +10,11 @@ test against the **staging API**, not your repositories. If something here alrea
 your development work, reply with the endpoint and we'll connect it.
 
 **How to answer:** for each item, a short reply is enough: "done, here is the endpoint", "done
-differently, here is why", or "not yet". When something reaches staging, please say so (see A4).
+differently, here is why", or "not yet". When something reaches staging, please say so (see A2).
 
 ## Contents
 
-- A. To keep testing on staging (blocking now)
+- A. Staging and production
 - B. Small changes to what exists
 - C. New features, in the order we'd like them
 - D. Rules both sides must share
@@ -20,84 +22,34 @@ differently, here is why", or "not yet". When something reaches staging, please 
 
 ---
 
-## A. To keep testing on staging (blocking now)
+## A. Staging and production
 
-### A1. Emails don't send on staging
-
-**Problem.** On staging, signup step 2 ("Your account") answers *"We could not send the email
-just now. Try again in a minute."* Every flow that sends an email stops there: the signup code,
-sign-in links, password resets and invitations.
-
-**What we need.** Emails that arrive on staging, or, if that isn't possible yet, a way for us to
-read the last email sent to a test address (for example, a staging-only endpoint or a shared
-inbox).
-
-**Done when.** We can sign up a new school on staging from start to finish, and accept an
-invitation.
-
-### A2. A test school with logins
-
-**Problem.** Staging has no school we can sign in to, so we can't check sign-in, Home, classes,
-subjects, students, import, change history or branding against the real API.
-
-**What we need.** One school on staging (address `fecheck`, or any name you choose) with:
-
-- an **owner** account and an **admin** account;
-- a few classes and arms, a few subjects and about 20 students, so the lists aren't empty.
-
-Please share the passwords privately, not in a chat or a repository.
-
-**Done when.** We can sign in to that school on staging as both people.
-
-### A3. A new shared secret for production
+### A1. A new shared secret for production
 
 **Problem.** The staging secret (`PROXY_SHARED_SECRET`) was sent in a chat.
 
 **What we need.** Keep it for staging if you like. Please create a **different** secret for
 production and share it privately when production is ready.
 
-### A4. Knowing what has reached staging
+### A2. A note when staging changes
 
-**Problem.** Your development work happens in a repository we don't see. We only learn what
-changed by trying staging.
+**Problem.** We learn what changed only by comparing `openapi.json` between deploys (thank you
+for keeping it current).
 
-**What we need.**
-
-- Keep `https://api-rouge-nine-18.vercel.app/openapi.json` current with every staging deploy. We
-  read the contract from there.
-- A short note when staging changes: which endpoints are new or changed, and anything that
-  breaks what we call (section E). A message per deploy is enough.
+**What we need.** A short note per staging deploy: which endpoints are new or changed, and
+anything that breaks what we call (section E).
 
 ---
 
 ## B. Small changes to what exists
 
-### B1. Invitations: the person's name
-
-**Problem.** An invitation carries only an email, so the "Join your school" page can't greet
-the person, and the owner's list of open invites shows emails, not names. We now ask for the
-name when the invite is accepted, which works.
-
-**What we need (optional, small).** Accept an optional `fullName` when an invitation is created,
-and return it when the invitation is looked up and listed.
-
-### B2. Invitations: teacher and parent roles
-
-**Problem.** Invitations accept only the `admin` role. Teachers and parents (C1, C2) join the
-same way.
-
-**What we need.** Invitations with role `teacher`, and with role `parent` plus the `guardianId`
-the parent's account links to. Accepting a parent invite links that account to that guardian.
-
-**Done when.** An owner or admin can invite a teacher, and invite a guardian to the parent app,
-and each lands on their own screens after accepting.
-
-### B3. The student page: attendance and parent access
+### B1. The student page: attendance and parent access
 
 **Problem.** The student page shows this term's attendance and whether the guardian uses the
-parent app. The student endpoint has neither yet.
+parent app. The register is in now, but the student endpoint has neither. (For parent access we
+look the guardian up in `GET /v1/parents` for now, an extra call on every student page.)
 
-**What we need, once C1 and C2 exist.** On one student's details:
+**What we need.** On `GET /v1/students/{id}`:
 
 - `attendance`: `{ term, days, present, late, absent }` for the current term (late counts as
   present), or `null` before the first term starts;
@@ -114,67 +66,7 @@ existing style. Change them freely, just tell us.
 
 Everything here is for one school, taken from the address, as today.
 
-### C1. Teachers and the daily register
-
-**Problem.** Schools need teachers on Brillianda: form teachers take the daily register, and
-subject teachers enter scores (C4). Some teachers only teach subjects and have no form class.
-
-**Who.** A new role, `teacher`, beside `owner` and `admin`. Teachers must be refused by every
-owner and admin endpoint. They see only the classes they're assigned.
-
-**What to store.**
-
-- One form teacher per arm (setting a new one replaces the old).
-- Subject teachers per arm and subject: one teacher for each subject in each arm.
-- A register per arm per school day: one mark per student (`present`, `late` or `absent`), an
-  optional note up to 120 characters, who took it and when, who last changed it and when.
-
-**Rules.**
-
-- School days are Monday to Friday inside a term.
-- A register can be saved or changed for any school day in the current term, up to today, by
-  that arm's form teacher or by an owner or admin. Every student in the arm must be marked.
-- Removing a teacher keeps their name on the registers they took.
-
-**Endpoints we need.**
-
-| What | Suggested | Returns |
-|---|---|---|
-| Teachers page: teachers and open invites with their form and subject classes; every arm with its form teacher; the subjects | `GET /v1/teachers` | `TeachersPage` |
-| Remove a teacher (or cancel their invite) | `DELETE /v1/teachers/{id}` | 204 |
-| Set an arm's form teacher, or none | `PUT /v1/arms/{armId}/form-teacher` `{ userId \| null }` | 204 |
-| Set a teacher's whole list of subject classes | `PUT /v1/teachers/{id}/subject-classes` `[{ armId, subjectId }]` | 204 |
-| One arm's register for a day (default: the latest school day), with this term's days and whether each was taken | `GET /v1/arms/{armId}/register?date=` | `Register` |
-| Save a register | `PUT /v1/arms/{armId}/register` `{ date, marks: [{ studentId, mark, note? }] }` | `{ present, absent }` |
-| A teacher's home: their form classes (taken today? days taken this term) and subject classes | `GET /v1/me/teaching` | `TeacherHome` |
-| The students in one subject class | `GET /v1/arms/{armId}/subjects/{subjectId}/students` | `SubjectClass` |
-| Home card for admins: today's registers in, and which are missing | `GET /v1/registers/today` | `RegistersToday` |
-
-**Done when.** A form teacher signs in, takes today's register, fixes yesterday's, and can't open
-any admin screen; a subject-only teacher sees their subject classes and no register.
-
-### C2. Parents
-
-**Problem.** Parents want to follow their own children: attendance now, results later (C6).
-
-**Who.** A new role, `parent`. A parent's account is linked to one guardian record (B2). Every
-parent endpoint returns only that guardian's children. Parents are refused by admin and teacher
-endpoints.
-
-**Endpoints we need.**
-
-| What | Suggested | Returns |
-|---|---|---|
-| Parents page: guardians with children here, their email and phone, and access (`none`, `invited`, `active`) | `GET /v1/parents` | `ParentsPage` |
-| Invite one guardian (needs an email on their record) | `POST /v1/guardians/{id}/invite` | 201 |
-| Invite every guardian with an email who isn't invited yet | `POST /v1/parents/invite-all` | `{ invited, withoutEmail }` |
-| End a guardian's access, or cancel their invite (records stay) | `DELETE /v1/guardians/{id}/access` | 204 |
-| A parent's home: each child with class, admission number, form teacher, this term's attendance and the last ten school days' marks (without the register's notes) | `GET /v1/me/children` | `ParentHome` |
-
-**Done when.** A parent signs in and sees only their own children; they can't open another
-child's page by changing the address.
-
-### C3. The team console
+### C1. The team console
 
 **Problem.** The Brillianda team needs to look after schools: see who signed up, pause a school,
 and follow up trial requests from the website.
@@ -203,7 +95,7 @@ and follow up trial requests from the website.
 | Trial requests, newest first | `GET /v1/team/trial-requests` | `TrialRequestRow[]` |
 | Set a request's status and note | `PATCH /v1/team/trial-requests/{id}` `{ status, note }` | 204 |
 
-### C4. Results: settings and score entry
+### C2. Results: settings and score entry
 
 **Problem.** Subject teachers enter each student's scores every term; admins follow progress and
 handle mistakes.
@@ -219,7 +111,7 @@ handle mistakes.
 **Rules.**
 
 - A term is identified as `<session start year>-<term number>`, e.g. `2026-1`. Results open for
-  the session's first term that isn't closed, once it has started (C7).
+  the session's first term that isn't closed, once it has started (C5).
 - A score is empty, `ABS`, or a number from 0 to the part's marks, up to 2 decimals.
 - The score parts can't change once any score is in for the term.
 - A sheet can be marked complete only when every student who takes the subject has every part
@@ -247,7 +139,7 @@ handle mistakes.
 **Who.** The subject's teacher for their own sheets (not once complete); owners and admins for
 all.
 
-### C5. Results: broadsheet, remarks, ratings, publishing, report cards
+### C3. Results: broadsheet, remarks, ratings, publishing, report cards
 
 **Problem.** Before parents see results, the school checks each class's broadsheet, adds remarks
 and ratings, and publishes.
@@ -285,7 +177,7 @@ and ratings, and publishes.
 **Who.** Owners and admins for all; the form teacher for their own arm (read the broadsheet,
 write the class teacher's remark and ratings).
 
-### C6. Parents see results
+### C4. Parents see results
 
 **Problem.** Parents should see results once, and only once, the school publishes them.
 
@@ -298,7 +190,7 @@ write the class teacher's remark and ratings).
   `GET /v1/me/children/{studentId}/report-card?term=` → `ReportCardData`. Anything else answers
   "not found".
 
-### C7. Closing a term
+### C5. Closing a term
 
 **Problem.** A term's results stay open until the school says it's finished, not when the end
 date passes.
@@ -308,7 +200,7 @@ date passes.
 - Closing a term locks its scores, keeps its results and publishing, drops open unlock requests,
   and can change the next term's dates.
 - It's refused while any class is unpublished, unless the admin confirms "close anyway".
-- The session's last term isn't closed here: promotion closes it (C8).
+- The session's last term isn't closed here: promotion closes it (C6).
 - Report cards for a past term use the class the student was in that term.
 
 **Endpoints we need.**
@@ -319,7 +211,7 @@ date passes.
 | Close the open term | `POST /v1/terms/close` `{ closeUnpublished, nextStartsOn?, nextEndsOn? }` | 204, or 409 |
 | Every term a student has results for, newest first | `GET /v1/students/{id}/report-terms` | `ReportTerm[]` |
 
-### C8. Promotion at the end of the session
+### C6. Promotion at the end of the session
 
 **Problem.** At the end of the session, students move up, repeat, or graduate.
 
@@ -348,7 +240,7 @@ date passes.
 | Set a student's decision | `PUT /v1/promotion/students/{id}` `{ decision, reason }` | 204 |
 | Complete it | `POST /v1/promotion/complete` `{ closeUnpublished, startsOn, endsOn }` | `{ promoted, repeating, graduated, session }` |
 
-### C9. Birthday messages
+### C7. Birthday messages
 
 **Problem.** Schools want each student's family to get a birthday greeting, automatically.
 
@@ -373,10 +265,10 @@ date passes.
 | The next 7 days, for Home | `GET /v1/birthdays?days=7` | `BirthdaysThisWeek` |
 | Save the settings | `PUT /v1/birthdays/settings` `{ enabled, message }` | 204 |
 
-On the parent's home (C2), each child gains `birthday`: the filled-in message on the child's
+On the parent's home (`GET /v1/me/children`), each child gains `birthday`: the filled-in message on the child's
 birthday when the school sends them, otherwise `null`. Rules: `packages/core/src/birthdays.ts`.
 
-### C10. Books and things needed
+### C8. Books and things needed
 
 **Problem.** Parents need to know which books, exercise books, uniform and other things to buy for
 their child's class, especially for the class they move into next session.
@@ -401,17 +293,17 @@ whether the list is shared with parents, who changed it last, and when.
 | Replace one class level's list | `PUT /v1/book-lists/{session}/{levelId}` `{ items }` | 204 |
 | Share or stop sharing | `PUT /v1/book-lists/{session}/{levelId}/shared` `{ shared }` | 204, or 409 for an empty list |
 
-On the parent's home (C2), each child gains `bookLists`: `[{ label, list }]`. Rules:
+On the parent's home (`GET /v1/me/children`), each child gains `bookLists`: `[{ label, list }]`. Rules:
 `packages/core/src/booklists.ts`.
 
-### C11. Student details for parents, and corrections
+### C9. Student details for parents, and corrections
 
 **Problem.** Parents should see what the school has on record for their child, and ask for
 mistakes to be fixed without visiting the office.
 
 **What we need.**
 
-- On each child in the parent's home (C2), `details`: first, other and last names, date of birth,
+- On each child in the parent's home (`GET /v1/me/children`), `details`: first, other and last names, date of birth,
   gender, admission date, state of origin, address, and the guardian's name, phone and email.
 - Correction requests: the child, who asked, when, the changes (field, what the record said, what
   it should say), an optional note (up to 300 characters), and the status (`open`, `approved`,
@@ -440,7 +332,7 @@ mistakes to be fixed without visiting the office.
 Each child in the parent's home also gains `corrections`: that child's latest five requests.
 Rules: `packages/core/src/corrections.ts`.
 
-### C12. Timetable
+### C10. Timetable
 
 **Problem.** Schools need one timetable everyone works from. Admins set it; teachers see it, with
 their own lessons highlighted.
@@ -454,7 +346,7 @@ their own lessons highlighted.
 
 **Rules.**
 
-- A lesson's teacher isn't stored: it's the class's teacher for that subject (C1).
+- A lesson's teacher isn't stored: it's the class's teacher for that subject (`PUT /v1/teachers/{id}/subject-classes`).
 - Periods: up to 16, in order, no overlaps, each ending after it starts, at least one lesson.
   Saving a schedule that removes a period (or makes it a break) drops its lessons.
 - No lessons in breaks. Flag (don't refuse) a teacher in two classes at once.
@@ -474,7 +366,7 @@ their own lessons highlighted.
 
 Rules: `packages/core/src/timetable.ts`.
 
-### C13. Student accounts and the student portal
+### C11. Student accounts and the student portal
 
 **Problem.** Students need their own sign-in: to see their timetable, attendance, results and
 book list, and to take tests (CBT, next).
@@ -504,7 +396,7 @@ endpoints.
 | Their class's week | `GET /v1/me/timetable` | `ClassTimetable` |
 | Their report card, once published | `GET /v1/me/report-card?term=` | `ReportCardData` |
 
-### C14. The question bank and AI-generated questions
+### C12. The question bank and AI-generated questions
 
 **Problem.** Teachers build up questions for tests, assignments and exams, and want AI to draft
 them, which they then check.
@@ -515,7 +407,7 @@ generations used per school per month.
 
 **Rules.**
 
-- A teacher sees and writes questions for the subject and class level pairs they teach (C1);
+- A teacher sees and writes questions for the subject and class level pairs they teach (their subject classes);
   owners and admins for all. A teacher changes or deletes only their own.
 - Generating returns drafts only; nothing is saved until the teacher saves.
 - The monthly allowance (300 by default) and everything about the AI call: `docs/ai-integration.md`.
@@ -530,14 +422,14 @@ generations used per school per month.
 | Save questions | `POST /v1/questions` `{ subjectId, levelId, questions, source }` | `{ saved }` |
 | Change or delete one | `PUT` / `DELETE /v1/questions/{id}` | 204 |
 
-### C15. CBT: tests taken on Brillianda
+### C13. CBT: tests taken on Brillianda
 
 **Problem.** Teachers want to set tests that students take on a phone or computer, mark
 themselves where they can, and feed the score sheets.
 
 **What to store.**
 
-- Tests: title, instructions, subject, class level, classes, a copy of the questions (from C14),
+- Tests: title, instructions, subject, class level, classes, a copy of the questions (from C12),
   length, opens and closes, `anywhere` or `school`, the access code, shuffle, show score, the
   score-sheet part, draft or set, who set it.
 - Attempts: test, student, started, submitted, each answer, the teacher's theory marks, times the
@@ -573,7 +465,7 @@ themselves where they can, and feed the score sheets.
 
 ---
 
-### C16. My profile, in every dashboard
+### C14. My profile, in every dashboard
 
 **Problem.** Owners, admins, teachers, parents and students all need to fix their own name, add a
 photo and change their password while signed in. Today `GET /v1/me` only reads who they are.
@@ -630,8 +522,8 @@ Please tell us before changing any of these.
 
 **How we call you.** Browsers never call the API. Our server calls it with:
 
-- `x-forwarded-host`: the school's address. On staging, which has no school subdomains,
-  `<school>.api-rouge-nine-18.vercel.app`, with a matching `Origin` on writes;
+- `x-forwarded-host`: the school's address. On staging, which has no school subdomains, the
+  school is in the path instead: `/s/<school>/v1/...`;
 - `x-forwarded-proto`, `x-forwarded-for`, and `x-brillianda-proxy-secret`;
 - the person's session cookie for that school, which we keep per school on our side.
 
@@ -660,5 +552,12 @@ Please tell us before changing any of these.
   `GET`/`PUT /v1/admission-numbers`
 - Import: `GET /v1/imports/setup`, `POST /v1/imports/check`, `PUT /v1/imports/mapping`,
   `POST /v1/imports`, `POST /v1/imports/{id}/undo`
+- Teachers and the register: `GET /v1/teachers`, `DELETE /v1/teachers/{id}`,
+  `PUT /v1/teachers/{id}/subject-classes`, `PUT /v1/arms/{id}/form-teacher`,
+  `GET`/`PUT /v1/arms/{id}/register`, `GET /v1/registers/today`, `GET /v1/me/teaching`,
+  `GET /v1/arms/{id}/subjects/{subjectId}/students`
+- Parents: `GET /v1/parents`, `POST /v1/parents/invite-all`, `POST /v1/guardians/{id}/invite`,
+  `DELETE /v1/guardians/{id}/access`, `GET /v1/me/children`
+- Staging's outbox: `GET /v1/dev/outbox`
 - Change history: `GET /v1/changes`
 - Website: `POST /v1/trial-requests`
