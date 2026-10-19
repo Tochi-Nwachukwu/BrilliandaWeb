@@ -91,16 +91,17 @@ export async function acceptInvite(subdomain: string, token: string, password: s
   return fail(result);
 }
 
-type Member = { userId: string; fullName: string; email: string; role: "owner" | "admin"; joinedAt: string };
-type Invitation = { id: string; email: string; role: "owner" | "admin"; createdAt: string };
+type Member = { userId: string; fullName: string; email: string; role: "owner" | "admin" | "teacher" | "parent" | "student"; joinedAt: string };
+type Invitation = { id: string; email: string; fullName?: string | null; role: "owner" | "admin" | "teacher" | "parent" | "student"; createdAt: string };
 
 export async function listMembers(subdomain: string): Promise<SchoolMember[]> {
   const [members, invites] = await Promise.all([
     read<{ data: Member[] }>(subdomain, "/v1/members"),
     read<{ data: Invitation[] }>(subdomain, "/v1/invitations"),
   ]);
-  const active: SchoolMember[] = (members?.data ?? []).map((m) => ({ id: m.userId, fullName: m.fullName, email: m.email, role: m.role, status: "active" }));
-  const invited: SchoolMember[] = (invites?.data ?? []).map((i) => ({ id: i.id, fullName: i.email, email: i.email, role: "admin", status: "invited", invitedAt: Date.parse(i.createdAt) }));
+  // Admins only: teachers have their own page, parents theirs.
+  const active: SchoolMember[] = (members?.data ?? []).filter((m) => m.role === "owner" || m.role === "admin").map((m) => ({ id: m.userId, fullName: m.fullName, email: m.email, role: m.role, status: "active" }));
+  const invited: SchoolMember[] = (invites?.data ?? []).filter((i) => i.role === "admin").map((i) => ({ id: i.id, fullName: i.fullName || i.email, email: i.email, role: "admin", status: "invited", invitedAt: Date.parse(i.createdAt) }));
   return [...active, ...invited];
 }
 

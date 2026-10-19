@@ -235,8 +235,8 @@ export type ParentChild = {
   birthday: string | null;
   /** Shared book lists (batch 20): this session’s class, and the class they move into next session. */
   bookLists: { label: string; list: BookList }[];
-  /** The child’s record (batch 21), and the parent’s correction requests, newest first. */
-  details: ChildDetails;
+  /** The child’s record (batch 21; null where it isn’t available yet), and the parent’s correction requests, newest first. */
+  details: ChildDetails | null;
   corrections: CorrectionRow[];
 };
 export type ParentHome = { fullName: string; schoolDay: boolean; children: ParentChild[] };

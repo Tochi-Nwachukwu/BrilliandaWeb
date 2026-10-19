@@ -3,8 +3,13 @@
 // Parents (batch 12; docs/data-contract.md). Owners and admins invite guardians to the parent app.
 // About `school`: see actions/auth.ts — the real actions take it from the request's host.
 import { revalidatePath } from "next/cache";
-import * as impl from "../fake/parents";
+import { LIVE } from "../api/client";
+import * as live from "../api/parents";
+import * as fake from "../fake/parents";
 import type { ActionResult, SampleEmail } from "../types";
+
+// The API where it has endpoints (DATA_SOURCE=api), else sample data.
+const impl = LIVE ? live : fake;
 
 const done = <T,>(school: string, result: ActionResult<T>) => {
   if (result.ok) revalidatePath(`/s/${school}`, "layout");

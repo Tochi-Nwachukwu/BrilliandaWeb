@@ -13,9 +13,10 @@ in `src/data/api/` with the same functions and shapes, calling the API from our 
 wrappers in `src/data` pick one: `DATA_SOURCE=api` uses the API, anything else the fake (the
 browser tests always run on the fake). Connected: everything in the v1 tables below (signup,
 sign-in, the team, Home and the calendar, classes, subjects, students, import, change history,
-branding, trial requests). Not connected, because the API has no endpoints for them yet: the
-after-v1 batches (teachers and registers, parents, the team console, results, closing a term,
-promotion). With `DATA_SOURCE=api` their screens say "Not connected yet" (a `layout.tsx` in
+branding, trial requests), plus teachers and the daily register (batch 11) and parents (batch 12;
+the parent home leaves out birthdays, book lists, a child's record and report cards until the API
+has them). Not connected, because the API has no endpoints for them yet: the other after-v1
+batches (the team console, results, closing a term, promotion, and batches 19 to 26). With `DATA_SOURCE=api` their screens say "Not connected yet" (a `layout.tsx` in
 each), and Home, Sessions and the student page leave out their parts.
 
 - `src/data/api/client.ts` calls the API with the school's address, the shared secret and the
@@ -253,7 +254,7 @@ is one); the real record is append-only (plan: safeguards). `GET
 /s/<school>/more/history/export` returns the same filters as a CSV (up to 1,000 lines, cells
 escaped against spreadsheet formulas), or 403 for anyone outside the school.
 
-### Teachers and the daily register (batch 11, after v1)
+### Teachers and the daily register (batch 11, after v1; connected)
 
 A third role, `teacher`, alongside `owner` and `admin`. Every admin read and write refuses teachers
 (the fakes' `requireMember` leaves them out by default), so a teacher can't reach admin data even by
@@ -278,7 +279,7 @@ assigned. Teachers sign in like admins (email and password, or an email link) an
 and absent. School days are Monday to Friday inside a term (`packages/core/src/attendance.ts`, with
 tests); public holidays come with the school's own calendar later.
 
-### Parents (batch 12, after v1)
+### Parents (batch 12, after v1; connected)
 
 A fourth role, `parent`. A parent's account is linked to a guardian record (`parentLinks`), and
 every parent read is limited to that guardian's children. Parents are not staff: admin and teacher

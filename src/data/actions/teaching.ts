@@ -7,10 +7,15 @@ import { registerSchema, subjectClassesSchema } from "@brillianda/core/attendanc
 import { inviteAdminSchema } from "@brillianda/core/auth";
 import { fieldErrorsOf } from "@brillianda/core/signup";
 import { revalidatePath } from "next/cache";
-import * as impl from "../fake/teaching";
+import { LIVE } from "../api/client";
+import * as live from "../api/teaching";
+import * as fake from "../fake/teaching";
 import type { ActionResult, SampleEmail } from "../types";
 
 const CHECK = "Please check the highlighted fields.";
+// The API where it has endpoints (DATA_SOURCE=api), else sample data.
+const impl = LIVE ? live : fake;
+
 const done = <T,>(school: string, result: ActionResult<T>) => {
   if (result.ok) revalidatePath(`/s/${school}`, "layout");
   return result;

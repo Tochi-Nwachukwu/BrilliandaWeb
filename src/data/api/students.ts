@@ -3,7 +3,7 @@
 import "server-only";
 import { ms } from "@brillianda/core/apiBridge";
 import type { StudentGender, StudentInput, StudentStatus } from "@brillianda/core/students";
-import type { ActionResult, AdmissionSettings, GuardianMatch, StudentDetail, StudentRow, StudentsList } from "../types";
+import type { ActionResult, AdmissionSettings, GuardianMatch, ParentsPage, StudentDetail, StudentRow, StudentsList } from "../types";
 import { api, fail, read } from "./client";
 
 const id = encodeURIComponent;
@@ -22,13 +22,17 @@ export async function listStudents(subdomain: string): Promise<StudentsList | nu
 }
 
 export async function getStudent(subdomain: string, studentId: string): Promise<StudentDetail | null> {
-  const s = await read<Detail>(subdomain, `/v1/students/${id(studentId)}`);
+  const [s, parents] = await Promise.all([
+    read<Detail>(subdomain, `/v1/students/${id(studentId)}`),
+    read<ParentsPage>(subdomain, "/v1/parents"),
+  ]);
   if (!s) return null;
+  const access = parents?.guardians.find((g) => g.id === s.guardian?.id)?.access ?? "none";
   return {
     ...s,
     gender: gender(s.gender),
-    // The parent app and registers aren't on the API yet (after v1).
-    guardian: s.guardian ? { ...s.guardian, parentAccess: "none" } : null,
+    guardian: s.guardian ? { ...s.guardian, parentAccess: access } : null,
+    // A student's own attendance isn't on the API yet.
     attendance: null,
     changes: s.changes.map((c) => ({ ...c, at: ms(c.at) })),
   };

@@ -40,7 +40,7 @@ export function ChildView({ child, reportHref, askCorrection }: { child: ParentC
         </dl>
       </section>
 
-      <ChildDetails details={child.details} corrections={child.corrections} ask={askCorrection} />
+      {child.details && <ChildDetails details={child.details} corrections={child.corrections} ask={askCorrection} />}
 
       <Card title="Results" description={child.results?.term}>
         {child.results?.published ? (

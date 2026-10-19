@@ -25,8 +25,8 @@ export default async function StudentRoute({ params }: PageProps<"/s/[school]/st
       setStatus={setStudentsStatus.bind(null, school)}
       remove={deleteStudent.bind(null, school, id)}
       reportTerms={reportTerms ?? []}
-      // The parent app and registers aren’t on the API yet.
-      inviteParent={LIVE ? undefined : inviteParent.bind(null, school, student.guardian?.id ?? "")}
+      inviteParent={student.guardian ? inviteParent.bind(null, school, student.guardian.id) : undefined}
+      // A student’s own attendance isn’t on the API yet.
       showAttendance={!LIVE}
     />
   );

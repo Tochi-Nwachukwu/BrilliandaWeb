@@ -1,6 +1,11 @@
 // Parents (batch 12; docs/data-contract.md). Screens import from here, never from fake/.
 import "server-only";
-import * as impl from "./fake/parents";
+import * as live from "./api/parents";
+import * as fake from "./fake/parents";
+import { LIVE } from "./source";
+
+// The API where it has endpoints (DATA_SOURCE=api), else sample data.
+const impl = LIVE ? live : fake;
 import type { ParentHome, ParentsPage, ReportCardData } from "./types";
 
 /** More › Parents: every guardian with children here, and whether they use the parent app. Owners and admins. */

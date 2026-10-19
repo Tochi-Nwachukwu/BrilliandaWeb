@@ -1,8 +1,12 @@
 // Teachers, what they teach, and the daily register (batch 11; docs/data-contract.md). Screens
 // import from here, never from fake/.
 import "server-only";
-import * as impl from "./fake/teaching";
+import * as live from "./api/teaching";
+import * as fake from "./fake/teaching";
 import { LIVE } from "./source";
+
+// The API where it has endpoints (DATA_SOURCE=api), else sample data.
+const impl = LIVE ? live : fake;
 import type { Register, RegistersToday, SubjectClass, TeacherHome, TeachersPage } from "./types";
 
 /** More › Teachers: every teacher (and open invite), with their form classes and subject classes. Owners and admins. */
@@ -27,7 +31,5 @@ export function getSubjectClass(subdomain: string, armId: string, subjectId: str
 
 /** Home's register card for admins: how many of today's registers are in, and which are missing. */
 export function getRegistersToday(subdomain: string): Promise<RegistersToday | null> {
-  // No registers on the API yet: Home leaves the card out.
-  if (LIVE) return Promise.resolve(null);
   return impl.getRegistersToday(subdomain);
 }
