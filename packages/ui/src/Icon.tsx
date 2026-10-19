@@ -138,6 +138,17 @@ const PATHS = {
       <path d="M4 10h16M8.5 3v4M15.5 3v4" />
     </>
   ),
+  user: (
+    <>
+      <circle cx="12" cy="12" r="8.5" />
+      <circle cx="12" cy="10" r="3" />
+      <path d="M6.5 18.2c1.2-2 3.1-3 5.5-3s4.3 1 5.5 3" />
+    </>
+  ),
+  phone: <path d="M6.5 4h2.6l1.4 4-2 1.3a10 10 0 0 0 6.2 6.2l1.3-2 4 1.4v2.6a1.5 1.5 0 0 1-1.6 1.5A15 15 0 0 1 5 5.6 1.5 1.5 0 0 1 6.5 4z" />,
+  edit: <path d="M14.5 5.5l4 4M4.5 19.5l1-4.5L15.8 4.7a1.4 1.4 0 0 1 2 0l1.5 1.5a1.4 1.4 0 0 1 0 2L9 18.5z" />,
+  back: <path d="M19 12H5M11 6l-6 6 6 6" />,
+  updown: <path d="M8 9l4-4 4 4M8 15l4 4 4-4" />,
 } as const;
 
 export type IconName = keyof typeof PATHS;

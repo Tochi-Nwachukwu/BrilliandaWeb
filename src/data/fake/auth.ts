@@ -38,7 +38,7 @@ const byEmail = (email: string) => store.users.find((u) => u.email === email);
 export async function getCurrentMember(subdomain: string): Promise<SignedInMember | null> {
   const user = await currentUser();
   const role = user && roleIn(user, subdomain);
-  return user && role ? { userId: user.id, fullName: user.fullName, email: user.email, role } : null;
+  return user && role ? { userId: user.id, fullName: user.fullName, email: user.email, role, photo: user.photo ?? null } : null;
 }
 
 export async function getMySchools(): Promise<SchoolSummary[]> {
@@ -178,6 +178,13 @@ export async function requireMember(subdomain: string, role?: SchoolRole) {
   const has = user && roleIn(user, subdomain);
   if (!user || !has || (role ? has !== role : has !== "owner" && has !== "admin")) return null;
   return user;
+}
+
+/** Anyone signed in at this school, whatever their role, with it; else null. */
+export async function requireSignedIn(subdomain: string) {
+  const user = await currentUser();
+  const role = user && roleIn(user, subdomain);
+  return user && role ? { user, role } : null;
 }
 
 /** Anyone on the school's staff (owner, admin or teacher), with their role; else null. Parents and students are not staff. */

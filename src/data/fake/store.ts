@@ -274,7 +274,7 @@ export type FakeSignupDraft = {
 };
 
 /** FAKE: plain-text passwords, because nothing here is real. Better Auth replaces all of this. */
-export type FakeUser = { id: string; fullName: string; email: string; password: string; phone?: string; schools: { subdomain: string; role: "owner" | "admin" | "teacher" | "parent" | "student" }[] };
+export type FakeUser = { id: string; fullName: string; email: string; password: string; phone?: string; photo?: string; schools: { subdomain: string; role: "owner" | "admin" | "teacher" | "parent" | "student" }[] };
 
 /** Greenfield's lists: JSS 1 for this session and JSS 2 for the next, shared; JSS 3's next one a draft. */
 function seedBookLists(): FakeStore["bookLists"] {

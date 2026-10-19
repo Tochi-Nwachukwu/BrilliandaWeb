@@ -45,7 +45,7 @@ async function SchoolApp({ params, children }: { params: Promise<{ school: strin
     <AppShell
       nav={nav}
       place={school.name}
-      account={{ fullName: me.fullName, roleLabel: ROLE_LABEL[me.role] }}
+      account={{ fullName: me.fullName, roleLabel: ROLE_LABEL[me.role], email: me.email, photo: me.photo, profileHref: `${base}/profile` }}
       sampleData={!LIVE}
       help={adminGuide(base)}
       signOut={signOut.bind(null, school.subdomain)}
@@ -61,12 +61,6 @@ async function SchoolApp({ params, children }: { params: Promise<{ school: strin
           <SchoolMark {...school} className="h-9 w-9 text-[13px]" />
           <span className="truncate text-[17px] font-semibold tracking-tight">{school.name}</span>
         </span>
-      }
-      note={
-        <>
-          <b className="mb-0.5 block text-text-primary">Coming soon</b>
-          Fees and messages.
-        </>
       }
     >
       {children}

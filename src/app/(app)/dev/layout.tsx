@@ -21,12 +21,6 @@ export default function DevLayout({ children }: LayoutProps<"/dev">) {
       account={{ fullName: "Amaka Obi", roleLabel: "School owner" }}
       sampleData
       signOut={devSignOut}
-      note={
-        <>
-          <b className="mb-0.5 block text-text-primary">Coming soon</b>
-          Attendance, fees, timetable and messages.
-        </>
-      }
     >
       {children}
     </AppShell>

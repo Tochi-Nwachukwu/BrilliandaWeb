@@ -38,7 +38,7 @@ async function Student({ params, children }: { params: Promise<{ school: string 
       nav={nav}
       help={studentGuide(base)}
       place={school.name}
-      account={{ fullName: me.fullName, roleLabel: ROLE_LABEL[me.role] }}
+      account={{ fullName: me.fullName, roleLabel: ROLE_LABEL[me.role], email: me.email, photo: me.photo, profileHref: `${base}/learn/profile` }}
       sampleData
       signOut={signOut.bind(null, school.subdomain)}
       mark={

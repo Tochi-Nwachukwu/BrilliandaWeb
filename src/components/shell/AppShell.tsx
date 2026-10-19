@@ -27,7 +27,27 @@ export type NavItem = {
   tour?: string;
 };
 
-export type ShellAccount = { fullName: string; roleLabel: string };
+export type ShellAccount = {
+  fullName: string;
+  roleLabel: string;
+  email?: string;
+  /** Their profile photo (a data URL); initials if none. */
+  photo?: string | null;
+  /** Where "My profile" goes; no link if absent. */
+  profileHref?: string;
+};
+
+/** A person's photo, or their initials on a soft circle. */
+export function Avatar({ name, photo, className }: { name: string; photo?: string | null; className?: string }) {
+  return photo ? (
+    // eslint-disable-next-line @next/next/no-img-element
+    <img src={photo} alt="" className={cx("shrink-0 rounded-full object-cover", className)} />
+  ) : (
+    <span aria-hidden className={cx("grid shrink-0 place-items-center rounded-full bg-accent-soft font-semibold text-accent", className)}>
+      {initials(name)}
+    </span>
+  );
+}
 
 
 function isActive(pathname: string, item: NavItem) {
@@ -52,7 +72,6 @@ export function AppShell({
   place,
   account,
   sampleData,
-  note,
   commands = [],
   signOut,
   mark,
@@ -65,7 +84,6 @@ export function AppShell({
   account: ShellAccount;
   /** Shows the "Sample data" badge while screens run on stand-in data. */
   sampleData?: boolean;
-  note?: ReactNode;
   /** Extra palette entries beyond the nav, e.g. "Add a student". */
   commands?: Command[];
   /** A Server Action from the backend; until then a fake one. */
@@ -78,6 +96,7 @@ export function AppShell({
 }) {
   const pathname = usePathname();
   const goTo: Command[] = nav.map((item) => ({ id: item.href, label: item.label, icon: item.icon, href: item.href, group: "Go to" }));
+  if (account.profileHref) goTo.push({ id: "profile", label: "My profile", icon: "user", href: account.profileHref, group: "Go to", keywords: ["account", "password", "photo"] });
   const helpCommands: Command[] = help
     ? [
         { id: "help", label: "Help", icon: "help", run: openHelp, group: "Help", keywords: ["questions", "how"] },
@@ -124,11 +143,9 @@ export function AppShell({
             );
           })}
         </nav>
-        {note && (
-          <div className="mt-auto rounded-2xl p-3.5 text-[13px] text-text-secondary" style={{ background: "var(--note-bg)" }}>
-            {note}
-          </div>
-        )}
+        <div className="mt-auto">
+          <AccountMenu account={account} signOut={signOut} card />
+        </div>
       </aside>
 
       <div className="min-w-0 px-4 pb-32 pt-3 md:px-3 md:pb-12">
@@ -148,7 +165,9 @@ export function AppShell({
               Sample data
             </Badge>
           )}
-          <AccountMenu account={account} signOut={signOut} />
+          <div className="md:hidden">
+            <AccountMenu account={account} signOut={signOut} />
+          </div>
         </header>
         <main>{children}</main>
         <Toaster />
@@ -189,7 +208,8 @@ const LOOKS: [Look, string][] = [
   ["neutral", "Neutral"],
 ];
 
-function AccountMenu({ account, signOut }: { account: ShellAccount; signOut?: () => void | Promise<void> }) {
+/** The account menu: a round photo button in the phone top bar, or a card at the foot of the sidebar. */
+function AccountMenu({ account, signOut, card = false }: { account: ShellAccount; signOut?: () => void | Promise<void>; card?: boolean }) {
   const look = useLook();
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
@@ -209,22 +229,50 @@ function AccountMenu({ account, signOut }: { account: ShellAccount; signOut?: ()
 
   return (
     <div ref={ref} className="relative">
-      <button
-        type="button"
-        aria-haspopup="true"
-        aria-expanded={open}
-        aria-label="Your account"
-        onClick={() => setOpen((value) => !value)}
-        className="grid h-11 w-11 place-items-center rounded-full bg-accent-soft text-[13px] font-semibold text-accent transition-transform hover:scale-105 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2"
-      >
-        {initials(account.fullName)}
-      </button>
+      {card ? (
+        <button
+          type="button"
+          aria-haspopup="true"
+          aria-expanded={open}
+          aria-label="Your account"
+          onClick={() => setOpen((value) => !value)}
+          className="flex w-full items-center gap-2.5 rounded-full bg-sunken py-1.5 pl-1.5 pr-3 text-left transition-colors hover:bg-hover focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-accent"
+        >
+          <Avatar name={account.fullName} photo={account.photo} className="h-10 w-10 text-[13px]" />
+          <span className="min-w-0 flex-1">
+            <span className="block truncate text-sm font-semibold leading-tight">{account.fullName}</span>
+            <span className="block truncate text-xs text-text-secondary">{account.email ?? account.roleLabel}</span>
+          </span>
+          <Icon name="updown" className="h-4 w-4 shrink-0 text-text-secondary" />
+        </button>
+      ) : (
+        <button
+          type="button"
+          aria-haspopup="true"
+          aria-expanded={open}
+          aria-label="Your account"
+          onClick={() => setOpen((value) => !value)}
+          className="grid h-11 w-11 place-items-center rounded-full transition-transform hover:scale-105 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2"
+        >
+          <Avatar name={account.fullName} photo={account.photo} className="h-11 w-11 text-[13px]" />
+        </button>
+      )}
       {open && (
-        <div className="absolute right-0 top-full z-40 mt-2 w-72 animate-pop rounded-3xl bg-surface p-2 shadow-float">
+        <div className={cx("absolute z-40 animate-pop rounded-3xl bg-surface p-2 shadow-float", card ? "inset-x-0 bottom-full mb-2" : "right-0 top-full mt-2 w-72")}>
           <div className="px-3 pb-3 pt-2">
             <p className="font-semibold">{account.fullName}</p>
             <p className="text-sm text-text-secondary">{account.roleLabel}</p>
           </div>
+          {account.profileHref && (
+            <Link
+              href={account.profileHref}
+              onClick={() => setOpen(false)}
+              className="mb-2 flex h-11 w-full items-center gap-2.5 rounded-2xl px-3 text-sm font-medium hover:bg-hover focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-accent"
+            >
+              <Icon name="user" className="h-[18px] w-[18px]" />
+              My profile
+            </Link>
+          )}
           <div className="px-3 pb-3">
             <p className="mb-2 text-xs font-medium text-text-secondary">Look</p>
             <div role="group" aria-label="Look" className="grid grid-cols-2 gap-1 rounded-full bg-sunken p-1">

@@ -573,6 +573,34 @@ themselves where they can, and feed the score sheets.
 
 ---
 
+### C16. My profile, in every dashboard
+
+**Problem.** Owners, admins, teachers, parents and students all need to fix their own name, add a
+photo and change their password while signed in. Today `GET /v1/me` only reads who they are.
+
+**What to store.** A photo on the user (a small square image; the browser already shrinks it to
+256×256 JPEG, under 200 KB as a data URL, or upload it as a file if you prefer).
+
+**Rules** (`packages/core/src/profile.ts`):
+
+- Name: first and last name, each 1 to 60 characters, saved as one full name ("first last").
+- Email and phone are **not** edited here: they are the school's records (a parent's phone is
+  on their guardian record). The page shows them locked.
+- Changing the password needs the current one; the new one follows the reset rules (8 to 128
+  characters) and can't be the same as the current one. Afterwards, sign out the person's
+  other devices, as a reset does.
+- Everyone changes only their own profile, whatever their role.
+
+**Endpoints we need.**
+
+| What | Suggested | Returns |
+|---|---|---|
+| Who I am, with photo and phone | `GET /v1/me` (add `photo`, `phone`) | as now, plus those |
+| Save my name | `PATCH /v1/me` `{ fullName }` | 204 |
+| Set or remove my photo | `PUT /v1/me/photo` `{ photo }` (data URL), `DELETE /v1/me/photo` | 204 |
+| Change my password | `POST /v1/me/password` `{ current, password }` | 204; 422 `current` when it's wrong |
+
+
 ## D. Rules both sides must share
 
 A total, grade, position or suggestion must never depend on which side worked it out. These

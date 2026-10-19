@@ -47,7 +47,19 @@ export type SubdomainCheck =
 export type SchoolRole = "owner" | "admin" | "teacher" | "parent" | "student";
 
 /** Who is signed in at a school, and as what. */
-export type SignedInMember = { userId: string; fullName: string; email: string; role: SchoolRole };
+export type SignedInMember = { userId: string; fullName: string; email: string; role: SchoolRole; photo?: string | null };
+
+/** My profile, in every dashboard. Email and phone are the school's records, shown but not edited here. */
+export type MyProfile = {
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string | null;
+  photo: string | null;
+  role: SchoolRole;
+  /** False where the API can't save these yet: the page shows them without editing. */
+  editable: boolean;
+};
 
 /** Someone on a school's team, or invited to it. */
 export type SchoolMember = {

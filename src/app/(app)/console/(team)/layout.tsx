@@ -28,7 +28,7 @@ async function Console({ children }: { children: React.ReactNode }) {
       nav={nav}
       help={consoleGuide()}
       place="Brillianda team"
-      account={{ fullName: me.fullName, roleLabel: "Brillianda team" }}
+      account={{ fullName: me.fullName, roleLabel: "Brillianda team", email: me.email }}
       sampleData
       signOut={teamSignOut}
       mark={
@@ -36,12 +36,6 @@ async function Console({ children }: { children: React.ReactNode }) {
           <span aria-hidden className="h-2.5 w-2.5 rounded-full bg-accent" />
           <span className="text-[17px] font-semibold tracking-tight">Brillianda team</span>
         </span>
-      }
-      note={
-        <>
-          <b className="mb-0.5 block text-text-primary">Every look is logged</b>
-          Opening a school writes to that school’s own change history.
-        </>
       }
     >
       {children}

@@ -50,7 +50,7 @@ async function Teacher({ params, children }: { params: Promise<{ school: string 
     <AppShell
       nav={nav}
       place={school.name}
-      account={{ fullName: me.fullName, roleLabel: ROLE_LABEL[me.role] }}
+      account={{ fullName: me.fullName, roleLabel: ROLE_LABEL[me.role], email: me.email, photo: me.photo, profileHref: `${base}/teach/profile` }}
       sampleData
       help={teacherGuide(base, isFormTeacher)}
       signOut={signOut.bind(null, school.subdomain)}
