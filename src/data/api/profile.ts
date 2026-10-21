@@ -1,5 +1,5 @@
 // My profile on the Brillianda API. It only reads who you are (GET /v1/me) for now; saving a name,
-// photo or password isn't on the API yet (docs/backend-requirements.md, C16).
+// photo or password isn't on the API yet (docs/backend-requirements.md, C14).
 import "server-only";
 import { splitName, type ProfileInput } from "@brillianda/core/profile";
 import type { ActionResult, MyProfile } from "../types";
