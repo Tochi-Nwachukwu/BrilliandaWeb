@@ -22,7 +22,7 @@ async function TeamLoginPage() {
   // Already signed in: straight to the console.
   if (await getTeamMember()) redirect("/console");
   return (
-    <AuthLayout title="Brillianda team" description="For the people who run Brillianda. Schools sign in at their own address.">
+    <AuthLayout title="Brillianda team" description="For the Brillianda team only, with a team account. Your school account won’t work here: schools sign in at their own address.">
       <TeamSignInForm action={teamSignIn} />
     </AuthLayout>
   );

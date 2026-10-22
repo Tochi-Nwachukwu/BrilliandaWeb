@@ -15,7 +15,7 @@ export async function getTeamMember(): Promise<TeamMember | null> {
 export async function teamSignIn(email: string, password: string): Promise<ActionResult<null>> {
   const result = await api<TeamMember>(null, "/v1/team/login", { method: "POST", body: { email, password } });
   if (result.ok) return { ok: true, data: null };
-  if (result.problem.code === "invalid_credentials") return { ok: false, error: "That email and password don’t match." };
+  if (result.problem.code === "invalid_credentials") return { ok: false, error: "That email and password don’t match a team account. School accounts sign in at their school’s address." };
   return fail(result);
 }
 

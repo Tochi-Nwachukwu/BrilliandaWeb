@@ -36,7 +36,7 @@ export async function getTeamMember(): Promise<TeamMember | null> {
 export async function teamSignIn(email: string, password: string): Promise<ActionResult<null>> {
   await pause();
   const user = store.teamUsers.find((u) => u.email === email.trim().toLowerCase());
-  if (!user || user.password !== password) return fail("That email and password don’t match a team account.");
+  if (!user || user.password !== password) return fail("That email and password don’t match a team account. School accounts sign in at their school’s address.");
   const token = crypto.randomUUID();
   store.teamSessions.set(token, { teamUserId: user.id });
   (await cookies()).set({ name: TEAM_COOKIE, value: token, httpOnly: true, sameSite: "strict", path: "/console" });
