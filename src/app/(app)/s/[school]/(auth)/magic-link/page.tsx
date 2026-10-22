@@ -7,6 +7,7 @@ import { EmailRequestForm } from "@/components/auth/forms";
 import { authLinkClass } from "@/components/auth/styles";
 import { schoolFromParams } from "@/components/school/school";
 import { sendMagicLink } from "@/data/actions/auth";
+import { schoolBase } from "@/lib/schoolBase";
 
 export const metadata: Metadata = { title: "Email me a sign-in link" };
 
@@ -20,13 +21,14 @@ export default function MagicLinkPage({ params }: PageProps<"/s/[school]/magic-l
 
 async function MagicLink({ params }: { params: Promise<{ school: string }> }) {
   const school = await schoolFromParams(params);
+  const sb = await schoolBase(school.subdomain);
   return (
     <AuthLayout
       school={school}
       title="Sign in with a link"
       description="We’ll email you a link that signs you in once, no password needed."
       footer={
-        <Link href={`/s/${school.subdomain}/login`} className={authLinkClass}>
+        <Link href={`${sb}/login`} className={authLinkClass}>
           Sign in with a password instead
         </Link>
       }

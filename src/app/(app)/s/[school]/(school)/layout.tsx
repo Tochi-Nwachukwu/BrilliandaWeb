@@ -10,6 +10,7 @@ import { signOut } from "@/data/actions/auth";
 import { getCurrentMember } from "@/data/auth";
 import { countOpenCorrections } from "@/data/corrections";
 import { LIVE } from "@/data/source";
+import { schoolBase } from "@/lib/schoolBase";
 
 // The signed-in part of a school: the shell with the plan's tabs. Anyone not signed in at this
 // school goes to its sign-in page.
@@ -23,7 +24,8 @@ export default function SchoolAppLayout({ children, params }: LayoutProps<"/s/[s
 
 async function SchoolApp({ params, children }: { params: Promise<{ school: string }>; children: React.ReactNode }) {
   const school = await schoolFromParams(params);
-  const base = `/s/${school.subdomain}`;
+  const sb = await schoolBase(school.subdomain);
+  const base = sb;
   const me = await getCurrentMember(school.subdomain);
   if (!me) redirect(`${base}/login`);
   // Teachers have their own screens (batch 11); the admin ones stay closed to them.
@@ -34,7 +36,7 @@ async function SchoolApp({ params, children }: { params: Promise<{ school: strin
   const waiting = await countOpenCorrections(school.subdomain);
 
   const nav: NavItem[] = [
-    { href: base, label: "Home", icon: "home", exact: true, tour: "nav-home" },
+    { href: base || "/", label: "Home", icon: "home", exact: true, tour: "nav-home" },
     { href: `${base}/students`, label: "Students", icon: "students", tour: "nav-students" },
     { href: `${base}/classes`, label: "Classes", icon: "classes", tour: "nav-classes" },
     { href: `${base}/results`, label: "Results", icon: "results", tour: "nav-results" },

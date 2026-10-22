@@ -1,10 +1,12 @@
 "use client";
 
+
 import { PageHeader } from "@brillianda/ui/PageHeader";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import type { ActionResult, ArmOption, GuardianMatch } from "@/data/types";
 import { blankStudent, StudentForm } from "../StudentForm";
+import { useSchoolBase } from "@/components/school/SchoolBase";
 
 export function AddStudent({
   school,
@@ -21,13 +23,14 @@ export function AddStudent({
   addStudent: (input: unknown) => Promise<ActionResult<{ id: string; admissionNo: string; fullName: string }>>;
   findGuardian: (phone: string) => Promise<GuardianMatch | null>;
 }) {
+  const sb = useSchoolBase(school);
   const router = useRouter();
   return (
     <div className="grid gap-4">
       <PageHeader
         title="Add a student"
         actions={
-          <Link href={`/s/${school}/students`} className="text-sm font-medium text-accent hover:underline">
+          <Link href={`${sb}/students`} className="text-sm font-medium text-accent hover:underline">
             Back to students
           </Link>
         }
@@ -42,7 +45,7 @@ export function AddStudent({
         save={addStudent}
         findGuardian={findGuardian}
         onSaved={({ id, another }) => {
-          if (!another && id) router.push(`/s/${school}/students/${id}`);
+          if (!another && id) router.push(`${sb}/students/${id}`);
         }}
       />
     </div>

@@ -11,11 +11,15 @@ test("a school's own address shows its pages and keeps it signed in", async ({ p
   await page.getByLabel("Email").fill("owner@greenfield.ng");
   await page.getByLabel("Password", { exact: true }).fill("brillianda");
   await page.getByRole("button", { name: "Sign in", exact: true }).click();
-  await expect(page).toHaveURL(/greenfield\.localhost:3100\/(s\/greenfield)?$/);
+  await expect(page).toHaveURL(/greenfield\.localhost:3100\/$/);
 
   // A page by its short address.
   await page.goto(at("greenfield", "/classes"));
   await expect(page.getByRole("heading", { name: "Classes", exact: true }).locator("visible=true")).toBeVisible();
+
+  // Links here stay short: the tab bar goes to /students, not /s/greenfield/students.
+  await page.getByRole("navigation", { name: "Main" }).locator("visible=true").getByRole("link", { name: "Students" }).click();
+  await expect(page).toHaveURL(at("greenfield", "/students"));
 
   // The school's own app manifest.
   await page.goto(at("greenfield", "/manifest.webmanifest"));

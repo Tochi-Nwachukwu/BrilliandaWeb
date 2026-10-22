@@ -1,5 +1,6 @@
 "use client";
 
+
 import { GENDER_LABEL, matchesSearch, STATUS_DETAIL, STATUS_LABEL, STUDENT_STATUSES, toCsv, type StudentStatus } from "@brillianda/core/students";
 import { ActionBar } from "@brillianda/ui/ActionBar";
 import { Badge, type Tone } from "@brillianda/ui/Badge";
@@ -19,6 +20,7 @@ import { useRouter } from "next/navigation";
 import { useMemo, useState, useTransition } from "react";
 import { initials } from "@/lib/initials";
 import type { ActionResult, ArmOption, StudentRow, StudentsList } from "@/data/types";
+import { useSchoolBase } from "@/components/school/SchoolBase";
 
 export const STATUS_TONE: Record<StudentStatus, Tone> = { active: "success", suspended: "warning", withdrawn: "neutral", transferred: "info", graduated: "info" };
 
@@ -57,6 +59,7 @@ function download(filename: string, csv: string) {
 
 /** The student list (plan: "Managing students"). Filters and selection stay on this device. */
 export function StudentsView({ school, list, actions }: { school: string; list: StudentsList; actions: StudentListActions }) {
+  const sb = useSchoolBase(school);
   const router = useRouter();
   const [query, setQuery] = useState("");
   const [levelId, setLevelId] = useState("");
@@ -89,7 +92,7 @@ export function StudentsView({ school, list, actions }: { school: string; list: 
         header: "Name",
         enableHiding: false,
         cell: ({ row }) => (
-          <Link href={`/s/${school}/students/${row.original.id}`} onClick={(e) => e.stopPropagation()} className="font-medium hover:text-accent hover:underline">
+          <Link href={`${sb}/students/${row.original.id}`} onClick={(e) => e.stopPropagation()} className="font-medium hover:text-accent hover:underline">
             {row.original.fullName}
           </Link>
         ),
@@ -100,7 +103,7 @@ export function StudentsView({ school, list, actions }: { school: string; list: 
       { accessorKey: "status", header: "Status", cell: ({ row }) => <Badge tone={STATUS_TONE[row.original.status]}>{STATUS_LABEL[row.original.status]}</Badge> },
       { accessorKey: "guardianName", header: "Guardian", cell: ({ row }) => row.original.guardianName ?? <span className="text-text-muted">None yet</span> },
     ],
-    [arms, school],
+    [arms, sb],
   );
 
   const exportCsv = (rows: StudentRow[]) => {
@@ -118,7 +121,7 @@ export function StudentsView({ school, list, actions }: { school: string; list: 
         <PageHeader title="Students" />
         <EmptyState title="Set up your classes first">
           Every student sits in a class.{" "}
-          <Link href={`/s/${school}/classes`} className="font-medium text-accent hover:underline">
+          <Link href={`${sb}/classes`} className="font-medium text-accent hover:underline">
             Go to Classes
           </Link>
         </EmptyState>
@@ -135,14 +138,14 @@ export function StudentsView({ school, list, actions }: { school: string; list: 
         actions={
           <div className="flex flex-wrap gap-2">
             <Link
-              href={`/s/${school}/students/import`}
+              href={`${sb}/students/import`}
               className="inline-flex min-h-[42px] items-center gap-2 rounded-full bg-raise px-5 text-sm font-medium shadow-raised hover:bg-hover focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-accent"
             >
               <Icon name="upload" className="h-4 w-4" />
               Import
             </Link>
             <Link
-              href={`/s/${school}/students/new`}
+              href={`${sb}/students/new`}
               className="inline-flex min-h-[42px] items-center gap-2 rounded-full bg-primary px-5 text-sm font-medium text-primary-text hover:bg-primary-hover focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2"
             >
               <Icon name="plus" className="h-4 w-4" />
@@ -240,7 +243,7 @@ export function StudentsView({ school, list, actions }: { school: string; list: 
         getRowId={(s) => s.id}
         selected={selected}
         onSelectedChange={setSelected}
-        onOpen={(s) => router.push(`/s/${school}/students/${s.id}`)}
+        onOpen={(s) => router.push(`${sb}/students/${s.id}`)}
         pageSize={50}
         empty={<EmptyState title={query || active ? "No students match" : "No students yet"}>{query || active ? "Try another search or clear the filters." : "Add your first student, or import your whole list."}</EmptyState>}
         renderCard={(s) => {

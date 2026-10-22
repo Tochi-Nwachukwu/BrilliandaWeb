@@ -16,6 +16,7 @@ import { getRegistersToday } from "@/data/teaching";
 import type { SessionSetup } from "@/data/types";
 import { formatDate, formatDay, greeting, plural, soonLabel, timeAgo, todayInLagos } from "@/lib/time";
 import { SetupChecklist } from "./SetupChecklist";
+import { schoolBase } from "@/lib/schoolBase";
 
 export const metadata: Metadata = { title: "Home" };
 
@@ -30,6 +31,7 @@ function whereWeAre(session: SessionSetup, position: TermPosition): string {
 // Home in today's design (plan: the setup checklist first, then counts and recent changes).
 export default async function SchoolHome({ params }: PageProps<"/s/[school]">) {
   const school = await schoolFromParams(params);
+  const sb = await schoolBase(school.subdomain);
   // Greeting and term week depend on the time now.
   await connection();
   const [me, setup, summary, session, registers, birthdays] = await Promise.all([
@@ -43,7 +45,7 @@ export default async function SchoolHome({ params }: PageProps<"/s/[school]">) {
   if (!me || !setup || !summary || !session) return null;
 
   const now = new Date();
-  const base = `/s/${school.subdomain}`;
+  const base = sb;
   const isOwner = me.role === "owner";
   const steps = setup.items.filter((item) => isOwner || (item.id !== "admins" && item.id !== "branding"));
   const stepsDone = steps.filter((item) => item.done).length;

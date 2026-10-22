@@ -11,6 +11,7 @@ import { schoolFromParams } from "@/components/school/school";
 import { acceptInvite } from "@/data/actions/auth";
 import { getInvite } from "@/data/auth";
 import { LIVE } from "@/data/source";
+import { schoolBase } from "@/lib/schoolBase";
 
 export const metadata: Metadata = { title: "Join your school" };
 
@@ -24,12 +25,13 @@ export default function AcceptInvitePage({ params }: PageProps<"/s/[school]/invi
 
 async function Accept({ params }: { params: Promise<{ school: string; token: string }> }) {
   const school = await schoolFromParams(params);
+  const sb = await schoolBase(school.subdomain);
   const { token } = await params;
   // Whether an invite has expired depends on the time now, so this part is worked out per request.
   await connection();
   const invite = await getInvite(school.subdomain, token);
   const signIn = (
-    <Link href={`/s/${school.subdomain}/login`} className={authLinkClass}>
+    <Link href={`${sb}/login`} className={authLinkClass}>
       Go to sign in
     </Link>
   );
@@ -64,7 +66,7 @@ async function Accept({ params }: { params: Promise<{ school: string; token: str
         </p>
       }
     >
-      <AcceptInviteFlow action={acceptInvite.bind(null, school.subdomain, token)} homeHref={`/s/${school.subdomain}`} hasAccount={invite.hasAccount} askName={!invite.fullName} joinOnly={LIVE} />
+      <AcceptInviteFlow action={acceptInvite.bind(null, school.subdomain, token)} homeHref={sb || "/"} hasAccount={invite.hasAccount} askName={!invite.fullName} joinOnly={LIVE} />
     </AuthLayout>
   );
 }

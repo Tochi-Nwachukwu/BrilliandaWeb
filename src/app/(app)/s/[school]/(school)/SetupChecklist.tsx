@@ -1,5 +1,6 @@
 "use client";
 
+
 import { Button } from "@brillianda/ui/Button";
 import { ProgressBar } from "@brillianda/ui/Cards";
 import { cx } from "@brillianda/ui/cx";
@@ -9,6 +10,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useTransition } from "react";
 import type { ActionResult, SetupItemId, SetupProgress } from "@/data/types";
+import { useSchoolBase } from "@/components/school/SchoolBase";
 
 // The plan's setup checklist: worked through in any order, left halfway, never a gate. Each step
 // says what it unlocks. It can be hidden, and it goes for good once everything is done.
@@ -36,6 +38,7 @@ export function SetupChecklist({
   isOwner: boolean;
   hide: (hidden: boolean) => Promise<ActionResult<null>>;
 }) {
+  const sb = useSchoolBase(school);
   const router = useRouter();
   const [pending, startTransition] = useTransition();
   // Only the owner invites admins and sets the branding, so admins don't see those steps.
@@ -99,7 +102,7 @@ export function SetupChecklist({
               </div>
               {!isDone && (
                 <Link
-                  href={`/s/${school}/${item.path}`}
+                  href={`${sb}/${item.path}`}
                   className={cx(
                     "col-start-2 inline-flex min-h-[36px] items-center justify-self-start rounded-full px-4 text-[13px] font-medium focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-accent sm:col-start-auto",
                     id === next ? "bg-primary text-primary-text" : "bg-raise shadow-raised",

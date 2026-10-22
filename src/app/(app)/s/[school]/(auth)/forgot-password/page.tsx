@@ -7,6 +7,7 @@ import { EmailRequestForm } from "@/components/auth/forms";
 import { authLinkClass } from "@/components/auth/styles";
 import { schoolFromParams } from "@/components/school/school";
 import { requestPasswordReset } from "@/data/actions/auth";
+import { schoolBase } from "@/lib/schoolBase";
 
 export const metadata: Metadata = { title: "Reset your password" };
 
@@ -20,13 +21,14 @@ export default function ForgotPasswordPage({ params }: PageProps<"/s/[school]/fo
 
 async function Forgot({ params }: { params: Promise<{ school: string }> }) {
   const school = await schoolFromParams(params);
+  const sb = await schoolBase(school.subdomain);
   return (
     <AuthLayout
       school={school}
       title="Reset your password"
       description="Enter the email you sign in with and we’ll send you a link to choose a new password."
       footer={
-        <Link href={`/s/${school.subdomain}/login`} className={authLinkClass}>
+        <Link href={`${sb}/login`} className={authLinkClass}>
           Back to sign in
         </Link>
       }

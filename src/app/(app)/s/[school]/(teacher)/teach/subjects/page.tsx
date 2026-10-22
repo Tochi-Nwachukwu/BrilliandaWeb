@@ -4,12 +4,14 @@ import type { Metadata } from "next";
 import { connection } from "next/server";
 import { SheetList } from "@/components/results/SheetList";
 import { getMySheets } from "@/data/results";
+import { schoolBase } from "@/lib/schoolBase";
 
 export const metadata: Metadata = { title: "My subjects" };
 
 /** A teacher's score sheets this term, one per class and subject they teach. */
 export default async function TeacherSubjects({ params }: PageProps<"/s/[school]/teach/subjects">) {
   const { school } = await params;
+  const sb = await schoolBase(school);
   await connection();
   const mine = await getMySheets(school);
   if (!mine) return null;
@@ -25,7 +27,7 @@ export default async function TeacherSubjects({ params }: PageProps<"/s/[school]
           <EmptyState title="No subjects yet">When your school gives you subjects to teach, each class’s score sheet shows here.</EmptyState>
         </div>
       ) : (
-        <SheetList sheets={mine.sheets} show="class" hrefOf={(s) => `/s/${school}/teach/subjects/${s.armId}/${s.subjectId}`} />
+        <SheetList sheets={mine.sheets} show="class" hrefOf={(s) => `${sb}/teach/subjects/${s.armId}/${s.subjectId}`} />
       )}
     </div>
   );

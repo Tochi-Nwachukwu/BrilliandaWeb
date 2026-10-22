@@ -4,11 +4,13 @@ import { connection } from "next/server";
 import { saveBookList, setBookListShared } from "@/data/actions/booklists";
 import { getBookLists } from "@/data/booklists";
 import { BookListsView } from "./BookListsView";
+import { schoolBase } from "@/lib/schoolBase";
 
 export const metadata: Metadata = { title: "Book lists" };
 
 export default async function BookListsPage({ params, searchParams }: PageProps<"/s/[school]/more/book-lists">) {
   const { school } = await params;
+  const sb = await schoolBase(school);
   const query = await searchParams;
   await connection();
   const session = Number(query.session) || undefined;
@@ -21,7 +23,7 @@ export default async function BookListsPage({ params, searchParams }: PageProps<
       <BookListsView
         key={page.startYear}
         page={page}
-        base={`/s/${school}/more/book-lists`}
+        base={`${sb}/more/book-lists`}
         initialLevel={level}
         save={saveBookList.bind(null, school)}
         share={setBookListShared.bind(null, school)}

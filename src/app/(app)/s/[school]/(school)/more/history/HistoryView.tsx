@@ -1,5 +1,6 @@
 "use client";
 
+
 import { Card } from "@brillianda/ui/Cards";
 import { cx } from "@brillianda/ui/cx";
 import { EmptyState } from "@brillianda/ui/EmptyState";
@@ -9,6 +10,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState, useTransition } from "react";
 import type { ChangeFilter, ChangeLog } from "@/data/types";
 import { plural } from "@/lib/time";
+import { useSchoolBase } from "@/components/school/SchoolBase";
 
 const ZONE = "Africa/Lagos";
 const dayOf = (at: number) => new Intl.DateTimeFormat("en-CA", { timeZone: ZONE, year: "numeric", month: "2-digit", day: "2-digit" }).format(at);
@@ -27,10 +29,11 @@ const lower = (s: string) => s.charAt(0).toLowerCase() + s.slice(1);
 
 /** More › Change history: filters in the address (so a filtered view can be shared), grouped by day. */
 export function HistoryView({ school, log, filter, now }: { school: string; log: ChangeLog; filter: ChangeFilter & { show: number }; now: number }) {
+  const sb = useSchoolBase(school);
   const router = useRouter();
   const [pending, startTransition] = useTransition();
   const [search, setSearch] = useState(filter.search ?? "");
-  const base = `/s/${school}/more/history`;
+  const base = `${sb}/more/history`;
 
   const query = (patch: Record<string, string | number | undefined>) => {
     const next = { who: filter.who, q: filter.search, from: filter.from, to: filter.to, student: filter.studentId, ...patch };
@@ -80,7 +83,7 @@ export function HistoryView({ school, log, filter, now }: { school: string; log:
             <div className="flex flex-wrap items-center justify-between gap-2 rounded-2xl bg-accent-soft px-4 py-3 text-sm">
               <span>
                 Only changes to{" "}
-                <Link href={`/s/${school}/students/${log.student.id}`} className="font-semibold text-accent hover:underline">
+                <Link href={`${sb}/students/${log.student.id}`} className="font-semibold text-accent hover:underline">
                   {log.student.name}
                 </Link>
               </span>

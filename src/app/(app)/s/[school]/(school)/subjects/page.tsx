@@ -6,12 +6,14 @@ import { addSubjects, removeSubject, renameSubject, setSubjectDepartment, setSub
 import { getSubjectsSetup } from "@/data/subjects";
 import { FirstSubjects } from "./FirstSubjects";
 import { SubjectsView } from "./SubjectsView";
+import { schoolBase } from "@/lib/schoolBase";
 
 export const metadata: Metadata = { title: "Subjects" };
 
 /** Classes first; then the first pick from the catalogue; then which classes take what. */
 export default async function SubjectsPage({ params }: PageProps<"/s/[school]/subjects">) {
   const { school } = await params;
+  const sb = await schoolBase(school);
   const setup = await getSubjectsSetup(school);
   if (!setup) return null;
 
@@ -21,7 +23,7 @@ export default async function SubjectsPage({ params }: PageProps<"/s/[school]/su
         <PageHeader title="Subjects" />
         <EmptyState title="Set up your classes first">
           Subjects attach to class levels, so add your classes, then come back.{" "}
-          <Link href={`/s/${school}/classes`} className="font-medium text-accent hover:underline">
+          <Link href={`${sb}/classes`} className="font-medium text-accent hover:underline">
             Go to Classes
           </Link>
         </EmptyState>

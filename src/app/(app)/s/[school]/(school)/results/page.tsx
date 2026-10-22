@@ -7,24 +7,26 @@ import Link from "next/link";
 import { connection } from "next/server";
 import { getResultsOverview } from "@/data/results";
 import { formatDate, timeAgo } from "@/lib/time";
+import { schoolBase } from "@/lib/schoolBase";
 
 export const metadata: Metadata = { title: "Results" };
 
 /** Results this term: each class's score sheets, and teachers' requests to unlock one. */
 export default async function ResultsPage({ params }: PageProps<"/s/[school]/results">) {
   const { school } = await params;
+  const sb = await schoolBase(school);
   await connection();
   const o = await getResultsOverview(school);
   if (!o) return null;
   const now = new Date().getTime();
-  const base = `/s/${school}/results`;
+  const base = `${sb}/results`;
 
   return (
     <div className="grid gap-4">
       <PageHeader
         title="Results"
         actions={
-          <Link href={`/s/${school}/more/results`} className="inline-flex min-h-[44px] items-center rounded-full bg-raise px-5 text-sm font-medium shadow-raised hover:bg-hover focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-accent">
+          <Link href={`${sb}/more/results`} className="inline-flex min-h-[44px] items-center rounded-full bg-raise px-5 text-sm font-medium shadow-raised hover:bg-hover focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-accent">
             Results settings
           </Link>
         }

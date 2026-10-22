@@ -5,18 +5,20 @@ import { connection } from "next/server";
 import { PrintButton } from "@/components/results/PublishButton";
 import { ReportCard } from "@/components/results/ReportCard";
 import { getReportCard } from "@/data/reports";
+import { schoolBase } from "@/lib/schoolBase";
 
 export const metadata: Metadata = { title: "Report card" };
 
 export default async function AdminReportCard({ params }: PageProps<"/s/[school]/results/[armId]/report/[studentId]">) {
   const { school, armId, studentId } = await params;
+  const sb = await schoolBase(school);
   await connection();
   const card = await getReportCard(school, studentId);
   if (!card) notFound();
   return (
     <div className="grid gap-4">
       <div className="flex flex-wrap items-center justify-between gap-3 print:hidden">
-        <Link href={`/s/${school}/results/${armId}/broadsheet`} className="rounded text-sm font-medium text-text-secondary hover:text-text-primary focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-accent">
+        <Link href={`${sb}/results/${armId}/broadsheet`} className="rounded text-sm font-medium text-text-secondary hover:text-text-primary focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-accent">
           ← Broadsheet
         </Link>
         <PrintButton />

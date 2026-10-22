@@ -8,6 +8,7 @@ import { RemarksForm } from "@/components/results/RemarksForm";
 import { saveRating, saveRemark } from "@/data/actions/reports";
 import { getBroadsheet, getClassReports } from "@/data/reports";
 import { getTeacherHome } from "@/data/teaching";
+import { schoolBase } from "@/lib/schoolBase";
 
 export const metadata: Metadata = { title: "My class" };
 
@@ -18,6 +19,7 @@ const pill = (on: boolean) =>
 /** A form teacher's class this term: its broadsheet, and the remarks and ratings they write. */
 export default async function MyClassPage({ params, searchParams }: PageProps<"/s/[school]/teach/class">) {
   const { school } = await params;
+  const sb = await schoolBase(school);
   const query = await searchParams;
   await connection();
   const home = await getTeacherHome(school);
@@ -37,7 +39,7 @@ export default async function MyClassPage({ params, searchParams }: PageProps<"/
   const tab = one(query.tab) === "remarks" ? "remarks" : "broadsheet";
   const [sheet, reports] = await Promise.all([getBroadsheet(school, armId), getClassReports(school, armId)]);
   if (!sheet || !reports) return null;
-  const base = `/s/${school}/teach/class?arm=${armId}`;
+  const base = `${sb}/teach/class?arm=${armId}`;
 
   return (
     <>
@@ -48,7 +50,7 @@ export default async function MyClassPage({ params, searchParams }: PageProps<"/
       {home.formArms.length > 1 && (
         <nav aria-label="Your form classes" className="mb-3 flex flex-wrap gap-2">
           {home.formArms.map((a) => (
-            <Link key={a.armId} href={`/s/${school}/teach/class?arm=${a.armId}`} aria-current={a.armId === armId ? "page" : undefined} className={pill(a.armId === armId)}>
+            <Link key={a.armId} href={`${sb}/teach/class?arm=${a.armId}`} aria-current={a.armId === armId ? "page" : undefined} className={pill(a.armId === armId)}>
               {a.label}
             </Link>
           ))}
@@ -63,7 +65,7 @@ export default async function MyClassPage({ params, searchParams }: PageProps<"/
         </Link>
       </nav>
       {tab === "broadsheet" ? (
-        <BroadsheetTable sheet={sheet} reportHref={(id) => `/s/${school}/teach/class/report/${id}`} />
+        <BroadsheetTable sheet={sheet} reportHref={(id) => `${sb}/teach/class/report/${id}`} />
       ) : (
         <RemarksForm reports={reports} saveRemark={saveRemark.bind(null, school, armId)} saveRating={saveRating.bind(null, school, armId)} />
       )}

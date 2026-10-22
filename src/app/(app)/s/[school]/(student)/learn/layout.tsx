@@ -8,6 +8,7 @@ import { SchoolMark } from "@/components/school/SchoolBrand";
 import { schoolFromParams } from "@/components/school/school";
 import { signOut } from "@/data/actions/auth";
 import { getCurrentMember } from "@/data/auth";
+import { schoolBase } from "@/lib/schoolBase";
 
 // A student's part of the school (batch 23): only themselves. Everyone else goes back to their own screens.
 export default function StudentLayout({ children, params }: LayoutProps<"/s/[school]/learn">) {
@@ -20,10 +21,11 @@ export default function StudentLayout({ children, params }: LayoutProps<"/s/[sch
 
 async function Student({ params, children }: { params: Promise<{ school: string }>; children: React.ReactNode }) {
   const school = await schoolFromParams(params);
-  const base = `/s/${school.subdomain}`;
+  const sb = await schoolBase(school.subdomain);
+  const base = sb;
   const me = await getCurrentMember(school.subdomain);
   if (!me) redirect(`${base}/login`);
-  if (me.role !== "student") redirect(base);
+  if (me.role !== "student") redirect(base || "/");
 
   const nav: NavItem[] = [
     { href: `${base}/learn`, label: "Today", icon: "home", exact: true, tour: "nav-today" },

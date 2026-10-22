@@ -8,6 +8,7 @@ import { SchoolMark } from "@/components/school/SchoolBrand";
 import { schoolFromParams } from "@/components/school/school";
 import { signOut } from "@/data/actions/auth";
 import { getCurrentMember } from "@/data/auth";
+import { schoolBase } from "@/lib/schoolBase";
 
 // A parent's part of the school (batch 12): their own children, nothing else. Everyone else goes
 // back to the school's own screens.
@@ -21,10 +22,11 @@ export default function ParentLayout({ children, params }: LayoutProps<"/s/[scho
 
 async function Parent({ params, children }: { params: Promise<{ school: string }>; children: React.ReactNode }) {
   const school = await schoolFromParams(params);
-  const base = `/s/${school.subdomain}`;
+  const sb = await schoolBase(school.subdomain);
+  const base = sb;
   const me = await getCurrentMember(school.subdomain);
   if (!me) redirect(`${base}/login`);
-  if (me.role !== "parent") redirect(base);
+  if (me.role !== "parent") redirect(base || "/");
 
   const nav: NavItem[] = [{ href: `${base}/family`, label: "My children", short: "Children", icon: "students", tour: "nav-children" }];
 

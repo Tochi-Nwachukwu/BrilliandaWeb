@@ -1,5 +1,6 @@
 "use client";
 
+
 import { armCode, armLayoutSchema, SECTION_LABEL, type Section } from "@brillianda/core/classes";
 import { Alert } from "@brillianda/ui/Alert";
 import { Button } from "@brillianda/ui/Button";
@@ -14,6 +15,7 @@ import { useState, useTransition } from "react";
 import type { ActionResult, ClassStructure } from "@/data/types";
 import { firstErrors, type Errors } from "@/lib/form";
 import { errorsFor } from "@/lib/formCheck";
+import { useSchoolBase } from "@/components/school/SchoolBase";
 
 type Row = { key: string; name: string; code: string; codeTouched: boolean; levels: Set<string> };
 
@@ -25,6 +27,7 @@ const plural = (n: number, one: string, many = `${one}s`) => `${n} ${n === 1 ? o
  * that have each arm, then save once. Arms with students stay put: they can't be unticked here.
  */
 export function ArmsEditor({ school, structure, save }: { school: string; structure: ClassStructure; save: (input: unknown) => Promise<ActionResult<{ summary: string }>> }) {
+  const sb = useSchoolBase(school);
   const router = useRouter();
   const levels = structure.levels.filter((l) => !l.archived);
   const armIn = (levelId: string, armNameId: string) => structure.arms.find((a) => a.levelId === levelId && a.armNameId === armNameId);
@@ -99,7 +102,7 @@ export function ArmsEditor({ school, structure, save }: { school: string; struct
         return;
       }
       toast(result.data.summary === "no changes" ? "Nothing changed" : "Arms saved");
-      router.push(`/s/${school}/classes`);
+      router.push(`${sb}/classes`);
       router.refresh();
     });
   };
@@ -109,7 +112,7 @@ export function ArmsEditor({ school, structure, save }: { school: string; struct
       <PageHeader
         title="Edit arms"
         actions={
-          <Link href={`/s/${school}/classes`} className="inline-flex min-h-[44px] items-center rounded-full px-4 text-sm font-medium text-text-secondary hover:bg-hover focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-accent">
+          <Link href={`${sb}/classes`} className="inline-flex min-h-[44px] items-center rounded-full px-4 text-sm font-medium text-text-secondary hover:bg-hover focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-accent">
             Cancel
           </Link>
         }

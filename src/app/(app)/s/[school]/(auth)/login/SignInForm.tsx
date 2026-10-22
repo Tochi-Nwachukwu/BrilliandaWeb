@@ -1,5 +1,6 @@
 "use client";
 
+
 import { Button } from "@brillianda/ui/Button";
 import { PasswordField } from "@brillianda/ui/PasswordField";
 import { TextField } from "@brillianda/ui/TextField";
@@ -9,6 +10,7 @@ import { useRef, useState, useTransition, type FormEvent } from "react";
 import { FormError, useFocusOnFailure } from "@/components/auth/FormError";
 import { checkLater, firstErrors, type Errors } from "@/lib/form";
 import type { ActionResult } from "@/data/types";
+import { useSchoolBase } from "@/components/school/SchoolBase";
 
 /** Email and password at one school. A wrong password and an unknown email read the same. */
 export function SignInForm({
@@ -21,6 +23,7 @@ export function SignInForm({
   /** FAKE ONLY: one-tap sample accounts. */
   samples: { label: string; email: string; password: string }[] | null;
 }) {
+  const sb = useSchoolBase(school);
   const router = useRouter();
   const formRef = useRef<HTMLFormElement>(null);
   const [values, setValues] = useState({ email: "", password: "" });
@@ -34,7 +37,7 @@ export function SignInForm({
     startTransition(async () => {
       const result = await action(input);
       if (result.ok) {
-        router.replace(`/s/${school}`);
+        router.replace(sb || "/");
         return;
       }
       setErrors(firstErrors(result.fieldErrors));
@@ -67,7 +70,7 @@ export function SignInForm({
           <PasswordField label="Password" name="password" autoComplete="current-password" data-focus-on-failure value={values.password} onChange={(e) => set("password")(e.target.value)} error={errors.password} />
           <div className="mt-2 text-right">
             <Link
-              href={`/s/${school}/forgot-password`}
+              href={`${sb}/forgot-password`}
               className="rounded text-sm text-text-secondary underline-offset-4 hover:text-text-primary hover:underline focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2"
             >
               Forgot your password?

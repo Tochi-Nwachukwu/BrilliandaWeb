@@ -3,11 +3,13 @@ import { PageHeader } from "@brillianda/ui/PageHeader";
 import Link from "next/link";
 import { setPublished } from "@/data/actions/reports";
 import type { Broadsheet } from "@/data/types";
+import { schoolBase } from "@/lib/schoolBase";
 import { PublishButton } from "./PublishButton";
 
 /** A class's results header for admins: term, publish state, and its three tabs. */
-export function ArmHeader({ school, sheet, tab }: { school: string; sheet: Broadsheet; tab: "subjects" | "broadsheet" | "remarks" }) {
-  const base = `/s/${school}/results/${sheet.armId}`;
+export async function ArmHeader({ school, sheet, tab }: { school: string; sheet: Broadsheet; tab: "subjects" | "broadsheet" | "remarks" }) {
+  const sb = await schoolBase(school);
+  const base = `${sb}/results/${sheet.armId}`;
   const tabs = [
     { id: "subjects", label: "Subjects", href: base },
     { id: "broadsheet", label: "Broadsheet", href: `${base}/broadsheet` },
@@ -16,7 +18,7 @@ export function ArmHeader({ school, sheet, tab }: { school: string; sheet: Broad
   const done = sheet.subjects.filter((s) => s.status === "complete").length;
   return (
     <>
-      <Link href={`/s/${school}/results`} className="mb-3 inline-block rounded text-sm font-medium text-text-secondary hover:text-text-primary focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-accent">
+      <Link href={`${sb}/results`} className="mb-3 inline-block rounded text-sm font-medium text-text-secondary hover:text-text-primary focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-accent">
         ← Results
       </Link>
       <PageHeader

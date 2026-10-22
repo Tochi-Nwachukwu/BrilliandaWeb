@@ -10,6 +10,7 @@ import Link from "next/link";
 import { connection } from "next/server";
 import { getStudentHome } from "@/data/learners";
 import { formatShortDate, greeting } from "@/lib/time";
+import { schoolBase } from "@/lib/schoolBase";
 
 export const metadata: Metadata = { title: "Today" };
 
@@ -19,10 +20,11 @@ const linkClass = "rounded text-sm font-medium text-accent hover:underline focus
 /** A student's Today (batch 23): their lessons, attendance and results. */
 export default async function StudentToday({ params }: PageProps<"/s/[school]/learn">) {
   const { school } = await params;
+  const sb = await schoolBase(school);
   await connection();
   const home = await getStudentHome(school);
   if (!home) return null;
-  const base = `/s/${school}/learn`;
+  const base = `${sb}/learn`;
   const a = home.attendance;
 
   return (

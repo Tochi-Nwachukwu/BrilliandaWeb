@@ -3,7 +3,9 @@ import type { Metadata } from "next";
 import { Suspense } from "react";
 import { BrandStyle } from "@/components/school/SchoolBrand";
 import { SchoolClosed } from "@/components/school/SchoolClosed";
+import { SchoolBase } from "@/components/school/SchoolBase";
 import { schoolFromParams } from "@/components/school/school";
+import { schoolBase } from "@/lib/schoolBase";
 
 // Every page on a school's address. In production proxy.ts maps surebloom.brillianda.com here;
 // in development open /s/surebloom directly. Unknown schools 404 (s/not-found.tsx); suspended
@@ -31,9 +33,9 @@ async function SchoolGate({ params, children }: { params: Promise<{ school: stri
   const school = await schoolFromParams(params);
   if (school.status !== "active") return <SchoolClosed school={school} />;
   return (
-    <>
+    <SchoolBase school={school.subdomain} base={await schoolBase(school.subdomain)}>
       <BrandStyle color={school.brandColor} />
       {children}
-    </>
+    </SchoolBase>
   );
 }

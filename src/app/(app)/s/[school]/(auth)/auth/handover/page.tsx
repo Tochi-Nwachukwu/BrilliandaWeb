@@ -5,6 +5,7 @@ import { AuthLayout } from "@/components/auth/AuthLayout";
 import { schoolFromParams } from "@/components/school/school";
 import { completeHandover } from "@/data/actions/auth";
 import { OpenSchool } from "./OpenSchool";
+import { schoolBase } from "@/lib/schoolBase";
 
 export const metadata: Metadata = { title: "Opening your school" };
 
@@ -20,11 +21,12 @@ export default function HandoverPage({ params, searchParams }: PageProps<"/s/[sc
 
 async function Handover({ params, searchParams }: { params: Promise<{ school: string }>; searchParams: Promise<Record<string, string | string[] | undefined>> }) {
   const school = await schoolFromParams(params);
+  const sb = await schoolBase(school.subdomain);
   const raw = (await searchParams).token;
   const token = (Array.isArray(raw) ? raw[0] : raw) ?? "";
   return (
     <AuthLayout school={school} title={`Opening ${school.name}`} description="Signing you in to your new school.">
-      <OpenSchool action={completeHandover.bind(null, school.subdomain, token)} homeHref={`/s/${school.subdomain}`} loginHref={`/s/${school.subdomain}/login`} />
+      <OpenSchool action={completeHandover.bind(null, school.subdomain, token)} homeHref={sb || "/"} loginHref={`${sb}/login`} />
     </AuthLayout>
   );
 }

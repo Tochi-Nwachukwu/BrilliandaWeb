@@ -1,5 +1,6 @@
 "use client";
 
+
 import { displayNigerianPhone } from "@brillianda/core/nigeria";
 import { GENDER_LABEL, STATUS_LABEL } from "@brillianda/core/students";
 import { Badge } from "@brillianda/ui/Badge";
@@ -17,6 +18,7 @@ import { formatDate, timeAgo } from "@/lib/time";
 import { SampleLinks } from "@/components/auth/forms";
 import type { ActionResult, ArmOption, ReportTerm, SampleEmail, StudentDetail } from "@/data/types";
 import { STATUS_TONE, StatusDialog } from "../StudentsView";
+import { useSchoolBase } from "@/components/school/SchoolBase";
 
 function Fact({ label, children, wide }: { label: string; children: ReactNode; wide?: boolean }) {
   // A <div> per pair is the one wrapper a <dl> allows, so screen readers still pair each label and value.
@@ -53,10 +55,11 @@ export function StudentPage({
   /** The register’s summary (batch 11); off while registers have no backend. */
   showAttendance?: boolean;
 }) {
+  const sb = useSchoolBase(school);
   const router = useRouter();
   const [dialog, setDialog] = useState<"status" | "delete" | null>(null);
   const [pending, startTransition] = useTransition();
-  const base = `/s/${school}/students`;
+  const base = `${sb}/students`;
 
   return (
     <div className="grid gap-4">
@@ -187,7 +190,7 @@ export function StudentPage({
           description="Who changed this record, newest first."
           action={
             student.changes.length ? (
-              <Link href={`/s/${school}/more/history?student=${student.id}`} className="rounded text-sm font-medium text-accent hover:underline focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-accent">
+              <Link href={`${sb}/more/history?student=${student.id}`} className="rounded text-sm font-medium text-accent hover:underline focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-accent">
                 See all
               </Link>
             ) : undefined

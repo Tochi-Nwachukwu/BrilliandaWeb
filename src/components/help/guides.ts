@@ -33,7 +33,7 @@ export function adminGuide(base: string): HelpGuide {
   const more = `${base}/more`;
   return {
     id: "admin",
-    home: base,
+    home: base || "/",
     tour: [
       { title: "Welcome to your school on Brillianda", body: "A quick look around: five stops, under a minute. You can skip it, and take it again any time from Help." },
       { target: "nav-home", title: "Home", body: "Your setup checklist and the latest changes. Start here: it tells you what to do next." },
@@ -47,7 +47,7 @@ export function adminGuide(base: string): HelpGuide {
       {
         title: "Getting started",
         items: [
-          { q: "What should I set up first?", a: "Follow the checklist on Home, top to bottom: your logo and colour, the school calendar, classes and arms, subjects, students, then your team. Each item ticks itself when it’s done.", href: base, link: "Open Home", pages: [base] },
+          { q: "What should I set up first?", a: "Follow the checklist on Home, top to bottom: your logo and colour, the school calendar, classes and arms, subjects, students, then your team. Each item ticks itself when it’s done.", href: base || "/", link: "Open Home", pages: [base || "/"] },
           { q: "How do I set the school year and its terms?", a: "More › Sessions and terms. Check the suggested dates for the three terms and save. Results open for scores once the first term starts.", href: `${more}/sessions`, link: "Sessions and terms", pages: [`${more}/sessions`] },
           { q: "How do I change our name, colour or logo?", a: "More › Branding. Only the owner can change these. Your logo and colour show on every page, report card and email.", href: `${more}/branding`, link: "Branding", pages: [`${more}/branding`] },
         ],
@@ -92,7 +92,7 @@ export function adminGuide(base: string): HelpGuide {
           { q: "Who teaches each lesson on the timetable?", a: "The class’s teacher for that subject, from More › Teachers. If a teacher ends up in two classes at once, the timetable warns you.", href: `${more}/teachers`, link: "Teachers", pages: [`${more}/timetable`] },
           { q: "A parent says their child’s details are wrong. What do I do?", a: "Parents can ask for a correction from their child’s page. Requests show in More › Corrections, with a count on the More tab. Check each one, then Correct the record (it changes the student’s details and goes in the change history) or Decline with a reason the parent sees.", href: `${more}/corrections`, link: "Corrections", pages: [`${more}/corrections`, `${base}/students`] },
           { q: "How do I tell parents which books to buy?", a: "More › Book lists. Pick the session and the class, add the books, exercise books, uniform and anything else, with prices if you like, then Share with parents. Parents see the list for their child’s class, and the one they move into next session.", href: `${more}/book-lists`, link: "Book lists", pages: [`${more}/book-lists`] },
-          { q: "How do birthday messages work?", a: "More › Birthdays. Turn them on and write the message: each child’s first name, age and the school’s name are filled in. On the birthday, at 7:00 am, the guardian gets a text and the parent app shows a birthday card. Home lists the week’s birthdays.", href: `${more}/birthdays`, link: "Birthdays", pages: [`${more}/birthdays`, base] },
+          { q: "How do birthday messages work?", a: "More › Birthdays. Turn them on and write the message: each child’s first name, age and the school’s name are filled in. On the birthday, at 7:00 am, the guardian gets a text and the parent app shows a birthday card. Home lists the week’s birthdays.", href: `${more}/birthdays`, link: "Birthdays", pages: [`${more}/birthdays`, base || "/"] },
           { q: "Who changed something?", a: "More › Change history lists every change: who, what and when. Filter by person, date or student, and download it as a spreadsheet.", href: `${more}/history`, link: "Change history", pages: [`${more}/history`] },
         ],
       },
@@ -173,7 +173,7 @@ export function parentGuide(base: string): HelpGuide {
   return {
     id: "parent",
     // A child’s pages sit under /family, so its questions show on them too.
-    home: base,
+    home: base || "/",
     tour: [
       { title: "Welcome", body: "Here you follow your children at school: attendance, results and report cards. Two quick stops." },
       { target: "nav-children", title: "My children", body: "Each of your children at this school. Open one to see their attendance and results." },

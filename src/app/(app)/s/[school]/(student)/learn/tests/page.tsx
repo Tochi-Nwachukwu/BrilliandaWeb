@@ -7,6 +7,7 @@ import Link from "next/link";
 import { connection } from "next/server";
 import { getMyTests } from "@/data/cbt";
 import type { StudentTestRow } from "@/data/types";
+import { schoolBase } from "@/lib/schoolBase";
 
 export const metadata: Metadata = { title: "Tests" };
 
@@ -22,6 +23,7 @@ function status(t: StudentTestRow): { label: string; tone: "success" | "warning"
 /** A student’s tests (batch 25): open ones first to take, then the rest. */
 export default async function StudentTests({ params }: PageProps<"/s/[school]/learn/tests">) {
   const { school } = await params;
+  const sb = await schoolBase(school);
   await connection();
   const tests = await getMyTests(school);
   if (!tests) return null;
@@ -31,7 +33,7 @@ export default async function StudentTests({ params }: PageProps<"/s/[school]/le
     const s = status(t);
     return (
       <li key={t.id}>
-        <Link href={`/s/${school}/learn/tests/${t.id}`} className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 rounded-3xl bg-surface p-4 shadow-raised hover:bg-hover focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-accent">
+        <Link href={`${sb}/learn/tests/${t.id}`} className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 rounded-3xl bg-surface p-4 shadow-raised hover:bg-hover focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-accent">
           <span className="min-w-0">
             <b className="block truncate font-semibold">{t.title}</b>
             <span className="block text-[12.5px] text-text-secondary">

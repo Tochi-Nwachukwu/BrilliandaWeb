@@ -1,5 +1,6 @@
 "use client";
 
+
 import { Alert } from "@brillianda/ui/Alert";
 import { Button } from "@brillianda/ui/Button";
 import { Card } from "@brillianda/ui/Cards";
@@ -12,12 +13,14 @@ import { useState, useTransition } from "react";
 import { FormError } from "@/components/auth/FormError";
 import type { ActionResult, TermStatusData } from "@/data/types";
 import { formatDate } from "@/lib/time";
+import { useSchoolBase } from "@/components/school/SchoolBase";
 
 /**
  * Closing the term open for results (batch 17, from the first app's F-43). Scores lock; results
  * stay on records and with parents where published; the next term's sheets open.
  */
 export function CloseTermCard({ school, status, close }: { school: string; status: TermStatusData; close: (input: unknown) => Promise<ActionResult<{ closed: string; next: string | null }>> }) {
+  const sb = useSchoolBase(school);
   const [open, setOpen] = useState(false);
   const term = status.open;
 
@@ -31,7 +34,7 @@ export function CloseTermCard({ school, status, close }: { school: string; statu
         )}
         {term && term.isLast && (
           <div>
-            <Link href={`/s/${school}/more/promotion`} className="inline-flex min-h-[44px] items-center rounded-full bg-primary px-5 text-sm font-medium text-primary-text hover:bg-primary-hover focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-accent">
+            <Link href={`${sb}/more/promotion`} className="inline-flex min-h-[44px] items-center rounded-full bg-primary px-5 text-sm font-medium text-primary-text hover:bg-primary-hover focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-accent">
               Go to promotion
             </Link>
           </div>
@@ -44,7 +47,7 @@ export function CloseTermCard({ school, status, close }: { school: string; statu
             {status.unpublished.length > 0 && (
               <Alert tone="warning">
                 Not published yet: {status.unpublished.map((u) => u.label).join(", ")}.{" "}
-                <Link href={`/s/${school}/results`} className="font-medium underline underline-offset-2">
+                <Link href={`${sb}/results`} className="font-medium underline underline-offset-2">
                   Publish on the Results page
                 </Link>
               </Alert>

@@ -1,21 +1,22 @@
 import { brandPalette } from "@brillianda/core/brand";
 import { getSchoolBySubdomain } from "@/data/school";
+import { schoolBaseOf } from "@/lib/schoolBase";
 
 // Each school's own web app manifest (plan: "Add to Home Screen gives an icon called Surebloom
 // School"). Served at /s/<school>/manifest.webmanifest; on a school's address that is its root.
-export async function GET(_request: Request, { params }: RouteContext<"/s/[school]/manifest.webmanifest">) {
+export async function GET(request: Request, { params }: RouteContext<"/s/[school]/manifest.webmanifest">) {
   const { school } = await params;
   const found = await getSchoolBySubdomain(school);
   if (!found || found.status !== "active") return new Response("Not found", { status: 404 });
   const p = brandPalette(found.brandColor);
-  const base = `/s/${found.subdomain}`;
+  const base = schoolBaseOf(request, found.subdomain);
   const manifest = {
     name: found.name,
     // Home screens show about 12 characters under an icon.
     short_name: found.name.length <= 12 ? found.name : found.name.split(" ")[0]!.slice(0, 12),
     description: `${found.name} on Brillianda`,
     id: `${base}/`,
-    start_url: `${base}`,
+    start_url: base || "/",
     scope: `${base}/`,
     display: "standalone",
     background_color: "#F4F2FA",

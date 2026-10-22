@@ -9,6 +9,7 @@ import { shortTime } from "@brillianda/core/timetable";
 import { getTeacherHome } from "@/data/teaching";
 import { getMyLessonsToday } from "@/data/timetable";
 import { greeting, lagosWeekday, plural } from "@/lib/time";
+import { schoolBase } from "@/lib/schoolBase";
 
 export const metadata: Metadata = { title: "Today" };
 
@@ -17,10 +18,11 @@ const linkClass = "rounded-2xl focus-visible:outline-hidden focus-visible:ring-2
 /** A teacher's Today: is the register in, and the subjects they teach. */
 export default async function TeacherToday({ params }: PageProps<"/s/[school]/teach">) {
   const { school } = await params;
+  const sb = await schoolBase(school);
   await connection();
   const [home, lessons] = await Promise.all([getTeacherHome(school), getMyLessonsToday(school, lagosWeekday())]);
   if (!home) return null;
-  const base = `/s/${school}/teach`;
+  const base = `${sb}/teach`;
   const first = home.fullName.split(" ")[0];
   const isFormTeacher = home.formArms.length > 0;
   // Not every teacher is a form teacher: many only teach subjects across classes.

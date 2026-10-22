@@ -5,15 +5,17 @@ import { connection } from "next/server";
 import { noteLeftPage, saveAnswer, startTest, submitTest } from "@/data/actions/cbt";
 import { getTakingTest } from "@/data/cbt";
 import { TakeTest } from "./TakeTest";
+import { schoolBase } from "@/lib/schoolBase";
 
 export const metadata: Metadata = { title: "Test" };
 
 export default async function TestPage({ params }: PageProps<"/s/[school]/learn/tests/[id]">) {
   const { school, id } = await params;
+  const sb = await schoolBase(school);
   await connection();
   const test = await getTakingTest(school, id);
   if (!test) notFound();
-  const back = `/s/${school}/learn/tests`;
+  const back = `${sb}/learn/tests`;
   return (
     <div className="grid gap-4">
       <Link href={back} className="w-fit rounded text-sm font-medium text-text-secondary hover:text-text-primary focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-accent">

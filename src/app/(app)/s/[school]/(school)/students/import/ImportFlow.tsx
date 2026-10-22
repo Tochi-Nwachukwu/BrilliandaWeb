@@ -1,5 +1,6 @@
 "use client";
 
+
 import { checkRows, guessMapping, IMPORT_COLUMNS, mappingProblems, type CheckedRow, type ImportColumnId, type ImportMapping, type RawRow } from "@brillianda/core/studentImport";
 import { toCsv } from "@brillianda/core/students";
 import { Alert } from "@brillianda/ui/Alert";
@@ -21,6 +22,7 @@ import { readStudentFile, type Sheet } from "@/lib/import/readFile";
 import { downloadTemplate } from "@/lib/import/template";
 import { formatDate } from "@/lib/time";
 import type { ActionResult, ImportResult, ImportSetup } from "@/data/types";
+import { useSchoolBase } from "@/components/school/SchoolBase";
 
 type Actions = {
   checkImport: (rows: unknown, armId: string | null) => Promise<ActionResult<CheckedRow[]>>;
@@ -40,6 +42,7 @@ function downloadCsv(name: string, csv: string) {
 
 /** The plan's import, start to finish: upload, match columns, review and fix, import, undo. */
 export function ImportFlow({ school, setup, arm, actions }: { school: string; setup: ImportSetup; arm: { id: string; label: string } | null; actions: Actions }) {
+  const sb = useSchoolBase(school);
   const router = useRouter();
   const [step, setStep] = useState<"upload" | "map" | "review" | "done">("upload");
   const [fileName, setFileName] = useState("");
@@ -128,7 +131,7 @@ export function ImportFlow({ school, setup, arm, actions }: { school: string; se
       <PageHeader
         title={arm ? `Import into ${arm.label}` : "Import students"}
         actions={
-          <Link href={`/s/${school}/students`} className="text-sm font-medium text-accent hover:underline">
+          <Link href={`${sb}/students`} className="text-sm font-medium text-accent hover:underline">
             Back to students
           </Link>
         }
@@ -489,6 +492,7 @@ function FixRow({ row, raw, columns, onClose, onSave }: { row: CheckedRow; raw: 
 }
 
 function Done({ school, result, undo, onAgain }: { school: string; result: ImportResult; undo: (batchId: string) => Promise<ActionResult<{ removed: number }>>; onAgain: () => void }) {
+  const sb = useSchoolBase(school);
   const router = useRouter();
   const [undone, setUndone] = useState(false);
   const [pending, startTransition] = useTransition();
@@ -505,7 +509,7 @@ function Done({ school, result, undo, onAgain }: { school: string; result: Impor
           <ul className="grid gap-1 text-sm" aria-label="New students">
             {result.newStudents.slice(0, 8).map((s) => (
               <li key={s.id}>
-                <Link href={`/s/${school}/students/${s.id}`} className="font-medium text-accent hover:underline">
+                <Link href={`${sb}/students/${s.id}`} className="font-medium text-accent hover:underline">
                   {s.fullName}
                 </Link>{" "}
                 <span className="text-text-secondary">· {s.armLabel}</span>
@@ -515,7 +519,7 @@ function Done({ school, result, undo, onAgain }: { school: string; result: Impor
           </ul>
         )}
         <div className="flex flex-wrap gap-2">
-          <Link href={`/s/${school}/students`} className="inline-flex min-h-[42px] items-center rounded-full bg-primary px-5 text-sm font-medium text-primary-text hover:bg-primary-hover">
+          <Link href={`${sb}/students`} className="inline-flex min-h-[42px] items-center rounded-full bg-primary px-5 text-sm font-medium text-primary-text hover:bg-primary-hover">
             See the students
           </Link>
           <Button variant="secondary" onClick={onAgain}>

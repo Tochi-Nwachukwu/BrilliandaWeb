@@ -4,6 +4,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { connection } from "next/server";
 import { countOpenCorrections } from "@/data/corrections";
+import { schoolBase } from "@/lib/schoolBase";
 
 export const metadata: Metadata = { title: "More" };
 
@@ -30,6 +31,7 @@ const ITEMS: { path: string; icon: IconName; title: string; detail: string }[] =
 /** Everything that isn't one of the four main tabs (plan: phone tab bar ends with More). */
 export default async function MorePage({ params }: PageProps<"/s/[school]/more">) {
   const { school } = await params;
+  const sb = await schoolBase(school);
   await connection();
   const waiting = await countOpenCorrections(school);
   return (
@@ -39,7 +41,7 @@ export default async function MorePage({ params }: PageProps<"/s/[school]/more">
         {ITEMS.map((item) => (
           <li key={item.path}>
             <Link
-              href={item.path.startsWith("../") ? `/s/${school}/${item.path.slice(3)}` : `/s/${school}/more/${item.path}`}
+              href={item.path.startsWith("../") ? `${sb}/${item.path.slice(3)}` : `${sb}/more/${item.path}`}
               className="grid grid-cols-[2.75rem_minmax(0,1fr)_auto] items-center gap-3.5 rounded-2xl p-3 hover:bg-hover focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-accent"
             >
               <span aria-hidden className="grid h-11 w-11 place-items-center rounded-2xl bg-accent-soft text-accent">

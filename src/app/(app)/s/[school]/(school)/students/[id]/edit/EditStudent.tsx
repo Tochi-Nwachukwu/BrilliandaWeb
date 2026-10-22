@@ -1,10 +1,12 @@
 "use client";
 
+
 import { PageHeader } from "@brillianda/ui/PageHeader";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import type { ActionResult, ArmOption, GuardianMatch, StudentDetail } from "@/data/types";
 import { StudentForm } from "../../StudentForm";
+import { useSchoolBase } from "@/components/school/SchoolBase";
 
 export function EditStudent({
   school,
@@ -19,8 +21,9 @@ export function EditStudent({
   updateStudent: (input: unknown) => Promise<ActionResult<null>>;
   findGuardian: (phone: string) => Promise<GuardianMatch | null>;
 }) {
+  const sb = useSchoolBase(school);
   const router = useRouter();
-  const page = `/s/${school}/students/${student.id}`;
+  const page = `${sb}/students/${student.id}`;
   const g = student.guardian;
   return (
     <div className="grid gap-4">

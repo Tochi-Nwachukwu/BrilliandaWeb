@@ -5,12 +5,14 @@ import { connection } from "next/server";
 import { PrintButton } from "@/components/results/PublishButton";
 import { ReportCard } from "@/components/results/ReportCard";
 import { getReportCard } from "@/data/reports";
+import { schoolBase } from "@/lib/schoolBase";
 
 export const metadata: Metadata = { title: "Report card" };
 
 /** A student's report card for any term they have results in (from their profile). */
 export default async function StudentReportCard({ params, searchParams }: PageProps<"/s/[school]/students/[id]/report">) {
   const { school, id } = await params;
+  const sb = await schoolBase(school);
   const raw = (await searchParams).term;
   const termKey = (Array.isArray(raw) ? raw[0] : raw) || undefined;
   await connection();
@@ -19,7 +21,7 @@ export default async function StudentReportCard({ params, searchParams }: PagePr
   return (
     <div className="grid gap-4">
       <div className="flex flex-wrap items-center justify-between gap-3 print:hidden">
-        <Link href={`/s/${school}/students/${id}`} className="rounded text-sm font-medium text-text-secondary hover:text-text-primary focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-accent">
+        <Link href={`${sb}/students/${id}`} className="rounded text-sm font-medium text-text-secondary hover:text-text-primary focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-accent">
           ← {card.student.fullName}
         </Link>
         <PrintButton />

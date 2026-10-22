@@ -7,6 +7,7 @@ import { ResetPasswordFlow } from "@/components/auth/flows";
 import { authLinkClass } from "@/components/auth/styles";
 import { schoolFromParams } from "@/components/school/school";
 import { resetPassword } from "@/data/actions/auth";
+import { schoolBase } from "@/lib/schoolBase";
 
 export const metadata: Metadata = { title: "Choose a new password" };
 
@@ -20,8 +21,9 @@ export default function ResetPasswordPage({ params }: PageProps<"/s/[school]/res
 
 async function Reset({ params }: { params: Promise<{ school: string; token: string }> }) {
   const school = await schoolFromParams(params);
+  const sb = await schoolBase(school.subdomain);
   const { token } = await params;
-  const signInHref = `/s/${school.subdomain}/login`;
+  const signInHref = `${sb}/login`;
   return (
     <AuthLayout
       school={school}

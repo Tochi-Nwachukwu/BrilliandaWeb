@@ -3,14 +3,16 @@ import { redirect } from "next/navigation";
 import { saveArmLayout } from "@/data/actions/classes";
 import { getClassStructure } from "@/data/classes";
 import { ArmsEditor } from "./ArmsEditor";
+import { schoolBase } from "@/lib/schoolBase";
 
 export const metadata: Metadata = { title: "Edit arms" };
 
 export default async function EditArmsPage({ params }: PageProps<"/s/[school]/classes/arms">) {
   const { school } = await params;
+  const sb = await schoolBase(school);
   const structure = await getClassStructure(school);
   if (!structure) return null;
   // Arms come after classes: until the quick setup is done, there's nothing to edit.
-  if (!structure.levels.length) redirect(`/s/${school}/classes`);
+  if (!structure.levels.length) redirect(`${sb}/classes`);
   return <ArmsEditor school={school} structure={structure} save={saveArmLayout.bind(null, school)} />;
 }

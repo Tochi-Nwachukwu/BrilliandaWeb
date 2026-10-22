@@ -6,6 +6,7 @@ import { connection } from "next/server";
 import { RegisterView } from "@/components/register/RegisterView";
 import { saveRegister } from "@/data/actions/teaching";
 import { getRegister, getTeacherHome } from "@/data/teaching";
+import { schoolBase } from "@/lib/schoolBase";
 
 export const metadata: Metadata = { title: "Register" };
 
@@ -14,11 +15,12 @@ const one = (v: string | string[] | undefined) => (Array.isArray(v) ? v[0] : v);
 /** The form teacher's register. Most teachers have one form class; a teacher with more picks one. */
 export default async function TeacherRegister({ params, searchParams }: PageProps<"/s/[school]/teach/register">) {
   const { school } = await params;
+  const sb = await schoolBase(school);
   const query = await searchParams;
   await connection();
   const home = await getTeacherHome(school);
   if (!home) return null;
-  const base = `/s/${school}/teach/register`;
+  const base = `${sb}/teach/register`;
 
   if (!home.formArms.length) {
     return (

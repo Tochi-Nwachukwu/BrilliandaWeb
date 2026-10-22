@@ -5,6 +5,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { connection } from "next/server";
 import { getStudentHome } from "@/data/learners";
+import { schoolBase } from "@/lib/schoolBase";
 
 export const metadata: Metadata = { title: "Results" };
 
@@ -13,10 +14,11 @@ const linkClass = "block rounded-xl p-2.5 text-sm font-medium underline-offset-2
 /** A student's results (batch 23): this term once published, and earlier published terms. */
 export default async function StudentResults({ params }: PageProps<"/s/[school]/learn/results">) {
   const { school } = await params;
+  const sb = await schoolBase(school);
   await connection();
   const home = await getStudentHome(school);
   if (!home) return null;
-  const report = `/s/${school}/learn/results/report`;
+  const report = `${sb}/learn/results/report`;
   return (
     <div className="grid gap-4">
       <PageHeader title="Results">Your report cards, once the school publishes them.</PageHeader>

@@ -1,5 +1,6 @@
 "use client";
 
+
 import { Badge } from "@brillianda/ui/Badge";
 import { Button } from "@brillianda/ui/Button";
 import { EmptyState } from "@brillianda/ui/EmptyState";
@@ -10,6 +11,7 @@ import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import { SampleLinks } from "@/components/auth/forms";
 import type { ActionResult, ParentAccess, ParentsPage, SampleEmail } from "@/data/types";
+import { useSchoolBase } from "@/components/school/SchoolBase";
 
 const STATUS: Record<ParentAccess, { label: string; tone: "success" | "warning" | "neutral" }> = {
   active: { label: "On the app", tone: "success" },
@@ -31,6 +33,7 @@ export function ParentsView({
   inviteAll: () => Promise<ActionResult<SampleEmail & { invited: number; withoutEmail: number }>>;
   remove: (guardianId: string) => Promise<ActionResult<null>>;
 }) {
+  const sb = useSchoolBase(school);
   const router = useRouter();
   const [links, setLinks] = useState<SampleEmail["sampleLinks"]>();
   const [busy, setBusy] = useState<string | null>(null);
@@ -98,7 +101,7 @@ export function ParentsView({
                   {g.children.map((c, i) => (
                     <span key={c.id}>
                       {i > 0 && ", "}
-                      <Link href={`/s/${school}/students/${c.id}`} className="underline underline-offset-2 hover:text-text-primary">
+                      <Link href={`${sb}/students/${c.id}`} className="underline underline-offset-2 hover:text-text-primary">
                         {c.fullName}
                       </Link>{" "}
                       ({c.armLabel})

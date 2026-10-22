@@ -10,6 +10,7 @@ import { schoolFromParams } from "@/components/school/school";
 import { signOut } from "@/data/actions/auth";
 import { getCurrentMember } from "@/data/auth";
 import { getTeacherHome } from "@/data/teaching";
+import { schoolBase } from "@/lib/schoolBase";
 
 // A teacher's part of the school (batch 11): today, their register, their subjects. Owners and
 // admins go back to the admin screens, where every class's register is too.
@@ -23,10 +24,11 @@ export default function TeacherLayout({ children, params }: LayoutProps<"/s/[sch
 
 async function Teacher({ params, children }: { params: Promise<{ school: string }>; children: React.ReactNode }) {
   const school = await schoolFromParams(params);
-  const base = `/s/${school.subdomain}`;
+  const sb = await schoolBase(school.subdomain);
+  const base = sb;
   const me = await getCurrentMember(school.subdomain);
   if (!me) redirect(`${base}/login`);
-  if (me.role !== "teacher") redirect(base);
+  if (me.role !== "teacher") redirect(base || "/");
   // Subject teachers who aren't form teachers have no register to take, so no Register tab.
   await connection();
   const home = await getTeacherHome(school.subdomain);
