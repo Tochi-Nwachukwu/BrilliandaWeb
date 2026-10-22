@@ -9,16 +9,17 @@ import { api, fail } from "./client";
 type PublicSchool = { name: string; subdomain: string; brandColor: string | null; logoUrl: string | null };
 
 /**
- * The API serves the logo at `/api/v1/school/logo?v=…` on the school's own address. On staging our
- * pages for every school share one address, so the school goes in the path (proxy.ts forwards it).
+ * The API serves pictures (the logo, a profile photo) at `/api/v1/…?v=…` on the school's own
+ * address. On staging our pages for every school share one address, so the school goes in the path
+ * (proxy.ts forwards it).
  */
-function logoOn(subdomain: string, url: string | null): string | null {
+export function pictureOn(subdomain: string, url: string | null): string | null {
   if (!url || !process.env.API_ROOT_DOMAIN || !url.startsWith("/api/")) return url;
   return `/s/${subdomain}${url}`;
 }
 
 function summary(subdomain: string, s: PublicSchool): SchoolSummary {
-  return { subdomain: s.subdomain || subdomain, name: s.name, status: "active", brandColor: s.brandColor ?? DEFAULT_BRAND_COLOR, logoUrl: logoOn(subdomain, s.logoUrl) };
+  return { subdomain: s.subdomain || subdomain, name: s.name, status: "active", brandColor: s.brandColor ?? DEFAULT_BRAND_COLOR, logoUrl: pictureOn(subdomain, s.logoUrl) };
 }
 
 export const getSchoolBySubdomain = cache(async (subdomain: string): Promise<SchoolSummary | null> => {

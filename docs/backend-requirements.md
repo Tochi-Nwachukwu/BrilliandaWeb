@@ -1,8 +1,6 @@
 # What the front end needs from the backend
 
-From the Brillianda front-end team. Updated 19 October 2026: only what is still open. Done and
-connected: staging emails (the outbox), the test school, names and roles on invitations,
-teachers and the daily register, and parents.
+From the Brillianda front-end team. Updated 22 October 2026: only what is still open.
 
 This is the complete list, in one place. Each item says what the problem is, what we need, the
 rules that matter, and how we'll know it's done. It is written from the screens' side only: we
@@ -10,19 +8,18 @@ test against the **staging API**, not your repositories. If something here alrea
 your development work, reply with the endpoint and we'll connect it.
 
 **How to answer:** for each item, a short reply is enough: "done, here is the endpoint", "done
-differently, here is why", or "not yet". When something reaches staging, please say so (see A2).
+differently, here is why", or "not yet".
 
 ## Contents
 
-- A. Staging and production
-- B. Small changes to what exists
-- C. New features, in the order we'd like them
-- D. Rules both sides must share
-- E. What the front end already relies on (please don't change without telling us)
+- A. Production
+- B. New features, in the order we'd like them
+- C. Rules both sides must share
+- D. What the front end already relies on (please don't change without telling us)
 
 ---
 
-## A. Staging and production
+## A. Production
 
 ### A1. A new shared secret for production
 
@@ -31,33 +28,9 @@ differently, here is why", or "not yet". When something reaches staging, please 
 **What we need.** Keep it for staging if you like. Please create a **different** secret for
 production and share it privately when production is ready.
 
-### A2. A note when staging changes
-
-**Problem.** We learn what changed only by comparing `openapi.json` between deploys (thank you
-for keeping it current).
-
-**What we need.** A short note per staging deploy: which endpoints are new or changed, and
-anything that breaks what we call (section E).
-
 ---
 
-## B. Small changes to what exists
-
-### B1. The student page: attendance and parent access
-
-**Problem.** The student page shows this term's attendance and whether the guardian uses the
-parent app. The register is in now, but the student endpoint has neither. (For parent access we
-look the guardian up in `GET /v1/parents` for now, an extra call on every student page.)
-
-**What we need.** On `GET /v1/students/{id}`:
-
-- `attendance`: `{ term, days, present, late, absent }` for the current term (late counts as
-  present), or `null` before the first term starts;
-- on the guardian, `parentAccess`: `"none"`, `"invited"` or `"active"`.
-
----
-
-## C. New features, in the order we'd like them
+## B. New features, in the order we'd like them
 
 All of these are built on our side and running on sample data. The exact shapes our screens use
 are in the front-end repository, `src/data/types.ts` (type names are given below), and each
@@ -66,152 +39,7 @@ existing style. Change them freely, just tell us.
 
 Everything here is for one school, taken from the address, as today.
 
-### C1. The team console
-
-**Problem.** The Brillianda team needs to look after schools: see who signed up, pause a school,
-and follow up trial requests from the website.
-
-**Who.** Team accounts, separate from school accounts, signing in on the main site at
-`/console`. Every console endpoint refuses anyone else.
-
-**Rules.**
-
-- Looking at a school's summary writes a line to **that school's** change history, so the school
-  can see that staff looked (at most once an hour per team member). Summaries are counts and
-  contacts, never a student's own record.
-- Pausing or reactivating a school needs a reason (3 to 200 characters), which the school sees
-  in its history. A paused school's people can't sign in. Nothing is deleted.
-- Trial requests have a status (`new`, `contacted`, `converted`, `declined`) and a team note.
-
-**Endpoints we need.**
-
-| What | Suggested | Returns |
-|---|---|---|
-| Sign in and out; who is signed in | `POST /v1/team/login`, `POST /v1/team/logout`, `GET /v1/team/me` | `TeamMember` |
-| Overview: schools active, paused and new this week; students; trial requests waiting; newest schools; recent activity | `GET /v1/team/overview` | `ConsoleOverview` |
-| Every school: status, owner, students, classes, setup progress, joined | `GET /v1/team/schools` | `ConsoleSchool[]` |
-| One school's summary (logged, see rules) | `GET /v1/team/schools/{subdomain}` | `ConsoleSchoolDetail` |
-| Pause or reactivate | `PUT /v1/team/schools/{subdomain}/status` `{ status, reason }` | 204 |
-| Trial requests, newest first | `GET /v1/team/trial-requests` | `TrialRequestRow[]` |
-| Set a request's status and note | `PATCH /v1/team/trial-requests/{id}` `{ status, note }` | 204 |
-
-### C2. Results: settings and score entry
-
-**Problem.** Subject teachers enter each student's scores every term; admins follow progress and
-handle mistakes.
-
-**What to store.**
-
-- Per school: the score parts (by default **CA1 20, CA2 20, Exam 60**; they must add up to 100),
-  the grading scale (by default **A to F**, see D), and whether positions are shown.
-- Per student, part, subject, arm and term: a score, or absent (`ABS`).
-- Per sheet (arm, subject, term): in progress or complete; unlock requests with a reason.
-- Per student and elective subject: "doesn't take this subject".
-
-**Rules.**
-
-- A term is identified as `<session start year>-<term number>`, e.g. `2026-1`. Results open for
-  the session's first term that isn't closed, once it has started (C5).
-- A score is empty, `ABS`, or a number from 0 to the part's marks, up to 2 decimals.
-- The score parts can't change once any score is in for the term.
-- A sheet can be marked complete only when every student who takes the subject has every part
-  filled. A complete sheet is locked for the teacher. The teacher can ask to unlock it with a
-  reason (5 to 200 characters). An owner or admin approves (it reopens) or declines, and can
-  reopen it without a request.
-- Marking a student as not taking an elective clears their scores on that sheet.
-- Totals and grades must match ours exactly (D).
-
-**Endpoints we need.**
-
-| What | Suggested | Returns |
-|---|---|---|
-| Results settings | `GET` / `PUT /v1/results/settings` | parts, scale, showPositions, scoresEntered |
-| Overview: each class's sheets (complete, in progress) and open unlock requests | `GET /v1/results` | per our `getResultsOverview` |
-| One class's sheets with teacher, status and progress | `GET /v1/arms/{armId}/sheets` | per `getArmSheets` |
-| A teacher's own sheets this term | `GET /v1/me/sheets` | per `getMySheets` |
-| One sheet: parts, scale, status, each student's scores and whether they take it | `GET /v1/arms/{armId}/subjects/{subjectId}/sheet` | per `getScoreSheet` |
-| Save one score | `PUT …/sheet/scores` `{ studentId, componentId, raw }` | the sheet's status |
-| Doesn't take this elective (or does again) | `PUT …/sheet/excluded` `{ studentId, excluded }` | 204 |
-| Mark complete | `POST …/sheet/complete` | 204, or 409 with the reason |
-| Ask to unlock | `POST …/sheet/unlock-request` `{ reason }` | 204 |
-| Approve, decline, or reopen | `POST …/sheet/unlock` `{ approve }` | 204 |
-
-**Who.** The subject's teacher for their own sheets (not once complete); owners and admins for
-all.
-
-### C3. Results: broadsheet, remarks, ratings, publishing, report cards
-
-**Problem.** Before parents see results, the school checks each class's broadsheet, adds remarks
-and ratings, and publishes.
-
-**What to store.**
-
-- Per student and term: the class teacher's remark and the principal's remark (each up to 300
-  characters).
-- Per school: behaviour ratings on or off, and the list of traits (by default Punctuality,
-  Neatness, Attentiveness, Politeness, Teamwork; at most 12, each up to 30 characters).
-- Per student, trait and term: a rating from 1 to 5 (Poor, Fair, Good, Very good, Excellent).
-- Per arm and term: published or not.
-
-**Rules.**
-
-- The class teacher's remark: the arm's form teacher or an admin. The principal's remark: owner
-  or admin.
-- An arm can be published only when every subject's sheet is complete. Publishing can be taken
-  back.
-- Average: the mean of the student's complete subject totals. Position: within the arm, ties
-  ranked 1, 2, 2, 4 (D).
-
-**Endpoints we need.**
-
-| What | Suggested | Returns |
-|---|---|---|
-| Broadsheet: subjects with status; each student's total and grade per subject (or "doesn't take it"); average; position when shown; published | `GET /v1/arms/{armId}/broadsheet` | `Broadsheet` |
-| Remarks and ratings for the class, and the school's traits | `GET /v1/arms/{armId}/reports` | `ClassReports` |
-| Save a remark (empty clears it) | `PUT /v1/arms/{armId}/students/{studentId}/remarks/{teacher\|principal}` `{ text }` | 204 |
-| Save a rating | `PUT …/students/{studentId}/ratings` `{ trait, value }` | 204 |
-| Rating settings | `GET` / `PUT /v1/results/ratings` `{ enabled, traits }` | 204 |
-| Publish or unpublish | `PUT /v1/arms/{armId}/published` `{ published }` | 204, or 409 with the reason |
-| A student's report card, for this term or a past one | `GET /v1/students/{id}/report-card?term=` | `ReportCardData` |
-
-**Who.** Owners and admins for all; the form teacher for their own arm (read the broadsheet,
-write the class teacher's remark and ratings).
-
-### C4. Parents see results
-
-**Problem.** Parents should see results once, and only once, the school publishes them.
-
-**What we need.**
-
-- On each child in the parent's home: this term's name and, once the class is published, the
-  average, position (when the school shows positions) and class size; plus the past terms whose
-  results were published.
-- The report card for the parent's own child, for a published term only:
-  `GET /v1/me/children/{studentId}/report-card?term=` → `ReportCardData`. Anything else answers
-  "not found".
-
-### C5. Closing a term
-
-**Problem.** A term's results stay open until the school says it's finished, not when the end
-date passes.
-
-**Rules.**
-
-- Closing a term locks its scores, keeps its results and publishing, drops open unlock requests,
-  and can change the next term's dates.
-- It's refused while any class is unpublished, unless the admin confirms "close anyway".
-- The session's last term isn't closed here: promotion closes it (C6).
-- Report cards for a past term use the class the student was in that term.
-
-**Endpoints we need.**
-
-| What | Suggested | Returns |
-|---|---|---|
-| Term status: the open term, the term after it (with dates), the next term when none is open, unpublished classes, closed terms | `GET /v1/terms/status` | `TermStatusData` |
-| Close the open term | `POST /v1/terms/close` `{ closeUnpublished, nextStartsOn?, nextEndsOn? }` | 204, or 409 |
-| Every term a student has results for, newest first | `GET /v1/students/{id}/report-terms` | `ReportTerm[]` |
-
-### C6. Promotion at the end of the session
+### B1. Promotion at the end of the session
 
 **Problem.** At the end of the session, students move up, repeat, or graduate.
 
@@ -240,7 +68,7 @@ date passes.
 | Set a student's decision | `PUT /v1/promotion/students/{id}` `{ decision, reason }` | 204 |
 | Complete it | `POST /v1/promotion/complete` `{ closeUnpublished, startsOn, endsOn }` | `{ promoted, repeating, graduated, session }` |
 
-### C7. Birthday messages
+### B2. Birthday messages
 
 **Problem.** Schools want each student's family to get a birthday greeting, automatically.
 
@@ -268,7 +96,7 @@ date passes.
 On the parent's home (`GET /v1/me/children`), each child gains `birthday`: the filled-in message on the child's
 birthday when the school sends them, otherwise `null`. Rules: `packages/core/src/birthdays.ts`.
 
-### C8. Books and things needed
+### B3. Books and things needed
 
 **Problem.** Parents need to know which books, exercise books, uniform and other things to buy for
 their child's class, especially for the class they move into next session.
@@ -296,7 +124,7 @@ whether the list is shared with parents, who changed it last, and when.
 On the parent's home (`GET /v1/me/children`), each child gains `bookLists`: `[{ label, list }]`. Rules:
 `packages/core/src/booklists.ts`.
 
-### C9. Student details for parents, and corrections
+### B4. Student details for parents, and corrections
 
 **Problem.** Parents should see what the school has on record for their child, and ask for
 mistakes to be fixed without visiting the office.
@@ -332,7 +160,7 @@ mistakes to be fixed without visiting the office.
 Each child in the parent's home also gains `corrections`: that child's latest five requests.
 Rules: `packages/core/src/corrections.ts`.
 
-### C10. Timetable
+### B5. Timetable
 
 **Problem.** Schools need one timetable everyone works from. Admins set it; teachers see it, with
 their own lessons highlighted.
@@ -366,7 +194,7 @@ their own lessons highlighted.
 
 Rules: `packages/core/src/timetable.ts`.
 
-### C11. Student accounts and the student portal
+### B6. Student accounts and the student portal
 
 **Problem.** Students need their own sign-in: to see their timetable, attendance, results and
 book list, and to take tests (CBT, next).
@@ -377,7 +205,7 @@ endpoints.
 
 **Rules.**
 
-- Students sign in with email and password, like staff (B2's invitations, with role `student` and
+- Students sign in with email and password, like staff (invitations, with role `student` and
   the `studentId`). The email is the student's own or one the school gives them; it can't belong
   to someone else at the school.
 - Ending access removes the account's role at this school; the student's record stays.
@@ -396,7 +224,7 @@ endpoints.
 | Their class's week | `GET /v1/me/timetable` | `ClassTimetable` |
 | Their report card, once published | `GET /v1/me/report-card?term=` | `ReportCardData` |
 
-### C12. The question bank and AI-generated questions
+### B7. The question bank and AI-generated questions
 
 **Problem.** Teachers build up questions for tests, assignments and exams, and want AI to draft
 them, which they then check.
@@ -422,14 +250,14 @@ generations used per school per month.
 | Save questions | `POST /v1/questions` `{ subjectId, levelId, questions, source }` | `{ saved }` |
 | Change or delete one | `PUT` / `DELETE /v1/questions/{id}` | 204 |
 
-### C13. CBT: tests taken on Brillianda
+### B8. CBT: tests taken on Brillianda
 
 **Problem.** Teachers want to set tests that students take on a phone or computer, mark
 themselves where they can, and feed the score sheets.
 
 **What to store.**
 
-- Tests: title, instructions, subject, class level, classes, a copy of the questions (from C12),
+- Tests: title, instructions, subject, class level, classes, a copy of the questions (from B7),
   length, opens and closes, `anywhere` or `school`, the access code, shuffle, show score, the
   score-sheet part, draft or set, who set it.
 - Attempts: test, student, started, submitted, each answer, the teacher's theory marks, times the
@@ -463,37 +291,7 @@ themselves where they can, and feed the score sheets.
 | One test to take | `GET /v1/me/tests/{id}` | `TakingTest` |
 | Start, answer, left the page, submit | `POST /v1/me/tests/{id}/start` `{ code }`, `PUT …/answers/{index}`, `POST …/left`, `POST …/submit` | 204, or the score |
 
----
-
-### C14. My profile, in every dashboard
-
-**Problem.** Owners, admins, teachers, parents and students all need to fix their own name, add a
-photo and change their password while signed in. Today `GET /v1/me` only reads who they are.
-
-**What to store.** A photo on the user (a small square image; the browser already shrinks it to
-256×256 JPEG, under 200 KB as a data URL, or upload it as a file if you prefer).
-
-**Rules** (`packages/core/src/profile.ts`):
-
-- Name: first and last name, each 1 to 60 characters, saved as one full name ("first last").
-- Email and phone are **not** edited here: they are the school's records (a parent's phone is
-  on their guardian record). The page shows them locked.
-- Changing the password needs the current one; the new one follows the reset rules (8 to 128
-  characters) and can't be the same as the current one. Afterwards, sign out the person's
-  other devices, as a reset does.
-- Everyone changes only their own profile, whatever their role.
-
-**Endpoints we need.**
-
-| What | Suggested | Returns |
-|---|---|---|
-| Who I am, with photo and phone | `GET /v1/me` (add `photo`, `phone`) | as now, plus those |
-| Save my name | `PATCH /v1/me` `{ fullName }` | 204 |
-| Set or remove my photo | `PUT /v1/me/photo` `{ photo }` (data URL), `DELETE /v1/me/photo` | 204 |
-| Change my password | `POST /v1/me/password` `{ current, password }` | 204; 422 `current` when it's wrong |
-
-
-## D. Rules both sides must share
+## C. Rules both sides must share
 
 A total, grade, position or suggestion must never depend on which side worked it out. These
 rules are pure TypeScript with tests in the front-end repository's `packages/core/src`. Copy them
@@ -516,7 +314,7 @@ The default scale: A 70+, B 60+, C 50+, D 45+, E 40+ (all passes), F below 40.
 
 ---
 
-## E. What the front end already relies on
+## D. What the front end already relies on
 
 Please tell us before changing any of these.
 
@@ -559,5 +357,18 @@ Please tell us before changing any of these.
 - Parents: `GET /v1/parents`, `POST /v1/parents/invite-all`, `POST /v1/guardians/{id}/invite`,
   `DELETE /v1/guardians/{id}/access`, `GET /v1/me/children`
 - Staging's outbox: `GET /v1/dev/outbox`
+- My profile: `GET`/`PATCH /v1/me`, `PUT`/`DELETE`/`GET /v1/me/photo`, `POST /v1/me/password`
+- Results: `GET`/`PUT /v1/results/settings`, `GET /v1/results`, `GET /v1/arms/{id}/sheets`,
+  `GET /v1/me/sheets`, `GET /v1/arms/{id}/subjects/{subjectId}/sheet` and its `/scores`,
+  `/excluded`, `/complete`, `/unlock-request`, `/unlock`
+- Report cards: `GET /v1/arms/{id}/broadsheet`, `GET /v1/arms/{id}/reports`,
+  `PUT …/students/{studentId}/remarks/{kind}`, `PUT …/students/{studentId}/ratings`,
+  `GET`/`PUT /v1/results/ratings`, `PUT /v1/arms/{id}/published`,
+  `GET /v1/students/{id}/report-card`, `GET /v1/students/{id}/report-terms`,
+  `GET /v1/me/children/{studentId}/report-card`
+- Closing a term: `GET /v1/terms/status`, `POST /v1/terms/close`
+- The team console (main site): `POST /v1/team/login`, `/logout`, `GET /v1/team/me`,
+  `/overview`, `/schools`, `/schools/{subdomain}`, `PUT …/status`, `GET /v1/team/trial-requests`,
+  `PATCH /v1/team/trial-requests/{id}`
 - Change history: `GET /v1/changes`
 - Website: `POST /v1/trial-requests`

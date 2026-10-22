@@ -50,8 +50,7 @@ export async function getParentHome(subdomain: string): Promise<ParentHome | nul
   return { ...home, children: home.children.map((c) => ({ ...c, birthday: null, bookLists: [], details: null, corrections: [] })) };
 }
 
-// Report cards aren't on the API yet.
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-export async function getParentReportCard(_subdomain: string, _studentId: string, _termKey?: string): Promise<ReportCardData | null> {
-  return null;
+/** Their own child's report card, published terms only; anything else is null. */
+export async function getParentReportCard(subdomain: string, studentId: string, termKey?: string): Promise<ReportCardData | null> {
+  return read<ReportCardData>(subdomain, `/v1/me/children/${id(studentId)}/report-card`, { term: termKey });
 }

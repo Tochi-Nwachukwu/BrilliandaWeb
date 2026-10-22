@@ -4,7 +4,6 @@ import { connection } from "next/server";
 import { inviteParent } from "@/data/actions/parents";
 import { deleteStudent, setStudentsStatus } from "@/data/actions/students";
 import { getReportTerms } from "@/data/reports";
-import { LIVE } from "@/data/source";
 import { getStudent, listStudents } from "@/data/students";
 import { StudentPage } from "./StudentPage";
 
@@ -26,8 +25,6 @@ export default async function StudentRoute({ params }: PageProps<"/s/[school]/st
       remove={deleteStudent.bind(null, school, id)}
       reportTerms={reportTerms ?? []}
       inviteParent={student.guardian ? inviteParent.bind(null, school, student.guardian.id) : undefined}
-      // A student’s own attendance isn’t on the API yet.
-      showAttendance={!LIVE}
     />
   );
 }

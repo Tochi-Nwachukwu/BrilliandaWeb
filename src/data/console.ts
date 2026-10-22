@@ -1,6 +1,11 @@
 // The Brillianda team console (batch 13; docs/data-contract.md). Screens import from here, never from fake/.
 import "server-only";
-import * as impl from "./fake/console";
+import * as live from "./api/console";
+import * as fake from "./fake/console";
+import { LIVE } from "./source";
+
+// The API where it has endpoints (DATA_SOURCE=api), else sample data.
+const impl = LIVE ? live : fake;
 import type { ConsoleOverview, ConsoleSchool, ConsoleSchoolDetail, TeamMember, TrialRequestRow } from "./types";
 
 /** The signed-in team member, or null. Team accounts are separate from school accounts. */

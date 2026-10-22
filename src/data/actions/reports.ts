@@ -4,8 +4,13 @@
 import { ratingSchema, ratingSettingsSchema, remarkSchema } from "@brillianda/core/results";
 import { fieldErrorsOf } from "@brillianda/core/signup";
 import { revalidatePath } from "next/cache";
-import * as impl from "../fake/reports";
+import { LIVE } from "../api/client";
+import * as live from "../api/reports";
+import * as fake from "../fake/reports";
 import type { ActionResult } from "../types";
+
+// The API where it has endpoints (DATA_SOURCE=api), else sample data.
+const impl = LIVE ? live : fake;
 
 const done = <T,>(school: string, result: ActionResult<T>) => {
   if (result.ok) revalidatePath(`/s/${school}`, "layout");

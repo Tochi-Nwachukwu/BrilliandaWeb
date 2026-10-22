@@ -5,16 +5,26 @@ import { cache } from "react";
 import type { ActionResult, InviteDetails, SampleEmail, SchoolMember, SchoolSummary, SignedInMember } from "../types";
 import { api, dropCookies, fail, read } from "./client";
 import { outboxSample } from "./outbox";
+import { pictureOn } from "./school";
 
-type Me = { user: { id: string; email: string; fullName: string }; membership: { role: "owner" | "admin" }; school: { name: string; subdomain: string } };
+export type Me = {
+  user: { id: string; email: string; fullName: string };
+  membership: { role: "owner" | "admin" | "teacher" | "parent" | "student" };
+  school: { name: string; subdomain: string };
+  /** An address for <img src> (like the logo's), or null. */
+  photo?: string | null;
+  phone?: string | null;
+};
 
 const CREDENTIALS_DONT_MATCH = "That email and password don’t match.";
 const LINK_EXPIRED = "This link has expired or was already used. Ask for a new one.";
 
-/** Asked once per page render, however many parts of the page need it. */
+/** Who is signed in at this school (`GET /v1/me`), asked once per page render however many parts need it. */
+export const readMe = cache((subdomain: string) => read<Me>(subdomain, "/v1/me"));
+
 export const getCurrentMember = cache(async (subdomain: string): Promise<SignedInMember | null> => {
-  const me = await read<Me>(subdomain, "/v1/me");
-  return me ? { userId: me.user.id, fullName: me.user.fullName, email: me.user.email, role: me.membership.role } : null;
+  const me = await readMe(subdomain);
+  return me ? { userId: me.user.id, fullName: me.user.fullName, email: me.user.email, role: me.membership.role, photo: pictureOn(subdomain, me.photo ?? null) } : null;
 });
 
 /**

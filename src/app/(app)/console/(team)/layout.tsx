@@ -5,6 +5,7 @@ import { consoleGuide } from "@/components/help/guides";
 import { AppShell, type NavItem } from "@/components/shell/AppShell";
 import { teamSignOut } from "@/data/actions/console";
 import { getTeamMember } from "@/data/console";
+import { LIVE } from "@/data/source";
 
 // The Brillianda team console (batch 13): every school, trial requests, and what the team did.
 export default function ConsoleLayout({ children }: { children: React.ReactNode }) {
@@ -29,7 +30,7 @@ async function Console({ children }: { children: React.ReactNode }) {
       help={consoleGuide()}
       place="Brillianda team"
       account={{ fullName: me.fullName, roleLabel: "Brillianda team", email: me.email }}
-      sampleData
+      sampleData={!LIVE}
       signOut={teamSignOut}
       mark={
         <span className="flex items-center gap-2.5">

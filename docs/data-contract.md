@@ -13,10 +13,11 @@ in `src/data/api/` with the same functions and shapes, calling the API from our 
 wrappers in `src/data` pick one: `DATA_SOURCE=api` uses the API, anything else the fake (the
 browser tests always run on the fake). Connected: everything in the v1 tables below (signup,
 sign-in, the team, Home and the calendar, classes, subjects, students, import, change history,
-branding, trial requests), plus teachers and the daily register (batch 11) and parents (batch 12;
-the parent home leaves out birthdays, book lists, a child's record and report cards until the API
-has them). Not connected, because the API has no endpoints for them yet: the other after-v1
-batches (the team console, results, closing a term, promotion, and batches 19 to 26). With `DATA_SOURCE=api` their screens say "Not connected yet" (a `layout.tsx` in
+branding, trial requests), plus teachers and the daily register (batch 11), parents (batch 12; the
+parent home leaves out birthdays, book lists and a child's record until the API has them), the
+team console (13), results, report cards and parents seeing them (14 to 16), closing a term (17)
+and My profile. Not connected, because the API has no endpoints for them yet: promotion (18) and
+batches 19 to 26. With `DATA_SOURCE=api` their screens say "Not connected yet" (a `layout.tsx` in
 each), and Home, Sessions and the student page leave out their parts.
 
 - `src/data/api/client.ts` calls the API with the school's address, the shared secret and the
@@ -296,7 +297,7 @@ functions refuse them.
 `getStudent`'s guardian gains `parentAccess`. Invitations carry `role: "parent"` and the
 `guardianId` they link to.
 
-### The team console (batch 13, after v1)
+### The team console (batch 13, after v1; connected)
 
 Team accounts are separate from school accounts (their own sign-in and cookie, scoped to
 `/console`). Every function below refuses anyone who isn't signed in as the team.
@@ -314,7 +315,7 @@ Team accounts are separate from school accounts (their own sign-in and cookie, s
 
 The trial form (`requestTrial`) now stores typed requests with a status.
 
-### Results: score entry (batch 14, after v1)
+### Results: score entry (batch 14, after v1; connected)
 
 Results are for the current term (`ResultsTerm`, keyed `<session start year>-<term number>`).
 Totals, grades and positions use `packages/core/src/grading.ts` and `results.ts`, which the real
@@ -334,7 +335,7 @@ API should use too, so a total never depends on where it was worked out.
 | `requestUnlock` | action | `armId, subjectId, { reason }` (5 to 200 characters) | the teacher | fake |
 | `resolveUnlock` | action | `armId, subjectId, approve` → reopens (with or without a request), or declines one | owner, admin | fake |
 
-### Results: broadsheet, remarks, ratings, publishing, report cards (batch 15, after v1)
+### Results: broadsheet, remarks, ratings, publishing, report cards (batch 15, after v1; connected)
 
 | Function | Kind | Input / output | Who | Status |
 |---|---|---|---|---|
@@ -346,14 +347,14 @@ API should use too, so a total never depends on where it was worked out.
 | `setPublished` | action | `armId, publish`; publishing needs every subject complete | owner, admin | fake |
 | `getReportCard` | read | `studentId` → `ReportCardData` | admins; the student's form teacher (parents in batch 16, once published) | fake |
 
-### Parents see results (batch 16, after v1)
+### Parents see results (batch 16, after v1; connected)
 
 `getParentHome`'s children gain `results`: the term's name, and once the class is published the
 average, position (when the school shows them) and class size. `getParentReportCard(studentId)`
 returns `ReportCardData` for the parent's own child only while their class is published; anything
 else is "not found".
 
-### Running the school year: closing a term (batch 17, after v1)
+### Running the school year: closing a term (batch 17, after v1; connected)
 
 `ResultsTerm` gains `index` and `isLast`. The open term is the first of the session not closed,
 once started (no longer whichever term today falls in).

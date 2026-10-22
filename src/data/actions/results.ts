@@ -5,8 +5,13 @@
 import { resultsSettingsSchema, unlockRequestSchema } from "@brillianda/core/results";
 import { fieldErrorsOf } from "@brillianda/core/signup";
 import { revalidatePath } from "next/cache";
-import * as impl from "../fake/results";
+import { LIVE } from "../api/client";
+import * as live from "../api/results";
+import * as fake from "../fake/results";
 import type { ActionResult, SheetStatus } from "../types";
+
+// The API where it has endpoints (DATA_SOURCE=api), else sample data.
+const impl = LIVE ? live : fake;
 
 const done = <T,>(school: string, result: ActionResult<T>) => {
   if (result.ok) revalidatePath(`/s/${school}`, "layout");

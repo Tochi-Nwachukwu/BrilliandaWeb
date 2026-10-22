@@ -3,7 +3,7 @@
 import "server-only";
 import { ms } from "@brillianda/core/apiBridge";
 import type { StudentGender, StudentInput, StudentStatus } from "@brillianda/core/students";
-import type { ActionResult, AdmissionSettings, GuardianMatch, ParentsPage, StudentDetail, StudentRow, StudentsList } from "../types";
+import type { ActionResult, AdmissionSettings, GuardianMatch, StudentDetail, StudentRow, StudentsList } from "../types";
 import { api, fail, read } from "./client";
 
 const id = encodeURIComponent;
@@ -12,7 +12,8 @@ const gender = (g: string) => g.toUpperCase() as StudentGender;
 type Row = Omit<StudentRow, "gender"> & { gender: string };
 type Detail = Row &
   Pick<StudentDetail, "firstName" | "lastName" | "otherNames" | "admissionDate" | "address" | "stateOfOrigin" | "classHistory"> & {
-    guardian: Omit<NonNullable<StudentDetail["guardian"]>, "parentAccess"> | null;
+    guardian: StudentDetail["guardian"];
+    attendance: StudentDetail["attendance"];
     changes: { id: string; at: string; who: string; what: string }[];
   };
 
@@ -22,18 +23,11 @@ export async function listStudents(subdomain: string): Promise<StudentsList | nu
 }
 
 export async function getStudent(subdomain: string, studentId: string): Promise<StudentDetail | null> {
-  const [s, parents] = await Promise.all([
-    read<Detail>(subdomain, `/v1/students/${id(studentId)}`),
-    read<ParentsPage>(subdomain, "/v1/parents"),
-  ]);
+  const s = await read<Detail>(subdomain, `/v1/students/${id(studentId)}`);
   if (!s) return null;
-  const access = parents?.guardians.find((g) => g.id === s.guardian?.id)?.access ?? "none";
   return {
     ...s,
     gender: gender(s.gender),
-    guardian: s.guardian ? { ...s.guardian, parentAccess: access } : null,
-    // A student's own attendance isn't on the API yet.
-    attendance: null,
     changes: s.changes.map((c) => ({ ...c, at: ms(c.at) })),
   };
 }

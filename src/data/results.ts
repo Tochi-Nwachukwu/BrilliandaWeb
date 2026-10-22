@@ -1,6 +1,11 @@
 // Results (batch 14; docs/data-contract.md). Screens import from here, never from fake/.
 import "server-only";
-import * as impl from "./fake/results";
+import * as live from "./api/results";
+import * as fake from "./fake/results";
+import { LIVE } from "./source";
+
+// The API where it has endpoints (DATA_SOURCE=api), else sample data.
+const impl = LIVE ? live : fake;
 import type { ResultsOverview, ResultsSettingsData, ResultsTerm, ScoreSheetData, SheetSummary } from "./types";
 
 /** The school's score parts, grading scale and whether positions show. Owners and admins. */

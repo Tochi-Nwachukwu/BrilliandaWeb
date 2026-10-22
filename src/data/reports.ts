@@ -1,8 +1,12 @@
 // Results for the school (batch 15; docs/data-contract.md). Screens import from here, never from fake/.
 import "server-only";
 import type { RatingSettings } from "@brillianda/core/results";
-import * as impl from "./fake/reports";
+import * as live from "./api/reports";
+import * as fake from "./fake/reports";
 import { LIVE } from "./source";
+
+// The API where it has endpoints (DATA_SOURCE=api), else sample data.
+const impl = LIVE ? live : fake;
 import type { Broadsheet, ClassReports, ReportCardData, ReportTerm } from "./types";
 
 /** A class's broadsheet this term. Admins, or that class's form teacher (read only). */
@@ -22,7 +26,6 @@ export function getReportCard(subdomain: string, studentId: string, termKey?: st
 
 /** Every term a student has results in, newest first. Owners and admins. */
 export function getReportTerms(subdomain: string, studentId: string): Promise<ReportTerm[] | null> {
-  if (LIVE) return Promise.resolve(null);
   return impl.getReportTerms(subdomain, studentId);
 }
 

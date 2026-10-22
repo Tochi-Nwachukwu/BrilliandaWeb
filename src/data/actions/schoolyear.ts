@@ -4,8 +4,13 @@
 import { revalidatePath } from "next/cache";
 import { decisionSchema, passMarkSchema } from "@brillianda/core/promotion";
 import * as promotion from "../fake/promotion";
-import * as impl from "../fake/schoolyear";
+import { LIVE } from "../api/client";
+import * as live from "../api/schoolyear";
+import * as fake from "../fake/schoolyear";
 import type { ActionResult } from "../types";
+
+// The API where it has endpoints (DATA_SOURCE=api), else sample data. Promotion isn’t on the API yet.
+const impl = LIVE ? live : fake;
 
 export async function closeTerm(school: string, input: unknown): Promise<ActionResult<{ closed: string; next: string | null }>> {
   const value = (input ?? {}) as { closeUnpublished?: unknown; nextStartsOn?: unknown; nextEndsOn?: unknown };

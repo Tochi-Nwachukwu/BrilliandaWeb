@@ -5,8 +5,13 @@ import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { signInSchema } from "@brillianda/core/auth";
 import { fieldErrorsOf } from "@brillianda/core/signup";
-import * as impl from "../fake/console";
+import { LIVE } from "../api/client";
+import * as live from "../api/console";
+import * as fake from "../fake/console";
 import type { ActionResult, TrialStatus } from "../types";
+
+// The API where it has endpoints (DATA_SOURCE=api), else sample data.
+const impl = LIVE ? live : fake;
 
 const STATUSES: TrialStatus[] = ["new", "contacted", "converted", "declined"];
 
