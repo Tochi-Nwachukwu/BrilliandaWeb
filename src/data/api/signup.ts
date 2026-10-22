@@ -1,6 +1,7 @@
 // Signup on the Brillianda API (on the main site). Same functions and shapes as ../fake/signup.ts.
 // The draft travels in the API's own cookie, kept on our side for the main site (client.ts).
 import "server-only";
+import { headers } from "next/headers";
 import { RESEND_AFTER_SECONDS, type OwnerAccount, type SchoolDetails, type SchoolLevel } from "@brillianda/core/signup";
 import { normaliseSubdomain, subdomainProblem } from "@brillianda/core/subdomain";
 import type { ActionResult, SignupDraft, SubdomainCheck } from "../types";
@@ -110,9 +111,12 @@ export async function createSchool(subdomain: string, existingPassword?: string)
     return fail(result);
   }
   const created = result.data.school.subdomain;
-  // On staging the school's address is the API's stand-in, so the pass is used on our own pages.
+  // The one-time pass, opened on the new school's own address (surebloom.staging.brillianda.com) when
+  // this page is on our domain; elsewhere (localhost, a vercel.app preview) on its /s/<school> pages.
   const handover = new URL(result.data.handoverUrl);
-  const onOurPages = handover.pathname.startsWith(`/s/${created}/`) ? handover.pathname : `/s/${created}${handover.pathname}`;
-  const url = process.env.API_ROOT_DOMAIN ? `${onOurPages}${handover.search}` : result.data.handoverUrl;
+  const page = handover.pathname.replace(new RegExp(`^/s/${created}(?=/)`), "");
+  const host = ((await headers()).get("host") ?? "").toLowerCase().replace(/:d+$/, "");
+  const root = (process.env.ROOT_DOMAIN ?? "").split(",")[0]!.trim().toLowerCase();
+  const url = root && host === root ? `https://${created}.${root}${page}${handover.search}` : `/s/${created}${page}${handover.search}`;
   return { ok: true, data: { subdomain: created, url } };
 }

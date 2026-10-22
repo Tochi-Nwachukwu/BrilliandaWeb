@@ -5,7 +5,7 @@ import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
 import { AuthLayout } from "@/components/auth/AuthLayout";
-import { getOutboxCode, getSignupDraft } from "@/data/signup";
+import { getSignupDraft } from "@/data/signup";
 import { LIVE } from "@/data/source";
 import { SignupSteps } from "../SignupSteps";
 import { VerifyForm } from "./VerifyForm";
@@ -25,18 +25,11 @@ export default function SignupVerifyPage() {
 
 async function SentTo() {
   const draft = await getSignupDraft();
-  // Staging only: the code from the API’s outbox, until emails reach every inbox.
-  const code = draft?.owner?.email ? await getOutboxCode(draft.owner.email) : null;
   return (
     <>
       <p>
         We sent a 6-digit code to <b className="font-medium text-text-primary">{draft?.owner?.email}</b>.
       </p>
-      {code && (
-        <p>
-          <Badge tone="info">Staging</Badge> From the outbox, your code is <b className="font-mono text-[17px] tracking-[0.2em] text-text-primary">{code}</b>. Refresh after asking for a new one.
-        </p>
-      )}
       {/* FAKE: until real emails go out. */}
       {!LIVE && (
         <p>

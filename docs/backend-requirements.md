@@ -28,6 +28,32 @@ differently, here is why", or "not yet".
 **What we need.** Keep it for staging if you like. Please create a **different** secret for
 production and share it privately when production is ready.
 
+### A2. Email links: the school's own address
+
+**Problem.** Staging's emails link to `https://staging.brillianda.com/invite?token=…&school=surebloomschool`
+(and the same for "Open your school", resets and sign-in links). Schools now have real addresses on
+staging, `<school>.staging.brillianda.com`, with https.
+
+**What we need.** The switch your notes of 16 October describe: set `ROOT_DOMAIN=staging.brillianda.com`
+on the staging API and drop `FRONTEND_URL`, so links read
+`https://surebloomschool.staging.brillianda.com/invite?token=…`. (Until then our side forwards the
+`?school=` links to the school's address, so they work either way.)
+
+**Done when.** An invitation email, a reset email and the "school is ready" email each open on the
+school's own address.
+
+### A3. Find my school: say when an email has no school
+
+**Problem.** `POST /v1/auth/find-school` answers the same whether or not the email has a school,
+and nothing is sent when it has none. People wait for an email that never comes.
+
+**What we need.** When the email has no school, still send an email to that address: "There's no
+school on Brillianda for this email", with a link to sign up and a line asking them to check with
+their school which email it uses. Keep the API's answer the same either way, so the page never
+reveals whether someone has an account; the email does, to its owner only.
+
+**Done when.** An address with no school receives that email.
+
 ---
 
 ## B. New features, in the order we'd like them

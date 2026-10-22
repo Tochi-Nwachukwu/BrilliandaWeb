@@ -72,10 +72,3 @@ export async function outboxSample(to: string, since: number): Promise<SampleEma
     ],
   };
 }
-
-/** The 6-digit code in the newest signup email to `to`, for the code screen. */
-export async function latestCode(to: string): Promise<string | null> {
-  if (!outboxOn()) return null;
-  const emails = await fetchEmails(to);
-  return emails.find((e) => e.code)?.code ?? null;
-}

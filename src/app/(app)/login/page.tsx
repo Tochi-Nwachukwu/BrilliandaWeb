@@ -39,8 +39,8 @@ export default function FindMySchoolPage() {
         pendingLabel="Sending…"
         sent={
           <>
-            <p className="font-medium text-text-primary">If that email is on file, we’ve sent a link to each of your schools.</p>
-            <p>Nothing arrived? Check your spam folder, or ask your school’s owner for its address.</p>
+            <p className="font-medium text-text-primary">If that email has a school, we’ve sent it a link to each one.</p>
+            <p>No email within a few minutes (spam folder included) means there’s no school under that address. Try the email your school has for you, or ask your school.</p>
           </>
         }
       />

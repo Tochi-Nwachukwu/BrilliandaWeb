@@ -55,7 +55,21 @@ export function routeFor({ host, path, search = "", roots }: { host: string; pat
     const root = bare.slice(4);
     return { kind: "redirect", url: `${protocol}://${root}${port}${path}${search}` };
   }
-  if (!school) return { kind: "pass" };
+  if (!school) {
+    // The API's emails can name the school in the query (`/invite?token=…&school=surebloom`): send
+    // the browser to that school's own address, or its /s/<school> pages on an address that isn't
+    // ours (a vercel.app preview).
+    const named = new URLSearchParams(search).get("school")?.trim().toLowerCase();
+    if (named && /^[a-z][a-z0-9-]{1,29}$/.test(named) && !named.endsWith("-") && named !== "www" && !MAIN_SITE_ONLY.test(path) && !isShared(path) && !path.startsWith("/s/")) {
+      const rest = new URLSearchParams(search);
+      rest.delete("school");
+      const query = rest.size ? `?${rest}` : "";
+      const tail = path === "/" ? "" : path;
+      if (roots.includes(bare)) return { kind: "redirect", url: `${protocol}://${named}.${bare}${port}${tail || "/"}${query}` };
+      return { kind: "redirect", url: `${protocol}://${bare}${port}/s/${named}${tail}${query}` };
+    }
+    return { kind: "pass" };
+  }
 
   if (isShared(path)) return { kind: "pass" };
   if (MAIN_SITE_ONLY.test(path)) {

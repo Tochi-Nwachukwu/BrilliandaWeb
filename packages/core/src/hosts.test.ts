@@ -52,4 +52,17 @@ describe("routeFor", () => {
     expect(route("brillianda.com", "/")).toEqual({ kind: "pass" });
     expect(route("brillianda.com", "/login")).toEqual({ kind: "pass" });
   });
+  it("sends the API's ?school= email links to the school's own address", () => {
+    const staging = rootDomains("staging.brillianda.com");
+    expect(routeFor({ host: "staging.brillianda.com", path: "/invite", search: "?token=abc&school=surebloomschool", roots: staging })).toEqual({
+      kind: "redirect",
+      url: "https://surebloomschool.staging.brillianda.com/invite?token=abc",
+    });
+    expect(route("brillianda.com", "/", "?school=surebloom")).toEqual({ kind: "redirect", url: "https://surebloom.brillianda.com/" });
+    // Not one of our domains: the school's /s/ pages there.
+    expect(route("brillianda-web.vercel.app", "/reset-password", "?token=t&school=greenfield")).toEqual({ kind: "redirect", url: "https://brillianda-web.vercel.app/s/greenfield/reset-password?token=t" });
+    // Not a school name, or a main-site page: left alone.
+    expect(route("brillianda.com", "/invite", "?school=../x")).toEqual({ kind: "pass" });
+    expect(route("brillianda.com", "/signup", "?school=surebloom")).toEqual({ kind: "pass" });
+  });
 });
