@@ -12,23 +12,16 @@ differently, here is why", or "not yet".
 
 ## Contents
 
-- A. Production
+- A. Emails
 - B. New features, in the order we'd like them
 - C. Rules both sides must share
 - D. What the front end already relies on (please don't change without telling us)
 
 ---
 
-## A. Production
+## A. Emails
 
-### A1. A new shared secret for production
-
-**Problem.** The staging secret (`PROXY_SHARED_SECRET`) was sent in a chat.
-
-**What we need.** Keep it for staging if you like. Please create a **different** secret for
-production and share it privately when production is ready.
-
-### A2. Email links: the school's own address
+### A1. Email links: the school's own address
 
 **Problem.** Staging's emails link to `https://staging.brillianda.com/invite?token=…&school=surebloomschool`
 (and the same for "Open your school", resets and sign-in links). Schools now have real addresses on
@@ -42,7 +35,7 @@ on the staging API and drop `FRONTEND_URL`, so links read
 **Done when.** An invitation email, a reset email and the "school is ready" email each open on the
 school's own address.
 
-### A3. Find my school: say when an email has no school
+### A2. Find my school: say when an email has no school
 
 **Problem.** `POST /v1/auth/find-school` answers the same whether or not the email has a school,
 and nothing is sent when it has none. People wait for an email that never comes.
