@@ -38,9 +38,10 @@ export function adminGuide(base: string): HelpGuide {
       { title: "Welcome to your school on Brillianda", body: "A quick look around: five stops, under a minute. You can skip it, and take it again any time from Help." },
       { target: "nav-home", title: "Home", body: "Your setup checklist and the latest changes. Start here: it tells you what to do next." },
       { target: "nav-students", title: "Students", body: "Add students one at a time or import your list from Excel or Word. Open a student for their details, guardian and report cards." },
+      { target: "nav-teachers", title: "Teachers", body: "Invite your teachers, then give each one a form class and the subjects they teach." },
       { target: "nav-classes", title: "Classes", body: "Your class levels and their arms, like JSS 1 Blue. Each arm’s daily register is here too." },
       { target: "nav-results", title: "Results", body: "Follow each class’s score sheets, check the broadsheet, add remarks and publish results to parents." },
-      { target: "nav-more", title: "More", body: "Teachers, parents, admins, subjects, sessions and terms, promotion, branding and change history." },
+      { target: "nav-more", title: "More", body: "Parents, admins, subjects, sessions and terms, promotion, branding and change history." },
       { target: "help", title: "Help is always here", body: "Questions and answers about every screen, and this tour again. Search finds any page by name." },
     ],
     topics: [
@@ -66,7 +67,7 @@ export function adminGuide(base: string): HelpGuide {
         title: "Classes and registers",
         items: [
           { q: "How do I add a class or an arm?", a: "Classes › Add a class, or open a class and add an arm. To change how many arms every class has, or their names, use Edit arms.", href: `${base}/classes`, link: "Classes", pages: [`${base}/classes`] },
-          { q: "Who takes each class’s register?", a: "The class’s form teacher. Set form teachers in More › Teachers. You can also open any arm’s register from Classes and fix a day.", href: `${more}/teachers`, link: "Teachers", pages: [`${base}/classes`, `${more}/teachers`] },
+          { q: "Who takes each class’s register?", a: "The class’s form teacher. Set form teachers on the Teachers page. You can also open any arm’s register from Classes and fix a day.", href: `${base}/teachers`, link: "Teachers", pages: [`${base}/classes`, `${base}/teachers`] },
           { q: "Which subjects does each class take?", a: "More › Subjects. Tick a subject for a class level as compulsory or elective, and set departments for senior electives.", href: `${base}/subjects`, link: "Subjects", pages: [`${base}/subjects`] },
         ],
       },
@@ -83,13 +84,13 @@ export function adminGuide(base: string): HelpGuide {
       {
         title: "Your team and parents",
         items: [
-          { q: "How do I add a teacher?", a: "More › Teachers › Invite a teacher. They get an email to set a password. Then give them a form class and the subjects they teach.", href: `${more}/teachers`, link: "Teachers", pages: [`${more}/teachers`] },
+          { q: "How do I add a teacher?", a: "Teachers › Invite a teacher. They get an email to set a password. Then give them a form class and the subjects they teach.", href: `${base}/teachers`, link: "Teachers", pages: [`${base}/teachers`] },
           { q: "How do students get access?", a: "More › Student accounts. Invite a student with their email (their own, or one the school gives them); they set a password and sign in at the school’s address. They see their timetable, attendance, results and book list, and later take tests.", href: `${more}/student-accounts`, link: "Student accounts", pages: [`${more}/student-accounts`] },
           { q: "How do parents get access?", a: "More › Parents. Invite one guardian, or everyone with an email at once. Parents see only their own children.", href: `${more}/parents`, link: "Parents", pages: [`${more}/parents`] },
           { q: "How do I add another admin?", a: "More › Admins › Invite an admin. Only the owner can invite or remove admins.", href: `${more}/admins`, link: "Admins", pages: [`${more}/admins`] },
           { q: "What is the question bank?", a: "More › Question bank: every subject’s questions for tests, assignments and exams, written by teachers or generated with AI and checked by them, and the school’s AI use this month.", href: `${more}/questions`, link: "Question bank", pages: [`${more}/questions`] },
           { q: "How do I set up the timetable?", a: "More › Timetable. First check the Bell schedule (the periods and breaks, the same for every class). Then pick a class and choose a subject for each period, or download the template, fill it in Excel and upload it (Excel, CSV and Word all work). A PDF can be uploaded too, as a document staff can open, but it can’t highlight anyone’s lessons.", href: `${more}/timetable`, link: "Timetable", pages: [`${more}/timetable`] },
-          { q: "Who teaches each lesson on the timetable?", a: "The class’s teacher for that subject, from More › Teachers. If a teacher ends up in two classes at once, the timetable warns you.", href: `${more}/teachers`, link: "Teachers", pages: [`${more}/timetable`] },
+          { q: "Who teaches each lesson on the timetable?", a: "The class’s teacher for that subject, from the Teachers page. If a teacher ends up in two classes at once, the timetable warns you.", href: `${base}/teachers`, link: "Teachers", pages: [`${more}/timetable`] },
           { q: "A parent says their child’s details are wrong. What do I do?", a: "Parents can ask for a correction from their child’s page. Requests show in More › Corrections, with a count on the More tab. Check each one, then Correct the record (it changes the student’s details and goes in the change history) or Decline with a reason the parent sees.", href: `${more}/corrections`, link: "Corrections", pages: [`${more}/corrections`, `${base}/students`] },
           { q: "How do I tell parents which books to buy?", a: "More › Book lists. Pick the session and the class, add the books, exercise books, uniform and anything else, with prices if you like, then Share with parents. Parents see the list for their child’s class, and the one they move into next session.", href: `${more}/book-lists`, link: "Book lists", pages: [`${more}/book-lists`] },
           { q: "How do birthday messages work?", a: "More › Birthdays. Turn them on and write the message: each child’s first name, age and the school’s name are filled in. On the birthday, at 7:00 am, the guardian gets a text and the parent app shows a birthday card. Home lists the week’s birthdays.", href: `${more}/birthdays`, link: "Birthdays", pages: [`${more}/birthdays`, base || "/"] },

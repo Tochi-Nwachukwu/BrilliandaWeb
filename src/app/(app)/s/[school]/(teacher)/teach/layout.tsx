@@ -52,6 +52,7 @@ async function Teacher({ params, children }: { params: Promise<{ school: string 
     <AppShell
       nav={nav}
       place={school.name}
+      placeMark={<SchoolMark {...school} className="h-9 w-9 text-[13px]" />}
       account={{ fullName: me.fullName, roleLabel: ROLE_LABEL[me.role], email: me.email, photo: me.photo, profileHref: `${base}/teach/profile` }}
       sampleData
       help={teacherGuide(base, isFormTeacher)}

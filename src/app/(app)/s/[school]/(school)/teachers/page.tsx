@@ -5,7 +5,7 @@ import { TeachersView } from "./TeachersView";
 
 export const metadata: Metadata = { title: "Teachers" };
 
-export default async function TeachersPage({ params }: PageProps<"/s/[school]/more/teachers">) {
+export default async function TeachersPage({ params }: PageProps<"/s/[school]/teachers">) {
   const { school } = await params;
   const page = await getTeachersPage(school);
   if (!page) return null;

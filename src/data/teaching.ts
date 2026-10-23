@@ -9,7 +9,7 @@ import { LIVE } from "./source";
 const impl = LIVE ? live : fake;
 import type { Register, RegistersToday, SubjectClass, TeacherHome, TeachersPage } from "./types";
 
-/** More › Teachers: every teacher (and open invite), with their form classes and subject classes. Owners and admins. */
+/** The Teachers page: every teacher (and open invite), with their form classes and subject classes. Owners and admins. */
 export function getTeachersPage(subdomain: string): Promise<TeachersPage | null> {
   return impl.getTeachersPage(subdomain);
 }

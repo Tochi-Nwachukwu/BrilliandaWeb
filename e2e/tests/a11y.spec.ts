@@ -51,7 +51,7 @@ test("the public screens and the team console pass the accessibility scan", asyn
 // One of each kind of school screen: setup, lists, a record, forms, grids and results.
 const SCHOOL = [
   ["", "/classes", "/subjects", "/students", "/students/st1", "/students/new", "/students/import", "/more"],
-  ["/more/sessions", "/more/branding", "/more/history", "/more/teachers", "/more/timetable", "/more/book-lists", "/classes/register/ga-gl1-gn1"],
+  ["/more/sessions", "/more/branding", "/more/history", "/teachers", "/more/timetable", "/more/book-lists", "/classes/register/ga-gl1-gn1"],
   ["/results/ga-gl1-gn1", "/results/ga-gl1-gn1/gs-mathematics", "/results/ga-gl1-gn1/broadsheet", "/results/ga-gl1-gn1/report/st1", "/more/promotion", "/more/questions", "/more/tests/tt1"],
 ];
 

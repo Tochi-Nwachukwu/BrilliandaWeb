@@ -21,7 +21,7 @@ import { initials } from "@/lib/initials";
 
 type Open = { kind: "invite" } | { kind: "form"; teacher: TeacherSummary } | { kind: "subjects"; teacher: TeacherSummary } | { kind: "remove"; teacher: TeacherSummary } | null;
 
-/** More › Teachers (batch 11): invite teachers, then give each a form class and subject classes. */
+/** Teachers (batch 11; in the sidebar): invite teachers, then give each a form class and subject classes. */
 export function TeachersView({
   page,
   invite,

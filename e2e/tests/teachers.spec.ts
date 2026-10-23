@@ -53,7 +53,7 @@ test("an admin invites a teacher, gives them a class and a subject, and they joi
   const email = `zara-${testInfo.project.name}-${Date.now() % 100000}@greenfield.ng`;
   await signIn(page, "owner@greenfield.ng");
   await expect(page).toHaveURL(/\/s\/greenfield$/);
-  await open(page, "/s/greenfield/more/teachers");
+  await open(page, "/s/greenfield/teachers");
   await page.getByRole("button", { name: "Invite a teacher" }).click();
   await page.getByLabel("Full name").fill("Zara Bello");
   await page.getByLabel("Email").fill(email);
@@ -70,7 +70,7 @@ test("an admin invites a teacher, gives them a class and a subject, and they joi
   await expect(zara.getByText("No classes yet")).toBeVisible();
 
   // The admin makes her form teacher of JSS 2 Gold and gives her English there.
-  await open(page, "/s/greenfield/more/teachers");
+  await open(page, "/s/greenfield/teachers");
   const card = page.getByRole("listitem").filter({ hasText: "Zara Bello" });
   await card.getByRole("button", { name: "Form class" }).click();
   await page.getByRole("combobox", { name: "Form class" }).selectOption({ label: "JSS 2 Gold" });

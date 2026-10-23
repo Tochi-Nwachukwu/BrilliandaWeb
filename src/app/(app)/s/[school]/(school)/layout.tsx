@@ -38,6 +38,7 @@ async function SchoolApp({ params, children }: { params: Promise<{ school: strin
   const nav: NavItem[] = [
     { href: base || "/", label: "Home", icon: "home", exact: true, tour: "nav-home" },
     { href: `${base}/students`, label: "Students", icon: "students", tour: "nav-students" },
+    { href: `${base}/teachers`, label: "Teachers", icon: "staff", tour: "nav-teachers" },
     { href: `${base}/classes`, label: "Classes", icon: "classes", tour: "nav-classes" },
     { href: `${base}/results`, label: "Results", icon: "results", tour: "nav-results" },
     { href: `${base}/more`, label: "More", icon: "more", tour: "nav-more", count: waiting },
@@ -47,13 +48,13 @@ async function SchoolApp({ params, children }: { params: Promise<{ school: strin
     <AppShell
       nav={nav}
       place={school.name}
+      placeMark={<SchoolMark {...school} className="h-9 w-9 text-[13px]" />}
       account={{ fullName: me.fullName, roleLabel: ROLE_LABEL[me.role], email: me.email, photo: me.photo, profileHref: `${base}/profile` }}
       sampleData={!LIVE}
       help={adminGuide(base)}
       signOut={signOut.bind(null, school.subdomain)}
       commands={[
         { id: "admins", label: "Admins", icon: "staff", href: `${base}/more/admins`, group: "Go to" },
-        { id: "teachers", label: "Teachers", icon: "staff", href: `${base}/more/teachers`, group: "Go to" },
         { id: "subjects", label: "Subjects", icon: "subjects", href: `${base}/subjects`, group: "Go to" },
         { id: "results-settings", label: "Results settings", icon: "results", href: `${base}/more/results`, group: "Go to" },
         { id: "sessions", label: "Sessions and terms", icon: "calendar", href: `${base}/more/sessions`, group: "Go to" },

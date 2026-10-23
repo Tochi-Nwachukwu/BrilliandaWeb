@@ -70,6 +70,7 @@ export function Wordmark({ className }: { className?: string }) {
 export function AppShell({
   nav,
   place,
+  placeMark,
   account,
   sampleData,
   commands = [],
@@ -81,6 +82,8 @@ export function AppShell({
   nav: NavItem[];
   /** The school's name, on the sidebar card. */
   place: string;
+  /** The school's logo (or its initials in its colour) for the sidebar card; our initials if absent. */
+  placeMark?: ReactNode;
   account: ShellAccount;
   /** Shows the "Sample data" badge while screens run on stand-in data. */
   sampleData?: boolean;
@@ -110,9 +113,11 @@ export function AppShell({
         <Wordmark className="px-2" />
         {place && (
           <div className="flex items-center gap-2.5 rounded-2xl bg-sunken p-2">
-            <span aria-hidden className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-primary text-[13px] font-semibold text-primary-text">
-              {initials(place) || "B"}
-            </span>
+            {placeMark ?? (
+              <span aria-hidden className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-primary text-[13px] font-semibold text-primary-text">
+                {initials(place) || "B"}
+              </span>
+            )}
             <span className="min-w-0">
               <span className="block truncate text-sm font-semibold leading-tight">{place}</span>
               <span className="block truncate text-xs text-text-secondary">{account.roleLabel}</span>
