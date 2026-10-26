@@ -24,11 +24,11 @@ export default function SchoolSignInPage({ params }: PageProps<"/s/[school]/logi
 }
 
 async function SignIn({ params }: { params: Promise<{ school: string }> }) {
-  const school = await schoolFromParams(params);
-  const sb = await schoolBase(school.subdomain);
+  const { school: subdomain } = await params;
+  // All at once: each is a round trip to the backend.
+  const [school, sb, me] = await Promise.all([schoolFromParams(params), schoolBase(subdomain), getCurrentMember(subdomain)]);
   // Already signed in: say as whom, rather than quietly sending them on. Someone sharing a phone
   // (or trying another account) can sign out from here.
-  const me = await getCurrentMember(school.subdomain);
   if (me) {
     return (
       <AuthLayout school={school} title="You’re already signed in" description={`As ${me.fullName}, ${ROLE_LABEL[me.role].toLowerCase()} at ${school.name}.`}>

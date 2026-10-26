@@ -10,9 +10,9 @@ import { TimetableEditor } from "./TimetableEditor";
 export const metadata: Metadata = { title: "Timetable" };
 
 export default async function TimetablePage({ params }: PageProps<"/s/[school]/more/timetable">) {
-  const school = await schoolFromParams(params);
+  const { school: subdomain } = await params;
   await connection();
-  const page = await getTimetable(school.subdomain);
+  const [school, page] = await Promise.all([schoolFromParams(params), getTimetable(subdomain)]);
   if (!page) return null;
   const s = school.subdomain;
   return (

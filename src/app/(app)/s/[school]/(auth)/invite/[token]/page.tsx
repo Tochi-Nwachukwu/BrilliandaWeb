@@ -24,12 +24,11 @@ export default function AcceptInvitePage({ params }: PageProps<"/s/[school]/invi
 }
 
 async function Accept({ params }: { params: Promise<{ school: string; token: string }> }) {
-  const school = await schoolFromParams(params);
-  const sb = await schoolBase(school.subdomain);
-  const { token } = await params;
+  const { school: subdomain, token } = await params;
   // Whether an invite has expired depends on the time now, so this part is worked out per request.
   await connection();
-  const invite = await getInvite(school.subdomain, token);
+  // All at once: each is a round trip to the backend.
+  const [school, sb, invite] = await Promise.all([schoolFromParams(params), schoolBase(subdomain), getInvite(subdomain, token)]);
   const signIn = (
     <Link href={`${sb}/login`} className={authLinkClass}>
       Go to sign in

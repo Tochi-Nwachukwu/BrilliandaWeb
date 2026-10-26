@@ -47,6 +47,20 @@ reveals whether someone has an account; the email does, to its owner only.
 
 **Done when.** An address with no school receives that email.
 
+### A3. Run the staging API in London, next to its database
+
+**Problem.** Every screen waits on the API, and each request takes 0.6 to 1.3 seconds even for
+`GET /v1/school`. The API's responses come from Washington (`X-Vercel-Id: …::iad1::…`), while the
+database is in London. `apps/api/vercel.json` asks for `lhr1`, but staging isn't running there,
+so every database round trip crosses the Atlantic. Your own notes put London to London at about
+1 ms a round trip.
+
+**What we need.** The staging API's functions in `lhr1` (Vercel project → Settings → Functions →
+Region, which can override `vercel.json`; on the Hobby plan only one region can be chosen). Tell us
+when it moves: we'll move our server to London too, so the two stay side by side.
+
+**Done when.** `GET /v1/school` answers in well under half a second, and `X-Vercel-Id` shows `lhr1`.
+
 ---
 
 ## B. New features, in the order we'd like them

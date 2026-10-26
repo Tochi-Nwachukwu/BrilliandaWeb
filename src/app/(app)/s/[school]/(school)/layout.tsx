@@ -23,17 +23,16 @@ export default function SchoolAppLayout({ children, params }: LayoutProps<"/s/[s
 }
 
 async function SchoolApp({ params, children }: { params: Promise<{ school: string }>; children: React.ReactNode }) {
-  const school = await schoolFromParams(params);
-  const sb = await schoolBase(school.subdomain);
+  const { school: subdomain } = await params;
+  // All at once: each is a round trip to the backend.
+  const [school, sb, me, waiting] = await Promise.all([schoolFromParams(params), schoolBase(subdomain), getCurrentMember(subdomain), countOpenCorrections(subdomain)]);
   const base = sb;
-  const me = await getCurrentMember(school.subdomain);
   if (!me) redirect(`${base}/login`);
   // Teachers have their own screens (batch 11); the admin ones stay closed to them.
   if (me.role === "teacher") redirect(`${base}/teach`);
   if (me.role === "parent") redirect(`${base}/family`);
   if (me.role === "student") redirect(`${base}/learn`);
   // Parents' correction requests waiting (batch 21), on the More tab.
-  const waiting = await countOpenCorrections(school.subdomain);
 
   const nav: NavItem[] = [
     { href: base || "/", label: "Home", icon: "home", exact: true, tour: "nav-home" },

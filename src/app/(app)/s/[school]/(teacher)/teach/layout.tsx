@@ -23,15 +23,14 @@ export default function TeacherLayout({ children, params }: LayoutProps<"/s/[sch
 }
 
 async function Teacher({ params, children }: { params: Promise<{ school: string }>; children: React.ReactNode }) {
-  const school = await schoolFromParams(params);
-  const sb = await schoolBase(school.subdomain);
+  await connection();
+  const { school: subdomain } = await params;
+  // All at once: each is a round trip to the backend.
+  const [school, sb, me, home] = await Promise.all([schoolFromParams(params), schoolBase(subdomain), getCurrentMember(subdomain), getTeacherHome(subdomain)]);
   const base = sb;
-  const me = await getCurrentMember(school.subdomain);
   if (!me) redirect(`${base}/login`);
   if (me.role !== "teacher") redirect(base || "/");
   // Subject teachers who aren't form teachers have no register to take, so no Register tab.
-  await connection();
-  const home = await getTeacherHome(school.subdomain);
   const isFormTeacher = (home?.formArms.length ?? 0) > 0;
 
   const nav: NavItem[] = [

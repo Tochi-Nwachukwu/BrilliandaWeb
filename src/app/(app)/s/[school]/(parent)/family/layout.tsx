@@ -21,10 +21,10 @@ export default function ParentLayout({ children, params }: LayoutProps<"/s/[scho
 }
 
 async function Parent({ params, children }: { params: Promise<{ school: string }>; children: React.ReactNode }) {
-  const school = await schoolFromParams(params);
-  const sb = await schoolBase(school.subdomain);
+  const { school: subdomain } = await params;
+  // All at once: each is a round trip to the backend.
+  const [school, sb, me] = await Promise.all([schoolFromParams(params), schoolBase(subdomain), getCurrentMember(subdomain)]);
   const base = sb;
-  const me = await getCurrentMember(school.subdomain);
   if (!me) redirect(`${base}/login`);
   if (me.role !== "parent") redirect(base || "/");
 

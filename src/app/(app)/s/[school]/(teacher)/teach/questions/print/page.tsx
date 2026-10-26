@@ -8,9 +8,9 @@ import { getQuestionBank } from "@/data/questions";
 export const metadata: Metadata = { title: "Print a paper" };
 
 export default async function PrintPaperPage({ params }: PageProps<"/s/[school]/teach/questions/print">) {
-  const school = await schoolFromParams(params);
+  const { school: subdomain } = await params;
   await connection();
-  const page = await getQuestionBank(school.subdomain);
+  const [school, page] = await Promise.all([schoolFromParams(params), getQuestionBank(subdomain)]);
   if (!page) return null;
   return (
     <div className="grid gap-4">
