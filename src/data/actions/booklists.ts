@@ -3,8 +3,13 @@
 // Books and things needed (batch 20; docs/data-contract.md).
 import { bookListSchema } from "@brillianda/core/booklists";
 import { fieldErrorsOf } from "@brillianda/core/signup";
-import * as impl from "../fake/booklists";
+import { LIVE } from "../api/client";
+import * as live from "../api/booklists";
+import * as fake from "../fake/booklists";
 import type { ActionResult } from "../types";
+
+// The API where it has endpoints (DATA_SOURCE=api), else sample data.
+const impl = LIVE ? live : fake;
 
 /** Replaces a class level's list for a session. Owners and admins. */
 export async function saveBookList(school: string, levelId: string, startYear: number, input: unknown): Promise<ActionResult<null>> {

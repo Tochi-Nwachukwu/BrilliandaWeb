@@ -1,7 +1,12 @@
 // Student accounts and the student portal (batch 23; docs/data-contract.md). Screens import from here, never from fake/.
 import "server-only";
-import * as impl from "./fake/learners";
+import * as live from "./api/learners";
+import * as fake from "./fake/learners";
+import { LIVE } from "./source";
 import type { ClassTimetable, ReportCardData, StudentAccountsPage, StudentHome } from "./types";
+
+// The API where it has endpoints (DATA_SOURCE=api), else sample data.
+const impl = LIVE ? live : fake;
 
 /** More › Student accounts: every active student and whether they use the portal. Owners and admins. */
 export function getStudentAccounts(subdomain: string): Promise<StudentAccountsPage | null> {

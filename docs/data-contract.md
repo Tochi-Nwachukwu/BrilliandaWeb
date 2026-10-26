@@ -16,8 +16,9 @@ sign-in, the team, Home and the calendar, classes, subjects, students, import, c
 branding, trial requests), plus teachers and the daily register (batch 11), parents (batch 12; the
 parent home leaves out birthdays, book lists and a child's record until the API has them), the
 team console (13), results, report cards and parents seeing them (14 to 16), closing a term (17)
-and My profile. Not connected, because the API has no endpoints for them yet: promotion (18) and
-batches 19 to 26. With `DATA_SOURCE=api` their screens say "Not connected yet" (a `layout.tsx` in
+My profile, promotion (18), birthdays, book lists, corrections, the timetable and student
+accounts with the student portal (19 to 23). Not connected, because the API has no endpoints for
+them yet: the question bank, CBT and printing papers (24 to 26). With `DATA_SOURCE=api` their screens say "Not connected yet" (a `layout.tsx` in
 each), and Home, Sessions and the student page leave out their parts.
 
 - `src/data/api/client.ts` calls the API with the school's address, the shared secret and the

@@ -3,14 +3,16 @@
 // Running the school year (group 3; docs/data-contract.md). Owners and admins.
 import { revalidatePath } from "next/cache";
 import { decisionSchema, passMarkSchema } from "@brillianda/core/promotion";
-import * as promotion from "../fake/promotion";
+import * as livePromotion from "../api/promotion";
+import * as fakePromotion from "../fake/promotion";
 import { LIVE } from "../api/client";
 import * as live from "../api/schoolyear";
 import * as fake from "../fake/schoolyear";
 import type { ActionResult } from "../types";
 
-// The API where it has endpoints (DATA_SOURCE=api), else sample data. Promotion isn’t on the API yet.
+// The API where it has endpoints (DATA_SOURCE=api), else sample data.
 const impl = LIVE ? live : fake;
+const promotion = LIVE ? livePromotion : fakePromotion;
 
 export async function closeTerm(school: string, input: unknown): Promise<ActionResult<{ closed: string; next: string | null }>> {
   const value = (input ?? {}) as { closeUnpublished?: unknown; nextStartsOn?: unknown; nextEndsOn?: unknown };

@@ -1,6 +1,6 @@
 // Parents, on the Brillianda API. Same functions and shapes as ../fake/parents.ts.
 import "server-only";
-import type { ActionResult, ParentChild, ParentHome, ParentsPage, ReportCardData, SampleEmail } from "../types";
+import type { ActionResult, ParentHome, ParentsPage, ReportCardData, SampleEmail } from "../types";
 import { api, fail, read } from "./client";
 import { outboxSample } from "./outbox";
 
@@ -41,13 +41,8 @@ export async function removeParentAccess(subdomain: string, guardianId: string):
   return result.ok ? { ok: true, data: null } : fail(result);
 }
 
-type ApiChild = Pick<ParentChild, "id" | "fullName" | "armLabel" | "admissionNo" | "formTeacher" | "attendance" | "recent" | "results" | "pastTerms">;
-
 export async function getParentHome(subdomain: string): Promise<ParentHome | null> {
-  const home = await read<{ fullName: string; schoolDay: boolean; children: ApiChild[] }>(subdomain, "/v1/me/children");
-  if (!home) return null;
-  // Birthdays, book lists, a child's record and corrections aren't on the API yet: those parts stay hidden.
-  return { ...home, children: home.children.map((c) => ({ ...c, birthday: null, bookLists: [], details: null, corrections: [] })) };
+  return read<ParentHome>(subdomain, "/v1/me/children");
 }
 
 /** Their own child's report card, published terms only; anything else is null. */

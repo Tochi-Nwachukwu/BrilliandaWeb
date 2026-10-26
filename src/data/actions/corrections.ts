@@ -3,8 +3,13 @@
 // Parents' correction requests (batch 21; docs/data-contract.md).
 import { correctionRequestSchema, declineSchema } from "@brillianda/core/corrections";
 import { fieldErrorsOf } from "@brillianda/core/signup";
-import * as impl from "../fake/corrections";
+import { LIVE } from "../api/client";
+import * as live from "../api/corrections";
+import * as fake from "../fake/corrections";
 import type { ActionResult } from "../types";
+
+// The API where it has endpoints (DATA_SOURCE=api), else sample data.
+const impl = LIVE ? live : fake;
 
 const CHECK_FIELDS = "Please check the highlighted fields.";
 

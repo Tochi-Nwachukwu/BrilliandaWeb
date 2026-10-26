@@ -3,8 +3,13 @@
 // Student accounts (batch 23; docs/data-contract.md). Owners and admins.
 import { emailOnlySchema } from "@brillianda/core/auth";
 import { fieldErrorsOf } from "@brillianda/core/signup";
-import * as impl from "../fake/learners";
+import { LIVE } from "../api/client";
+import * as live from "../api/learners";
+import * as fake from "../fake/learners";
 import type { ActionResult, SampleEmail } from "../types";
+
+// The API where it has endpoints (DATA_SOURCE=api), else sample data.
+const impl = LIVE ? live : fake;
 
 /** Invites a student to the student portal by email (theirs, or one the school gives them). */
 export async function inviteStudent(school: string, studentId: string, input: unknown): Promise<ActionResult<SampleEmail>> {

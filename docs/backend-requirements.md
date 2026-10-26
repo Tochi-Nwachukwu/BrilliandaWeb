@@ -1,6 +1,6 @@
 # What the front end needs from the backend
 
-From the Brillianda front-end team. Updated 22 October 2026: only what is still open.
+From the Brillianda front-end team. Updated 26 October 2026: only what is still open.
 
 This is the complete list, in one place. Each item says what the problem is, what we need, the
 rules that matter, and how we'll know it's done. It is written from the screens' side only: we
@@ -35,32 +35,6 @@ on the staging API and drop `FRONTEND_URL`, so links read
 **Done when.** An invitation email, a reset email and the "school is ready" email each open on the
 school's own address.
 
-### A2. Find my school: say when an email has no school
-
-**Problem.** `POST /v1/auth/find-school` answers the same whether or not the email has a school,
-and nothing is sent when it has none. People wait for an email that never comes.
-
-**What we need.** When the email has no school, still send an email to that address: "There's no
-school on Brillianda for this email", with a link to sign up and a line asking them to check with
-their school which email it uses. Keep the API's answer the same either way, so the page never
-reveals whether someone has an account; the email does, to its owner only.
-
-**Done when.** An address with no school receives that email.
-
-### A3. Run the staging API in London, next to its database
-
-**Problem.** Every screen waits on the API, and each request takes 0.6 to 1.3 seconds even for
-`GET /v1/school`. The API's responses come from Washington (`X-Vercel-Id: …::iad1::…`), while the
-database is in London. `apps/api/vercel.json` asks for `lhr1`, but staging isn't running there,
-so every database round trip crosses the Atlantic. Your own notes put London to London at about
-1 ms a round trip.
-
-**What we need.** The staging API's functions in `lhr1` (Vercel project → Settings → Functions →
-Region, which can override `vercel.json`; on the Hobby plan only one region can be chosen). Tell us
-when it moves: we'll move our server to London too, so the two stay side by side.
-
-**Done when.** `GET /v1/school` answers in well under half a second, and `X-Vercel-Id` shows `lhr1`.
-
 ---
 
 ## B. New features, in the order we'd like them
@@ -72,195 +46,23 @@ existing style. Change them freely, just tell us.
 
 Everything here is for one school, taken from the address, as today.
 
-### B1. Promotion at the end of the session
+### B1. Birthday texts: an SMS account
 
-**Problem.** At the end of the session, students move up, repeat, or graduate.
+**Problem.** Birthday messages are built (24 October): the settings, the daily job and the log.
+The texts only reach phones once an SMS provider account is set up; on staging they land in the
+outbox.
 
-**Rules.**
+**What we need.** Nothing more from the backend: Brillianda needs to open an SMS account (Termii,
+as built) and fund it. Tell us when it's on so we can test a real text.
 
-- Each student's **yearly average** is the average of their term averages for the session
-  (terms with no results are skipped).
-- The **pass mark** is per school; by default the lowest passing grade on the scale (40 with the
-  default scale).
-- Suggested decision: the final class graduates; others move up at or above the pass mark, else
-  repeat; a student with no results at all is suggested to move up.
-- Any decision can be changed, with an optional reason. Choosing the suggestion again clears the
-  change.
-- Completing promotion, in the session's last term only: close that term; move each student to
-  the next class level, in the arm with the same name if it exists there (else its first arm),
-  recorded in their class history; mark graduates as `graduated`; start the next session with
-  its first term's dates. Classes, subjects and teachers carry over. Refused while classes are
-  unpublished, unless the admin confirms.
-
-**Endpoints we need.**
-
-| What | Suggested | Returns |
-|---|---|---|
-| The plan: sessions, pass mark, whether it can be completed now, each class with each student's yearly average, terms counted, suggested and current decision, reason, destination; counts; unpublished classes; next session's first term | `GET /v1/promotion` | `PromotionPlan` |
-| Set the pass mark | `PUT /v1/promotion/pass-mark` `{ passMark }` (0 to 100) | 204 |
-| Set a student's decision | `PUT /v1/promotion/students/{id}` `{ decision, reason }` | 204 |
-| Complete it | `POST /v1/promotion/complete` `{ closeUnpublished, startsOn, endsOn }` | `{ promoted, repeating, graduated, session }` |
-
-### B2. Birthday messages
-
-**Problem.** Schools want each student's family to get a birthday greeting, automatically.
-
-**What to store.** Per school: on or off, and the message (up to 300 characters, must include
-`{name}`; may include `{age}` and `{school}`). A log of texts sent: student, day, phone, text.
-
-**Rules.**
-
-- Every day at 7:00 am Lagos time, for each active student whose birthday is today, text the
-  guardian's phone **once** with the message filled in: `{name}` is the first name, `{age}` the
-  age they turn as an ordinal ("12th"), `{school}` the school's name.
-- A birthday on 29 February is celebrated on 28 February in other years.
-- A guardian with no phone: log it as not sent.
-- An SMS provider is needed (for example Termii). Texts with letters like ọ or ẹ are Unicode:
-  70 characters a text instead of 160, which costs more.
-
-**Endpoints we need.**
-
-| What | Suggested | Returns |
-|---|---|---|
-| The settings, the next 30 days' birthdays, the latest 20 texts sent | `GET /v1/birthdays` | `BirthdaysPage` |
-| The next 7 days, for Home | `GET /v1/birthdays?days=7` | `BirthdaysThisWeek` |
-| Save the settings | `PUT /v1/birthdays/settings` `{ enabled, message }` | 204 |
-
-On the parent's home (`GET /v1/me/children`), each child gains `birthday`: the filled-in message on the child's
-birthday when the school sends them, otherwise `null`. Rules: `packages/core/src/birthdays.ts`.
-
-### B3. Books and things needed
-
-**Problem.** Parents need to know which books, exercise books, uniform and other things to buy for
-their child's class, especially for the class they move into next session.
-
-**What to store.** A list per school, class level and session (this session or the next): items
-with a kind (`textbook`, `stationery`, `uniform`, `other`), a name, optional details (author,
-publisher, a note), a quantity (1 to 99) and an optional price in whole naira; up to 80 items. And
-whether the list is shared with parents, who changed it last, and when.
-
-**Rules.**
-
-- An empty list can't be shared. Sharing and unsharing go in the change history.
-- A parent sees, for each child: the shared list for the next class level (by the school's
-  order of levels) for next session, unless the child is in the final class; and the shared list
-  for their current class level this session.
-
-**Endpoints we need.**
-
-| What | Suggested | Returns |
-|---|---|---|
-| Every class level's list for a session | `GET /v1/book-lists?session=2027` | `BookListsPage` |
-| Replace one class level's list | `PUT /v1/book-lists/{session}/{levelId}` `{ items }` | 204 |
-| Share or stop sharing | `PUT /v1/book-lists/{session}/{levelId}/shared` `{ shared }` | 204, or 409 for an empty list |
-
-On the parent's home (`GET /v1/me/children`), each child gains `bookLists`: `[{ label, list }]`. Rules:
-`packages/core/src/booklists.ts`.
-
-### B4. Student details for parents, and corrections
-
-**Problem.** Parents should see what the school has on record for their child, and ask for
-mistakes to be fixed without visiting the office.
-
-**What we need.**
-
-- On each child in the parent's home (`GET /v1/me/children`), `details`: first, other and last names, date of birth,
-  gender, admission date, state of origin, address, and the guardian's name, phone and email.
-- Correction requests: the child, who asked, when, the changes (field, what the record said, what
-  it should say), an optional note (up to 300 characters), and the status (`open`, `approved`,
-  `declined`) with who answered, when, and the reason for declining.
-
-**Rules.**
-
-- Fields a parent can ask about: `firstName`, `otherNames`, `lastName`, `dateOfBirth`, `gender`,
-  `stateOfOrigin`, `address`, `guardianPhone`, `guardianEmail`. Each new value is checked with
-  the same rules as the school's student form. Values that match the record are dropped; a
-  request with nothing left is refused.
-- Only for the parent's own children.
-- Approving changes the student's record (or the guardian's, for phone and email) in one go and
-  writes it to the change history with the student. Declining needs a reason (3 to 200
-  characters), which the parent sees.
-
-**Endpoints we need.**
-
-| What | Suggested | Returns |
-|---|---|---|
-| Ask for a correction | `POST /v1/me/children/{studentId}/corrections` `{ changes: [{ field, value }], note }` | 201 |
-| Requests waiting, then the latest 20 answered | `GET /v1/corrections` | `CorrectionsPage` |
-| How many are waiting | `GET /v1/corrections/count` | `{ open }` |
-| Approve or decline | `POST /v1/corrections/{id}/resolve` `{ approve, reason? }` | 204, or 409 if already answered |
-
-Each child in the parent's home also gains `corrections`: that child's latest five requests.
-Rules: `packages/core/src/corrections.ts`.
-
-### B5. Timetable
-
-**Problem.** Schools need one timetable everyone works from. Admins set it; teachers see it, with
-their own lessons highlighted.
-
-**What to store.**
-
-- Per school, the bell schedule: periods in order, each with an id, a name, start and end times
-  (`HH:MM`) and a kind (`lesson` or `break`). The same for every class, Monday to Friday.
-- Per class, day (1 to 5) and lesson period: a subject.
-- Optionally, one timetable document per school (a PDF up to 2 MB), in file storage.
-
-**Rules.**
-
-- A lesson's teacher isn't stored: it's the class's teacher for that subject (`PUT /v1/teachers/{id}/subject-classes`).
-- Periods: up to 16, in order, no overlaps, each ending after it starts, at least one lesson.
-  Saving a schedule that removes a period (or makes it a break) drops its lessons.
-- No lessons in breaks. Flag (don't refuse) a teacher in two classes at once.
-- Uploads are read in the browser; the API receives whole classes' weeks to replace.
-- Owners and admins change it; teachers read it (all classes).
-
-**Endpoints we need.**
-
-| What | Suggested | Returns |
-|---|---|---|
-| The whole timetable for staff | `GET /v1/timetable` | `TimetablePage` |
-| The bell schedule | `PUT /v1/timetable/periods` `{ periods }` | `{ removed }` |
-| One lesson | `PUT /v1/timetable/{armId}/{day}/{periodId}` `{ subjectId \| null }` | 204 |
-| Replace classes' weeks | `PUT /v1/timetable/classes` `{ fileName, classes: [{ armId, lessons }] }` | `{ classes, lessons }` |
-| The document | `PUT` / `DELETE /v1/timetable/document` (multipart `file`), `GET` to download | 204 |
-| A teacher's lessons on a day | `GET /v1/me/lessons?day=` | lessons in period order |
-
-Rules: `packages/core/src/timetable.ts`.
-
-### B6. Student accounts and the student portal
-
-**Problem.** Students need their own sign-in: to see their timetable, attendance, results and
-book list, and to take tests (CBT, next).
-
-**Who.** A new role, `student`. A student's account links to their student record. Every student
-endpoint returns only that student. Students are refused by owner, admin, teacher and parent
-endpoints.
-
-**Rules.**
-
-- Students sign in with email and password, like staff (invitations, with role `student` and
-  the `studentId`). The email is the student's own or one the school gives them; it can't belong
-  to someone else at the school.
-- Ending access removes the account's role at this school; the student's record stays.
-- Students are often under 18: this is the reason for the AI terms check in
-  `docs/ai-integration.md`, Step 0, and for the child-safety and data-protection duties that
-  come with it.
-
-**Endpoints we need.**
-
-| What | Suggested | Returns |
-|---|---|---|
-| Students with their portal access | `GET /v1/student-accounts` | `StudentAccountsPage` |
-| Invite a student | `POST /v1/students/{id}/invite` `{ email }` | 201 |
-| End access or cancel the invite | `DELETE /v1/students/{id}/access` | 204 |
-| The student's home | `GET /v1/me/student` | `StudentHome` |
-| Their class's week | `GET /v1/me/timetable` | `ClassTimetable` |
-| Their report card, once published | `GET /v1/me/report-card?term=` | `ReportCardData` |
-
-### B7. The question bank and AI-generated questions
+### B2. The question bank and AI-generated questions
 
 **Problem.** Teachers build up questions for tests, assignments and exams, and want AI to draft
 them, which they then check.
+
+**Waiting on:** the AI provider, which Tochi is deciding (Claude, or Gemini if Google agrees in
+writing; `docs/ai-integration.md`, Step 0). The question bank itself (saving, editing and the
+monthly count) doesn't need the provider and can be built first.
 
 **What to store.** Questions per school, subject and class level, in the shape of `questionSchema`
 (`packages/core/src/questions.ts`), with who wrote it, when, and whether it came from AI. AI
@@ -283,14 +85,14 @@ generations used per school per month.
 | Save questions | `POST /v1/questions` `{ subjectId, levelId, questions, source }` | `{ saved }` |
 | Change or delete one | `PUT` / `DELETE /v1/questions/{id}` | 204 |
 
-### B8. CBT: tests taken on Brillianda
+### B3. CBT: tests taken on Brillianda
 
 **Problem.** Teachers want to set tests that students take on a phone or computer, mark
 themselves where they can, and feed the score sheets.
 
 **What to store.**
 
-- Tests: title, instructions, subject, class level, classes, a copy of the questions (from B7),
+- Tests: title, instructions, subject, class level, classes, a copy of the questions (from B2),
   length, opens and closes, `anywhere` or `school`, the access code, shuffle, show score, the
   score-sheet part, draft or set, who set it.
 - Attempts: test, student, started, submitted, each answer, the teacher's theory marks, times the
@@ -403,5 +205,15 @@ Please tell us before changing any of these.
 - The team console (main site): `POST /v1/team/login`, `/logout`, `GET /v1/team/me`,
   `/overview`, `/schools`, `/schools/{subdomain}`, `PUT …/status`, `GET /v1/team/trial-requests`,
   `PATCH /v1/team/trial-requests/{id}`
+- Promotion: `GET /v1/promotion`, `PUT /v1/promotion/pass-mark`, `PUT /v1/promotion/students/{id}`,
+  `POST /v1/promotion/complete`
+- Birthdays: `GET /v1/birthdays` (and `?days=7`), `PUT /v1/birthdays/settings`
+- Book lists: `GET /v1/book-lists`, `PUT /v1/book-lists/{session}/{levelId}` and its `/shared`
+- Corrections: `POST /v1/me/children/{studentId}/corrections`, `GET /v1/corrections`,
+  `GET /v1/corrections/count`, `POST /v1/corrections/{id}/resolve`
+- Timetable: `GET /v1/timetable`, `PUT /v1/timetable/periods`, `PUT /v1/timetable/{armId}/{day}/{periodId}`,
+  `PUT /v1/timetable/classes`, `PUT`/`DELETE`/`GET /v1/timetable/document`, `GET /v1/me/lessons`
+- Student accounts and portal: `GET /v1/student-accounts`, `POST /v1/students/{id}/invite`,
+  `DELETE /v1/students/{id}/access`, `GET /v1/me/student`, `GET /v1/me/timetable`, `GET /v1/me/report-card`
 - Change history: `GET /v1/changes`
 - Website: `POST /v1/trial-requests`

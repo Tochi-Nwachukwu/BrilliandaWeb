@@ -3,8 +3,13 @@
 // The timetable (batch 22; docs/data-contract.md). Owners and admins only.
 import { lessonInputSchema, periodsSchema, timetableImportSchema, type Day } from "@brillianda/core/timetable";
 import { fieldErrorsOf } from "@brillianda/core/signup";
-import * as impl from "../fake/timetable";
+import { LIVE } from "../api/client";
+import * as live from "../api/timetable";
+import * as fake from "../fake/timetable";
 import type { ActionResult } from "../types";
+
+// The API where it has endpoints (DATA_SOURCE=api), else sample data.
+const impl = LIVE ? live : fake;
 
 export async function saveBellSchedule(school: string, input: unknown): Promise<ActionResult<{ removed: number }>> {
   const parsed = periodsSchema.safeParse((input as { periods?: unknown })?.periods);
