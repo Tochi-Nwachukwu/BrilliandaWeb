@@ -12,32 +12,13 @@ differently, here is why", or "not yet".
 
 ## Contents
 
-- A. Emails
-- B. New features, in the order we'd like them
-- C. Rules both sides must share
-- D. What the front end already relies on (please don't change without telling us)
+- A. New features, in the order we'd like them
+- B. Rules both sides must share
+- C. What the front end already relies on (please don't change without telling us)
 
 ---
 
-## A. Emails
-
-### A1. Email links: the school's own address
-
-**Problem.** Staging's emails link to `https://staging.brillianda.com/invite?token=…&school=surebloomschool`
-(and the same for "Open your school", resets and sign-in links). Schools now have real addresses on
-staging, `<school>.staging.brillianda.com`, with https.
-
-**What we need.** The switch your notes of 16 October describe: set `ROOT_DOMAIN=staging.brillianda.com`
-on the staging API and drop `FRONTEND_URL`, so links read
-`https://surebloomschool.staging.brillianda.com/invite?token=…`. (Until then our side forwards the
-`?school=` links to the school's address, so they work either way.)
-
-**Done when.** An invitation email, a reset email and the "school is ready" email each open on the
-school's own address.
-
----
-
-## B. New features, in the order we'd like them
+## A. New features, in the order we'd like them
 
 All of these are built on our side and running on sample data. The exact shapes our screens use
 are in the front-end repository, `src/data/types.ts` (type names are given below), and each
@@ -46,16 +27,7 @@ existing style. Change them freely, just tell us.
 
 Everything here is for one school, taken from the address, as today.
 
-### B1. Birthday texts: an SMS account
-
-**Problem.** Birthday messages are built (24 October): the settings, the daily job and the log.
-The texts only reach phones once an SMS provider account is set up; on staging they land in the
-outbox.
-
-**What we need.** Nothing more from the backend: Brillianda needs to open an SMS account (Termii,
-as built) and fund it. Tell us when it's on so we can test a real text.
-
-### B2. The question bank and AI-generated questions
+### A1. The question bank and AI-generated questions
 
 **Problem.** Teachers build up questions for tests, assignments and exams, and want AI to draft
 them, which they then check.
@@ -85,14 +57,14 @@ generations used per school per month.
 | Save questions | `POST /v1/questions` `{ subjectId, levelId, questions, source }` | `{ saved }` |
 | Change or delete one | `PUT` / `DELETE /v1/questions/{id}` | 204 |
 
-### B3. CBT: tests taken on Brillianda
+### A2. CBT: tests taken on Brillianda
 
 **Problem.** Teachers want to set tests that students take on a phone or computer, mark
 themselves where they can, and feed the score sheets.
 
 **What to store.**
 
-- Tests: title, instructions, subject, class level, classes, a copy of the questions (from B2),
+- Tests: title, instructions, subject, class level, classes, a copy of the questions (from A1),
   length, opens and closes, `anywhere` or `school`, the access code, shuffle, show score, the
   score-sheet part, draft or set, who set it.
 - Attempts: test, student, started, submitted, each answer, the teacher's theory marks, times the
@@ -126,7 +98,7 @@ themselves where they can, and feed the score sheets.
 | One test to take | `GET /v1/me/tests/{id}` | `TakingTest` |
 | Start, answer, left the page, submit | `POST /v1/me/tests/{id}/start` `{ code }`, `PUT …/answers/{index}`, `POST …/left`, `POST …/submit` | 204, or the score |
 
-## C. Rules both sides must share
+## B. Rules both sides must share
 
 A total, grade, position or suggestion must never depend on which side worked it out. These
 rules are pure TypeScript with tests in the front-end repository's `packages/core/src`. Copy them
@@ -149,7 +121,7 @@ The default scale: A 70+, B 60+, C 50+, D 45+, E 40+ (all passes), F below 40.
 
 ---
 
-## D. What the front end already relies on
+## C. What the front end already relies on
 
 Please tell us before changing any of these.
 
