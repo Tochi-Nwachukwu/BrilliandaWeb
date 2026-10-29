@@ -20,9 +20,24 @@ differently, here is why", or "not yet".
 
 ## A. Open requests
 
-None right now (29 October 2026). Everything we asked for is on staging. Still to switch on, not
-backend work: AI generating (waiting on the provider decision, `docs/ai-integration.md` Step 0)
-and birthday texts (an SMS account).
+### A1. The team account's name
+
+**Problem.** Schools' change history shows "Full Name Here (Brillianda) viewed the school's summary
+from the Brillianda team console": the team account was made with the example name from
+`team:add`.
+
+**What we need.** Give that account a real name, or a role name such as "Brillianda Support".
+
+**Done when.** New lines in a school's history show that name.
+
+### A2. AI generating, once the provider is chosen
+
+**Problem.** Generate is switched off (`AI_PROVIDER=off`), so the question bank hides it.
+
+**What we need.** When Tochi settles the provider (`docs/ai-integration.md`, Step 0), switch it on
+for staging so we can test it with made-up topics.
+
+**Done when.** `GET /v1/questions` returns `aiEnabled: true` and a Generate request returns drafts.
 
 ---
 
