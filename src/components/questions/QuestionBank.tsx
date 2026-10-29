@@ -66,7 +66,7 @@ export function QuestionBank({ page, actions }: { page: QuestionBankPage; action
           <Button variant="secondary" onClick={() => setDialog({ kind: "write" })}>
             Write a question
           </Button>
-          <Button onClick={() => setDialog({ kind: "generate" })}>Generate questions</Button>
+          {page.aiEnabled !== false && <Button onClick={() => setDialog({ kind: "generate" })}>Generate questions</Button>}
         </div>
       </div>
 

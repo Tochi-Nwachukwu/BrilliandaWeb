@@ -12,91 +12,19 @@ differently, here is why", or "not yet".
 
 ## Contents
 
-- A. New features, in the order we'd like them
+- A. Open requests
 - B. Rules both sides must share
 - C. What the front end already relies on (please don't change without telling us)
 
 ---
 
-## A. New features, in the order we'd like them
+## A. Open requests
 
-All of these are built on our side and running on sample data. The exact shapes our screens use
-are in the front-end repository, `src/data/types.ts` (type names are given below), and each
-feature's function list is in `docs/data-contract.md`. The paths below are suggestions in your
-existing style. Change them freely, just tell us.
+None right now (29 October 2026). Everything we asked for is on staging. Still to switch on, not
+backend work: AI generating (waiting on the provider decision, `docs/ai-integration.md` Step 0)
+and birthday texts (an SMS account).
 
-Everything here is for one school, taken from the address, as today.
-
-### A1. The question bank and AI-generated questions
-
-**Problem.** Teachers build up questions for tests, assignments and exams, and want AI to draft
-them, which they then check.
-
-**Waiting on:** the AI provider, which Tochi is deciding (Claude, or Gemini if Google agrees in
-writing; `docs/ai-integration.md`, Step 0). The question bank itself (saving, editing and the
-monthly count) doesn't need the provider and can be built first.
-
-**What to store.** Questions per school, subject and class level, in the shape of `questionSchema`
-(`packages/core/src/questions.ts`), with who wrote it, when, and whether it came from AI. AI
-generations used per school per month.
-
-**Rules.**
-
-- A teacher sees and writes questions for the subject and class level pairs they teach (their subject classes);
-  owners and admins for all. A teacher changes or deletes only their own.
-- Generating returns drafts only; nothing is saved until the teacher saves.
-- The monthly allowance (300 by default) and everything about the AI call: `docs/ai-integration.md`.
-  **Read its Step 0 first**: Google's terms don't allow Gemini in a service used by under-18s.
-
-**Endpoints we need.**
-
-| What | Suggested | Returns |
-|---|---|---|
-| The bank and this month's AI use | `GET /v1/questions` | `QuestionBankPage` |
-| Generate drafts | `POST /v1/questions/generate` (`generateRequestSchema`) | `{ questions, usage }` |
-| Save questions | `POST /v1/questions` `{ subjectId, levelId, questions, source }` | `{ saved }` |
-| Change or delete one | `PUT` / `DELETE /v1/questions/{id}` | 204 |
-
-### A2. CBT: tests taken on Brillianda
-
-**Problem.** Teachers want to set tests that students take on a phone or computer, mark
-themselves where they can, and feed the score sheets.
-
-**What to store.**
-
-- Tests: title, instructions, subject, class level, classes, a copy of the questions (from A1),
-  length, opens and closes, `anywhere` or `school`, the access code, shuffle, show score, the
-  score-sheet part, draft or set, who set it.
-- Attempts: test, student, started, submitted, each answer, the teacher's theory marks, times the
-  page was left.
-
-**Rules** (`packages/core/src/cbt.ts`):
-
-- **The server keeps the clock.** Deadline = start + length, or the close, whichever is first.
-  Answers are accepted up to 30 seconds after it (slow connections), then the attempt is
-  submitted with what was saved.
-- **Never send the answers to a student**, not even hidden. Shuffle per attempt, the same order
-  every time for that attempt.
-- School-only tests need the code to start.
-- Objective, true/false and gap answers mark themselves (all or nothing; gaps ignore case and
-  spaces). Theory waits for the teacher.
-- Sending scores: submitted, fully marked attempts only, scaled to the part's marks (two decimals),
-  into the current term's sheet. Sheets marked complete are skipped.
-
-**Endpoints we need.**
-
-| What | Suggested | Returns |
-|---|---|---|
-| A teacher's tests | `GET /v1/tests` | `TestRow[]` |
-| What can go in a test, or a draft | `GET /v1/tests/editor?test=` | `TestEditorData` |
-| Save or set a test | `POST` / `PUT /v1/tests/{id}` | `{ id }` |
-| Delete a draft | `DELETE /v1/tests/{id}` | 204, or 409 once started |
-| Results | `GET /v1/tests/{id}/results` | `TestResults` |
-| Mark a theory answer | `PUT /v1/tests/{id}/attempts/{attemptId}/marks/{index}` `{ marks }` | 204 |
-| Send scores | `POST /v1/tests/{id}/send-scores` | `{ sent, skipped, lockedClasses }` |
-| A student's tests | `GET /v1/me/tests` | `StudentTestRow[]` |
-| One test to take | `GET /v1/me/tests/{id}` | `TakingTest` |
-| Start, answer, left the page, submit | `POST /v1/me/tests/{id}/start` `{ code }`, `PUT …/answers/{index}`, `POST …/left`, `POST …/submit` | 204, or the score |
+---
 
 ## B. Rules both sides must share
 
@@ -187,5 +115,9 @@ Please tell us before changing any of these.
   `PUT /v1/timetable/classes`, `PUT`/`DELETE`/`GET /v1/timetable/document`, `GET /v1/me/lessons`
 - Student accounts and portal: `GET /v1/student-accounts`, `POST /v1/students/{id}/invite`,
   `DELETE /v1/students/{id}/access`, `GET /v1/me/student`, `GET /v1/me/timetable`, `GET /v1/me/report-card`
+- Question bank: `GET`/`POST /v1/questions`, `POST /v1/questions/generate`, `PUT`/`DELETE /v1/questions/{id}`
+- CBT: `GET`/`POST /v1/tests`, `GET /v1/tests/editor`, `PUT`/`DELETE /v1/tests/{id}`, `GET /v1/tests/{id}/results`,
+  `PUT /v1/tests/{id}/attempts/{attemptId}/marks/{index}`, `POST /v1/tests/{id}/send-scores`, `GET /v1/me/tests`,
+  `GET /v1/me/tests/{id}`, `POST …/start`, `PUT …/answers/{index}`, `POST …/left`, `POST …/submit`
 - Change history: `GET /v1/changes`
 - Website: `POST /v1/trial-requests`

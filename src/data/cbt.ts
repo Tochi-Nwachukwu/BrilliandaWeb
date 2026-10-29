@@ -1,7 +1,12 @@
 // CBT tests (batch 25; docs/data-contract.md). Screens import from here, never from fake/.
 import "server-only";
-import * as impl from "./fake/cbt";
+import * as live from "./api/cbt";
+import * as fake from "./fake/cbt";
+import { LIVE } from "./source";
 import type { StudentTestRow, TakingTest, TestEditorData, TestResults, TestRow } from "./types";
+
+// The API where it has endpoints (DATA_SOURCE=api), else sample data.
+const impl = LIVE ? live : fake;
 
 /** A teacher's tests (all of them for admins), newest window first. */
 export function getTests(subdomain: string): Promise<TestRow[] | null> {

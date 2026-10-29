@@ -3,8 +3,13 @@
 // The question bank and generating questions (batch 24; docs/data-contract.md). Teachers and admins.
 import { generateRequestSchema, questionSchema, type Question } from "@brillianda/core/questions";
 import { fieldErrorsOf } from "@brillianda/core/signup";
-import * as impl from "../fake/questions";
+import { LIVE } from "../api/client";
+import * as live from "../api/questions";
+import * as fake from "../fake/questions";
 import type { ActionResult, QuestionBankPage } from "../types";
+
+// The API where it has endpoints (DATA_SOURCE=api), else sample data.
+const impl = LIVE ? live : fake;
 
 const CHECK = "Please check the highlighted fields.";
 

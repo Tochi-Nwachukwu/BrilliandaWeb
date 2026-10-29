@@ -3,9 +3,14 @@
 // CBT tests (batch 25; docs/data-contract.md).
 import { testSettingsSchema } from "@brillianda/core/cbt";
 import { fieldErrorsOf } from "@brillianda/core/signup";
-import * as impl from "../fake/cbt";
+import { LIVE } from "../api/client";
+import * as live from "../api/cbt";
+import * as fake from "../fake/cbt";
 import type { ActionResult } from "../types";
 import type { Response } from "@brillianda/core/questions";
+
+// The API where it has endpoints (DATA_SOURCE=api), else sample data.
+const impl = LIVE ? live : fake;
 
 /** Saves a test as a draft, or publishes it (`publish`). Teachers for their classes; admins for any. */
 export async function saveTest(school: string, input: unknown): Promise<ActionResult<{ id: string }>> {

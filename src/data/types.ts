@@ -589,6 +589,8 @@ export type QuestionBankPage = {
   questions: BankQuestion[];
   /** This month's AI generations: used, the school's allowance, and when it resets. */
   usage: { used: number; limit: number; resetsOn: string };
+  /** False while the school's AI is switched off: Generate is hidden. */
+  aiEnabled?: boolean;
   canEditAll: boolean;
 };
 
