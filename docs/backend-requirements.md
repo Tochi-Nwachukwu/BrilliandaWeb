@@ -1,6 +1,6 @@
 # What the front end needs from the backend
 
-From the Brillianda front-end team. Updated 26 October 2026: only what is still open.
+From the Brillianda front-end team. Updated 30 October 2026: only what is still open.
 
 This is the complete list, in one place. Each item says what the problem is, what we need, the
 rules that matter, and how we'll know it's done. It is written from the screens' side only: we
