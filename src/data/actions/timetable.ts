@@ -1,7 +1,7 @@
 "use server";
 
 // The timetable (batch 22; docs/data-contract.md). Owners and admins only.
-import { lessonInputSchema, periodsSchema, timetableImportSchema, type Day } from "@brillianda/core/timetable";
+import { groupsSchema, lessonInputSchema, periodsSchema, timetableImportSchema, type Day } from "@brillianda/core/timetable";
 import { fieldErrorsOf } from "@brillianda/core/signup";
 import { LIVE } from "../api/client";
 import * as live from "../api/timetable";
@@ -14,7 +14,15 @@ const impl = LIVE ? live : fake;
 export async function saveBellSchedule(school: string, input: unknown): Promise<ActionResult<{ removed: number }>> {
   const parsed = periodsSchema.safeParse((input as { periods?: unknown })?.periods);
   if (!parsed.success) return { ok: false, error: parsed.error.issues[0]?.message ?? "Please check the periods.", fieldErrors: fieldErrorsOf(parsed.error) };
-  return impl.saveBellSchedule(String(school), parsed.data);
+  const groupId = (input as { groupId?: unknown })?.groupId;
+  return impl.saveBellSchedule(String(school), parsed.data, typeof groupId === "string" ? groupId : undefined);
+}
+
+/** Splits the timetable by class section (Primary, JSS, SSS), or joins it again. */
+export async function saveTimetableGroups(school: string, input: unknown): Promise<ActionResult<{ removed: number }>> {
+  const parsed = groupsSchema.safeParse(input);
+  if (!parsed.success) return { ok: false, error: parsed.error.issues[0]?.message ?? "Please check the timetables.", fieldErrors: fieldErrorsOf(parsed.error) };
+  return impl.saveTimetableGroups(String(school), parsed.data.groups);
 }
 
 export async function setLesson(school: string, armId: string, input: unknown): Promise<ActionResult<null>> {
@@ -36,9 +44,10 @@ export async function importTimetable(school: string, input: unknown): Promise<A
 export async function uploadTimetableFile(school: string, form: FormData): Promise<ActionResult<null>> {
   const file = form.get("file");
   if (!(file instanceof File) || !file.size) return { ok: false, error: "Choose a PDF to upload." };
-  return impl.setTimetableFile(String(school), file);
+  const groupId = form.get("groupId");
+  return impl.setTimetableFile(String(school), file, typeof groupId === "string" && groupId ? groupId : undefined);
 }
 
-export async function removeTimetableFile(school: string): Promise<ActionResult<null>> {
-  return impl.removeTimetableFile(String(school));
+export async function removeTimetableFile(school: string, groupId?: string): Promise<ActionResult<null>> {
+  return impl.removeTimetableFile(String(school), groupId ? String(groupId) : undefined);
 }

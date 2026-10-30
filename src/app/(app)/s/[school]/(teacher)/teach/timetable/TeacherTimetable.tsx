@@ -1,6 +1,6 @@
 "use client";
 
-import { type Day } from "@brillianda/core/timetable";
+import { groupFor, type Day } from "@brillianda/core/timetable";
 import { cx } from "@brillianda/ui/cx";
 import { EmptyState } from "@brillianda/ui/EmptyState";
 import { SelectField } from "@brillianda/ui/TextField";
@@ -14,12 +14,19 @@ const pill = (active: boolean) =>
     active ? "bg-primary text-primary-text" : "bg-raise shadow-raised hover:bg-hover",
   );
 
-/** A teacher's timetable (batch 22): their own week, or any class's with their lessons highlighted. */
+/**
+ * A teacher's timetable (batch 22): their own week, or any class's with their lessons highlighted.
+ * A school with separate timetables (Primary, JSS, SSS) has a bell schedule for each, so a teacher
+ * who teaches in more than one sees a week for each.
+ */
 export function TeacherTimetable({ page, today }: { page: TimetablePage; today: Day | null }) {
   const mine = page.lessons.filter((l) => l.teacherId === page.me.userId);
   const myArms = [...new Set(mine.map((l) => l.armId))];
   const [view, setView] = useState<"mine" | "class">("mine");
   const [armId, setArmId] = useState(myArms[0] ?? page.arms[0]?.id ?? "");
+  const groupOf = (armId: string) => groupFor(page.groups, page.arms.find((a) => a.id === armId)?.section);
+  const mineByGroup = page.groups.map((g) => ({ g, lessons: mine.filter((l) => groupOf(l.armId).id === g.id) })).filter((x) => x.lessons.length > 0);
+  const documents = page.groups.filter((g) => g.file);
   const subject = (id: string) => page.subjects.find((s) => s.id === id)?.name ?? "";
   const label = (id: string) => page.arms.find((a) => a.id === id)?.label ?? "";
   const at = (lessons: typeof page.lessons, day: Day, periodId: string) => lessons.filter((l) => l.day === day && l.periodId === periodId);
@@ -35,12 +42,18 @@ export function TeacherTimetable({ page, today }: { page: TimetablePage; today: 
         </button>
       </div>
 
-      {page.file && (
+      {documents.length > 0 && (
         <p className="text-sm text-text-secondary">
           The school also shared its timetable as a document:{" "}
-          <a href={page.file.url} download={page.file.name} className="font-semibold text-accent underline underline-offset-2">
-            {page.file.name}
-          </a>
+          {documents.map((g, i) => (
+            <span key={g.id}>
+              {i > 0 && ", "}
+              <a href={g.file!.url} download={g.file!.name} className="font-semibold text-accent underline underline-offset-2">
+                {g.file!.name}
+              </a>
+              {page.groups.length > 1 && ` (${g.name})`}
+            </span>
+          ))}
         </p>
       )}
 
@@ -52,28 +65,33 @@ export function TeacherTimetable({ page, today }: { page: TimetablePage; today: 
             <p className="text-sm text-text-secondary">
               {mine.length === 1 ? "1 lesson" : `${mine.length} lessons`} a week, in {myArms.length === 1 ? "1 class" : `${myArms.length} classes`}.
             </p>
-            <WeekGrid
-              label="My week"
-              periods={page.periods}
-              today={today}
-              marked={(day, p) => at(mine, day, p.id).length > 0}
-              cell={(day, p) => {
-                const here = at(mine, day, p.id);
-                return here.length ? (
-                  <span className="block px-1.5 py-1 text-[13px] leading-snug">
-                    {here.map((l) => (
-                      <span key={l.armId} className="block">
-                        <b className="font-semibold">{subject(l.subjectId)}</b>
-                        <span className="block text-[12px] text-text-secondary">{label(l.armId)}</span>
+            {mineByGroup.map(({ g, lessons }) => (
+              <div key={g.id} className="grid gap-2">
+                {mineByGroup.length > 1 && <h2 className="text-base font-semibold">{g.name}</h2>}
+                <WeekGrid
+                  label={mineByGroup.length > 1 ? `My week: ${g.name}` : "My week"}
+                  periods={g.periods}
+                  today={today}
+                  marked={(day, p) => at(lessons, day, p.id).length > 0}
+                  cell={(day, p) => {
+                    const here = at(lessons, day, p.id);
+                    return here.length ? (
+                      <span className="block px-1.5 py-1 text-[13px] leading-snug">
+                        {here.map((l) => (
+                          <span key={l.armId} className="block">
+                            <b className="font-semibold">{subject(l.subjectId)}</b>
+                            <span className="block text-[12px] text-text-secondary">{label(l.armId)}</span>
+                          </span>
+                        ))}
+                        {here.length > 1 && <span className="mt-0.5 block text-[12px] font-medium text-danger">Two classes at once: tell the school</span>}
                       </span>
-                    ))}
-                    {here.length > 1 && <span className="mt-0.5 block text-[12px] font-medium text-danger">Two classes at once: tell the school</span>}
-                  </span>
-                ) : (
-                  <span className="block px-1.5 py-1 text-[13px] text-text-muted">Free</span>
-                );
-              }}
-            />
+                    ) : (
+                      <span className="block px-1.5 py-1 text-[13px] text-text-muted">Free</span>
+                    );
+                  }}
+                />
+              </div>
+            ))}
           </>
         )
       ) : (
@@ -88,7 +106,7 @@ export function TeacherTimetable({ page, today }: { page: TimetablePage; today: 
           </SelectField>
           <WeekGrid
             label={`${label(armId)} timetable`}
-            periods={page.periods}
+            periods={groupOf(armId).periods}
             today={today}
             marked={(day, p) => at(mine, day, p.id).some((l) => l.armId === armId)}
             cell={(day, p) => {

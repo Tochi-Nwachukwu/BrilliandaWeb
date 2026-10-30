@@ -2,7 +2,7 @@ import { PageHeader } from "@brillianda/ui/PageHeader";
 import type { Metadata } from "next";
 import { connection } from "next/server";
 import { schoolFromParams } from "@/components/school/school";
-import { importTimetable, removeTimetableFile, saveBellSchedule, setLesson, uploadTimetableFile } from "@/data/actions/timetable";
+import { importTimetable, removeTimetableFile, saveBellSchedule, saveTimetableGroups, setLesson, uploadTimetableFile } from "@/data/actions/timetable";
 import { getTimetable } from "@/data/timetable";
 import { lagosWeekday } from "@/lib/time";
 import { TimetableEditor } from "./TimetableEditor";
@@ -17,7 +17,7 @@ export default async function TimetablePage({ params }: PageProps<"/s/[school]/m
   const s = school.subdomain;
   return (
     <div className="grid gap-4">
-      <PageHeader title="Timetable">Each class’s week, by the school’s bell schedule. Teachers see it with their own lessons highlighted.</PageHeader>
+      <PageHeader title="Timetable">Each class’s week, by its bell schedule. Split it by class group if Primary, JSS and SSS run different days. Teachers see it with their own lessons highlighted.</PageHeader>
       <TimetableEditor
         page={page}
         schoolName={school.name}
@@ -26,6 +26,7 @@ export default async function TimetablePage({ params }: PageProps<"/s/[school]/m
         actions={{
           setLesson: setLesson.bind(null, s),
           saveBells: saveBellSchedule.bind(null, s),
+          saveGroups: saveTimetableGroups.bind(null, s),
           importFile: importTimetable.bind(null, s),
           uploadPdf: uploadTimetableFile.bind(null, s),
           removePdf: removeTimetableFile.bind(null, s),

@@ -423,6 +423,11 @@ the guardian's phone and email. Rules in `packages/core/src/corrections.ts`, wit
 
 ### Timetable (batch 22)
 
+Split by class (30 October): `TimetablePage` has `groups` (name, class `sections`, its own `periods` and `file`)
+and `canSplit`; every class follows its group's bell schedule (`groupFor`). `saveTimetableGroups` splits or joins
+them, and a clash is two classes at overlapping times. The API has one schedule, so live `canSplit` is false
+(`docs/backend-requirements.md`, A4).
+
 One bell schedule per school (periods and breaks, Monday to Friday) and a lesson per class, day and
 period. A lesson's teacher isn't stored: it is the class's teacher for that subject (batch 11).
 

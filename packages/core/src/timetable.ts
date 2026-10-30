@@ -1,7 +1,10 @@
-// The school timetable (user request, 15 Oct 2026): one bell schedule for the whole school, Monday
-// to Friday, and each class's subject in each lesson period. Teachers see it with their own lessons
-// highlighted, because a lesson's teacher is the class's teacher for that subject.
+// The school timetable (user request, 15 Oct 2026): a bell schedule, Monday to Friday, and each
+// class's subject in each lesson period. Teachers see it with their own lessons highlighted, because
+// a lesson's teacher is the class's teacher for that subject. A school can split its timetable into
+// groups of class sections (user request, 30 Oct 2026): Primary on its own, JSS and SSS together, or
+// JSS and SSS apart. Each group has its own bell schedule and document.
 import { z } from "zod";
+import type { Section } from "./classes";
 
 export const DAYS = [1, 2, 3, 4, 5] as const;
 export type Day = (typeof DAYS)[number];
@@ -55,10 +58,96 @@ export function shortTime(time: string): string {
 
 export type Lesson = { armId: string; day: Day; periodId: string; subjectId: string };
 
+// ——— Splitting the timetable by class group ———
+
+export const SECTIONS: readonly Section[] = ["preschool", "primary", "junior", "senior"];
+/** How schools say them in a timetable's name: Primary, JSS, SSS. */
+export const SECTION_SHORT: Record<Section, string> = { preschool: "Pre-school", primary: "Primary", junior: "JSS", senior: "SSS" };
+
+/** One timetable: the class sections it covers, and its own bell schedule. */
+export type GroupDraft = { id?: string; name: string; sections: Section[] };
+
+export const groupsSchema = z
+  .object({
+    groups: z
+      .array(
+        z.object({
+          id: z.string().min(1).max(40).optional(),
+          name: z.string().trim().min(1, "Give each timetable a name").max(40, "Use at most 40 characters for a name"),
+          sections: z.array(z.enum(["preschool", "primary", "junior", "senior"])).min(1, "Pick the classes each timetable covers"),
+        }),
+      )
+      .min(1, "Keep at least one timetable")
+      .max(4, "Use at most 4 timetables"),
+  })
+  .superRefine((r, ctx) => {
+    const seen = new Set<string>();
+    const names = new Set<string>();
+    r.groups.forEach((g, i) => {
+      for (const s of g.sections) {
+        if (seen.has(s)) ctx.addIssue({ code: "custom", path: ["groups", i, "sections"], message: `${SECTION_SHORT[s]} is in two timetables. Each class belongs to one` });
+        seen.add(s);
+      }
+      const key = g.name.trim().toLowerCase();
+      if (names.has(key)) ctx.addIssue({ code: "custom", path: ["groups", i, "name"], message: "Two timetables have the same name" });
+      names.add(key);
+    });
+  });
+
+/** "Primary", "JSS and SSS", or "Whole school" when every section is in. */
+export function groupName(sections: readonly Section[], available: readonly Section[] = SECTIONS): string {
+  const picked = SECTIONS.filter((s) => sections.includes(s));
+  if (picked.length > 1 && available.every((s) => picked.includes(s))) return "Whole school";
+  return picked.map((s) => SECTION_SHORT[s]).join(" and ") || "Timetable";
+}
+
+/** The group a class section belongs to: its own, else the first (a class whose section is unknown). */
+export function groupFor<G extends { sections: readonly Section[] }>(groups: G[], section: Section | null | undefined): G {
+  return (section && groups.find((g) => g.sections.includes(section))) || groups[0]!;
+}
+
+const minutes = (time: string) => Number(time.slice(0, 2)) * 60 + Number(time.slice(3, 5));
+
 /** Two lessons for one teacher at the same time, in different classes. */
 export type Clash = { teacherId: string; day: Day; periodId: string; armIds: string[] };
 
-export function clashes(lessons: Lesson[], teacherOf: (armId: string, subjectId: string) => string | null): Clash[] {
+/**
+ * Teachers in two classes at once. Without `timeOf`, the same period id is the same time (one bell
+ * schedule). With it, lessons clash when their times overlap, which is what two groups with
+ * different bell schedules need.
+ */
+export function clashes(lessons: Lesson[], teacherOf: (armId: string, subjectId: string) => string | null, timeOf?: (armId: string, periodId: string) => { start: string; end: string } | null): Clash[] {
+  if (timeOf) {
+    const byTeacherDay = new Map<string, { armId: string; periodId: string; start: number; end: number }[]>();
+    for (const l of lessons) {
+      const teacherId = teacherOf(l.armId, l.subjectId);
+      const time = teacherId ? timeOf(l.armId, l.periodId) : null;
+      if (!teacherId || !time) continue;
+      const key = `${teacherId}|${l.day}`;
+      (byTeacherDay.get(key) ?? byTeacherDay.set(key, []).get(key)!).push({ armId: l.armId, periodId: l.periodId, start: minutes(time.start), end: minutes(time.end) });
+    }
+    const found: Clash[] = [];
+    for (const [key, list] of byTeacherDay) {
+      const [teacherId, day] = key.split("|") as [string, string];
+      list.sort((a, b) => a.start - b.start);
+      let cluster: typeof list = [];
+      let until = -1;
+      const flush = () => {
+        const arms = [...new Set(cluster.map((x) => x.armId))];
+        if (arms.length > 1) found.push({ teacherId, day: Number(day) as Day, periodId: cluster[0]!.periodId, armIds: arms });
+      };
+      for (const item of list) {
+        if (cluster.length && item.start >= until) {
+          flush();
+          cluster = [];
+        }
+        cluster.push(item);
+        until = Math.max(cluster.length === 1 ? 0 : until, item.end);
+      }
+      if (cluster.length) flush();
+    }
+    return found;
+  }
   const at = new Map<string, Clash>();
   for (const l of lessons) {
     const teacherId = teacherOf(l.armId, l.subjectId);

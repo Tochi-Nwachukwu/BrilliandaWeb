@@ -60,6 +60,37 @@ text file, or from photos of a notebook or a PDF. The screens are built (30 Octo
 **Done when.** A photo of handwritten or printed notes comes back as text, and generating from
 pasted notes of 5,000 characters works.
 
+### A4. Timetable groups: split the timetable by class
+
+**Problem.** Primary, JSS and SSS often run different days (their own start time, breaks and
+periods). Today the API has one bell schedule and one document for the whole school. The screens
+are built (30 October): an admin chooses which class sections each timetable covers (Primary alone;
+JSS and SSS together; or each on its own). Until the API has this, the screens show one timetable
+and hide "Split by class".
+
+**What we need.**
+
+- `GET /v1/timetable`: `periods` and `file` move into `groups: [{ id, name, sections, periods, file }]`
+  (at least one). `sections` are `preschool`, `primary`, `junior`, `senior` (a class level's
+  `section`). Each `arms[]` entry also gets its `section`. A school that never split has one group
+  covering every section.
+- `PUT /v1/timetable/groups` `{ groups: [{ id?, name, sections }] }` → `{ removed }`. One to four
+  timetables; every section the school has is in exactly one; names are unique, 1 to 40 characters
+  (`groupsSchema`: 422 with a pointer, e.g. `#/groups/1/sections`). A new timetable starts as a copy
+  of the first one's periods. Lessons whose period isn't a lesson period of their class's new
+  timetable are removed and counted. A removed timetable's document is deleted. Goes in the change
+  history ("Split the timetable: Primary, JSS and SSS").
+- `PUT /v1/timetable/groups/{id}/periods` `{ periods }` → `{ removed }`: that timetable's bell
+  schedule (`PUT /v1/timetable/periods` can stay for the first one). Only that timetable's classes lose lessons.
+- `PUT` / `DELETE` / `GET /v1/timetable/groups/{id}/document`: one PDF per timetable.
+- `setLesson` and `PUT /v1/timetable/classes`: a period must belong to the class's own timetable.
+- **Clashes are by overlapping times, not period ids** (two timetables can both have "p1" at
+  different times): `clashes(lessons, teacherOf, timeOf)` in `packages/core/src/timetable.ts`.
+- `GET /v1/me/timetable` (student) and `GET /v1/me/lessons` use the class's own timetable's periods.
+
+**Done when.** A school splits Primary from JSS and SSS, gives Primary its own bell schedule, and a
+teacher in both sees a week for each.
+
 ---
 
 ## B. Rules both sides must share

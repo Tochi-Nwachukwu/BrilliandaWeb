@@ -15,7 +15,7 @@ import { buildReportCard, reportTermsOf } from "./reports";
 import { store } from "./store";
 import { armOptions } from "./students";
 import { attendanceOf } from "./teaching";
-import { periodsOf } from "./timetable";
+import { periodsOfArm } from "./timetable";
 
 const pause = () => new Promise((resolve) => setTimeout(resolve, 300));
 const ADMINS_ONLY = "Only the school’s owner and admins can do this.";
@@ -87,7 +87,7 @@ export async function getStudentHome(subdomain: string): Promise<StudentHome | n
   const term = termOf(today, termsOf(subdomain));
   const days = term ? schoolDaysSoFar(term, today).slice(0, 10) : [];
   const weekday = new Date(`${today}T12:00:00Z`).getUTCDay();
-  const periods = periodsOf(subdomain);
+  const periods = periodsOfArm(subdomain, s.armId);
   const formTeacherId = store.formTeachers.find((f) => f.armId === s.armId)?.userId;
   return {
     fullName: fullName(s),
@@ -125,7 +125,7 @@ export async function getStudentTimetable(subdomain: string): Promise<ClassTimet
   };
   return {
     armLabel: armOptions(subdomain).find((a) => a.id === armId)?.label ?? "",
-    periods: periodsOf(subdomain),
+    periods: periodsOfArm(subdomain, armId),
     lessons: store.lessons
       .filter((l) => l.subdomain === subdomain && l.armId === armId)
       .map((l) => ({ day: l.day, periodId: l.periodId, subjectName: store.subjects.find((x) => x.id === l.subjectId)?.name ?? "", teacherName: teacher(l.subjectId) })),

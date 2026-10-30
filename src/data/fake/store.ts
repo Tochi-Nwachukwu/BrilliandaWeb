@@ -102,8 +102,8 @@ type FakeStore = {
     status: "open" | "approved" | "declined";
     decided?: { by: string; at: number; reason: string | null };
   }[];
-  /** Batch 22: each school's bell schedule, each class's lessons, and an uploaded timetable document (a PDF). */
-  bellSchedules: Map<string, Period[]>;
+  /** Batch 22: each school's timetables (a group of class sections and its bell schedule), each class's lessons, and a timetable document (a PDF) per timetable, keyed "subdomain|groupId". */
+  timetableGroups: Map<string, { id: string; name: string; sections: Section[]; periods: Period[] }[]>;
   lessons: { subdomain: string; armId: string; day: Day; periodId: string; subjectId: string }[];
   timetableFiles: Map<string, { name: string; type: string; size: number; url: string; by: string; at: number }>;
   /** Batch 24: each school's question bank, and AI generations used per month ("2026-10"). */
@@ -534,7 +534,7 @@ function seed(): FakeStore {
     birthdayLog: [],
     bookLists: seedBookLists(),
     corrections: [],
-    bellSchedules: new Map([["greenfield", DEFAULT_PERIODS]]),
+    timetableGroups: new Map([["greenfield", [{ id: "all", name: "Whole school", sections: ["preschool", "primary", "junior", "senior"], periods: DEFAULT_PERIODS }]]]),
     lessons: seedLessons(greenfieldSubjects.subjectLinks),
     timetableFiles: new Map(),
     questionBank: seedQuestionBank(),

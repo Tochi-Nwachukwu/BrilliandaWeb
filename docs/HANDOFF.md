@@ -31,6 +31,8 @@ tours, My profile, sidebar account card and logo, Teachers in the sidebar, loadi
 
 ## To do
 
+- The timetable can be split by class group (Primary, JSS, SSS) on our side; it needs the backend
+  (`docs/backend-requirements.md` A4). Until then live schools see one timetable.
 - Lesson notes for generating questions (paste, Word/text, photos, PDF) are built on our side;
   the backend part is `docs/backend-requirements.md` A3. Test it once AI is on.
 - AI generating is switched off on the API (`aiEnabled: false` hides Generate) until Tochi picks a

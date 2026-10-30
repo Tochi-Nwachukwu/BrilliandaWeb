@@ -536,16 +536,27 @@ export type CorrectionsPage = { open: CorrectionRow[]; answered: CorrectionRow[]
 export type TimetableLesson = { armId: string; day: Day; periodId: string; subjectId: string; teacherId: string | null; teacherName: string | null };
 
 /** The school's timetable, for staff. Teachers see every class, with their own lessons marked by `me`. */
-export type TimetablePage = {
+/** One timetable: the class sections it covers, its own bell schedule, and its own document (a PDF). */
+export type TimetableGroup = {
+  id: string;
+  name: string;
+  sections: Section[];
   periods: Period[];
-  arms: { id: string; label: string; levelId: string }[];
+  file: { name: string; size: number; url: string; by: string; at: number } | null;
+};
+
+export type TimetablePage = {
+  /** At least one. Primary can have its own; JSS and SSS can share one or have one each. */
+  groups: TimetableGroup[];
+  /** False while the API has a single bell schedule for the whole school: the Split by class screen is hidden. */
+  canSplit: boolean;
+  /** `section` is absent when the API doesn't say: the class then belongs to the first timetable. */
+  arms: { id: string; label: string; levelId: string; section?: Section }[];
   /** The school's subjects, and which class levels take each (for the editor's choices). */
   subjects: { id: string; name: string; code: string; levelIds: string[] }[];
   lessons: TimetableLesson[];
   /** A teacher in two classes at once. */
   clashes: { teacherName: string; day: Day; periodId: string; armLabels: string[] }[];
-  /** An uploaded timetable document (a PDF): opened as it is, nothing highlighted. */
-  file: { name: string; size: number; url: string; by: string; at: number } | null;
   me: { userId: string; canEdit: boolean };
 };
 

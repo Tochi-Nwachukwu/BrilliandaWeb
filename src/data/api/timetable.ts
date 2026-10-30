@@ -1,21 +1,36 @@
-// The timetable, on the Brillianda API. Same functions and shapes as ../fake/timetable.ts.
+// The timetable, on the Brillianda API. Same functions and shapes as ../fake/timetable.ts. The API
+// has one bell schedule and one document for the whole school, so here the school has a single
+// timetable and splitting it by class section is switched off (`canSplit: false`) until the API
+// has timetable groups (docs/backend-requirements.md, A4).
 import "server-only";
-import type { Day, Lesson, Period } from "@brillianda/core/timetable";
+import { SECTIONS, type Day, type GroupDraft, type Lesson, type Period } from "@brillianda/core/timetable";
 import type { ActionResult, TimetablePage } from "../types";
 import { api, fail, read } from "./client";
 import { pictureOn } from "./school";
 
 const id = encodeURIComponent;
 
+type ApiPage = Omit<TimetablePage, "groups" | "canSplit"> & { periods: Period[]; file: NonNullable<TimetablePage["groups"][number]["file"]> | null };
+
 export async function getTimetable(subdomain: string): Promise<TimetablePage | null> {
-  const page = await read<TimetablePage>(subdomain, "/v1/timetable");
+  const page = await read<ApiPage>(subdomain, "/v1/timetable");
+  if (!page) return null;
+  const { periods, file, ...rest } = page;
   // The PDF is served like the logo: on staging, through the school's /s/<school> path.
-  return page?.file ? { ...page, file: { ...page.file, url: pictureOn(subdomain, page.file.url) ?? page.file.url } } : page;
+  const shown = file ? { ...file, url: pictureOn(subdomain, file.url) ?? file.url } : null;
+  return { ...rest, canSplit: false, groups: [{ id: "all", name: "Whole school", sections: [...SECTIONS], periods, file: shown }] };
 }
 
-export async function saveBellSchedule(subdomain: string, periods: Period[]): Promise<ActionResult<{ removed: number }>> {
+// The API has one bell schedule: a group id from the screens is ignored.
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export async function saveBellSchedule(subdomain: string, periods: Period[], _groupId?: string): Promise<ActionResult<{ removed: number }>> {
   const result = await api<{ removed: number }>(subdomain, "/v1/timetable/periods", { method: "PUT", body: { periods } });
   return result.ok ? { ok: true, data: result.data } : fail(result);
+}
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export async function saveTimetableGroups(_subdomain: string, _groups: GroupDraft[]): Promise<ActionResult<{ removed: number }>> {
+  return { ok: false, error: "Splitting the timetable by class isn’t switched on yet." };
 }
 
 export async function setLesson(subdomain: string, armId: string, day: Day, periodId: string, subjectId: string | null): Promise<ActionResult<null>> {
@@ -28,7 +43,8 @@ export async function importTimetable(subdomain: string, classes: { armId: strin
   return result.ok ? { ok: true, data: result.data } : fail(result);
 }
 
-export async function setTimetableFile(subdomain: string, file: File): Promise<ActionResult<null>> {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export async function setTimetableFile(subdomain: string, file: File, _groupId?: string): Promise<ActionResult<null>> {
   const form = new FormData();
   form.set("file", file);
   const result = await api(subdomain, "/v1/timetable/document", { method: "PUT", form });
@@ -37,7 +53,8 @@ export async function setTimetableFile(subdomain: string, file: File): Promise<A
   return fail(result);
 }
 
-export async function removeTimetableFile(subdomain: string): Promise<ActionResult<null>> {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export async function removeTimetableFile(subdomain: string, _groupId?: string): Promise<ActionResult<null>> {
   const result = await api(subdomain, "/v1/timetable/document", { method: "DELETE" });
   return result.ok ? { ok: true, data: null } : fail(result);
 }
