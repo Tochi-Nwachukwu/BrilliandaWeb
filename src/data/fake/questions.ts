@@ -83,6 +83,20 @@ export async function generateQuestions(subdomain: string, req: GenerateRequest)
   return { ok: true, data: { questions: fakeQuestions(req, pair.subjectName, pair.levelName, usage.used), usage: usageOf(subdomain) } };
 }
 
+/** Sample reading of photos and PDFs of lesson notes: the real one is the model's, on the API. */
+export async function readNotes(subdomain: string, input: { files: { name: string; dataUrl: string }[] }): Promise<ActionResult<{ text: string }>> {
+  const me = await who(subdomain);
+  if (!me) return { ok: false, error: "Sign in as a teacher to do this." };
+  await pause(1800);
+  return {
+    ok: true,
+    data: {
+      text: `(Sample text: the real reading of ${input.files.length === 1 ? "this file" : `these ${input.files.length} files`} comes from AI once the backend connects it.)
+Photosynthesis is the process by which green plants make their own food. They take in carbon dioxide from the air and water from the soil. Using sunlight and chlorophyll, they make glucose and give out oxygen.`,
+    },
+  };
+}
+
 /** Saves checked questions to the bank. */
 export async function saveQuestions(subdomain: string, subjectId: string, levelId: string, questions: Question[], source: "ai" | "teacher"): Promise<ActionResult<{ saved: number }>> {
   await pause();

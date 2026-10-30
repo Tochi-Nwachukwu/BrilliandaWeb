@@ -176,6 +176,16 @@ questions as they arrive.
 2. One pilot school for two weeks, watching usage, costs and teachers' edits.
 3. Production, with the monthly allowance per plan.
 
+## Lesson notes (30 October 2026)
+
+Teachers can give the generator their own notes three ways: paste text; add a Word (.docx) or text
+file, which the browser reads (only text leaves the device); or add photos (up to 5, shrunk to 1600
+px) or a PDF (up to 2 MB). Photos and PDFs go to `POST /v1/questions/notes`, where the model reads
+them into text that the teacher corrects before generating. Nothing is stored. Photos and
+notes go to the AI provider, so Step 0 applies to them too, and teachers are told to leave out
+student names. Cost: a page of notes is about 1,000 tokens in, a photo about 1,500; against the
+questions coming back it adds little. Backend request: `docs/backend-requirements.md`, A3.
+
 ## What the front end does (our side)
 
 We build every screen on a fake generator (realistic sample questions after a short wait):

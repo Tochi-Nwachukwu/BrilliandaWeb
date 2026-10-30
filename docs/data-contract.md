@@ -460,6 +460,10 @@ like staff, after an invitation; they land on `/s/<school>/learn`. Every other a
 
 ### The question bank and generating questions (batch 24)
 
+Lesson notes (30 October): `readNotes(school, { files })` turns photos and PDFs into text (`readNotesSchema`);
+notes up to `NOTES_MAX` (20,000) characters go to `generateQuestions`. Word and text files are read in
+the browser (`src/lib/notes/files.ts`).
+
 One question shape for the bank, the AI generator, CBT and printed papers: `questionSchema` in
 `packages/core/src/questions.ts` (objective with 2 to 5 options and the right one; true or false;
 fill in the gap with accepted answers; theory with a marking guide; marks, topic, difficulty). A

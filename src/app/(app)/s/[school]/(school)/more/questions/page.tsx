@@ -2,7 +2,7 @@ import { PageHeader } from "@brillianda/ui/PageHeader";
 import type { Metadata } from "next";
 import { connection } from "next/server";
 import { QuestionBank } from "@/components/questions/QuestionBank";
-import { deleteQuestion, generateQuestions, saveQuestions, updateQuestion } from "@/data/actions/questions";
+import { deleteQuestion, generateQuestions, readNotes, saveQuestions, updateQuestion } from "@/data/actions/questions";
 import { getQuestionBank } from "@/data/questions";
 
 export const metadata: Metadata = { title: "Question bank" };
@@ -19,6 +19,7 @@ export default async function SchoolQuestions({ params }: PageProps<"/s/[school]
         page={page}
         actions={{
           generate: generateQuestions.bind(null, school),
+          readNotes: readNotes.bind(null, school),
           save: saveQuestions.bind(null, school),
           update: updateQuestion.bind(null, school),
           remove: deleteQuestion.bind(null, school),

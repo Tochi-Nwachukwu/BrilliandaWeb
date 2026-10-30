@@ -39,6 +39,27 @@ for staging so we can test it with made-up topics.
 
 **Done when.** `GET /v1/questions` returns `aiEnabled: true` and a Generate request returns drafts.
 
+### A3. Lesson notes: a bigger notes box, and reading photos and PDFs
+
+**Problem.** Teachers want to generate questions from their own lesson notes: pasted, from a Word or
+text file, or from photos of a notebook or a PDF. The screens are built (30 October, `NotesInput`).
+
+**What we need.**
+
+- `POST /v1/questions/generate`: `notes` up to **20,000 characters** (it is 500 today). When notes
+  are given, every question must be answerable from them; say so in the prompt.
+- **New:** `POST /v1/questions/notes` `{ files: [{ name, dataUrl }] }` → `{ text }`. One to five
+  files: a photo (JPEG, PNG or WebP data URL) or a PDF (up to 2 MB), 3.8 million characters in all
+  (a Vercel request is capped at 4.5 MB). Read them with the model and return a plain transcription
+  of the text, not a summary. The teacher corrects the text before generating. Our schema:
+  `readNotesSchema` in `packages/core/src/questions.ts`.
+- **Keep nothing:** no stored files, no logged contents. Teachers and admins only. It doesn't use
+  up one of the school's monthly generations; rate-limit it (say 10 a minute per person). Allow up
+  to 60 seconds. Same `ai_*` problem codes as generating.
+
+**Done when.** A photo of handwritten or printed notes comes back as text, and generating from
+pasted notes of 5,000 characters works.
+
 ---
 
 ## B. Rules both sides must share

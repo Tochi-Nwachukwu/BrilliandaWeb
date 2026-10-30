@@ -27,10 +27,12 @@ For the next agent working on Brillianda-web. Read `CLAUDE.md` first; it has the
 
 Every screen is on the API, including the question bank and CBT (28 October). Help guides and
 tours, My profile, sidebar account card and logo, Teachers in the sidebar, loading outlines,
-"← More" links. `docs/backend-requirements.md` has no open requests.
+"← More" links. `docs/backend-requirements.md` lists the open backend asks (A1 to A3).
 
 ## To do
 
+- Lesson notes for generating questions (paste, Word/text, photos, PDF) are built on our side;
+  the backend part is `docs/backend-requirements.md` A3. Test it once AI is on.
 - AI generating is switched off on the API (`aiEnabled: false` hides Generate) until Tochi picks a
   provider (`docs/ai-integration.md`, Step 0: Gemini's under-18 terms).
 - Birthday texts need an SMS account (Termii); on staging they land in the outbox.

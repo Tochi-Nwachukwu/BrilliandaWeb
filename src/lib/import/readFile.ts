@@ -115,6 +115,20 @@ export async function readDocx(buffer: ArrayBuffer): Promise<string[][] | null> 
   );
 }
 
+/** All the text in a Word document, one paragraph per line (tables read cell by cell). */
+export async function readDocxText(buffer: ArrayBuffer): Promise<string> {
+  const { default: JSZip } = await import("jszip");
+  const zip = await JSZip.loadAsync(buffer);
+  const xml = await zip.file("word/document.xml")?.async("string");
+  if (!xml) return "";
+  const doc = new DOMParser().parseFromString(xml, "application/xml");
+  const W = "http://schemas.openxmlformats.org/wordprocessingml/2006/main";
+  return Array.from(doc.getElementsByTagNameNS(W, "p"))
+    .map((p) => Array.from(p.getElementsByTagNameNS(W, "t")).map((t) => t.textContent ?? "").join("").trim())
+    .filter(Boolean)
+    .join("\n");
+}
+
 /** The heading row is the first row with at least two filled cells; empty rows are dropped. */
 function toSheet(rows: string[][]): ReadResult {
   const filled = rows.map((r) => r.map((c) => (c ?? "").trim())).filter((r) => r.some(Boolean));

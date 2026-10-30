@@ -8,17 +8,20 @@ import { ProgressBar } from "@brillianda/ui/Cards";
 import { EmptyState } from "@brillianda/ui/EmptyState";
 import { ResponsiveDialog } from "@brillianda/ui/ResponsiveDialog";
 import { Spinner } from "@brillianda/ui/Spinner";
-import { SelectField, TextAreaField, TextField } from "@brillianda/ui/TextField";
+import { SelectField, TextField } from "@brillianda/ui/TextField";
 import { toast } from "@brillianda/ui/Toast";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import { FormError } from "@/components/auth/FormError";
 import type { ActionResult, BankQuestion, QuestionBankPage } from "@/data/types";
+import { NotesInput } from "./NotesInput";
 import { blankQuestion, errorsOf, QuestionCard, QuestionEditor } from "./QuestionParts";
 
 export type BankActions = {
   generate: (input: unknown) => Promise<ActionResult<{ questions: Question[]; usage: QuestionBankPage["usage"] }>>;
+  /** Reads photos and PDFs of lesson notes into text, for the teacher to check before generating. */
+  readNotes: (input: unknown) => Promise<ActionResult<{ text: string }>>;
   save: (input: unknown) => Promise<ActionResult<{ saved: number }>>;
   update: (id: string, input: unknown) => Promise<ActionResult<null>>;
   remove: (id: string) => Promise<ActionResult<null>>;
@@ -301,7 +304,7 @@ function GenerateDialog({ page, initialPair, actions, onClose }: { page: Questio
             <option value="exam">An exam</option>
           </SelectField>
           <TextField label="Topics" placeholder="e.g. Fractions, Decimals" hint="Separate topics with commas." value={topics} onChange={(e) => setTopics(e.target.value)} />
-          <TextAreaField label="Anything else (optional)" rows={2} placeholder="e.g. Focus on word problems" value={notes} onChange={(e) => setNotes(e.target.value)} />
+          <NotesInput value={notes} onChange={setNotes} readNotes={actions.readNotes} />
           <fieldset className="grid grid-cols-2 gap-3 sm:grid-cols-4">
             <legend className="mb-2 text-sm font-medium">How many of each</legend>
             {count("objective", "Objective")}

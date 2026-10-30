@@ -1,7 +1,7 @@
 "use server";
 
 // The question bank and generating questions (batch 24; docs/data-contract.md). Teachers and admins.
-import { generateRequestSchema, questionSchema, type Question } from "@brillianda/core/questions";
+import { generateRequestSchema, questionSchema, readNotesSchema, type Question } from "@brillianda/core/questions";
 import { fieldErrorsOf } from "@brillianda/core/signup";
 import { LIVE } from "../api/client";
 import * as live from "../api/questions";
@@ -18,6 +18,13 @@ export async function generateQuestions(school: string, input: unknown): Promise
   const parsed = generateRequestSchema.safeParse(input);
   if (!parsed.success) return { ok: false, error: parsed.error.issues[0]?.message ?? CHECK, fieldErrors: fieldErrorsOf(parsed.error) };
   return impl.generateQuestions(String(school), parsed.data);
+}
+
+/** Reads photos and PDFs of lesson notes into text. Nothing is kept; the teacher checks the text before generating. */
+export async function readNotes(school: string, input: unknown): Promise<ActionResult<{ text: string }>> {
+  const parsed = readNotesSchema.safeParse(input);
+  if (!parsed.success) return { ok: false, error: parsed.error.issues[0]?.message ?? CHECK };
+  return impl.readNotes(String(school), parsed.data);
 }
 
 /** Saves questions to the bank, for one subject and class level. */

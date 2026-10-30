@@ -97,13 +97,34 @@ export function seededOrder(length: number, seed: string): number[] {
 export const PURPOSES = ["test", "assignment", "exam"] as const;
 export type Purpose = (typeof PURPOSES)[number];
 
+/** Lesson notes a teacher gives the generator: pasted, read from a Word or text file, or read from photos and PDFs. */
+export const NOTES_MAX = 20_000;
+/** Photos or PDFs read into notes in one go, and their total size as data URLs (a request stays under Vercel's 4.5 MB). */
+export const NOTE_FILES_MAX = 5;
+export const NOTE_FILES_CHARS = 3_800_000;
+
+export const readNotesSchema = z
+  .object({
+    files: z
+      .array(
+        z.object({
+          name: z.string().trim().min(1).max(200),
+          dataUrl: z.string().regex(/^data:(image\/(jpeg|png|webp)|application\/pdf);base64,[A-Za-z0-9+/=]+$/, "That file can’t be read. Use a photo (JPG or PNG) or a PDF"),
+        }),
+      )
+      .min(1, "Add a photo or a PDF")
+      .max(NOTE_FILES_MAX, `Add up to ${NOTE_FILES_MAX} files at a time`),
+  })
+  .refine((r) => r.files.reduce((n, f) => n + f.dataUrl.length, 0) <= NOTE_FILES_CHARS, { path: ["files"], message: "Those files are too big together. Add fewer, or smaller ones" });
+export type ReadNotesRequest = z.infer<typeof readNotesSchema>;
+
 export const generateRequestSchema = z
   .object({
     purpose: z.enum(PURPOSES),
     subjectId: z.string().min(1, "Choose a subject"),
     levelId: z.string().min(1, "Choose a class"),
     topics: z.array(z.string().trim().min(2).max(80)).min(1, "Add at least one topic").max(10, "Use at most 10 topics"),
-    notes: z.string().trim().max(500, "Use at most 500 characters"),
+    notes: z.string().trim().max(NOTES_MAX, `Use at most ${NOTES_MAX.toLocaleString("en-GB")} characters`),
     counts: z.object({
       objective: z.coerce.number().int().min(0).max(50),
       trueFalse: z.coerce.number().int().min(0).max(20),
