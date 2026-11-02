@@ -62,7 +62,7 @@ export type Lesson = { armId: string; day: Day; periodId: string; subjectId: str
 
 export const SECTIONS: readonly Section[] = ["preschool", "primary", "junior", "senior"];
 /** How schools say them in a timetable's name: Primary, JSS, SSS. */
-export const SECTION_SHORT: Record<Section, string> = { preschool: "Pre-school", primary: "Primary", junior: "JSS", senior: "SSS" };
+export const SECTION_SHORT: Record<Section, string> = { preschool: "Nursery", primary: "Primary", junior: "JSS", senior: "SSS" };
 
 /** One timetable: the class sections it covers, and its own bell schedule. */
 export type GroupDraft = { id?: string; name: string; sections: Section[] };

@@ -14,7 +14,7 @@ import { useRef, useState, useTransition } from "react";
 import { FormError } from "@/components/auth/FormError";
 import { WeekGrid } from "@/components/timetable/WeekGrid";
 import type { ActionResult, TimetableGroup, TimetablePage } from "@/data/types";
-import { downloadMasterTemplate, downloadTimetableTemplate, readTimetableFile, sheetName } from "@/lib/timetable/files";
+import { downloadMasterTemplate, readTimetableFile, sheetName } from "@/lib/timetable/files";
 import { timeAgo } from "@/lib/time";
 
 type Actions = {
@@ -69,21 +69,6 @@ export function TimetableEditor({ page, schoolName, today, now, actions }: { pag
       group.periods,
       arms.map((a) => ({ id: a.id, label: a.label, subjects: page.subjects.filter((s) => s.levelIds.includes(a.levelId)).map((s) => s.name), lessons: lessonsOf(a.id) })),
     );
-  const template = () =>
-    downloadTimetableTemplate(
-      several ? `${schoolName}: ${group.name}` : schoolName,
-      group.periods,
-      arms.map((a) => {
-        const names = new Map(page.subjects.map((s) => [s.id, s.name]));
-        return {
-          id: a.id,
-          label: a.label,
-          subjects: page.subjects.filter((s) => s.levelIds.includes(a.levelId)).map((s) => s.name),
-          lessons: new Map(page.lessons.filter((l) => l.armId === a.id).map((l) => [`${l.day}|${l.periodId}`, names.get(l.subjectId) ?? ""])),
-        };
-      }),
-    );
-
   return (
     <div className="grid gap-4">
       {several && (
@@ -113,9 +98,6 @@ export function TimetableEditor({ page, schoolName, today, now, actions }: { pag
           <div className="flex flex-wrap gap-2">
             <Button variant="secondary" onClick={fullTemplate}>
               Download the template
-            </Button>
-            <Button variant="ghost" onClick={template}>
-              One sheet per class
             </Button>
             <Button onClick={() => setUploading(true)}>Upload a timetable</Button>
           </div>
@@ -169,7 +151,7 @@ export function TimetableEditor({ page, schoolName, today, now, actions }: { pag
         </>
       )}
 
-      {uploading && <UploadDialog page={page} group={group} arms={arms} armId={shownArmId} onClose={() => setUploading(false)} importFile={actions.importFile} uploadPdf={actions.uploadPdf} />}
+      {uploading && <UploadDialog page={page} group={group} arms={arms} onClose={() => setUploading(false)} importFile={actions.importFile} uploadPdf={actions.uploadPdf} />}
     </div>
   );
 }
@@ -360,25 +342,35 @@ type Preview = { armId: string; label: string; lessons: { day: Day; periodId: st
 /** "jss1blue" from "JSS 1 Blue" or "JSS1 BLUE": how sheet names meet class names. */
 const key = (text: string) => text.toLowerCase().replace(/[^a-z0-9]/g, "");
 
-function UploadDialog({ page, group, arms, armId, onClose, importFile, uploadPdf }: { page: TimetablePage; group: TimetableGroup; arms: TimetablePage["arms"]; armId: string | null; onClose: () => void; importFile: Actions["importFile"]; uploadPdf: Actions["uploadPdf"] }) {
+function UploadDialog({ page, group, arms, onClose, importFile, uploadPdf }: { page: TimetablePage; group: TimetableGroup; arms: TimetablePage["arms"]; onClose: () => void; importFile: Actions["importFile"]; uploadPdf: Actions["uploadPdf"] }) {
   const router = useRouter();
   const input = useRef<HTMLInputElement>(null);
   const [fileName, setFileName] = useState("");
   const [pdf, setPdf] = useState<File | null>(null);
   const [sheets, setSheets] = useState<{ name: string; rows: string[][] }[] | null>(null);
-  const [forArm, setForArm] = useState(armId ?? "");
+  // Which classes this upload is for: the whole school, or a class group (Nursery, Primary, JSS, SSS, JSS and SSS).
+  const present = SECTIONS.filter((s) => arms.some((a) => a.section === s));
+  const split = page.groups.length > 1;
+  const scopes: { key: string; label: string; sections: Section[] }[] = split || present.length < 2 ? [] : [
+    { key: "all", label: "The whole school", sections: present },
+    ...present.map((s) => ({ key: s, label: SECTION_SHORT[s], sections: [s] })),
+    ...(present.includes("junior") && present.includes("senior") && present.length > 2 ? [{ key: "junior+senior", label: "JSS and SSS together", sections: ["junior", "senior"] as Section[] }] : []),
+  ];
+  const [scopeKey, setScopeKey] = useState("all");
+  const scope = scopes.find((x) => x.key === scopeKey);
+  const scoped = scope ? arms.filter((a) => !a.section || scope.sections.includes(a.section)) : arms;
   const [failure, setFailure] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
 
-  const byKey = new Map(arms.map((a) => [key(sheetName(a.label)), a]));
-  const master = sheets ? (sheets.map((s) => readMasterGrid(s.rows, group.periods, page.subjects, arms)).find((m) => m && m.arms.length > 0) ?? null) : null;
+  const byKey = new Map(scoped.map((a) => [key(sheetName(a.label)), a]));
+  const master = sheets ? (sheets.map((s) => readMasterGrid(s.rows, group.periods, page.subjects, scoped)).find((m) => m && m.arms.length > 0) ?? null) : null;
   const previews: Preview[] = [];
   if (master) {
     for (const a of master.arms) previews.push({ armId: a.armId, label: a.label, lessons: a.lessons, problems: a.problems.map((p) => `${DAY_NAME[p.day]}, ${group.periods.find((x) => x.id === p.periodId)?.label}: ${p.message}`) });
   } else if (sheets) {
     const matched = sheets.filter((s) => byKey.has(key(s.name)));
     // Sheets named after classes go to those classes; otherwise the first table is for the class chosen here.
-    const targets = matched.length ? matched.map((s) => ({ sheet: s, arm: byKey.get(key(s.name))! })) : forArm ? [{ sheet: sheets[0]!, arm: arms.find((a) => a.id === forArm)! }] : [];
+    const targets = matched.map((s) => ({ sheet: s, arm: byKey.get(key(s.name))! }));
     for (const { sheet, arm } of targets) {
       const read = readTimetableGrid(sheet.rows, group.periods, page.subjects);
       previews.push(
@@ -426,7 +418,7 @@ function UploadDialog({ page, group, arms, armId, onClose, importFile, uploadPdf
       open
       onClose={onClose}
       title="Upload a timetable"
-      description={`Excel, CSV or Word: one sheet for the whole school, or one sheet per class (the templates are ready-made). A PDF is kept as a document staff can open${page.groups.length > 1 ? ` for ${group.name}` : ""}.`}
+      description={`Excel, CSV or Word: one sheet laid out like the template: days in blocks, a row for each class, periods across the top. A PDF is kept as a document staff can open${page.groups.length > 1 ? ` for ${group.name}` : ""}.`}
       footer={
         <Button className="w-full" loading={pending} disabled={!pdf && usable.length === 0} onClick={confirm}>
           {pdf ? "Save the document" : usable.length > 1 ? `Replace ${usable.length} classes’ timetables` : "Replace this class’s timetable"}
@@ -439,16 +431,17 @@ function UploadDialog({ page, group, arms, armId, onClose, importFile, uploadPdf
           {fileName ? `Chosen: ${fileName}. Choose another` : "Choose a file"}
         </Button>
         {pdf && <Alert tone="info">This PDF will be the school’s timetable document. Staff can open it, but it can’t highlight anyone’s lessons: for that, upload Excel, CSV or Word.</Alert>}
-        {sheets && !matchedSheets && (
-          <SelectField label="This timetable is for" value={forArm} onChange={(e) => setForArm(e.target.value)}>
-            <option value="">Choose a class</option>
-            {arms.map((a) => (
-              <option key={a.id} value={a.id}>
-                {a.label}
+        {scopes.length > 0 && (
+          <SelectField label="This timetable is for" value={scopeKey} onChange={(e) => setScopeKey(e.target.value)}>
+            {scopes.map((x) => (
+              <option key={x.key} value={x.key}>
+                {x.label}
               </option>
             ))}
           </SelectField>
         )}
+        {split && <p className="text-sm text-text-secondary">This timetable is for {group.name}.</p>}
+        {sheets && !master && !matchedSheets && <Alert tone="warning">We couldn’t find a timetable in this file. Use the template: days in blocks (MON to FRI), a row for each class, and the periods across the top.</Alert>}
         {previews.length > 0 && (
           <ul className="grid gap-2" aria-label="What we found">
             {previews.map((p) => (
@@ -466,7 +459,7 @@ function UploadDialog({ page, group, arms, armId, onClose, importFile, uploadPdf
             ))}
           </ul>
         )}
-        {master && master.skipped.length > 0 && <p className="text-sm text-text-secondary">Left out, because they aren’t in this timetable: {master.skipped.slice(0, 8).join(", ")}{master.skipped.length > 8 ? ` and ${master.skipped.length - 8} more` : ""}.</p>}
+        {master && master.skipped.length > 0 && <p className="text-sm text-text-secondary">Left out, because they’re not in the classes chosen: {master.skipped.slice(0, 8).join(", ")}{master.skipped.length > 8 ? ` and ${master.skipped.length - 8} more` : ""}.</p>}
         <FormError message={failure} />
         <p className="text-[12.5px] text-text-secondary">
           Times in the file must match the bell schedule{page.groups.length > 1 ? ` for ${group.name}` : ""} ({group.periods.filter((p) => p.kind === "lesson").length} lessons from {shortTime(group.periods[0]?.start ?? "08:00")}).

@@ -4,7 +4,7 @@
 // has timetable groups (docs/backend-requirements.md, A4).
 import "server-only";
 import { SECTIONS, type Day, type GroupDraft, type Lesson, type Period } from "@brillianda/core/timetable";
-import type { ActionResult, TimetablePage } from "../types";
+import type { ActionResult, ClassStructure, TimetablePage } from "../types";
 import { api, fail, read } from "./client";
 import { pictureOn } from "./school";
 
@@ -13,9 +13,12 @@ const id = encodeURIComponent;
 type ApiPage = Omit<TimetablePage, "groups" | "canSplit"> & { periods: Period[]; file: NonNullable<TimetablePage["groups"][number]["file"]> | null };
 
 export async function getTimetable(subdomain: string): Promise<TimetablePage | null> {
-  const page = await read<ApiPage>(subdomain, "/v1/timetable");
+  const [page, classes] = await Promise.all([read<ApiPage>(subdomain, "/v1/timetable"), read<ClassStructure>(subdomain, "/v1/classes")]);
   if (!page) return null;
   const { periods, file, ...rest } = page;
+  // The timetable doesn't say which section a class is in (Nursery, Primary, JSS, SSS); its level does.
+  const sectionOf = new Map((classes?.levels ?? []).map((l) => [l.id, l.section]));
+  rest.arms = rest.arms.map((a) => ({ ...a, section: sectionOf.get(a.levelId) }));
   // The PDF is served like the logo: on staging, through the school's /s/<school> path.
   const shown = file ? { ...file, url: pictureOn(subdomain, file.url) ?? file.url } : null;
   return { ...rest, canSplit: false, groups: [{ id: "all", name: "Whole school", sections: [...SECTIONS], periods, file: shown }] };
