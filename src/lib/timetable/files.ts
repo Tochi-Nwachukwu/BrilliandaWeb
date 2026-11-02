@@ -80,4 +80,84 @@ export async function downloadTimetableTemplate(
   URL.revokeObjectURL(url);
 }
 
+/**
+ * The whole school on one sheet, laid out like a printed timetable: for each day, a row per class,
+ * and the bell schedule's periods across the top (breaks shaded). Filled with today's lessons, with
+ * a dropdown of each class's subjects. The upload reads it back by each column's start time.
+ */
+export async function downloadMasterTemplate(
+  schoolName: string,
+  periods: Period[],
+  classes: { id: string; label: string; subjects: string[]; lessons: Map<string, string> }[],
+) {
+  const { default: ExcelJS } = await import("exceljs");
+  const book = new ExcelJS.Workbook();
+  book.creator = "Brillianda";
+  const lists = book.addWorksheet("Lists", { state: "veryHidden" });
+  const sheet = book.addWorksheet("Timetable", { views: [{ state: "frozen", xSplit: 2, ySplit: 2 }], pageSetup: { orientation: "landscape", fitToPage: true, fitToWidth: 1, fitToHeight: 0 } });
+  const last = periods.length + 2;
+
+  sheet.columns = [{ width: 9 }, { width: 11 }, ...periods.map((p) => ({ width: p.kind === "break" ? 9 : 13 }))];
+  sheet.mergeCells(1, 1, 1, last);
+  const title = sheet.getCell(1, 1);
+  title.value = `${schoolName}: weekly timetable`.toUpperCase();
+  title.font = { bold: true, size: 14 };
+  title.alignment = { horizontal: "center", vertical: "middle" };
+  sheet.getRow(1).height = 26;
+
+  const head = sheet.getRow(2);
+  head.values = ["DAYS", "Time/Class", ...periods.map((p) => `${shortTime(p.start)}–${shortTime(p.end)}`)];
+  head.font = { bold: true };
+  head.alignment = { horizontal: "center", vertical: "middle", wrapText: true };
+  head.height = 32;
+  head.eachCell((cell) => {
+    cell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FFECE7FF" } };
+    cell.border = { top: { style: "thin" }, bottom: { style: "thin" }, left: { style: "thin" }, right: { style: "thin" } };
+  });
+
+  // Each class's subjects, for the dropdowns.
+  classes.forEach((c, i) => c.subjects.forEach((s, r) => (lists.getCell(r + 1, i + 1).value = s)));
+
+  let row = 3;
+  for (const day of DAYS) {
+    const first = row;
+    classes.forEach((c, i) => {
+      const r = sheet.getRow(row++);
+      r.getCell(2).value = c.label;
+      r.getCell(2).alignment = { horizontal: "center" };
+      periods.forEach((p, k) => {
+        const cell = r.getCell(k + 3);
+        cell.alignment = { horizontal: "center" };
+        if (p.kind === "break") {
+          cell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FFF0F0F2" } };
+          return;
+        }
+        cell.value = c.lessons.get(`${day}|${p.id}`) ?? "";
+        if (c.subjects.length) {
+          const letter = lists.getColumn(i + 1).letter;
+          cell.dataValidation = { type: "list", allowBlank: true, formulae: [`Lists!${letter}$1:${letter}${c.subjects.length}`] };
+        }
+      });
+      for (let k = 1; k <= last; k++) r.getCell(k).border = { top: { style: "hair" }, bottom: { style: "hair" }, left: { style: "thin" }, right: { style: "thin" } };
+    });
+    if (classes.length) {
+      sheet.mergeCells(first, 1, row - 1, 1);
+      const dayCell = sheet.getCell(first, 1);
+      dayCell.value = DAY_NAME[day].slice(0, 3).toUpperCase();
+      dayCell.font = { bold: true };
+      dayCell.alignment = { horizontal: "center", vertical: "middle" };
+      for (let k = 1; k <= last; k++) sheet.getCell(row - 1, k).border = { ...sheet.getCell(row - 1, k).border, bottom: { style: "medium" } };
+    }
+  }
+
+  const data = await book.xlsx.writeBuffer();
+  const blob = new Blob([data], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `${schoolName} full timetable.xlsx`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
 export { sheetName };

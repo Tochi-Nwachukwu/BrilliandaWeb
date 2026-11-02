@@ -288,3 +288,68 @@ export const timetableImportSchema = z.object({
     .min(1, "Nothing to import")
     .max(200),
 });
+
+// ——— Reading a whole-school timetable (one sheet, laid out like a printed timetable) ———
+
+const DAY_WORDS: Record<string, Day> = { mon: 1, monday: 1, tue: 2, tues: 2, tuesday: 2, wed: 3, wednesday: 3, thu: 4, thur: 4, thurs: 4, thursday: 4, fri: 5, friday: 5 };
+
+/** The start of a heading like "8:40–9:20am", "11:55am–12:30pm" or "Period 1 (8:00–8:40)", as "HH:MM"; a lesson day never starts before 7. */
+function headingStart(heading: string): string | null {
+  const text = (heading.match(/\(([^)]*)\)/)?.[1] ?? heading).replace(/\s/g, "");
+  const m = text.match(/^(\d{1,2}):(\d{2})(am|pm)?[–—-]/i);
+  if (!m) return null;
+  let hour = Number(m[1]);
+  if (m[3]?.toLowerCase() === "pm" && hour < 12) hour += 12;
+  else if (!m[3] && hour < 7) hour += 12;
+  return `${String(hour).padStart(2, "0")}:${m[2]}`;
+}
+
+export type MasterRead = {
+  arms: { armId: string; label: string; lessons: Omit<Lesson, "armId">[]; problems: GridProblem[] }[];
+  /** Class names in the sheet that aren't in this timetable. */
+  skipped: string[];
+};
+
+/**
+ * A sheet with "DAYS | Time/Class | 8:00–8:40am | …" across the top, then for each day a row per
+ * class (the day written once, or on every row). Columns are matched to the bell schedule by start
+ * time, so break columns are ignored. Null when the sheet isn't laid out like this.
+ */
+export function readMasterGrid(rows: string[][], periods: Period[], subjects: { id: string; name: string; code: string }[], arms: { id: string; label: string }[]): MasterRead | null {
+  const clean = rows.map((r) => r.map((c) => String(c ?? "").trim()));
+  const head = clean.findIndex((r) => r.some((c) => norm(c) === "timeclass"));
+  if (head < 0) return null;
+  const classCol = clean[head]!.findIndex((c) => norm(c) === "timeclass");
+  const columns = new Map<number, Period>();
+  clean[head]!.forEach((text, i) => {
+    if (i <= classCol) return;
+    const start = headingStart(text);
+    const period = start ? periods.find((p) => p.kind === "lesson" && p.start === start) : undefined;
+    if (period) columns.set(i, period);
+  });
+  if (!columns.size) return null;
+  const byKey = new Map(arms.map((a) => [norm(a.label), a]));
+  const found = new Map<string, MasterRead["arms"][number]>();
+  const skipped = new Set<string>();
+  let day: Day | null = null;
+  for (const row of clean.slice(head + 1)) {
+    const named = DAY_WORDS[norm(row[0] ?? "")];
+    if (named) day = named;
+    const label = row[classCol] ?? "";
+    if (!label || !day) continue;
+    const arm = byKey.get(norm(label));
+    if (!arm) {
+      skipped.add(label);
+      continue;
+    }
+    const entry = found.get(arm.id) ?? found.set(arm.id, { armId: arm.id, label: arm.label, lessons: [], problems: [] }).get(arm.id)!;
+    for (const [col, period] of columns) {
+      const text = row[col] ?? "";
+      if (!text) continue;
+      const subjectId = matchSubject(text, subjects);
+      if (subjectId) entry.lessons.push({ day, periodId: period.id, subjectId });
+      else entry.problems.push({ day, periodId: period.id, text, message: `${text} isn’t one of your subjects` });
+    }
+  }
+  return { arms: [...found.values()].filter((a) => a.lessons.length || a.problems.length), skipped: [...skipped] };
+}

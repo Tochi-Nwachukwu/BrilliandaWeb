@@ -1,7 +1,7 @@
 "use client";
 
 import type { Section } from "@brillianda/core/classes";
-import { DAY_NAME, groupFor, groupName, groupsSchema, periodsSchema, readTimetableGrid, SECTION_SHORT, SECTIONS, shortTime, type Day, type Period } from "@brillianda/core/timetable";
+import { DAY_NAME, groupFor, groupName, groupsSchema, periodsSchema, readMasterGrid, readTimetableGrid, SECTION_SHORT, SECTIONS, shortTime, type Day, type Period } from "@brillianda/core/timetable";
 import { Alert } from "@brillianda/ui/Alert";
 import { Button } from "@brillianda/ui/Button";
 import { Card } from "@brillianda/ui/Cards";
@@ -14,7 +14,7 @@ import { useRef, useState, useTransition } from "react";
 import { FormError } from "@/components/auth/FormError";
 import { WeekGrid } from "@/components/timetable/WeekGrid";
 import type { ActionResult, TimetableGroup, TimetablePage } from "@/data/types";
-import { downloadTimetableTemplate, readTimetableFile, sheetName } from "@/lib/timetable/files";
+import { downloadMasterTemplate, downloadTimetableTemplate, readTimetableFile, sheetName } from "@/lib/timetable/files";
 import { timeAgo } from "@/lib/time";
 
 type Actions = {
@@ -38,7 +38,7 @@ const pill = (active: boolean) =>
  * classes and document, and a "Split by class" screen to choose which classes share one.
  */
 export function TimetableEditor({ page, schoolName, today, now, actions }: { page: TimetablePage; schoolName: string; today: Day | null; now: number; actions: Actions }) {
-  const [tab, setTab] = useState<"classes" | "bells" | "split">("classes");
+  const [tab, setTab] = useState<"classes" | "bells" | "split">("bells");
   const [groupId, setGroupId] = useState(page.groups[0]!.id);
   const group = page.groups.find((g) => g.id === groupId) ?? page.groups[0]!;
   const arms = page.arms.filter((a) => groupFor(page.groups, a.section).id === group.id);
@@ -49,7 +49,7 @@ export function TimetableEditor({ page, schoolName, today, now, actions }: { pag
   const periodLabel = (id: string) => page.groups.flatMap((g) => g.periods).find((p) => p.id === id)?.label ?? "";
   // The class sections this school has, in order. Splitting only makes sense with two or more.
   const sections = SECTIONS.filter((s) => page.arms.some((a) => a.section === s));
-  const canSplit = page.canSplit && page.me.canEdit && sections.length > 1;
+  const showSplit = page.me.canEdit && (!page.canSplit || sections.length > 1);
   const several = page.groups.length > 1;
 
   const pickGroup = (id: string) => {
@@ -59,6 +59,16 @@ export function TimetableEditor({ page, schoolName, today, now, actions }: { pag
     if (tab === "split") setTab("classes");
   };
 
+  const lessonsOf = (armId: string) => {
+    const names = new Map(page.subjects.map((s) => [s.id, s.name]));
+    return new Map(page.lessons.filter((l) => l.armId === armId).map((l) => [`${l.day}|${l.periodId}`, names.get(l.subjectId) ?? ""]));
+  };
+  const fullTemplate = () =>
+    downloadMasterTemplate(
+      several ? `${schoolName}: ${group.name}` : schoolName,
+      group.periods,
+      arms.map((a) => ({ id: a.id, label: a.label, subjects: page.subjects.filter((s) => s.levelIds.includes(a.levelId)).map((s) => s.name), lessons: lessonsOf(a.id) })),
+    );
   const template = () =>
     downloadTimetableTemplate(
       several ? `${schoolName}: ${group.name}` : schoolName,
@@ -93,7 +103,7 @@ export function TimetableEditor({ page, schoolName, today, now, actions }: { pag
           <button type="button" role="tab" aria-selected={tab === "bells"} onClick={() => setTab("bells")} className={pill(tab === "bells")}>
             Bell schedule
           </button>
-          {canSplit && (
+          {showSplit && (
             <button type="button" role="tab" aria-selected={tab === "split"} onClick={() => setTab("split")} className={pill(tab === "split")}>
               Split by class
             </button>
@@ -101,8 +111,11 @@ export function TimetableEditor({ page, schoolName, today, now, actions }: { pag
         </div>
         {tab !== "split" && (
           <div className="flex flex-wrap gap-2">
-            <Button variant="secondary" onClick={template}>
+            <Button variant="secondary" onClick={fullTemplate}>
               Download the template
+            </Button>
+            <Button variant="ghost" onClick={template}>
+              One sheet per class
             </Button>
             <Button onClick={() => setUploading(true)}>Upload a timetable</Button>
           </div>
@@ -124,7 +137,11 @@ export function TimetableEditor({ page, schoolName, today, now, actions }: { pag
 
       {group.file && tab !== "split" && <DocumentCard file={group.file} now={now} remove={() => actions.removePdf(group.id)} />}
 
-      {tab === "split" ? (
+      {tab === "split" && !page.canSplit ? (
+        <Card title="Split the timetable by class" description="Give Primary, JSS and SSS their own bell schedules and documents.">
+          <p className="text-sm text-text-secondary">This isn’t switched on for your school yet: we’ve asked for it. Until then your school has one timetable.</p>
+        </Card>
+      ) : tab === "split" ? (
         <SplitTimetable
           key={page.groups.map((g) => `${g.id}:${g.sections.join("")}`).join("|")}
           page={page}
@@ -354,8 +371,11 @@ function UploadDialog({ page, group, arms, armId, onClose, importFile, uploadPdf
   const [pending, startTransition] = useTransition();
 
   const byKey = new Map(arms.map((a) => [key(sheetName(a.label)), a]));
+  const master = sheets ? (sheets.map((s) => readMasterGrid(s.rows, group.periods, page.subjects, arms)).find((m) => m && m.arms.length > 0) ?? null) : null;
   const previews: Preview[] = [];
-  if (sheets) {
+  if (master) {
+    for (const a of master.arms) previews.push({ armId: a.armId, label: a.label, lessons: a.lessons, problems: a.problems.map((p) => `${DAY_NAME[p.day]}, ${group.periods.find((x) => x.id === p.periodId)?.label}: ${p.message}`) });
+  } else if (sheets) {
     const matched = sheets.filter((s) => byKey.has(key(s.name)));
     // Sheets named after classes go to those classes; otherwise the first table is for the class chosen here.
     const targets = matched.length ? matched.map((s) => ({ sheet: s, arm: byKey.get(key(s.name))! })) : forArm ? [{ sheet: sheets[0]!, arm: arms.find((a) => a.id === forArm)! }] : [];
@@ -368,7 +388,7 @@ function UploadDialog({ page, group, arms, armId, onClose, importFile, uploadPdf
       );
     }
   }
-  const matchedSheets = sheets ? sheets.some((s) => byKey.has(key(s.name))) : false;
+  const matchedSheets = master ? true : sheets ? sheets.some((s) => byKey.has(key(s.name))) : false;
   const usable = previews.filter((p) => p.lessons.length > 0);
 
   const pick = async (file: File | undefined) => {
@@ -406,7 +426,7 @@ function UploadDialog({ page, group, arms, armId, onClose, importFile, uploadPdf
       open
       onClose={onClose}
       title="Upload a timetable"
-      description={`Excel, CSV or Word: days down the side, periods across the top (the template is ready-made). A PDF is kept as a document staff can open${page.groups.length > 1 ? ` for ${group.name}` : ""}.`}
+      description={`Excel, CSV or Word: one sheet for the whole school, or one sheet per class (the templates are ready-made). A PDF is kept as a document staff can open${page.groups.length > 1 ? ` for ${group.name}` : ""}.`}
       footer={
         <Button className="w-full" loading={pending} disabled={!pdf && usable.length === 0} onClick={confirm}>
           {pdf ? "Save the document" : usable.length > 1 ? `Replace ${usable.length} classes’ timetables` : "Replace this class’s timetable"}
@@ -446,6 +466,7 @@ function UploadDialog({ page, group, arms, armId, onClose, importFile, uploadPdf
             ))}
           </ul>
         )}
+        {master && master.skipped.length > 0 && <p className="text-sm text-text-secondary">Left out, because they aren’t in this timetable: {master.skipped.slice(0, 8).join(", ")}{master.skipped.length > 8 ? ` and ${master.skipped.length - 8} more` : ""}.</p>}
         <FormError message={failure} />
         <p className="text-[12.5px] text-text-secondary">
           Times in the file must match the bell schedule{page.groups.length > 1 ? ` for ${group.name}` : ""} ({group.periods.filter((p) => p.kind === "lesson").length} lessons from {shortTime(group.periods[0]?.start ?? "08:00")}).
