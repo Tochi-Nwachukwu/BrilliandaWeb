@@ -1,7 +1,7 @@
 "use client";
 
 import type { Section } from "@brillianda/core/classes";
-import { DAY_NAME, groupFor, groupName, groupsSchema, periodsSchema, readMasterGrid, readTimetableGrid, SECTION_SHORT, SECTIONS, shortTime, type Day, type Period } from "@brillianda/core/timetable";
+import { DAY_NAME, DEFAULT_PERIODS, groupFor, groupName, groupsSchema, periodsSchema, readMasterGrid, readTimetableGrid, SECTION_SHORT, SECTIONS, shortTime, type Day, type Period } from "@brillianda/core/timetable";
 import { Alert } from "@brillianda/ui/Alert";
 import { Button } from "@brillianda/ui/Button";
 import { Card } from "@brillianda/ui/Cards";
@@ -63,8 +63,13 @@ export function TimetableEditor({ page, schoolName, today, now, actions }: { pag
     const names = new Map(page.subjects.map((s) => [s.id, s.name]));
     return new Map(page.lessons.filter((l) => l.armId === armId).map((l) => [`${l.day}|${l.periodId}`, names.get(l.subjectId) ?? ""]));
   };
+  const noBells = group.periods.length === 0;
+  const needBells = () => {
+    setTab("bells");
+    toast("Save the bell schedule first: the template and uploads use its periods.");
+  };
   const fullTemplate = () =>
-    downloadMasterTemplate(
+    noBells ? needBells() : downloadMasterTemplate(
       several ? `${schoolName}: ${group.name}` : schoolName,
       group.periods,
       arms.map((a) => ({ id: a.id, label: a.label, subjects: page.subjects.filter((s) => s.levelIds.includes(a.levelId)).map((s) => s.name), lessons: lessonsOf(a.id) })),
@@ -99,7 +104,7 @@ export function TimetableEditor({ page, schoolName, today, now, actions }: { pag
             <Button variant="secondary" onClick={fullTemplate}>
               Download the template
             </Button>
-            <Button onClick={() => setUploading(true)}>Upload a timetable</Button>
+            <Button onClick={() => (noBells ? needBells() : setUploading(true))}>Upload a timetable</Button>
           </div>
         )}
       </div>
@@ -240,7 +245,9 @@ function ClassWeek({ page, periods, armId, label, today, setLesson }: { page: Ti
 
 function BellSchedule({ periods: initial, groupId, groupName: forGroup, save }: { periods: Period[]; groupId: string; groupName: string | null; save: Actions["saveBells"] }) {
   const router = useRouter();
-  const [periods, setPeriods] = useState(initial);
+  // Nothing saved yet: start from a typical Nigerian school day to edit. It counts once saved.
+  const unsaved = initial.length === 0;
+  const [periods, setPeriods] = useState(unsaved ? DEFAULT_PERIODS : initial);
   const [errors, setErrors] = useState<Record<string, string[]>>({});
   const [failure, setFailure] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
@@ -279,7 +286,8 @@ function BellSchedule({ periods: initial, groupId, groupName: forGroup, save }: 
 
   return (
     <Card title={forGroup ? `Bell schedule: ${forGroup}` : "Bell schedule"} description={forGroup ? `The same periods for every class in ${forGroup}, Monday to Friday. Breaks have no lessons.` : "The same periods for every class, Monday to Friday. Breaks have no lessons."}>
-      <ol className="grid gap-3">
+      {unsaved && <Alert tone="info">You haven’t saved a bell schedule yet. This is a typical day to start from: change the times to match your school, then save. Uploads and the template need it.</Alert>}
+      <ol className="mt-3 grid gap-3">
         {periods.map((p, i) => (
           <li key={p.id} className="grid grid-cols-2 gap-2 rounded-2xl bg-sunken p-3 sm:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)_auto] sm:items-end">
             <TextField label="Name" value={p.label} onChange={(e) => set(i, { label: e.target.value })} error={errors[`${i}.label`]?.[0]} className="col-span-2 sm:col-span-1" />
