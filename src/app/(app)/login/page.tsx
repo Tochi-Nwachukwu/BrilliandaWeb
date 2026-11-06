@@ -9,17 +9,18 @@ import { SchoolMark } from "@/components/school/SchoolBrand";
 import { findMySchool } from "@/data/actions/auth";
 import { getMySchools } from "@/data/auth";
 import { ROOT_DOMAIN as ROOT } from "@/lib/domain";
-import { GoToSchool } from "./GoToSchool";
+import { MainSignIn } from "./MainSignIn";
 
-export const metadata: Metadata = { title: "Sign in to your school" };
+export const metadata: Metadata = { title: "Sign in" };
 
-// brillianda.com/login (plan: "Signing in later"). Everyone signs in at their school's own
-// address; this page gets them there.
+// brillianda.com/login (plan: "Signing in later"). Sign in with the school's address, email and
+// password (the form posts to the school's own address, where sessions live). Find your school is a
+// line underneath, for people who don't know the address.
 export default function FindMySchoolPage() {
   return (
     <AuthLayout
-      title="Sign in to your school"
-      description={`Each school signs in at its own address, like greenfield.${ROOT}.`}
+      title="Sign in"
+      description="Your school’s address, then the email and password your school added you with."
       footer={
         <>
           New to Brillianda?{" "}
@@ -32,16 +33,24 @@ export default function FindMySchoolPage() {
       <Suspense>
         <YourSchools />
       </Suspense>
-      <GoToSchool root={ROOT} />
-      <EmailRequestForm
-        action={findMySchool}
-        submitLabel="Email me my schools"
-        pendingLabel="Sending…"
-        sent={
-          <>
-            <p className="font-medium text-text-primary">If that email has a school, we’ve sent it a link to each one.</p>
-            <p>No email within a few minutes (spam folder included) means there’s no school under that address. Try the email your school has for you, or ask your school.</p>
-          </>
+      <MainSignIn
+        root={ROOT}
+        findSchool={
+          <div className="grid gap-3">
+            <p className="font-medium text-text-primary">Find your school</p>
+            <p>We’ll email a link to each school that uses your email.</p>
+            <EmailRequestForm
+              action={findMySchool}
+              submitLabel="Email me my schools"
+              pendingLabel="Sending…"
+              sent={
+                <>
+                  <p className="font-medium text-text-primary">If that email has a school, we’ve sent it a link to each one.</p>
+                  <p>No email within a few minutes (spam folder included) means there’s no school under that address. Try the email your school has for you, or ask your school.</p>
+                </>
+              }
+            />
+          </div>
         }
       />
     </AuthLayout>

@@ -17,8 +17,13 @@ export function SignInForm({
   school,
   action,
   samples,
+  initialEmail = "",
+  initialError = null,
 }: {
   school: string;
+  /** From a failed sign-in on the main site. */
+  initialEmail?: string;
+  initialError?: string | null;
   action: (input: unknown) => Promise<ActionResult<null>>;
   /** FAKE ONLY: one-tap sample accounts. */
   samples: { label: string; email: string; password: string }[] | null;
@@ -26,9 +31,9 @@ export function SignInForm({
   const sb = useSchoolBase(school);
   const router = useRouter();
   const formRef = useRef<HTMLFormElement>(null);
-  const [values, setValues] = useState({ email: "", password: "" });
+  const [values, setValues] = useState({ email: initialEmail, password: "" });
   const [errors, setErrors] = useState<Errors>({});
-  const [failure, setFailure] = useState<string | null>(null);
+  const [failure, setFailure] = useState<string | null>(initialError);
   const [attempt, setAttempt] = useState(0);
   const [pending, startTransition] = useTransition();
   useFocusOnFailure(formRef, attempt);

@@ -15,16 +15,18 @@ import { schoolBase } from "@/lib/schoolBase";
 
 export const metadata: Metadata = { title: "Sign in" };
 
-export default function SchoolSignInPage({ params }: PageProps<"/s/[school]/login">) {
+export default function SchoolSignInPage({ params, searchParams }: PageProps<"/s/[school]/login">) {
   return (
     <Suspense fallback={<PageSpinner fullScreen />}>
-      <SignIn params={params} />
+      <SignIn params={params} searchParams={searchParams} />
     </Suspense>
   );
 }
 
-async function SignIn({ params }: { params: Promise<{ school: string }> }) {
+async function SignIn({ params, searchParams }: { params: Promise<{ school: string }>; searchParams: Promise<Record<string, string | string[] | undefined>> }) {
   const { school: subdomain } = await params;
+  const query = await searchParams;
+  const one = (v: string | string[] | undefined) => (Array.isArray(v) ? v[0] : v) ?? "";
   // All at once: each is a round trip to the backend.
   const [school, sb, me] = await Promise.all([schoolFromParams(params), schoolBase(subdomain), getCurrentMember(subdomain)]);
   // Already signed in: say as whom, rather than quietly sending them on. Someone sharing a phone
@@ -62,7 +64,7 @@ async function SignIn({ params }: { params: Promise<{ school: string }> }) {
         </>
       }
     >
-      <SignInForm school={school.subdomain} action={signIn.bind(null, school.subdomain)} samples={await getSampleAccounts(school.subdomain)} />
+      <SignInForm school={school.subdomain} initialEmail={one(query.email).slice(0, 254)} initialError={one(query.error).slice(0, 200) || null} action={signIn.bind(null, school.subdomain)} samples={await getSampleAccounts(school.subdomain)} />
     </AuthLayout>
   );
 }
