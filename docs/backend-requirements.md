@@ -1,6 +1,6 @@
 # What the front end needs from the backend
 
-From the Brillianda front-end team. Updated 30 October 2026: only what is still open.
+From the Brillianda front-end team. Updated 21 November 2026: only what is still open.
 
 This is the complete list, in one place. Each item says what the problem is, what we need, the
 rules that matter, and how we'll know it's done. It is written from the screens' side only: we
@@ -20,76 +20,7 @@ differently, here is why", or "not yet".
 
 ## A. Open requests
 
-### A1. The team account's name
-
-**Problem.** Schools' change history shows "Full Name Here (Brillianda) viewed the school's summary
-from the Brillianda team console": the team account was made with the example name from
-`team:add`.
-
-**What we need.** Give that account a real name, or a role name such as "Brillianda Support".
-
-**Done when.** New lines in a school's history show that name.
-
-### A2. AI generating, once the provider is chosen
-
-**Problem.** Generate is switched off (`AI_PROVIDER=off`), so the question bank hides it.
-
-**What we need.** When Tochi settles the provider (`docs/ai-integration.md`, Step 0), switch it on
-for staging so we can test it with made-up topics.
-
-**Done when.** `GET /v1/questions` returns `aiEnabled: true` and a Generate request returns drafts.
-
-### A3. Lesson notes: a bigger notes box, and reading photos and PDFs
-
-**Problem.** Teachers want to generate questions from their own lesson notes: pasted, from a Word or
-text file, or from photos of a notebook or a PDF. The screens are built (30 October, `NotesInput`).
-
-**What we need.**
-
-- `POST /v1/questions/generate`: `notes` up to **20,000 characters** (it is 500 today). When notes
-  are given, every question must be answerable from them; say so in the prompt.
-- **New:** `POST /v1/questions/notes` `{ files: [{ name, dataUrl }] }` → `{ text }`. One to five
-  files: a photo (JPEG, PNG or WebP data URL) or a PDF (up to 2 MB), 3.8 million characters in all
-  (a Vercel request is capped at 4.5 MB). Read them with the model and return a plain transcription
-  of the text, not a summary. The teacher corrects the text before generating. Our schema:
-  `readNotesSchema` in `packages/core/src/questions.ts`.
-- **Keep nothing:** no stored files, no logged contents. Teachers and admins only. It doesn't use
-  up one of the school's monthly generations; rate-limit it (say 10 a minute per person). Allow up
-  to 60 seconds. Same `ai_*` problem codes as generating.
-
-**Done when.** A photo of handwritten or printed notes comes back as text, and generating from
-pasted notes of 5,000 characters works.
-
-### A4. Timetable groups: split the timetable by class
-
-**Problem.** Primary, JSS and SSS often run different days (their own start time, breaks and
-periods). Today the API has one bell schedule and one document for the whole school. The screens
-are built (30 October): an admin chooses which class sections each timetable covers (Primary alone;
-JSS and SSS together; or each on its own). Until the API has this, the screens show one timetable
-and hide "Split by class".
-
-**What we need.**
-
-- `GET /v1/timetable`: `periods` and `file` move into `groups: [{ id, name, sections, periods, file }]`
-  (at least one). `sections` are `preschool`, `primary`, `junior`, `senior` (a class level's
-  `section`). Each `arms[]` entry also gets its `section`. A school that never split has one group
-  covering every section.
-- `PUT /v1/timetable/groups` `{ groups: [{ id?, name, sections }] }` → `{ removed }`. One to four
-  timetables; every section the school has is in exactly one; names are unique, 1 to 40 characters
-  (`groupsSchema`: 422 with a pointer, e.g. `#/groups/1/sections`). A new timetable starts as a copy
-  of the first one's periods. Lessons whose period isn't a lesson period of their class's new
-  timetable are removed and counted. A removed timetable's document is deleted. Goes in the change
-  history ("Split the timetable: Primary, JSS and SSS").
-- `PUT /v1/timetable/groups/{id}/periods` `{ periods }` → `{ removed }`: that timetable's bell
-  schedule (`PUT /v1/timetable/periods` can stay for the first one). Only that timetable's classes lose lessons.
-- `PUT` / `DELETE` / `GET /v1/timetable/groups/{id}/document`: one PDF per timetable.
-- `setLesson` and `PUT /v1/timetable/classes`: a period must belong to the class's own timetable.
-- **Clashes are by overlapping times, not period ids** (two timetables can both have "p1" at
-  different times): `clashes(lessons, teacherOf, timeOf)` in `packages/core/src/timetable.ts`.
-- `GET /v1/me/timetable` (student) and `GET /v1/me/lessons` use the class's own timetable's periods.
-
-**Done when.** A school splits Primary from JSS and SSS, gives Primary its own bell schedule, and a
-teacher in both sees a week for each.
+None right now (21 November 2026): A1 to A4 of the 30 October list are on staging.
 
 ---
 
@@ -178,11 +109,12 @@ Please tell us before changing any of these.
 - Book lists: `GET /v1/book-lists`, `PUT /v1/book-lists/{session}/{levelId}` and its `/shared`
 - Corrections: `POST /v1/me/children/{studentId}/corrections`, `GET /v1/corrections`,
   `GET /v1/corrections/count`, `POST /v1/corrections/{id}/resolve`
-- Timetable: `GET /v1/timetable`, `PUT /v1/timetable/periods`, `PUT /v1/timetable/{armId}/{day}/{periodId}`,
+- Timetable: `GET /v1/timetable`, `PUT /v1/timetable/groups`, `PUT /v1/timetable/groups/{id}/periods`,
+  `PUT`/`DELETE`/`GET /v1/timetable/groups/{id}/document`, `PUT /v1/timetable/periods`, `PUT /v1/timetable/{armId}/{day}/{periodId}`,
   `PUT /v1/timetable/classes`, `PUT`/`DELETE`/`GET /v1/timetable/document`, `GET /v1/me/lessons`
 - Student accounts and portal: `GET /v1/student-accounts`, `POST /v1/students/{id}/invite`,
   `DELETE /v1/students/{id}/access`, `GET /v1/me/student`, `GET /v1/me/timetable`, `GET /v1/me/report-card`
-- Question bank: `GET`/`POST /v1/questions`, `POST /v1/questions/generate`, `PUT`/`DELETE /v1/questions/{id}`
+- Question bank: `GET`/`POST /v1/questions`, `POST /v1/questions/generate`, `POST /v1/questions/notes`, `PUT`/`DELETE /v1/questions/{id}`
 - CBT: `GET`/`POST /v1/tests`, `GET /v1/tests/editor`, `PUT`/`DELETE /v1/tests/{id}`, `GET /v1/tests/{id}/results`,
   `PUT /v1/tests/{id}/attempts/{attemptId}/marks/{index}`, `POST /v1/tests/{id}/send-scores`, `GET /v1/me/tests`,
   `GET /v1/me/tests/{id}`, `POST …/start`, `PUT …/answers/{index}`, `POST …/left`, `POST …/submit`
