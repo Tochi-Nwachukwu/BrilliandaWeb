@@ -16,7 +16,11 @@ export async function getQuestionBank(subdomain: string): Promise<QuestionBankPa
 
 export async function generateQuestions(subdomain: string, req: GenerateRequest): Promise<ActionResult<{ questions: Question[]; usage: QuestionBankPage["usage"] }>> {
   const result = await api<{ questions: Question[]; usage: QuestionBankPage["usage"] }>(subdomain, "/v1/questions/generate", { method: "POST", body: req });
-  return result.ok ? { ok: true, data: result.data } : fail(result);
+  if (result.ok) return { ok: true, data: result.data };
+  // The API says "Generating didn't finish" for both of these; say what to try for each.
+  if (result.problem.code === "ai_unavailable") return { ok: false, error: "The AI didn’t answer in time. It may be busy, or your notes may be too long. Try again, with shorter notes or fewer questions." };
+  if (result.problem.code === "ai_invalid_output") return { ok: false, error: "The AI’s answer couldn’t be used. Try again, or ask for fewer questions at a time." };
+  return fail(result);
 }
 
 /** Photos and PDFs of lesson notes to text. The API reads them with the model and keeps nothing. */

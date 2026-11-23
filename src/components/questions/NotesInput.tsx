@@ -89,6 +89,7 @@ export function NotesInput({ value, onChange, readNotes }: { value: string; onCh
           {message}
         </p>
       )}
+      {value.length > 6000 && <p className="text-sm text-text-secondary">These are long notes. Generating takes longer, and can fail. Using one topic’s notes at a time gives better questions.</p>}
       <p className="text-[12.5px] text-text-secondary">Word (.docx) and text files are read on your device. Photos and PDFs are read by AI, then thrown away: we don’t keep them. Leave out student names.</p>
     </div>
   );
