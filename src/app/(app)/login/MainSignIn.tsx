@@ -30,7 +30,8 @@ export function MainSignIn({ root, findSchool }: { root: string; findSchool: Rea
     return ours ? `${protocol}//${name}.${base}${port ? `:${port}` : ""}` : `/s/${name}`;
   };
   const checkSchool = (): { ok: true; name: string } | { ok: false; problem: string } => {
-    const name = normaliseSubdomain(school);
+    // People paste or type the whole address (westworld.staging.brillianda.com): the school is the first part.
+    const name = normaliseSubdomain(school.trim().replace(/^[a-z]+:\/\//i, "").split(/[./:\s]/)[0] ?? "");
     const problem = name ? subdomainProblem(name) : { message: "Type your school’s address" };
     return problem || !name ? { ok: false, problem: problem?.message ?? "Type your school’s address" } : { ok: true, name };
   };
