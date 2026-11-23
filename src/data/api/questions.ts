@@ -29,6 +29,9 @@ export async function readNotes(subdomain: string, input: ReadNotesRequest): Pro
   if (result.ok) return { ok: true, data: result.data };
   // Until the API has it (docs/backend-requirements.md, A3), or while AI is switched off.
   if (result.status === 404 || result.status === 405 || result.problem.code === "ai_disabled") return { ok: false, error: "Reading photos and PDFs isn’t switched on yet. Type or paste your notes, or add a Word or text file." };
+  // The API says "Generating didn't finish" here too; say what happened to the photos.
+  if (result.problem.code === "ai_unavailable") return { ok: false, error: "The AI couldn’t read the photos just now. Try again with fewer or smaller photos, or type or paste your notes instead." };
+  if (result.problem.code === "ai_invalid_output") return { ok: false, error: "The AI’s reading of the photos couldn’t be used. Try again, or type or paste your notes instead." };
   return fail(result);
 }
 
