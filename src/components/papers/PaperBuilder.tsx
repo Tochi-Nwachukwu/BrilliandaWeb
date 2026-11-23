@@ -8,8 +8,8 @@ import { SelectField, TextAreaField, TextField } from "@brillianda/ui/TextField"
 import { useState } from "react";
 import type { QuestionBankPage } from "@/data/types";
 import { Paper } from "./Paper";
+import { PairPicker, pairKey } from "@/components/questions/PairPicker";
 
-const pairKey = (p: { subjectId: string; levelId: string }) => `${p.subjectId}|${p.levelId}`;
 
 /** Printing a question paper from the bank (batch 26): choose, preview, print or save as PDF. */
 export function PaperBuilder({ page, schoolName }: { page: QuestionBankPage; schoolName: string }) {
@@ -46,20 +46,14 @@ export function PaperBuilder({ page, schoolName }: { page: QuestionBankPage; sch
     <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)] lg:items-start">
       <Card title="The paper">
         <div className="grid gap-4">
-          <SelectField
-            label="Subject and class"
+          <PairPicker
+            pairs={page.pairs}
             value={pair}
-            onChange={(e) => {
-              setPair(e.target.value);
+            onChange={(key) => {
+              setPair(key);
               setChosen([]);
             }}
-          >
-            {page.pairs.map((p) => (
-              <option key={pairKey(p)} value={pairKey(p)}>
-                {p.levelName} {p.subjectName}
-              </option>
-            ))}
-          </SelectField>
+          />
           <TextField label="Title" value={title} onChange={(e) => setTitle(e.target.value)} />
           <TextField label="Time allowed" value={timeAllowed} onChange={(e) => setTimeAllowed(e.target.value)} />
           <TextAreaField label="Instructions" rows={2} value={instructions} onChange={(e) => setInstructions(e.target.value)} />

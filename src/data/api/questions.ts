@@ -1,13 +1,17 @@
 // The question bank, on the Brillianda API. Same functions and shapes as ../fake/questions.ts.
 import "server-only";
 import type { GenerateRequest, Question, ReadNotesRequest } from "@brillianda/core/questions";
-import type { ActionResult, QuestionBankPage } from "../types";
+import type { ActionResult, ClassStructure, QuestionBankPage } from "../types";
 import { api, fail, read } from "./client";
 
 const id = encodeURIComponent;
 
 export async function getQuestionBank(subdomain: string): Promise<QuestionBankPage | null> {
-  return read<QuestionBankPage>(subdomain, "/v1/questions");
+  const [page, classes] = await Promise.all([read<QuestionBankPage>(subdomain, "/v1/questions"), read<ClassStructure>(subdomain, "/v1/classes")]);
+  if (!page) return null;
+  // The bank doesn't say which section a class level is in (Primary, JSS, SSS); the class structure does.
+  const sectionOf = new Map((classes?.levels ?? []).map((l) => [l.id, l.section]));
+  return { ...page, pairs: page.pairs.map((p) => ({ ...p, section: sectionOf.get(p.levelId) })) };
 }
 
 export async function generateQuestions(subdomain: string, req: GenerateRequest): Promise<ActionResult<{ questions: Question[]; usage: QuestionBankPage["usage"] }>> {

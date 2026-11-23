@@ -41,9 +41,10 @@ export function pairsFor(subdomain: string, userId: string, admin: boolean) {
       subjectName: subjects.find((s) => s.id === p.subjectId)?.name ?? "",
       levelName: levels.find((l) => l.id === p.levelId)?.name ?? "",
       levelPosition: levels.find((l) => l.id === p.levelId)?.position ?? 0,
+      section: levels.find((l) => l.id === p.levelId)?.section,
     }))
     .sort((a, b) => a.levelPosition - b.levelPosition || a.subjectName.localeCompare(b.subjectName))
-    .map((p) => ({ subjectId: p.subjectId, subjectName: p.subjectName, levelId: p.levelId, levelName: p.levelName }));
+    .map((p) => ({ subjectId: p.subjectId, subjectName: p.subjectName, levelId: p.levelId, levelName: p.levelName, section: p.section }));
 }
 
 async function who(subdomain: string) {
@@ -66,6 +67,7 @@ export async function getQuestionBank(subdomain: string): Promise<QuestionBankPa
       .map((q) => ({ id: q.id, subjectId: q.subjectId, levelId: q.levelId, question: q.question, source: q.source, by: q.by, byMe: q.byId === me.user.id, at: q.at })),
     usage: usageOf(subdomain),
     canEditAll: me.admin,
+    aiSample: true,
   };
 }
 

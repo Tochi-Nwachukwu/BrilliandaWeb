@@ -596,10 +596,12 @@ export type BankQuestion = { id: string; subjectId: string; levelId: string; que
 /** The questions a person can see and write: a teacher's own subjects and classes; everything for admins. */
 export type QuestionBankPage = {
   /** Subject and class level pairs this person may write questions for. */
-  pairs: { subjectId: string; subjectName: string; levelId: string; levelName: string }[];
+  pairs: { subjectId: string; subjectName: string; levelId: string; levelName: string; section?: Section }[];
   questions: BankQuestion[];
   /** This month's AI generations: used, the school's allowance, and when it resets. */
   usage: { used: number; limit: number; resetsOn: string };
+  /** Sample data only: Generate gives sample questions, and the dialog says so. */
+  aiSample?: boolean;
   /** False while the school's AI is switched off: Generate is hidden. */
   aiEnabled?: boolean;
   canEditAll: boolean;

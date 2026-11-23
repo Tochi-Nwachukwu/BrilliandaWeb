@@ -16,6 +16,7 @@ import { useState, useTransition } from "react";
 import { FormError } from "@/components/auth/FormError";
 import type { ActionResult, BankQuestion, QuestionBankPage } from "@/data/types";
 import { NotesInput } from "./NotesInput";
+import { PairPicker, pairKey } from "./PairPicker";
 import { blankQuestion, errorsOf, QuestionCard, QuestionEditor } from "./QuestionParts";
 
 export type BankActions = {
@@ -27,7 +28,6 @@ export type BankActions = {
   remove: (id: string) => Promise<ActionResult<null>>;
 };
 
-const pairKey = (p: { subjectId: string; levelId: string }) => `${p.subjectId}|${p.levelId}`;
 
 /** The question bank (batch 24): filter, write, generate with AI, edit and delete. */
 export function QuestionBank({ page, actions }: { page: QuestionBankPage; actions: BankActions }) {
@@ -74,14 +74,7 @@ export function QuestionBank({ page, actions }: { page: QuestionBankPage; action
       </div>
 
       <div className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_12rem_minmax(0,1fr)]">
-        <SelectField label="Subject and class" value={pair} onChange={(e) => setPair(e.target.value)}>
-          <option value="">All of them</option>
-          {page.pairs.map((p) => (
-            <option key={pairKey(p)} value={pairKey(p)}>
-              {p.levelName} {p.subjectName}
-            </option>
-          ))}
-        </SelectField>
+        <PairPicker pairs={page.pairs} value={pair} onChange={setPair} allLabel="All of them" />
         <SelectField label="Type" value={type} onChange={(e) => setType(e.target.value)}>
           <option value="">Every type</option>
           {QUESTION_TYPES.map((t) => (
@@ -149,13 +142,7 @@ export function QuestionBank({ page, actions }: { page: QuestionBankPage; action
 
 function PairSelect({ page, value, onChange }: { page: QuestionBankPage; value: string; onChange: (v: string) => void }) {
   return (
-    <SelectField label="Subject and class" value={value} onChange={(e) => onChange(e.target.value)}>
-      {page.pairs.map((p) => (
-        <option key={pairKey(p)} value={pairKey(p)}>
-          {p.levelName} {p.subjectName}
-        </option>
-      ))}
-    </SelectField>
+    <PairPicker pairs={page.pairs} value={value} onChange={onChange} />
   );
 }
 
@@ -296,7 +283,7 @@ function GenerateDialog({ page, initialPair, actions, onClose }: { page: Questio
     >
       {step === "ask" && (
         <div className="grid gap-4">
-          <Alert tone="info">Sample questions for now: the real ones come from AI once the backend connects it.</Alert>
+          {page.aiSample && <Alert tone="info">Sample questions for now: the real ones come from AI once the backend connects it.</Alert>}
           <PairSelect page={page} value={pair} onChange={setPair} />
           <SelectField label="For" value={purpose} onChange={(e) => setPurpose(e.target.value as GenerateRequest["purpose"])}>
             <option value="test">A test</option>
