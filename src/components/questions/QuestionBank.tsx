@@ -30,13 +30,13 @@ export type BankActions = {
 
 
 /** The question bank (batch 24): filter, write, generate with AI, edit and delete. */
-export function QuestionBank({ page, actions }: { page: QuestionBankPage; actions: BankActions }) {
+export function QuestionBank({ page, actions, openGenerate }: { page: QuestionBankPage; actions: BankActions; /** Opens with the Generate dialog showing (the Tests page links here). */ openGenerate?: boolean }) {
   const router = useRouter();
   const pathname = usePathname();
   const [pair, setPair] = useState("");
   const [type, setType] = useState("");
   const [query, setQuery] = useState("");
-  const [dialog, setDialog] = useState<{ kind: "write" } | { kind: "generate" } | { kind: "edit"; item: BankQuestion } | null>(null);
+  const [dialog, setDialog] = useState<{ kind: "write" } | { kind: "generate" } | { kind: "edit"; item: BankQuestion } | null>(openGenerate && page.aiEnabled !== false && page.pairs.length ? { kind: "generate" } : null);
   const [pending, startTransition] = useTransition();
   const label = (p: { subjectId: string; levelId: string }) => {
     const found = page.pairs.find((x) => pairKey(x) === pairKey(p));

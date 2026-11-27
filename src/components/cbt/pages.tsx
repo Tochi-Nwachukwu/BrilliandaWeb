@@ -31,6 +31,8 @@ export async function TestsListPage({ school, base }: { school: string; base: st
   await connection();
   const tests = await getTests(school);
   if (!tests) return null;
+  // The question bank sits beside the tests, under the same base (…/tests, …/questions).
+  const generateHref = `${base.replace(/\/tests$/, "/questions")}?generate=1`;
   return (
     <div className="grid gap-4">
       <PageHeader
@@ -43,6 +45,15 @@ export async function TestsListPage({ school, base }: { school: string; base: st
       >
         Tests students take on Brillianda, from the question bank. Objective answers mark themselves; you mark theory and send the scores to the score sheet.
       </PageHeader>
+      <section aria-label="Questions for your tests" className="flex flex-wrap items-center justify-between gap-3 rounded-3xl bg-sunken p-4">
+        <p className="min-w-0 flex-1 text-sm">
+          <b className="block font-semibold">Need questions for a test or exam?</b>
+          <span className="text-text-secondary">Generate a set from your lesson notes or a topic, check it, and it’s saved in your question bank ready to use.</span>
+        </p>
+        <Link href={generateHref} className={buttonClass}>
+          Generate questions
+        </Link>
+      </section>
       {tests.length === 0 ? (
         <EmptyState title="No tests yet">Set one from your question bank: choose the class, the questions and when it’s open.</EmptyState>
       ) : (

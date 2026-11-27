@@ -7,8 +7,9 @@ import { getQuestionBank } from "@/data/questions";
 
 export const metadata: Metadata = { title: "Question bank" };
 
-export default async function SchoolQuestions({ params }: PageProps<"/s/[school]/more/questions">) {
+export default async function SchoolQuestions({ params, searchParams }: PageProps<"/s/[school]/more/questions">) {
   const { school } = await params;
+  const { generate } = await searchParams;
   await connection();
   const page = await getQuestionBank(school);
   if (!page) return null;
@@ -17,6 +18,7 @@ export default async function SchoolQuestions({ params }: PageProps<"/s/[school]
       <PageHeader title="Question bank">Every subject’s questions, for tests, assignments and exams, and the school’s AI use this month.</PageHeader>
       <QuestionBank
         page={page}
+        openGenerate={generate === "1"}
         actions={{
           generate: generateQuestions.bind(null, school),
           readNotes: readNotes.bind(null, school),
