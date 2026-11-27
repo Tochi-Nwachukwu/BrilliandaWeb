@@ -9,10 +9,10 @@ import { cx } from "@brillianda/ui/cx";
 import { Icon } from "@brillianda/ui/Icon";
 import { PageHeader } from "@brillianda/ui/PageHeader";
 import { Stepper } from "@brillianda/ui/Stepper";
-import { SelectField } from "@brillianda/ui/TextField";
 import { toast } from "@brillianda/ui/Toast";
 import { useRouter } from "next/navigation";
 import { useState, useTransition, type KeyboardEvent } from "react";
+import { ClassSelect } from "@/components/ClassSelect";
 import { FormError } from "@/components/auth/FormError";
 import { errorsFor } from "@/lib/formCheck";
 import { firstErrors, type Errors } from "@/lib/form";
@@ -160,36 +160,24 @@ export function QuickSetup({ levelsOffered, setup }: { levelsOffered: SchoolLeve
                 </div>
               </div>
               <div className="grid gap-4 sm:grid-cols-2">
-                <SelectField
+                <ClassSelect
                   label="Our first class"
+                  items={options.map((o) => ({ id: o.key!, label: o.name, section: o.section }))}
                   value={first}
-                  onChange={(e) => {
-                    const key = e.target.value as LadderKey;
-                    setFirst(key);
-                    rebuild(key, last, scheme);
+                  onChange={(key) => {
+                    setFirst(key as LadderKey);
+                    rebuild(key as LadderKey, last, scheme);
                   }}
-                >
-                  {options.map((o) => (
-                    <option key={o.key} value={o.key!}>
-                      {o.name}
-                    </option>
-                  ))}
-                </SelectField>
-                <SelectField
+                />
+                <ClassSelect
                   label="Our last class"
+                  items={options.map((o) => ({ id: o.key!, label: o.name, section: o.section }))}
                   value={last}
-                  onChange={(e) => {
-                    const key = e.target.value as LadderKey;
-                    setLast(key);
-                    rebuild(first, key, scheme);
+                  onChange={(key) => {
+                    setLast(key as LadderKey);
+                    rebuild(first, key as LadderKey, scheme);
                   }}
-                >
-                  {options.map((o) => (
-                    <option key={o.key} value={o.key!}>
-                      {o.name}
-                    </option>
-                  ))}
-                </SelectField>
+                />
               </div>
 
               <ol className="grid gap-1.5" aria-label="Classes">

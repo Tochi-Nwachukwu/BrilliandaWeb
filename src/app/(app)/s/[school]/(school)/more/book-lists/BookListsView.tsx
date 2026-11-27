@@ -12,6 +12,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import { FormError } from "@/components/auth/FormError";
+import { ClassSelect } from "@/components/ClassSelect";
 import type { ActionResult, BookList, BookListsPage } from "@/data/types";
 import { firstErrors, type Errors } from "@/lib/form";
 
@@ -157,11 +158,12 @@ function ListEditor({
 
       {items.length === 0 && others.length > 0 && (
         <div className="mt-4 max-w-sm">
-          <SelectField
+          <ClassSelect
             label="Start from another class’s list"
+            items={others.map((o) => ({ id: o.levelId, label: `${o.levelName} (${o.items.length} items)` }))}
             value=""
-            onChange={(e) => {
-              const from = others.find((o) => o.levelId === e.target.value);
+            onChange={(levelId) => {
+              const from = others.find((o) => o.levelId === levelId);
               // Copies get their own ids when saved.
               if (from)
                 store(
@@ -169,14 +171,7 @@ function ListEditor({
                   `Copied ${from.levelName}’s list`,
                 );
             }}
-          >
-            <option value="">Choose a class</option>
-            {others.map((o) => (
-              <option key={o.levelId} value={o.levelId}>
-                {o.levelName} ({o.items.length} items)
-              </option>
-            ))}
-          </SelectField>
+          />
         </div>
       )}
 

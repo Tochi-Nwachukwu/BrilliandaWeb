@@ -3,7 +3,7 @@
 import { groupFor, type Day } from "@brillianda/core/timetable";
 import { cx } from "@brillianda/ui/cx";
 import { EmptyState } from "@brillianda/ui/EmptyState";
-import { SelectField } from "@brillianda/ui/TextField";
+import { ClassSelect } from "@/components/ClassSelect";
 import { useState } from "react";
 import { WeekGrid } from "@/components/timetable/WeekGrid";
 import type { TimetablePage } from "@/data/types";
@@ -96,14 +96,7 @@ export function TeacherTimetable({ page, today }: { page: TimetablePage; today: 
         )
       ) : (
         <>
-          <SelectField label="Class" value={armId} onChange={(e) => setArmId(e.target.value)} className="max-w-xs">
-            {page.arms.map((a) => (
-              <option key={a.id} value={a.id}>
-                {a.label}
-                {myArms.includes(a.id) ? " (you teach here)" : ""}
-              </option>
-            ))}
-          </SelectField>
+          <ClassSelect label="Class" items={page.arms.map((a) => ({ id: a.id, label: a.label + (myArms.includes(a.id) ? " (you teach here)" : ""), section: a.section }))} value={armId} onChange={setArmId} className="max-w-xs" />
           <WeekGrid
             label={`${label(armId)} timetable`}
             periods={groupOf(armId).periods}

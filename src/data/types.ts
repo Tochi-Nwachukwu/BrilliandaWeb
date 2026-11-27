@@ -121,7 +121,7 @@ export type SubjectLink = { subjectId: string; levelId: string; kind: LinkKind; 
 export type SubjectsSetup = { subjects: Subject[]; links: SubjectLink[]; levels: ClassLevel[]; catalogue: CatalogueEntry[]; bands: Band[] };
 
 /** A class a student can sit in, labelled for pickers and lists ("JSS 1 Gold"). */
-export type ArmOption = { id: string; label: string; chip: string; levelId: string; levelName: string; levelPosition: number };
+export type ArmOption = { id: string; label: string; chip: string; levelId: string; levelName: string; levelPosition: number; section?: Section };
 
 /** A student as the list needs them. */
 export type StudentRow = {

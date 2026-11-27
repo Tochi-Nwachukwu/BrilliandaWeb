@@ -458,6 +458,7 @@ like staff, after an invitation; they land on `/s/<school>/learn`. Every other a
 |---|---|---|---|---|
 | `getStudentAccounts` | read | → `StudentAccountsPage`: active students with class and portal access (`none`, `invited`, `active`, and the email) | owner, admin | fake |
 | `inviteStudent` | action | `studentId, { email }` → sample email; the invite carries role `student` and the `studentId`; refused if that email is already someone's at this school | owner, admin | fake |
+| `inviteNewStudent` | action (src/data/actions/invites.ts, no new endpoint) | `studentId, { studentEmail?, guardian? }` → `{ student, guardian }`, each `"none"`, `"sent"` or a reason. Runs `inviteStudent` and the guardian's `inviteParent` right after Add student saves | owner, admin | both |
 | `removeStudentAccess` | action | `studentId` → ends access or cancels the invite; the record stays | owner, admin | fake |
 | `getStudentHome` | read | → `StudentHome`: class, admission number, form teacher, birthday message, today's lessons, attendance and the last ten days, this term's results once published, earlier published terms, book lists | the student | fake |
 | `getStudentTimetable` | read | → `ClassTimetable`: the class's periods and lessons with teachers | the student | fake |

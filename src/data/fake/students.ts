@@ -26,7 +26,7 @@ export function armOptions(subdomain: string): ArmOption[] {
         .sort((a, b) => (names.get(a.armNameId)?.position ?? 0) - (names.get(b.armNameId)?.position ?? 0));
       return arms.map((arm) => {
         const name = names.get(arm.armNameId);
-        return { id: arm.id, label: armLabel(level.name, name?.name ?? "", arms.length), chip: armChip(level.short, name?.code ?? "", arms.length), levelId: level.id, levelName: level.name, levelPosition: level.position };
+        return { id: arm.id, label: armLabel(level.name, name?.name ?? "", arms.length), chip: armChip(level.short, name?.code ?? "", arms.length), levelId: level.id, levelName: level.name, levelPosition: level.position, section: level.section };
       });
     });
 }

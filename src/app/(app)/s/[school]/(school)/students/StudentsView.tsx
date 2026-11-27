@@ -21,6 +21,7 @@ import { useMemo, useState, useTransition } from "react";
 import { initials } from "@/lib/initials";
 import type { ActionResult, ArmOption, StudentRow, StudentsList } from "@/data/types";
 import { useSchoolBase } from "@/components/school/SchoolBase";
+import { ClassSelect } from "@/components/ClassSelect";
 
 export const STATUS_TONE: Record<StudentStatus, Tone> = { active: "success", suspended: "warning", withdrawn: "neutral", transferred: "info", graduated: "info" };
 
@@ -179,32 +180,18 @@ export function StudentsView({ school, list, actions }: { school: string; list: 
             setStatus("active");
           }}
         >
-          <SelectField
+          <ClassSelect
             label="Class"
+            allLabel="Every class"
+            items={levels.map(([id, name]) => ({ id, label: name, section: list.arms.find((a) => a.levelId === id)?.section }))}
             value={levelId}
-            onChange={(e) => {
-              setLevelId(e.target.value);
+            onChange={(id) => {
+              setLevelId(id);
               setArmId("");
             }}
-            className="md:w-40"
-          >
-            <option value="">Every class</option>
-            {levels.map(([id, name]) => (
-              <option key={id} value={id}>
-                {name}
-              </option>
-            ))}
-          </SelectField>
-          <SelectField label="Arm" value={armId} onChange={(e) => setArmId(e.target.value)} className="md:w-44">
-            <option value="">Every arm</option>
-            {list.arms
-              .filter((a) => !levelId || a.levelId === levelId)
-              .map((a) => (
-                <option key={a.id} value={a.id}>
-                  {a.label}
-                </option>
-              ))}
-          </SelectField>
+            className="md:w-44"
+          />
+          <ClassSelect label="Arm" allLabel="Every arm" items={list.arms.filter((a) => !levelId || a.levelId === levelId)} value={armId} onChange={setArmId} className="md:w-48" />
           <SelectField label="Gender" value={gender} onChange={(e) => setGender(e.target.value)} className="md:w-32">
             <option value="">Any</option>
             <option value="FEMALE">Female</option>
@@ -339,10 +326,7 @@ function MoveDialog({
         </>
       }
     >
-      <SelectField label="Move to" value={target} onChange={(e) => setTarget(e.target.value)}>
-        <option value="">Choose a class</option>
-        <ArmOptions arms={arms} />
-      </SelectField>
+      <ClassSelect label="Move to" items={arms} value={target} onChange={setTarget} />
     </ResponsiveDialog>
   );
 }

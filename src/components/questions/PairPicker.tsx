@@ -5,6 +5,7 @@ import { SECTION_SHORT, SECTIONS } from "@brillianda/core/timetable";
 import { cx } from "@brillianda/ui/cx";
 import { Icon } from "@brillianda/ui/Icon";
 import { useEffect, useId, useRef, useState } from "react";
+import { sectionOfName } from "@/components/ClassSelect";
 
 export type Pair = { subjectId: string; subjectName: string; levelId: string; levelName: string; section?: Section };
 export const pairKey = (p: { subjectId: string; levelId: string }) => `${p.subjectId}|${p.levelId}`;
@@ -14,8 +15,9 @@ export const pairKey = (p: { subjectId: string; levelId: string }) => `${p.subje
  * (Nursery, Primary, JSS, SSS) with a chip for each; a teacher sees only what they teach, usually one
  * section, and gets just the search.
  */
-export function PairPicker({ pairs, value, onChange, label = "Subject and class", allLabel }: { pairs: Pair[]; value: string; onChange: (key: string) => void; label?: string; /** A first choice meaning every pair (the value ""). */ allLabel?: string }) {
+export function PairPicker({ pairs: given, value, onChange, label = "Subject and class", allLabel }: { pairs: Pair[]; value: string; onChange: (key: string) => void; label?: string; /** A first choice meaning every pair (the value ""). */ allLabel?: string }) {
   const id = useId();
+  const pairs = given.map((p) => ({ ...p, section: p.section ?? sectionOfName(p.levelName) }));
   const box = useRef<HTMLDivElement>(null);
   const search = useRef<HTMLInputElement>(null);
   const [open, setOpen] = useState(false);

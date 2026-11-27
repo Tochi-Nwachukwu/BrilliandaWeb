@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { inviteNewStudent } from "@/data/actions/invites";
 import { addStudent, findGuardian } from "@/data/actions/students";
 import { listStudents } from "@/data/students";
 import { AddStudent } from "./AddStudent";
@@ -18,6 +19,7 @@ export default async function NewStudentPage({ params, searchParams }: PageProps
       nextAdmissionNo={list.nextAdmissionNo}
       addStudent={addStudent.bind(null, school)}
       findGuardian={findGuardian.bind(null, school)}
+      invite={inviteNewStudent.bind(null, school)}
     />
   );
 }

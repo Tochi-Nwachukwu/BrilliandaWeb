@@ -30,12 +30,15 @@ export function SetupChecklist({
   schoolName,
   setup,
   isOwner,
+  invites,
   hide,
 }: {
   school: string;
   schoolName: string;
   setup: SetupProgress;
   isOwner: boolean;
+  /** Students and guardians not yet invited: a prompt in this card, once there are students to invite. */
+  invites: { students: number; parents: number };
   hide: (hidden: boolean) => Promise<ActionResult<null>>;
 }) {
   const sb = useSchoolBase(school);
@@ -44,7 +47,13 @@ export function SetupChecklist({
   // Only the owner invites admins and sets the branding, so admins don't see those steps.
   const items = setup.items.filter((item) => isOwner || (item.id !== "admins" && item.id !== "branding"));
   const done = items.filter((item) => item.done).length;
-  if (done === items.length) return null;
+  // Not part of the setup count: things to do once the school has students.
+  const todo = [
+    invites.students > 0 && { id: "invite-students", title: `Invite your students (${invites.students} not invited)`, unlocks: "They sign in to see their timetable, results and report cards.", path: "more/student-accounts", action: "Invite students" },
+    invites.parents > 0 && { id: "invite-parents", title: `Invite parents (${invites.parents} not invited)`, unlocks: "Guardians follow their child’s attendance, results and report cards.", path: "more/parents", action: "Invite parents" },
+  ].filter((t): t is { id: string; title: string; unlocks: string; path: string; action: string } => Boolean(t));
+  const setupDone = done === items.length;
+  if (setupDone && !todo.length) return null;
 
   const setHidden = (hidden: boolean) =>
     startTransition(async () => {
@@ -56,7 +65,7 @@ export function SetupChecklist({
   if (setup.hidden) {
     return (
       <p className="text-sm text-text-secondary">
-        Setup: {done} of {items.length} done.{" "}
+        {setupDone ? "To do" : "Setup"}: {setupDone ? `${todo.length} ${todo.length === 1 ? "thing" : "things"}` : `${done} of ${items.length} done`}.{" "}
         <button type="button" disabled={pending} onClick={() => setHidden(false)} className="font-medium text-accent hover:underline focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-accent">
           Show the checklist
         </button>
@@ -71,19 +80,21 @@ export function SetupChecklist({
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
           <h2 id="setup-title" className="text-[17px] font-semibold tracking-[-0.02em]">
-            Finish setting up {schoolName}
+            {setupDone ? "Things to do" : `Finish setting up ${schoolName}`}
           </h2>
           <p className="mt-0.5 text-[13px] text-text-secondary">
-            {done} of {items.length} done. Do them in any order; none of it stops you using Brillianda in the meantime.
+            {setupDone ? "Next steps for your school." : `${done} of ${items.length} done. Do them in any order; none of it stops you using Brillianda in the meantime.`}
           </p>
         </div>
         <Button size="sm" variant="ghost" loading={pending} onClick={() => setHidden(true)}>
           Hide
         </Button>
       </div>
-      <div className="mt-3 max-w-sm">
-        <ProgressBar value={done / items.length} color="var(--color-chart)" />
-      </div>
+      {!setupDone && (
+        <div className="mt-3 max-w-sm">
+          <ProgressBar value={done / items.length} color="var(--color-chart)" />
+        </div>
+      )}
       <ul className="mt-4 grid gap-2">
         {items.map(({ id, done: isDone }) => {
           const item = ITEMS[id];
@@ -115,6 +126,27 @@ export function SetupChecklist({
             </li>
           );
         })}
+        {todo.map((t) => (
+          <li key={t.id} className={cx("grid grid-cols-[auto_minmax(0,1fr)] items-center gap-3 rounded-2xl p-3 sm:grid-cols-[auto_minmax(0,1fr)_auto]", setupDone && t.id === todo[0]!.id ? "bg-sunken" : "")}>
+            <span aria-hidden className="grid h-8 w-8 place-items-center rounded-full bg-raise text-text-muted shadow-raised">
+              <Icon name="students" className="h-4 w-4" />
+            </span>
+            <div className="min-w-0">
+              <b className="block text-[15px] font-semibold">{t.title}</b>
+              <span className="block text-[13px] text-text-secondary">{t.unlocks}</span>
+            </div>
+            <Link
+              href={`${sb}/${t.path}`}
+              className={cx(
+                "col-start-2 inline-flex min-h-[36px] items-center justify-self-start rounded-full px-4 text-[13px] font-medium focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-accent sm:col-start-auto",
+                setupDone && t.id === todo[0]!.id ? "bg-primary text-primary-text" : "bg-raise shadow-raised",
+              )}
+            >
+              {t.action}
+              <span className="sr-only">: {t.title}</span>
+            </Link>
+          </li>
+        ))}
       </ul>
     </section>
   );

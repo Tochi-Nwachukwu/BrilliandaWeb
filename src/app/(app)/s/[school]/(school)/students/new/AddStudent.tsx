@@ -4,6 +4,7 @@
 import { PageHeader } from "@brillianda/ui/PageHeader";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import type { ComponentProps } from "react";
 import type { ActionResult, ArmOption, GuardianMatch } from "@/data/types";
 import { blankStudent, StudentForm } from "../StudentForm";
 import { useSchoolBase } from "@/components/school/SchoolBase";
@@ -15,6 +16,7 @@ export function AddStudent({
   nextAdmissionNo,
   addStudent,
   findGuardian,
+  invite,
 }: {
   school: string;
   arms: ArmOption[];
@@ -22,6 +24,7 @@ export function AddStudent({
   nextAdmissionNo: string;
   addStudent: (input: unknown) => Promise<ActionResult<{ id: string; admissionNo: string; fullName: string }>>;
   findGuardian: (phone: string) => Promise<GuardianMatch | null>;
+  invite: ComponentProps<typeof StudentForm>["invite"];
 }) {
   const sb = useSchoolBase(school);
   const router = useRouter();
@@ -44,6 +47,7 @@ export function AddStudent({
         mode="add"
         save={addStudent}
         findGuardian={findGuardian}
+        invite={invite}
         onSaved={({ id, another }) => {
           if (!another && id) router.push(`${sb}/students/${id}`);
         }}

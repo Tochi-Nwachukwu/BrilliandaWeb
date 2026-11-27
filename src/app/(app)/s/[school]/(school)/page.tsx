@@ -12,6 +12,8 @@ import { hideChecklist } from "@/data/actions/home";
 import { getCurrentMember } from "@/data/auth";
 import { getBirthdaysThisWeek } from "@/data/birthdays";
 import { getHomeSummary, getSession, getSetupProgress } from "@/data/home";
+import { getStudentAccounts } from "@/data/learners";
+import { getParentsPage } from "@/data/parents";
 import { getRegistersToday } from "@/data/teaching";
 import type { SessionSetup } from "@/data/types";
 import { formatDate, formatDay, greeting, plural, soonLabel, timeAgo, todayInLagos } from "@/lib/time";
@@ -34,18 +36,25 @@ export default async function SchoolHome({ params }: PageProps<"/s/[school]">) {
   const sb = await schoolBase(school.subdomain);
   // Greeting and term week depend on the time now.
   await connection();
-  const [me, setup, summary, session, registers, birthdays] = await Promise.all([
+  const [me, setup, summary, session, registers, birthdays, accounts, parents] = await Promise.all([
     getCurrentMember(school.subdomain),
     getSetupProgress(school.subdomain),
     getHomeSummary(school.subdomain),
     getSession(school.subdomain),
     getRegistersToday(school.subdomain),
     getBirthdaysThisWeek(school.subdomain),
+    getStudentAccounts(school.subdomain),
+    getParentsPage(school.subdomain),
   ]);
   if (!me || !setup || !summary || !session) return null;
 
   const now = new Date();
   const base = sb;
+  // Students and guardians who haven't been invited yet, for the to-do card.
+  const invites = {
+    students: accounts ? accounts.students.filter((s) => s.access === "none").length : 0,
+    parents: parents ? parents.guardians.filter((g) => g.access === "none" && g.email).length : 0,
+  };
   const isOwner = me.role === "owner";
   const steps = setup.items.filter((item) => isOwner || (item.id !== "admins" && item.id !== "branding"));
   const stepsDone = steps.filter((item) => item.done).length;
@@ -89,7 +98,7 @@ export default async function SchoolHome({ params }: PageProps<"/s/[school]">) {
         </p>
       </Hero>
 
-      <SetupChecklist school={school.subdomain} schoolName={school.name} setup={setup} isOwner={isOwner} hide={hideChecklist.bind(null, school.subdomain)} />
+      <SetupChecklist school={school.subdomain} schoolName={school.name} setup={setup} isOwner={isOwner} invites={invites} hide={hideChecklist.bind(null, school.subdomain)} />
 
       <div className="grid grid-cols-2 gap-3.5 lg:grid-cols-4">
         <StatCard href={`${base}/students`} icon="students" label="Students" value={summary.students} note={summary.students ? undefined : "None yet"} level={0} index={0} />

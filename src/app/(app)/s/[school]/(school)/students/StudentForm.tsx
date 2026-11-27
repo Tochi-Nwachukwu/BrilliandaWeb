@@ -13,8 +13,9 @@ import { useRef, useState, useTransition, type ReactNode } from "react";
 import { FormError, useFocusOnFailure } from "@/components/auth/FormError";
 import { errorsFor } from "@/lib/formCheck";
 import { firstErrors, type Errors } from "@/lib/form";
+import type { NewStudentInvites } from "@/data/actions/invites";
 import type { ActionResult, ArmOption, GuardianMatch } from "@/data/types";
-import { ArmOptions } from "./StudentsView";
+import { ClassSelect } from "@/components/ClassSelect";
 
 export type StudentValues = {
   firstName: string;
@@ -68,6 +69,7 @@ export function StudentForm({
   findGuardian,
   onSaved,
   linkedGuardian,
+  invite,
 }: {
   arms: ArmOption[];
   initial: StudentValues;
@@ -79,6 +81,8 @@ export function StudentForm({
   onSaved: (result: { id?: string; another: boolean }) => void;
   /** Editing a student whose guardian is shared with siblings. */
   linkedGuardian?: { name: string; siblings: number } | null;
+  /** Adding only: sends the invites asked for under “Invite”, once the student is saved. */
+  invite?: (studentId: string, input: { studentEmail?: string; guardian?: boolean }) => Promise<NewStudentInvites>;
 }) {
   const router = useRouter();
   const formRef = useRef<HTMLFormElement>(null);
@@ -88,6 +92,8 @@ export function StudentForm({
   const [attempt, setAttempt] = useState(0);
   const [match, setMatch] = useState<GuardianMatch | null>(null);
   const [linked, setLinked] = useState<{ name: string; detail: string } | null>(linkedGuardian ? { name: linkedGuardian.name, detail: linkedGuardian.siblings ? `Shared with ${linkedGuardian.siblings} ${linkedGuardian.siblings === 1 ? "sibling" : "siblings"}` : "" } : null);
+  const [studentEmail, setStudentEmail] = useState("");
+  const [inviteGuardian, setInviteGuardian] = useState(false);
   const [pending, startTransition] = useTransition();
   useFocusOnFailure(formRef, attempt);
 
@@ -119,6 +125,14 @@ export function StudentForm({
       }
       if (result.data) toast(`Added ${result.data.fullName}, ${result.data.admissionNo}`);
       else toast("Saved");
+      // Invites asked for on this page go out now, and each says how it went.
+      if (result.data && invite && (studentEmail.trim() || inviteGuardian)) {
+        const sent = await invite(result.data.id, { studentEmail, guardian: inviteGuardian });
+        const notes = [sent.student !== "none" && (sent.student === "sent" ? "Student invited" : `Student not invited: ${sent.student}`), sent.guardian !== "none" && (sent.guardian === "sent" ? "Guardian invited" : `Guardian not invited: ${sent.guardian}`)].filter(Boolean);
+        if (notes.length) toast(notes.join(". "));
+      }
+      setStudentEmail("");
+      setInviteGuardian(false);
       if (another) {
         // Keep the class for the next child (plan: Save and add another).
         setValues(blankStudent(values.armId));
@@ -163,10 +177,7 @@ export function StudentForm({
           </div>
           {errors.gender && <p className="mt-1.5 text-sm text-danger">{errors.gender}</p>}
         </fieldset>
-        <SelectField label="Class" value={values.armId} onChange={(e) => set("armId")(e.target.value)} error={errors.armId}>
-          <option value="">Choose a class</option>
-          <ArmOptions arms={arms} />
-        </SelectField>
+        <ClassSelect label="Class" items={arms} value={values.armId} onChange={set("armId")} error={errors.armId} />
         <TextField label="Date of birth (optional)" type="date" value={values.dateOfBirth} onChange={(e) => set("dateOfBirth")(e.target.value)} error={errors.dateOfBirth} />
       </Section>
 
@@ -247,6 +258,27 @@ export function StudentForm({
           </>
         )}
       </Section>
+
+      {mode === "add" && invite && (
+        <Section title="Invite (optional)">
+          <TextField
+            label="Student’s email"
+            type="email"
+            autoCapitalize="none"
+            autoComplete="off"
+            hint="We email the student a link to set a password for the student portal. Leave it blank to skip."
+            value={studentEmail}
+            onChange={(e) => setStudentEmail(e.target.value)}
+          />
+          <label className="flex items-start gap-3 self-start rounded-2xl bg-sunken p-3.5 text-sm md:mt-7">
+            <input type="checkbox" className="mt-0.5 h-5 w-5 shrink-0 accent-[var(--color-accent)]" checked={inviteGuardian} onChange={(e) => setInviteGuardian(e.target.checked)} />
+            <span>
+              <b className="block font-semibold">Invite the guardian to the parent app</b>
+              <span className="text-text-secondary">{linked || values.guardianEmail.trim() ? "We email them a link when you save." : "Add the guardian’s email above first."}</span>
+            </span>
+          </label>
+        </Section>
+      )}
 
       <Section title="More (optional)">
         <TextField label="Address" value={values.address} onChange={(e) => set("address")(e.target.value)} error={errors.address} />

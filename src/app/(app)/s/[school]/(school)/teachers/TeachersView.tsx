@@ -14,6 +14,7 @@ import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import { SampleLinks } from "@/components/auth/forms";
 import { FormError } from "@/components/auth/FormError";
+import { ClassSelect } from "@/components/ClassSelect";
 import type { ActionResult, SampleEmail, TeachersPage, TeacherSummary } from "@/data/types";
 import { firstErrors, type Errors } from "@/lib/form";
 import { errorsFor } from "@/lib/formCheck";
@@ -210,15 +211,13 @@ function FormClassDialog({
   return (
     <ResponsiveDialog open onClose={onClose} title={`${teacher.fullName}’s form class`} description="The form teacher takes the class’s daily register.">
       <div className="grid gap-4">
-        <SelectField label="Form class" value={armId} onChange={(e) => setArmId(e.target.value)}>
-          <option value="">None</option>
-          {page.arms.map((a) => (
-            <option key={a.id} value={a.id}>
-              {a.label}
-              {a.formTeacherId && a.formTeacherId !== teacher.id ? ` (now ${nameOf(a.formTeacherId)})` : ""}
-            </option>
-          ))}
-        </SelectField>
+        <ClassSelect
+          label="Form class"
+          allLabel="None"
+          items={page.arms.map((a) => ({ id: a.id, label: a.label + (a.formTeacherId && a.formTeacherId !== teacher.id ? ` (now ${nameOf(a.formTeacherId)})` : "") }))}
+          value={armId}
+          onChange={setArmId}
+        />
         {takesOver && <p className="text-sm text-text-secondary">{takesOver} stops being this class’s form teacher.</p>}
         <FormError message={failure} />
         <Button onClick={save} loading={pending} disabled={armId === current}>

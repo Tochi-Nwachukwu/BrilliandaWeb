@@ -13,6 +13,7 @@ import { useState, useTransition } from "react";
 import { FormError } from "@/components/auth/FormError";
 import type { ActionResult, TestEditorData } from "@/data/types";
 import { errorsOf } from "@/components/questions/QuestionParts";
+import { PairPicker } from "@/components/questions/PairPicker";
 
 const pairKey = (p: { subjectId: string; levelId: string }) => `${p.subjectId}|${p.levelId}`;
 /** A datetime-local value (the device's time, in Nigeria Lagos time) from an ISO time, and back. */
@@ -86,22 +87,16 @@ export function TestEditor({ data, base, save }: { data: TestEditorData; base: s
     <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)] lg:items-start">
       <Card title="The test">
         <div className="grid gap-4">
-          <SelectField
-            label="Subject and class"
+          <PairPicker
+            pairs={data.pairs}
             value={pair}
-            onChange={(e) => {
-              setPair(e.target.value);
+            onChange={(key) => {
+              setPair(key);
               setQuestionIds([]);
-              const p = data.pairs.find((x) => pairKey(x) === e.target.value);
+              const p = data.pairs.find((x) => pairKey(x) === key);
               setArmIds(p?.arms.length === 1 ? [p.arms[0]!.id] : []);
             }}
-          >
-            {data.pairs.map((p) => (
-              <option key={pairKey(p)} value={pairKey(p)}>
-                {p.levelName} {p.subjectName}
-              </option>
-            ))}
-          </SelectField>
+          />
           <TextField label="Title" placeholder="e.g. Fractions: class test" value={title} onChange={(e) => setTitle(e.target.value)} error={err("title")} />
           <TextAreaField label="Instructions for students" rows={2} value={instructions} onChange={(e) => setInstructions(e.target.value)} error={err("instructions")} />
           <fieldset>
