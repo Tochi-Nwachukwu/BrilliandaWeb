@@ -93,7 +93,9 @@ export function StudentForm({
   const [match, setMatch] = useState<GuardianMatch | null>(null);
   const [linked, setLinked] = useState<{ name: string; detail: string } | null>(linkedGuardian ? { name: linkedGuardian.name, detail: linkedGuardian.siblings ? `Shared with ${linkedGuardian.siblings} ${linkedGuardian.siblings === 1 ? "sibling" : "siblings"}` : "" } : null);
   const [studentEmail, setStudentEmail] = useState("");
-  const [inviteGuardian, setInviteGuardian] = useState(false);
+  // null until the person chooses: then it follows whether there's a guardian to invite.
+  const [guardianChoice, setGuardianChoice] = useState<boolean | null>(null);
+  const inviteGuardian = guardianChoice ?? Boolean(linked || values.guardianEmail.trim());
   const [pending, startTransition] = useTransition();
   useFocusOnFailure(formRef, attempt);
 
@@ -132,7 +134,7 @@ export function StudentForm({
         if (notes.length) toast(notes.join(". "));
       }
       setStudentEmail("");
-      setInviteGuardian(false);
+      setGuardianChoice(null);
       if (another) {
         // Keep the class for the next child (plan: Save and add another).
         setValues(blankStudent(values.armId));
@@ -271,7 +273,7 @@ export function StudentForm({
             onChange={(e) => setStudentEmail(e.target.value)}
           />
           <label className="flex items-start gap-3 self-start rounded-2xl bg-sunken p-3.5 text-sm md:mt-7">
-            <input type="checkbox" className="mt-0.5 h-5 w-5 shrink-0 accent-[var(--color-accent)]" checked={inviteGuardian} onChange={(e) => setInviteGuardian(e.target.checked)} />
+            <input type="checkbox" className="mt-0.5 h-5 w-5 shrink-0 accent-[var(--color-accent)]" checked={inviteGuardian} onChange={(e) => setGuardianChoice(e.target.checked)} />
             <span>
               <b className="block font-semibold">Invite the guardian to the parent app</b>
               <span className="text-text-secondary">{linked || values.guardianEmail.trim() ? "We email them a link when you save." : "Add the guardian’s email above first."}</span>

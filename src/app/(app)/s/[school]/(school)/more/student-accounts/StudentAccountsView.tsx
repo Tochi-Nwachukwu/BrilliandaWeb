@@ -11,6 +11,7 @@ import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import { FormError } from "@/components/auth/FormError";
 import { ClassSelect } from "@/components/ClassSelect";
+import type { NewStudentInvites } from "@/data/actions/invites";
 import type { ActionResult, SampleEmail, StudentAccountsPage } from "@/data/types";
 
 type Row = StudentAccountsPage["students"][number];
@@ -20,10 +21,13 @@ const ACCESS = { active: ["Uses the portal", "success"], invited: ["Invited", "w
 export function StudentAccountsView({
   page,
   invite,
+  inviteGuardian,
   remove,
 }: {
   page: StudentAccountsPage;
   invite: (studentId: string, input: unknown) => Promise<ActionResult<SampleEmail>>;
+  /** Invites the student's guardian to the parent app (the one on the student's record). */
+  inviteGuardian: (studentId: string, input: { guardian: boolean }) => Promise<NewStudentInvites>;
   remove: (studentId: string) => Promise<ActionResult<null>>;
 }) {
   const router = useRouter();
@@ -116,6 +120,7 @@ export function StudentAccountsView({
           arms={page.arms}
           initialArm={armId}
           invite={invite}
+          inviteGuardian={inviteGuardian}
           onClose={() => setBulk(false)}
           onDone={() => {
             setBulk(false);
@@ -192,6 +197,7 @@ function BulkInviteDialog({
   arms,
   initialArm,
   invite,
+  inviteGuardian,
   onClose,
   onDone,
 }: {
@@ -199,6 +205,7 @@ function BulkInviteDialog({
   arms: StudentAccountsPage["arms"];
   initialArm: string;
   invite: (studentId: string, input: unknown) => Promise<ActionResult<SampleEmail>>;
+  inviteGuardian: (studentId: string, input: { guardian: boolean }) => Promise<NewStudentInvites>;
   onClose: () => void;
   onDone: () => void;
 }) {
@@ -208,9 +215,11 @@ function BulkInviteDialog({
   const [note, setNote] = useState<string | null>(null);
   const [problems, setProblems] = useState<Record<string, string>>({});
   const [progress, setProgress] = useState<string | null>(null);
+  const [withGuardians, setWithGuardians] = useState(true);
   const [pending, startTransition] = useTransition();
   const shown = students.filter((s) => !armId || s.armId === armId);
   const ready = shown.filter((s) => emails[s.id]?.trim());
+  const toSend = withGuardians ? shown : ready;
 
   const fill = () => {
     const byNo = new Map(students.map((s) => [s.admissionNo.toLowerCase(), s.id]));
@@ -233,15 +242,25 @@ function BulkInviteDialog({
     startTransition(async () => {
       const failed: Record<string, string> = {};
       let sent = 0;
-      for (const [i, s] of ready.entries()) {
-        setProgress(`Sending ${i + 1} of ${ready.length}…`);
-        const result = await invite(s.id, { email: emails[s.id] });
-        if (result.ok) sent++;
-        else failed[s.id] = result.fieldErrors?.email?.[0] ?? result.error;
+      let guardians = 0;
+      let noGuardian = 0;
+      for (const [i, s] of toSend.entries()) {
+        setProgress(`Sending ${i + 1} of ${toSend.length}…`);
+        if (emails[s.id]?.trim()) {
+          const result = await invite(s.id, { email: emails[s.id] });
+          if (result.ok) sent++;
+          else failed[s.id] = result.fieldErrors?.email?.[0] ?? result.error;
+        }
+        if (withGuardians) {
+          const result = await inviteGuardian(s.id, { guardian: true });
+          if (result.guardian === "sent") guardians++;
+          else noGuardian++;
+        }
       }
       setProgress(null);
       setProblems(failed);
-      toast(`Invited ${sent} ${sent === 1 ? "student" : "students"}${Object.keys(failed).length ? `. ${Object.keys(failed).length} didn’t go.` : ""}`);
+      const parts = [sent > 0 && `${sent} ${sent === 1 ? "student" : "students"}`, withGuardians && `${guardians} ${guardians === 1 ? "guardian" : "guardians"}`].filter(Boolean);
+      toast(`Invited ${parts.join(" and ") || "no one"}${Object.keys(failed).length ? `. ${Object.keys(failed).length} didn’t go.` : ""}${noGuardian ? ` ${noGuardian} had no guardian email.` : ""}`);
       if (!Object.keys(failed).length) onDone();
     });
 
@@ -250,15 +269,22 @@ function BulkInviteDialog({
       open
       onClose={onClose}
       title="Invite several students"
-      description="Each student gets an email with a link to set a password. Students without an email are skipped."
+      description="Each student gets an email with a link to set a password. A student without an email is skipped, but their guardian is still invited."
       footer={
-        <Button className="w-full" loading={pending} disabled={!ready.length} onClick={send}>
-          {progress ?? `Send ${ready.length} ${ready.length === 1 ? "invite" : "invites"}`}
+        <Button className="w-full" loading={pending} disabled={!toSend.length} onClick={send}>
+          {progress ?? `Send ${toSend.length} ${toSend.length === 1 ? "invite" : "invites"}`}
         </Button>
       }
     >
       <div className="grid gap-4">
         <ClassSelect label="Class" allLabel="Every class" items={arms} value={armId} onChange={setArmId} />
+        <label className="flex items-start gap-3 rounded-2xl bg-sunken p-3.5 text-sm">
+          <input type="checkbox" className="mt-0.5 h-5 w-5 shrink-0 accent-[var(--color-accent)]" checked={withGuardians} onChange={(e) => setWithGuardians(e.target.checked)} />
+          <span>
+            <b className="block font-semibold">Also invite their guardians to the parent app</b>
+            <span className="text-text-secondary">They’re the ones who follow results. Guardians with no email on file are skipped.</span>
+          </span>
+        </label>
         <div className="grid gap-2">
           <TextAreaField label="Paste emails (optional)" rows={3} placeholder={"0012, ada@example.com\n0013, tunde@example.com"} hint="One line per student: admission number, then email." value={paste} onChange={(e) => setPaste(e.target.value)} />
           <div className="flex items-center gap-3">

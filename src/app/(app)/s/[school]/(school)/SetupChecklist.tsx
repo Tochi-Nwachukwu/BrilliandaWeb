@@ -49,8 +49,8 @@ export function SetupChecklist({
   const done = items.filter((item) => item.done).length;
   // Not part of the setup count: things to do once the school has students.
   const todo = [
-    invites.students > 0 && { id: "invite-students", title: `Invite your students (${invites.students} not invited)`, unlocks: "They sign in to see their timetable, results and report cards.", path: "more/student-accounts", action: "Invite students" },
     invites.parents > 0 && { id: "invite-parents", title: `Invite parents (${invites.parents} not invited)`, unlocks: "Guardians follow their child’s attendance, results and report cards.", path: "more/parents", action: "Invite parents" },
+    invites.students > 0 && { id: "invite-students", title: `Invite your students (${invites.students} not invited)`, unlocks: "They sign in to see their timetable, results and report cards.", path: "more/student-accounts", action: "Invite students" },
   ].filter((t): t is { id: string; title: string; unlocks: string; path: string; action: string } => Boolean(t));
   const setupDone = done === items.length;
   if (setupDone && !todo.length) return null;
